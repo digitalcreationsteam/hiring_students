@@ -21,6 +21,12 @@ import {
 } from "@subframe/core";
 import API, { URL_PATH } from "src/common/API";
 
+type ExperiencePoints = {
+  demographics?: number;
+  education?: number;
+  workExperience?: number;
+};
+
 type ExperienceEntry = {
   id: string;
   roleTitle: string;
@@ -55,8 +61,6 @@ export default function Experience() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  
-
   // form state
   const [roleTitle, setRoleTitle] = useState("");
   const [typeOfRole, setTypeOfRole] = useState("");
@@ -67,17 +71,7 @@ export default function Experience() {
   const [description, setDescription] = useState("");
 
   // stored entries
-  const [experiences, setExperiences] = useState<ExperienceEntry[]>([
-    {
-      id: "example-1",
-      roleTitle: "Senior Product Manager",
-      company: "Stripe",
-      startDate: "01/2022",
-      endDate: undefined,
-      currentlyWorking: true,
-      description: "",
-    },
-  ]);
+  const [experiences, setExperiences] = useState<ExperienceEntry[]>([]);
 
   // small SC2-style TextField wrapper classes (one-line)
   const scTextFieldClass =
@@ -155,7 +149,7 @@ export default function Experience() {
   const toSentenceCase = (v: string) =>
     v ? v.charAt(0).toUpperCase() + v.slice(1) : v;
 
-const TEXT_REGEX = /^[A-Za-z0-9][A-Za-z0-9\s.&()+/-]{1,80}$/;
+  const TEXT_REGEX = /^[A-Za-z0-9][A-Za-z0-9\s.&()+/-]{1,80}$/;
 
   const isValidText = (value: string) => {
     return TEXT_REGEX.test(value.trim());
@@ -184,79 +178,105 @@ const TEXT_REGEX = /^[A-Za-z0-9][A-Za-z0-9\s.&()+/-]{1,80}$/;
     setDescription("");
   };
 
-  const handleAddExperience = () => {
-    if (!isAddable()) {
+  const handleAddExperience = async () => {
+    if (!isAddable()) return;
+
+    if (!userId) {
+      alert("Session expired. Please login again.");
+      navigate("/login");
       return;
     }
-    const newEntry: ExperienceEntry = {
-      id: String(Date.now()),
-      roleTitle: toTitleCase(roleTitle.trim()),
-      typeOfRole: typeOfRole ? toTitleCase(typeOfRole.trim()) : undefined,
-      company: toTitleCase(company.trim()),
-      startDate: startDate.trim(),
-      endDate: currentlyWorking ? undefined : endDate.trim(),
-      currentlyWorking,
-      description: description.trim() || undefined,
+
+    const startYearNum = Number(startDate.split("/")[1]);
+    const endYearNum = currentlyWorking
+      ? new Date().getFullYear()
+      : Number(endDate.split("/")[1]);
+
+    const duration = Math.max(0, endYearNum - startYearNum);
+
+    const payload = {
+      workExperiences: [
+        {
+          jobTitle: toTitleCase(roleTitle.trim()),
+          companyName: toTitleCase(company.trim()),
+          startYear: startYearNum,
+          endYear: currentlyWorking ? null : endYearNum,
+          currentlyWorking,
+          duration,
+          description: description.trim() || "",
+          typeOfRole: typeOfRole ? toTitleCase(typeOfRole.trim()) : undefined,
+        },
+      ],
     };
 
-    const duplicate = experiences.some(
-      (e) =>
-        e.company === newEntry.company &&
-        e.roleTitle === newEntry.roleTitle &&
-        e.startDate === newEntry.startDate
-    );
+    try {
+      setIsSubmitting(true);
 
-    if (duplicate) {
-      alert("This experience already exists.");
-      return;
+      const res = await API("POST", URL_PATH.experience, payload, undefined, {
+        "user-id": userId,
+      });
+
+      setExperiences((prev) => [
+        {
+          id: res.data._id,
+          roleTitle: res.data.jobTitle,
+          company: res.data.companyName,
+          startDate: `01/${res.data.startYear}`,
+          endDate: res.data.currentlyWorking
+            ? undefined
+            : `01/${res.data.endYear}`,
+          currentlyWorking: res.data.currentlyWorking,
+          description: res.data.description || undefined,
+        },
+        ...prev,
+      ]);
+
+      await fetchExperienceIndex();
+      resetForm();
+    } catch (err: any) {
+      alert(err?.message || "Failed to add experience");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setExperiences((prev) => {
-      const withoutDemo = prev.filter((e) => e.id !== "example-1");
-      return [newEntry, ...withoutDemo];
-    });
-
-    resetForm();
   };
 
   // DELETE EXPERIENCE
- const handleRemove = async (id: string) => {
-  if (id === "example-1") {
-    setExperiences((prev) => prev.filter((e) => e.id !== id));
-    return;
-  }
+  const handleRemove = async (id: string) => {
+    if (id === "example-1") {
+      setExperiences((prev) => prev.filter((e) => e.id !== id));
+      return;
+    }
 
-  if (!userId) {
-    alert("Session expired. Please login again.");
-    navigate("/login");
-    return;
-  }
+    if (!userId) {
+      alert("Session expired. Please login again.");
+      navigate("/login");
+      return;
+    }
 
-  const confirmDelete = window.confirm(
-    "Are you sure you want to delete this experience?"
-  );
-  if (!confirmDelete) return;
-
-  try {
-    await API(
-      "DELETE",
-      `${URL_PATH.deleteExperience}/${id}`,
-      undefined,
-      undefined,
-      { "user-id": userId }
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this experience?"
     );
+    if (!confirmDelete) return;
 
-    // remove from UI
-    setExperiences((prev) => prev.filter((e) => e.id !== id));
+    try {
+      await API(
+        "DELETE",
+        `${URL_PATH.deleteExperience}/${id}`,
+        undefined,
+        undefined,
+        { "user-id": userId }
+      );
 
-    // refresh experience index
-    await fetchExperienceIndex();
-  } catch (err: any) {
-    console.error("Delete failed", err);
-    alert(err?.message || "Failed to delete experience");
-  }
-};
+      // remove from UI
+      setExperiences((prev) => prev.filter((e) => e.id !== id));
 
+      // refresh experience index
+      await fetchExperienceIndex();
+    } catch (err: any) {
+      console.error("Delete failed", err);
+      alert(err?.message || "Failed to delete experience");
+    }
+  };
 
   // GET
 
@@ -276,16 +296,17 @@ const TEXT_REGEX = /^[A-Za-z0-9][A-Za-z0-9\s.&()+/-]{1,80}$/;
 
       const mapped: ExperienceEntry[] = apiExperiences.map((e: any) => ({
         id: e._id,
-        roleTitle: e.jobTitle ?? "",
-        company: e.companyName ?? "",
-        startDate: `01/${e.startYear}`,
+        roleTitle: typeof e.jobTitle === "string" ? e.jobTitle : "",
+        company: typeof e.companyName === "string" ? e.companyName : "",
+        startDate: e.startYear ? `01/${e.startYear}` : "",
         endDate: e.currentlyWorking
           ? undefined
           : e.endYear
           ? `01/${e.endYear}`
           : undefined,
-        currentlyWorking: !!e.currentlyWorking,
-        description: e.description || undefined,
+        currentlyWorking: Boolean(e.currentlyWorking),
+        description:
+          typeof e.description === "string" ? e.description : undefined,
       }));
 
       setExperiences(mapped);
@@ -296,101 +317,43 @@ const TEXT_REGEX = /^[A-Za-z0-9][A-Za-z0-9\s.&()+/-]{1,80}$/;
 
   // GET EXPERIENCE INDEX
   const [isExpIndexLoading, setIsExpIndexLoading] = useState(true);
-  const [experiencePoints, setExperiencePoints] = useState<any>(null);
-  
+  const [experiencePoints, setExperiencePoints] =
+    useState<ExperiencePoints | null>(null);
 
   const displayedIndex =
-  (experiencePoints?.demographics ?? 0) +
-  (experiencePoints?.education ?? 0) +
-  (experiencePoints?.workExperience ?? 0);
-
+    (experiencePoints?.demographics ?? 0) +
+    (experiencePoints?.education ?? 0) +
+    (experiencePoints?.workExperience ?? 0);
 
   const fetchExperienceIndex = React.useCallback(async () => {
-  if (!userId) return;
+    if (!userId) return;
 
-  try {
-    const res = await API(
-      "GET",
-      URL_PATH.calculateExperienceIndex,
-      undefined,
-      undefined,
-      { "user-id": userId }
-    );
+    try {
+      const res = await API(
+        "GET",
+        URL_PATH.calculateExperienceIndex,
+        undefined,
+        undefined,
+        { "user-id": userId }
+      );
 
-    setExperiencePoints(res?.points ?? null);
-  } catch {
-    setExperiencePoints(null);
-  } finally {
-    setIsExpIndexLoading(false);
-  }
-}, [userId]);
-
-
-  //  PAYLOAD
-
-  const buildPayload = (list: ExperienceEntry[]) => {
-    if (!userId) {
-      alert("Session expired. Please login again.");
-      navigate("/login");
-      return null;
+      setExperiencePoints(res?.points ?? null);
+    } catch {
+      setExperiencePoints(null);
+    } finally {
+      setIsExpIndexLoading(false);
     }
+  }, [userId]);
 
-    const currentYear = new Date().getFullYear();
+  const canContinue = experiences.length > 0;
 
-    return {
-      workExperiences: list.map((exp) => {
-        const startYear = Number(exp.startDate.split("/")[1]);
-        const resolvedEndYear = exp.currentlyWorking
-          ? currentYear
-          : exp.endDate
-          ? Number(exp.endDate.split("/")[1])
-          : currentYear;
-
-        return {
-          jobTitle: exp.roleTitle,
-          companyName: exp.company,
-          startYear,
-          endYear: exp.currentlyWorking ? null : resolvedEndYear,
-          currentlyWorking: exp.currentlyWorking,
-          duration: Math.max(0, resolvedEndYear - startYear),
-          description: exp.description || "",
-        };
-      }),
-    };
-  };
-
-  const hasRealExperience = experiences.some((e) => e.id !== "example-1");
-  const canContinue = hasRealExperience;
-
-  const handleContinue = async () => {
-    if (isSubmitting) return;
-
-    const realExperiences = experiences.filter(
-      (e) => e.id !== "example-1" && e.roleTitle && e.company
-    );
-
-    if (realExperiences.length === 0) {
+  const handleContinue = () => {
+    if (!experiences.length) {
       alert("Please add at least one experience.");
       return;
     }
 
-    const payload = buildPayload(realExperiences);
-    if (!payload) return;
-
-    try {
-      setIsSubmitting(true);
-
-      await API("POST", URL_PATH.experience, payload, undefined, {
-        "user-id": userId,
-      });
-      await fetchExperienceIndex();
-
-      navigate("/certifications");
-    } catch (err: any) {
-      alert(err.message || "Failed to save experience");
-    } finally {
-      setIsSubmitting(false);
-    }
+    navigate("/certifications");
   };
 
   useEffect(() => {
@@ -402,10 +365,9 @@ const TEXT_REGEX = /^[A-Za-z0-9][A-Za-z0-9\s.&()+/-]{1,80}$/;
 
   return (
     <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-4 sm:px-6 py-20 sm:py-32">
-  <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8">
-
+      <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8">
         {/* Left card */}
-<main className="w-full md:max-w-[480px] bg-white rounded-3xl border px-4 sm:px-6 md:px-8 py-6 ...">
+        <main className="w-full md:max-w-[480px] bg-white rounded-3xl border px-4 sm:px-6 md:px-8 py-6 ...">
           {/* top row - back + progress */}
           <div className="flex items-center gap-4">
             <IconButton
@@ -414,7 +376,6 @@ const TEXT_REGEX = /^[A-Za-z0-9][A-Za-z0-9\s.&()+/-]{1,80}$/;
               onClick={() => navigate(-1)}
             />
             <div className="flex-1 w-full max-w-full md:max-w-[420px]">
-
               <div className="flex items-center gap-3">
                 {[...Array(3)].map((_, i) => (
                   <div
@@ -461,8 +422,9 @@ const TEXT_REGEX = /^[A-Za-z0-9][A-Za-z0-9\s.&()+/-]{1,80}$/;
                       image="https://res.cloudinary.com/subframe/image/upload/v1711417525/shared/elkoy8wipvhulayviq7t.png"
                       className="!rounded-2xl shadow-sm"
                     >
-                      {exp.company
+                      {(exp.company || "")
                         .split(" ")
+                        .filter(Boolean)
                         .slice(0, 2)
                         .map((w) => w[0])
                         .join("")}
@@ -487,10 +449,12 @@ const TEXT_REGEX = /^[A-Za-z0-9][A-Za-z0-9\s.&()+/-]{1,80}$/;
                     />
 
                     <span className="text-xs text-neutral-500">
-                      {exp.startDate}{" "}
+                      {exp.startDate || "—"}{" "}
                       {exp.currentlyWorking
                         ? " - Present"
-                        : ` - ${exp.endDate}`}
+                        : exp.endDate
+                        ? ` - ${exp.endDate}`
+                        : ""}
                     </span>
                   </div>
                 </div>
@@ -555,7 +519,6 @@ const TEXT_REGEX = /^[A-Za-z0-9][A-Za-z0-9\s.&()+/-]{1,80}$/;
             </TextField>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
               <TextField
                 label="Start Date *"
                 helpText=""
@@ -687,16 +650,17 @@ const TEXT_REGEX = /^[A-Za-z0-9][A-Za-z0-9\s.&()+/-]{1,80}$/;
             </TextField>
 
             <div className="mt-2 flex flex-col sm:flex-row gap-3">
-
               <Button
                 type="button"
+                disabled={isSubmitting}
                 variant="neutral-secondary"
                 icon={<FeatherPlus />}
-                className="w-full rounded-full h-10 px-4 flex items-center gap-2"
+                className="w-full rounded-full h-10 px-4"
                 onClick={handleAddExperience}
               >
-                Add another experience
+                {isSubmitting ? "Adding..." : "Add another experience"}
               </Button>
+
               <div className="flex-1" />
             </div>
           </form>
@@ -723,7 +687,6 @@ const TEXT_REGEX = /^[A-Za-z0-9][A-Za-z0-9\s.&()+/-]{1,80}$/;
         {/* Right panel - SC2 style with Experience active */}
         {/* Right panel */}
         <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
-
           <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-200">
             <h3 className="text-base font-semibold text-neutral-900">
               Your Experience Index
@@ -731,7 +694,6 @@ const TEXT_REGEX = /^[A-Za-z0-9][A-Za-z0-9\s.&()+/-]{1,80}$/;
 
             <div className="flex items-center justify-center py-6">
               <span className="font-['Afacad_Flux'] text-[32px] sm:text-[40px] md:text-[48px] ...">
-
                 {displayedIndex !== null ? displayedIndex : "0"}
               </span>
             </div>

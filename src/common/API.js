@@ -1,11 +1,16 @@
 import axios from "axios";
 
-// Environment-based base URL
-export const BASE_URL =
-  process.env.REACT_APP_API_URL || "http://127.0.0.1:5000/api";
+/* =========================================
+   🌐 BASE URL
+========================================= */
+export const BASE_URL = "http://localhost:5000/api";
 
 const isDev = process.env.NODE_ENV === "development";
 
+
+/* =========================================
+   🧪 LOGGER
+========================================= */
 export const log = (str) => {
   if (!isDev) return;
   console.log("====================================");
@@ -13,76 +18,99 @@ export const log = (str) => {
   console.log("====================================");
 };
 
+/* =========================================
+   🔥 AXIOS INSTANCE (CORS + SESSION SAFE)
+========================================= */
 const apiClient = axios.create({
   baseURL: BASE_URL,
-  timeout: 30000,
+  withCredentials: true,
   headers: {
     Accept: "application/json",
   },
 });
 
-// ✅ CORRECT URL PATHS (RELATIVE)
+
+/* =========================================
+   🔗 ALL API PATHS
+========================================= */
 export const URL_PATH = {
+  /* ---------- AUTH ---------- */
   signup: "/auth/signup",
   login: "/auth/login",
+  logout: "/auth/logout",
+  verifyEmail:
+    "/auth/verify/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MzZhNTY3Y2YxOTlkZWM3NzgxY2E4ZSIsImlhdCI6MTc2NTE4ODk2NywiZXhwIjoxNzY1NzkzNzY3fQ.OkuphrcwOBFyOuAjV3HyNMd-IaeiJa5lR_y7whS3PAc",
+
+  /* ---------- USER ---------- */
   getUser: "/user",
+  updateUser: "/user",
 
-  calculateExperienceIndex:"/user/experience_index",// api to calculate experience index
+  /* ---------- EXPERIENCE INDEX ---------- */
+  calculateExperienceIndex: "/user/experience_index",
 
-  verifyEmail:"/auth/verify/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MzZhNTY3Y2YxOTlkZWM3NzgxY2E4ZSIsImlhdCI6MTc2NTE4ODk2NywiZXhwIjoxNzY1NzkzNzY3fQ.OkuphrcwOBFyOuAjV3HyNMd-IaeiJa5lR_y7whS3PAc",
+  /* ---------- DEMOGRAPHICS ---------- */
+  demographics: "/user/demographics",
+  getDemographics: "/user/demographics",
+  deleteDemographics: "/user/demographics",
 
-  demographics:"/user/demographics",
-  getDemographics:"/user/demographics",
-  deleteDemographics:"/user/demographics",
+  /* ---------- EDUCATION ---------- */
+  education: "/user/education",
+  getEducation: "/user/education",
+  deleteEducation: "/user/education",
 
-  education:"/user/education",
-  getEducation:"/user/education",
-  deleteEducation:"/user/education",
+  /* ---------- WORK EXPERIENCE ---------- */
+  experience: "/user/work",
+  getExperience: "/user/work",
+  deleteExperience: "/user/work",
 
-  experience:"/user/work",
-  getExperience:"/user/work",
-  deleteExperience:"/user/work",
+  /* ---------- CERTIFICATIONS ---------- */
+  certification: "/user/certification",
+  getCertification: "/user/certification",
+  deleteCertification: "/user/certification",
 
-  certification:"/user/certification",
-  getCertification:"/user/certification", 
-  deleteCertification:"/user/certification",
+  /* ---------- AWARDS ---------- */
+  awards: "/user/awards",
+  getAwards: "/user/awards",
+  deleteAward: "/user/awards",
 
-  awards:"/user/awards", 
-  getAwards:"/user/awards",
-  deleteAward:"/user/awards",
-
-  projects:"/user/projects",
-  getProjects:"/user/projects", 
-  deleteProject:"/user/projects",
-
-  
-
+  /* ---------- PROJECTS ---------- */
+  projects: "/user/projects",
+  getProjects: "/user/projects",
+  deleteProject: "/user/projects",
 };
 
-// 🔥 API WRAPPER
+/* =========================================
+   🚀 API WRAPPER
+========================================= */
 export default async function API(
   method,
   url,
   data = {},
   token = null,
-  headers = {},
-  showLoader = true
+  headers = {}
 ) {
   try {
     const config = {
       method: method.toLowerCase(),
-      url, 
+      url,
       headers: {
         ...headers,
       },
     };
 
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
     if (config.method === "get") {
       config.params = data;
     } else {
       config.data = data;
+
       if (data instanceof FormData) {
         delete config.headers["Content-Type"];
+      } else {
+        config.headers["Content-Type"] = "application/json";
       }
     }
 
@@ -95,7 +123,7 @@ export default async function API(
     } else if (error.request) {
       throw {
         success: false,
-        message: "No response from server. Check your internet.",
+        message: "No response from server.",
       };
     } else {
       throw {

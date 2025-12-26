@@ -58,7 +58,18 @@ export default function Projects() {
   );
   const [experienceIndex, setExperienceIndex] = useState<number | null>(null);
   const [isExpIndexLoading, setIsExpIndexLoading] = useState(true);
-  const [experiencePoints, setExperiencePoints] = useState<any>(null);
+  type ExperiencePoints = {
+    demographics?: number;
+    education?: number;
+    workExperience?: number;
+    certifications?: number;
+    awards?: number;
+    projects?: number;
+    total?: number;
+  };
+
+  const [experiencePoints, setExperiencePoints] =
+    useState<ExperiencePoints | null>(null);
 
   const displayedIndex = experiencePoints?.total ?? 0;
 
@@ -147,9 +158,21 @@ export default function Projects() {
     setLink("");
   };
 
-  const handleAddProject = () => {
+  const handleAddProject = async () => {
+    if (isSubmitting) return;
+
     if (!name.trim() || !summary.trim()) {
       alert("Project name and summary are required.");
+      return;
+    }
+    const normalizedName = toTitleCase(normalizeSpaces(name));
+
+    const duplicate = projects.some(
+      (p) => !p.isDemo && p.name === normalizedName
+    );
+
+    if (duplicate) {
+      alert("This project already exists.");
       return;
     }
 
@@ -158,31 +181,46 @@ export default function Projects() {
       return;
     }
 
-    const duplicate = projects.some(
-      (p) => !p.isDemo && p.name === toTitleCase(name.trim())
-    );
-
-    if (duplicate) {
-      alert("This project already exists.");
+    if (!userId) {
+      alert("Session expired. Please login again.");
+      navigate("/login");
       return;
     }
 
-    const newProject: ProjectEntry = {
-      id: crypto.randomUUID(),
-      name: toTitleCase(normalizeSpaces(name)),
-      role: toTitleCase(normalizeSpaces(role)),
-      summary: toSentenceCase(normalizeSpaces(summary)),
-      outcome: toSentenceCase(normalizeSpaces(outcome)),
-      link: normalizeSpaces(link) || undefined,
-    };
+    try {
+      setIsSubmitting(true);
 
-    setProjects((prev) => {
-      const withoutDemo = prev.filter((p) => !p.isDemo);
-      return [newProject, ...withoutDemo];
-    });
+      await API(
+  "POST",
+  URL_PATH.projects,
+  {
+    projects: [
+      {
+        projectName: toTitleCase(normalizeSpaces(name)),
+        role: role ? toTitleCase(normalizeSpaces(role)) : null,
 
-    setSelectedProject(null);
-    resetForm();
+        summary: toSentenceCase(normalizeSpaces(summary.trim())),
+        outcome: outcome
+          ? toSentenceCase(normalizeSpaces(outcome.trim()))
+          : null,
+
+        link: link ? normalizeSpaces(link) : null,
+      },
+    ],
+  },
+  undefined,
+  { "user-id": userId }
+);
+
+      await fetchProjects();
+      await fetchExperienceIndex();
+      resetForm();
+      setSelectedProject(null);
+    } catch (err: any) {
+      alert(err?.response?.data?.message || "Failed to add project");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // -------------------- DELETE PROJECT --------------------
@@ -232,54 +270,15 @@ export default function Projects() {
     }
   };
 
-  //PAYLOAD
-  const buildProjectsPayload = (list: ProjectEntry[]) => {
-    if (!userId) {
-      alert("Session expired. Please login again.");
-      navigate("/login");
-      return null;
-    }
-
-    return {
-      projects: list.map((p) => ({
-        projectName: p.name.trim(),
-        role: p.role?.trim() || null,
-        summary: p.summary.trim(),
-        outcome: p.outcome?.trim() || null,
-        link: p.link?.trim() || null,
-      })),
-    };
-  };
-
   const hasRealProject = projects.some((p) => !p.isDemo);
   const canContinue = hasRealProject;
 
-  const handleContinue = async () => {
-    if (isSubmitting) return;
-
+  const handleContinue = () => {
     if (!hasRealProject) {
       alert("Please add at least one project to continue.");
       return;
     }
-
-    const realProjects = projects.filter((p) => !p.isDemo);
-    const payload = buildProjectsPayload(realProjects);
-
-    if (!payload) return;
-
-    try {
-      setIsSubmitting(true);
-
-      await API("POST", URL_PATH.projects, payload, undefined, {
-        "user-id": userId,
-      });
-
-      navigate("/skill-index-intro");
-    } catch (err: any) {
-      alert(err.message || "Failed to save projects");
-    } finally {
-      setIsSubmitting(false);
-    }
+    navigate("/skill-index-intro");
   };
 
   return (
@@ -461,13 +460,14 @@ export default function Projects() {
               <TextField.Input
                 placeholder="What was the project about?"
                 value={summary}
-                onChange={(ev) => setSummary(toSentenceCase(ev.target.value))}
+                onChange={(e) => setSummary(e.target.value)}
+                onBlur={() => setSummary(toSentenceCase(summary))}
                 className={scInputClass}
               />
             </TextField>
 
             <TextField
-              label="Outcome *"
+              label="Outcome (optional)"
               helpText=""
               className={scTextFieldClass}
             >
@@ -501,9 +501,11 @@ export default function Projects() {
                 icon={<FeatherPlus />}
                 className="w-full rounded-full h-10 px-4 flex items-center gap-2"
                 onClick={handleAddProject}
+                disabled={isSubmitting}
               >
-                Add another project
+                {isSubmitting ? "Adding..." : "Add another project"}
               </Button>
+
               <div className="flex-1" />
             </div>
           </form>

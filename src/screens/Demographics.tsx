@@ -45,15 +45,15 @@ export default function Demographics() {
     "w-full h-9 rounded-full px-3 text-[14px] bg-transparent focus:bg-transparent focus:outline-none focus:ring-0";
 
   /* -------------------- VALIDATION RULES -------------------- */
-  const fullNameRegex = /^[A-Za-z\s]{2,}$/;
+  const normalizeText = (v: string) => v.replace(/\s+/g, " ").trim();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const phoneNumberRegex = /^[0-9]{10,15}$/;
-  const textRegex = /^[A-Za-z\s]{2,}$/;
+  const phoneNumberRegex = /^[+]?[\d\s]{10,15}$/;
+  const textRegex = /^[A-Za-z\s.'-]{2,}$/;
 
   /* Form Validation */
   const isFormValid = (): string | null => {
-    if (!fullNameRegex.test(form.fullName.trim())) {
-      return "Please enter a valid fullName (letters only, min 2 characters).";
+    if (!textRegex.test(form.fullName.trim())) {
+      return "Please enter a valid full name.";
     }
 
     if (!emailRegex.test(form.email.trim())) {
@@ -61,11 +61,12 @@ export default function Demographics() {
     }
 
     if (
-      form.phoneNumber.trim() &&
-      !phoneNumberRegex.test(form.phoneNumber.trim())
-    ) {
-      return "Please enter a valid phoneNumber number (10–15 digits).";
-    }
+  form.phoneNumber.trim() &&
+  !phoneNumberRegex.test(form.phoneNumber.replace(/\s/g, ""))
+) {
+  return "Please enter a valid phone number (10–15 digits).";
+}
+
 
     if (!textRegex.test(form.city.trim())) {
       return "Please enter a valid city Name.";
@@ -86,7 +87,6 @@ export default function Demographics() {
   const [phoneVisibleToRecruiters, setShowPhone] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [experienceIndex, setExperienceIndex] = useState<number>(0);
   const [isExpIndexLoading, setIsExpIndexLoading] = useState(true);
   const [experiencePoints, setExperiencePoints] = useState<any>(null);
 
@@ -106,7 +106,7 @@ export default function Demographics() {
 
   /* -------------------- EXPERIENCE INDEX -------------------- */
 
-  const displayedIndex = 0;
+const displayedIndex = experiencePoints?.total ?? 0;
 
   // -------------------- GET EXPERIENCE INDEX --------------------
   const fetchExperienceIndex = React.useCallback(async () => {
@@ -190,12 +190,14 @@ export default function Demographics() {
     }
 
     const payload = {
-      fullName: form.fullName.trim(),
+      fullName: normalizeText(form.fullName),
       email: form.email.trim(),
       phoneNumber: form.phoneNumber.trim() || null,
-      city: form.city.trim(),
-      state: form.state.trim(),
-      country: form.country.trim(),
+      city: normalizeText(form.city),
+
+      state: normalizeText(form.state),
+      country: normalizeText(form.country),
+
       phoneVisibleToRecruiters,
     };
 
@@ -421,7 +423,6 @@ export default function Demographics() {
 
         {/* RIGHT PANEL */}
         <aside className="w-full md:w-72 shrink-0">
-
           <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-200">
             <h3 className="text-base font-semibold text-neutral-900">
               Your Experience Index

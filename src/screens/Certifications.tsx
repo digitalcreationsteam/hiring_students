@@ -144,16 +144,7 @@ export default function Certifications() {
   }, []);
 
   // stored certs
-  const [certs, setCerts] = useState<CertEntry[]>([
-    {
-      id: "example-1",
-      name: "Certified Product Manager",
-      issuer: "Product Management Institute",
-      issueDate: "06/2021",
-      credentialLink: undefined,
-      file: undefined,
-    },
-  ]);
+  const [certs, setCerts] = useState<CertEntry[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -228,37 +219,50 @@ export default function Certifications() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
+    if (isSubmitting) return;
     if (!isAddable()) return;
 
-    const newEntry: CertEntry = {
-      id: String(Date.now()),
-      name: toTitleCase(normalizeSpaces(name)),
-      issuer: toTitleCase(normalizeSpaces(issuer)),
-
-      issueDate: issueDate.trim(),
-      credentialLink: credentialLink.trim() || undefined,
-      file: file || undefined,
-    };
-
-    const duplicate = certs.some(
-      (c) =>
-        c.name === newEntry.name &&
-        c.issuer === newEntry.issuer &&
-        c.issueDate === newEntry.issueDate
-    );
-
-    if (duplicate) {
-      alert("This certification already exists.");
+    if (!userId) {
+      alert("Session expired. Please login again.");
+      navigate("/login");
       return;
     }
 
-    setCerts((prev) => {
-      const withoutDemo = prev.filter((c) => c.id !== "example-1");
-      return [newEntry, ...withoutDemo];
-    });
+    setIsSubmitting(true);
 
-    resetForm();
+    const formData = new FormData();
+
+    formData.append("certificationName[0]", toTitleCase(normalizeSpaces(name)));
+    formData.append("issuer[0]", toTitleCase(normalizeSpaces(issuer)));
+
+    const [mm, yyyy] = issueDate.split("/");
+    formData.append("issueDate[0]", `${yyyy}-${mm}-01`);
+
+    if (credentialLink) {
+      formData.append("credentialLink[0]", credentialLink.trim());
+    }
+
+    if (file) {
+      // 🔥 MUST be plural to go into req.files[]
+      formData.append("certificateFiles", file);
+    }
+
+    try {
+      await API("POST", URL_PATH.certification, formData, undefined, {
+        "user-id": userId,
+      });
+
+      // safest pattern (same as Experience)
+      await fetchCertifications();
+      await fetchExperienceIndex();
+
+      resetForm();
+    } catch (err: any) {
+      alert(err?.response?.data?.message || "Error creating certifications");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // -------------------- DELETE CERTIFICATION --------------------
@@ -342,66 +346,15 @@ export default function Certifications() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const hasRealCertification = certs.some((c) => c.id !== "example-1");
+  const canContinue = certs.length > 0;
 
-  const canContinue = hasRealCertification;
-
-  const handleContinue = async () => {
-    if (isSubmitting) return;
-
+  const handleContinue = () => {
     if (!canContinue) {
       alert("Please add at least one certification.");
       return;
     }
 
-    setIsSubmitting(true);
-
-    const realCerts = certs.filter((c) => c.id !== "example-1");
-
-    const formData = new FormData();
-
-    realCerts.forEach((cert, index) => {
-      formData.append(`certificationName[${index}]`, cert.name);
-      formData.append(`issuer[${index}]`, cert.issuer);
-
-      // backend expects YYYY-MM-DD, but UI uses MM/YYYY
-      // convert before sending
-      const [mm, yyyy] = cert.issueDate.split("/");
-      formData.append(`issueDate[${index}]`, `${yyyy}-${mm}-01`);
-
-      if (cert.credentialLink) {
-        formData.append(`credentialLink[${index}]`, cert.credentialLink);
-      }
-
-      if (cert.file) {
-        formData.append("certificateFiles", cert.file); // IMPORTANT
-      }
-    });
-
-    try {
-      const res = await API(
-        "POST",
-        URL_PATH.certification,
-        formData,
-        undefined,
-        { "user-id": localStorage.getItem("userId") }
-      );
-      if (!res.status == true) {
-        let msg = "Failed to save certifications";
-        try {
-          const err = await res.json();
-          msg = err.message || msg;
-        } catch {}
-        alert(msg);
-        return;
-      }
-
-      navigate("/awards");
-    } catch (err) {
-      alert("Network error. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    navigate("/awards");
   };
 
   const handleUploadKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -670,9 +623,9 @@ export default function Certifications() {
                 icon={<FeatherPlus />}
                 className="w-full rounded-full h-10 px-4 flex items-center gap-2"
                 onClick={handleAdd}
-                disabled={!isAddableSilent()}
+                disabled={isSubmitting}
               >
-                Add another certification
+                {isSubmitting ? "Adding..." : "Add another certification"}
               </Button>
 
               <div className="flex-1" />

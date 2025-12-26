@@ -43,7 +43,16 @@ export default function Awards() {
   const [description, setDescription] = useState("");
   const [year, setYear] = useState("");
   const [isExpIndexLoading, setIsExpIndexLoading] = useState(true);
-  const [experiencePoints, setExperiencePoints] = useState<any>(null);
+  type ExperiencePoints = {
+    demographics?: number;
+    education?: number;
+    workExperience?: number;
+    certifications?: number;
+    awards?: number;
+  };
+
+  const [experiencePoints, setExperiencePoints] =
+    useState<ExperiencePoints | null>(null);
 
   const displayedIndex =
     (experiencePoints?.demographics ?? 0) +
@@ -71,7 +80,7 @@ export default function Awards() {
         isDemo: false,
       }));
 
-      setAwards(mappedAwards.length ? mappedAwards : []);
+      setAwards(mappedAwards);
     } catch (error) {
       console.error("Failed to fetch awards", error);
     }
@@ -105,15 +114,7 @@ export default function Awards() {
   }, []);
 
   // stored awards (example)
-  const [awards, setAwards] = useState<AwardEntry[]>([
-    {
-      id: "example-1",
-      name: "Hackathon Winner",
-      description: "First place in University Tech Competition",
-      year: "2021",
-      isDemo: true,
-    },
-  ]);
+  const [awards, setAwards] = useState<AwardEntry[]>([]);
 
   // SC2 small textfield classes
   const scTextFieldClass =
@@ -127,7 +128,9 @@ export default function Awards() {
     setYear("");
   };
 
-  const handleAddAward = () => {
+  const handleAddAward = async () => {
+    if (isSubmitting) return;
+
     if (!name.trim() || !year.trim()) {
       alert("Please complete all required fields before adding.");
       return;
@@ -135,6 +138,7 @@ export default function Awards() {
 
     const yearNum = Number(year);
     const currentYear = new Date().getFullYear();
+
     if (!/^\d{4}$/.test(year)) {
       alert("Year must be a 4-digit number.");
       return;
@@ -145,28 +149,40 @@ export default function Awards() {
       return;
     }
 
-    const duplicate = awards.some(
-      (a) => !a.isDemo && a.name === toTitleCase(name.trim())
-    );
-
-    if (duplicate) {
-      alert("This award already exists.");
+    if (!userId) {
+      alert("Session expired. Please login again.");
+      navigate("/login");
       return;
     }
 
-    const newAward: AwardEntry = {
-      id: String(Date.now()),
-      name: toTitleCase(normalizeSpaces(name)),
-      description: description.trim() ? normalizeSpaces(description) : null,
-      year: year.trim(),
-    };
+    try {
+      setIsSubmitting(true);
 
-    setAwards((prev) => {
-      const withoutDemo = prev.filter((a) => !a.isDemo);
-      return [newAward, ...withoutDemo];
-    });
+      await API(
+        "POST",
+        URL_PATH.awards,
+        {
+          awards: [
+            {
+              awardName: toTitleCase(normalizeSpaces(name)),
+              description: description.trim() || null,
+              year: yearNum,
+            },
+          ],
+        },
+        undefined,
+        { "user-id": userId }
+      );
 
-    resetForm();
+      await fetchAwards();
+      await fetchExperienceIndex();
+
+      resetForm();
+    } catch (err: any) {
+      alert(err?.response?.data?.message || "Failed to add award");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // -------------------- DELETE AWARD --------------------
@@ -230,32 +246,12 @@ export default function Awards() {
   const hasRealAward = awards.some((a) => !a.isDemo);
   const canContinue = hasRealAward;
 
-  const handleContinue = async () => {
-    if (isSubmitting) return;
-
+  const handleContinue = () => {
     if (!hasRealAward) {
       alert("Please add at least one award to continue.");
       return;
     }
-
-    const realAwards = awards.filter((a) => !a.isDemo);
-    const payload = buildAwardsPayload(realAwards);
-
-    if (!payload) return;
-
-    try {
-      setIsSubmitting(true);
-
-      await API("POST", URL_PATH.awards, payload, undefined, {
-        "user-id": userId,
-      });
-
-      navigate("/projects");
-    } catch (err: any) {
-      alert(err.message || "Failed to save awards");
-    } finally {
-      setIsSubmitting(false);
-    }
+    navigate("/projects");
   };
 
   return (
@@ -363,14 +359,15 @@ export default function Awards() {
             </TextField>
 
             <TextField
-              label="Description *"
+              label="Description (optional)"
               helpText=""
               className={scTextFieldClass}
             >
               <TextField.Input
                 placeholder="Brief description of the achievement or role"
                 value={description}
-                onChange={(e) => setDescription(toSentenceCase(e.target.value))}
+                onChange={(e) => setDescription(e.target.value)}
+                onBlur={() => setDescription(toSentenceCase(description))}
                 className={scInputClass}
               />
             </TextField>
@@ -392,9 +389,11 @@ export default function Awards() {
                 icon={<FeatherPlus />}
                 className="w-full rounded-full h-10 px-4 flex items-center gap-2"
                 onClick={handleAddAward}
+                disabled={isSubmitting}
               >
-                Add another award
+                {isSubmitting ? "Adding..." : "Add another award"}
               </Button>
+
               <div className="flex-1" />
             </div>
           </form>

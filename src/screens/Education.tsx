@@ -23,6 +23,11 @@ import {
 } from "@subframe/core";
 import API, { URL_PATH } from "src/common/API";
 
+type ExperiencePoints = {
+  demographics?: number;
+  education?: number;
+};
+
 type EducationEntry = {
   id: string;
   degree: string;
@@ -53,12 +58,17 @@ const toTitleCase = (v: string) =>
     .replace(/\b\w/g, (c) => c.toUpperCase());
 
 const notify = (msg: string) => {
-  console.error(msg); // replace later with toast
+  alert(msg);
 };
 
 export default function Education() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this education?"
+  );
 
   const userId = localStorage.getItem("userId");
   // local form state
@@ -70,15 +80,14 @@ export default function Education() {
   const [currentlyStudying, setStudying] = useState(false);
   const [gpa, setGpa] = useState("");
   const [isExpIndexLoading, setIsExpIndexLoading] = useState(true);
-const [experiencePoints, setExperiencePoints] = useState<any>(null);
+  const [experiencePoints, setExperiencePoints] =
+    useState<ExperiencePoints | null>(null);
 
   // stored entries
   const [educations, setEducations] = useState<EducationEntry[]>([]);
 
   const displayedIndex =
-  (experiencePoints?.demographics ?? 0) +
-  (experiencePoints?.education ?? 0);
-
+    (experiencePoints?.demographics ?? 0) + (experiencePoints?.education ?? 0);
 
   // helpers
   const validateEducation = (): string | null => {
@@ -112,78 +121,113 @@ const [experiencePoints, setExperiencePoints] = useState<any>(null);
     setGpa("");
   };
 
-  const handleAddEducation = () => {
+  const handleAddEducation = async () => {
     const error = validateEducation();
     if (error) {
       notify(error);
       return;
     }
 
-    const newEntry: EducationEntry = {
-      id: crypto.randomUUID(),
-      degree: toTitleCase(degree),
-      fieldOfStudy: toTitleCase(fieldOfStudy),
-      schoolName: toTitleCase(schoolName),
-      startYear: startYear.trim(),
-      endYear: currentlyStudying ? undefined : endYear.trim(),
-      currentlyStudying,
-      gpa: gpa.trim() || undefined,
-    };
-
-    const duplicate = educations.some(
-      (e) =>
-        normalize(e.degree) === normalize(degree) &&
-        normalize(e.fieldOfStudy) === normalize(fieldOfStudy) &&
-        normalize(e.schoolName) === normalize(schoolName) &&
-        e.startYear === startYear
-    );
-
-    if (duplicate) {
-      notify("This education already exists.");
+    if (!userId) {
+      notify("Session expired. Please login again.");
+      navigate("/login");
       return;
     }
 
-    setEducations((prev) => [newEntry, ...prev]);
+    // ✅ DUPLICATE CHECK (CORRECT PLACE)
+    const normalizedNew = {
+      degree: normalize(toTitleCase(degree)),
+      fieldOfStudy: normalize(toTitleCase(fieldOfStudy)),
+      schoolName: normalize(toTitleCase(schoolName)),
+      startYear,
+    };
 
-    resetForm();
-  };
-
-
-  // -------------------- DELETE EDUCATION --------------------
- const handleRemove = async (id: string) => {
-  if (!userId) {
-    notify("Session expired. Please login again.");
-    navigate("/login");
-    return;
-  }
-
-  const confirmDelete = window.confirm(
-    "Are you sure you want to delete this education?"
-  );
-  if (!confirmDelete) return;
-
-  try {
-    setIsSubmitting(true);
-
-    await API(
-      "DELETE",
-      `${URL_PATH.deleteEducation}/${id}`,
-      undefined,
-      undefined,
-      { "user-id": userId }
+    const isDuplicate = educations.some(
+      (ed) =>
+        normalize(ed.degree) === normalizedNew.degree &&
+        normalize(ed.fieldOfStudy) === normalizedNew.fieldOfStudy &&
+        normalize(ed.schoolName) === normalizedNew.schoolName &&
+        ed.startYear === normalizedNew.startYear
     );
 
-    setEducations((prev) => prev.filter((e) => e.id !== id));
-    await fetchExperienceIndex();
-  } catch (err: any) {
-    notify(err?.message || "Failed to delete education");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+    if (isDuplicate) {
+      notify("This education entry already exists.");
+      return;
+    }
 
+    // ✅ API payload
+    const payload = {
+      degree: toTitleCase(degree),
+      fieldOfStudy: toTitleCase(fieldOfStudy),
+      schoolName: toTitleCase(schoolName),
+      startYear: Number(startYear),
+      endYear: currentlyStudying ? null : Number(endYear),
+      currentlyStudying,
+      gpa: gpa ? Number(gpa) : null,
+    };
 
+    try {
+      setIsSubmitting(true);
 
+      const res = await API("POST", URL_PATH.education, payload, undefined, {
+        "user-id": userId,
+      });
+
+      setEducations((prev) => [
+        {
+          id: res.data._id,
+          degree: res.data.degree,
+          fieldOfStudy: res.data.fieldOfStudy,
+          schoolName: res.data.schoolName,
+          startYear: String(res.data.startYear),
+          endYear: res.data.currentlyStudying
+            ? undefined
+            : String(res.data.endYear),
+          currentlyStudying: res.data.currentlyStudying,
+          gpa: res.data.gpa ? String(res.data.gpa) : undefined,
+        },
+        ...prev,
+      ]);
+
+      await fetchExperienceIndex();
+      resetForm();
+    } catch (err: any) {
+      notify(err?.message || "Failed to add education");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // -------------------- DELETE EDUCATION --------------------
+  const handleRemove = async () => {
+    if (!deleteId) return;
+
+    if (!userId) {
+      notify("Session expired. Please login again.");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      await API(
+        "DELETE",
+        `${URL_PATH.deleteEducation}/${deleteId}`,
+        undefined,
+        undefined,
+        { "user-id": userId }
+      );
+
+      setEducations((prev) => prev.filter((e) => e.id !== deleteId));
+      await fetchExperienceIndex();
+      setDeleteId(null);
+    } catch (err: any) {
+      notify(err?.message || "Failed to delete education");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const hasEducation = educations.length > 0;
   const canContinue = hasEducation;
@@ -222,104 +266,51 @@ const [experiencePoints, setExperiencePoints] = useState<any>(null);
     }
   }, [userId]);
 
-
   // -------------------- GET EXPERIENCE INDEX --------------------
-const fetchExperienceIndex = React.useCallback(async () => {
-  if (!userId) return;
+  const fetchExperienceIndex = React.useCallback(async () => {
+    if (!userId) return;
 
-  try {
-    const res = await API(
-      "GET",
-      URL_PATH.calculateExperienceIndex,
-      undefined,
-      undefined,
-      { "user-id": userId }
-    );
+    try {
+      const res = await API(
+        "GET",
+        URL_PATH.calculateExperienceIndex,
+        undefined,
+        undefined,
+        { "user-id": userId }
+      );
 
-    setExperiencePoints(res?.points ?? null);
-  } catch {
-    setExperiencePoints(null);
-  } finally {
-    setIsExpIndexLoading(false);
-  }
-}, [userId]);
-
-
-
-
-
-  
+      setExperiencePoints(res?.points ?? null);
+    } catch {
+      setExperiencePoints(null);
+    } finally {
+      setIsExpIndexLoading(false);
+    }
+  }, [userId]);
 
   //use Effect
   useEffect(() => {
-  if (!userId) return;
+    if (!userId) return;
 
-  fetchExperienceIndex();
-  fetchEducations();
-}, [userId, fetchExperienceIndex, fetchEducations]);
-
+    fetchExperienceIndex();
+    fetchEducations();
+  }, [userId, fetchExperienceIndex, fetchEducations]);
 
   /* -------------------- BUILD PAYLOAD -------------------- */
-  const buildEducationPayload = (list: EducationEntry[]) => {
-    if (!userId) {
-      notify("Session expired. Please login again.");
-      navigate("/login");
-      return null;
-    }
 
-    const currentYear = new Date().getFullYear();
-
-    return {
-      educations: list.map((edu) => {
-        const start = Number(edu.startYear);
-        const end = edu.currentlyStudying ? currentYear : Number(edu.endYear);
-
-        return {
-          degree: edu.degree.trim(),
-          fieldOfStudy: edu.fieldOfStudy.trim(),
-          schoolName: edu.schoolName.trim(),
-          startYear: start,
-          endYear: edu.currentlyStudying ? null : end,
-          duration: Math.max(0, end - start),
-          currentlyStudying: edu.currentlyStudying,
-          gpa: edu.gpa ? Number(edu.gpa) : null,
-        };
-      }),
-    };
-  };
-
-  const handleContinue = async () => {
-    if (isSubmitting) return;
-
+  const handleContinue = () => {
     if (!educations.length) {
       notify("Please add at least one education to continue.");
       return;
     }
 
-    const payload = buildEducationPayload(educations);
-    if (!payload) return;
-
-    try {
-      setIsSubmitting(true);
-
-      await API("POST", URL_PATH.education, payload, undefined, {
-        "user-id": userId,
-      });
-
-      navigate("/experience");
-    } catch (err: any) {
-      notify(err.message || "Failed to save education");
-    } finally {
-      setIsSubmitting(false);
-    }
+    navigate("/experience");
   };
 
   return (
     <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-4 sm:px-6 py-20 sm:py-32">
-  <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8">
-
+      <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8">
         {/* Left card */}
-<main className="w-full md:max-w-[480px] bg-white rounded-3xl border px-4 sm:px-6 md:px-8 py-6 ...">
+        <main className="w-full md:max-w-[480px] bg-white rounded-3xl border px-4 sm:px-6 md:px-8 py-6 ...">
           {/* Top: back + progress */}
           <div className="flex items-center gap-4">
             <IconButton
@@ -329,7 +320,6 @@ const fetchExperienceIndex = React.useCallback(async () => {
             />
 
             <div className="flex-1 w-full max-w-full md:max-w-[420px]">
-
               <div className="flex items-center gap-3">
                 {[...Array(2)].map((_, i) => (
                   <div
@@ -392,12 +382,11 @@ const fetchExperienceIndex = React.useCallback(async () => {
                     </div>
                   </div>
 
-                 
                   <div className="flex flex-col items-end gap-2">
                     <IconButton
                       size="small"
                       icon={<FeatherX />}
-                      onClick={() => handleRemove(ed.id)}
+                      onClick={() => setDeleteId(ed.id)}
                       className="!bg-transparent !text-neutral-500"
                     />
 
@@ -467,7 +456,6 @@ const fetchExperienceIndex = React.useCallback(async () => {
 
             {/* Years */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
               <TextField
                 label="Start Year *"
                 helpText=""
@@ -552,15 +540,15 @@ const fetchExperienceIndex = React.useCallback(async () => {
             </TextField>
 
             <div className="mt-2 flex flex-col sm:flex-row gap-3 items-center">
-
               <Button
                 type="button"
+                disabled={isSubmitting}
                 variant="neutral-secondary"
                 icon={<FeatherPlus />}
-                className="w-full rounded-full h-10 px-4 flex items-center gap-2"
+                className="w-full rounded-full h-10 px-4"
                 onClick={handleAddEducation}
               >
-                Add another education
+                {isSubmitting ? "Adding..." : "Add another education"}
               </Button>
               <div className="flex-1" /> {/* pushes continue to the right */}
             </div>
@@ -588,7 +576,6 @@ const fetchExperienceIndex = React.useCallback(async () => {
         {/* Right panel */}
 
         <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
-
           <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-200">
             <h3 className="text-base font-semibold text-neutral-900">
               Your Experience Index
