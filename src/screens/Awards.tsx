@@ -250,7 +250,7 @@ export default function Awards() {
     <div className="min-h-screen flex justify-center bg-neutral-50 px-4 sm:px-6 py-20 sm:py-32">
       <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
         {/* Left card */}
-        <main className="w-full md:max-w-[448px] flex flex-col gap-6 rounded-[28px] border bg-white px-4 sm:px-6 md:px-8 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.06)]">
+        <main className="w-full md:max-w-[448px] flex flex-col gap-6 rounded-[28px] border border-neutral-300 bg-white px-4 sm:px-6 md:px-8 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.06)]">
           {/* top row - back + progress */}
           <div className="flex items-center gap-4">
             <IconButton
@@ -280,7 +280,7 @@ export default function Awards() {
 
           {/* Header */}
           <header className=" w-full">
-            <h2 className="text-[20px] font-semibold text-neutral-900">
+            <h2 className="text-[22px] text-neutral-900">
               Add awards and extracurriculars
             </h2>
             <p className="text-xs text-neutral-500">
@@ -307,7 +307,7 @@ export default function Awards() {
         <Avatar
           size="large"
           square
-          className="!rounded-2xl bg-violet-100 text-violet-700 font-semibold"
+          className="!rounded-2xl bg-violet-200 text-violet-700 font-semibold"
         >
           {a.name
             .split(" ")
@@ -354,7 +354,7 @@ export default function Awards() {
             className="flex flex-col gap-4 mt-2"
           >
             <TextField
-              label="Award or Activity Name *"
+              label={<span className="text-[12px]">Award or Activity Name * </span>}
               helpText=""
               className={scTextFieldClass}
             >
@@ -367,7 +367,7 @@ export default function Awards() {
             </TextField>
 
             <TextField
-              label="Description (optional)"
+              label={<span className="text-[12px]">Description (optional)" </span>}
               helpText=""
               className={scTextFieldClass}
             >
@@ -380,7 +380,8 @@ export default function Awards() {
               />
             </TextField>
 
-            <TextField label="Year *" helpText="" className={scTextFieldClass}>
+            <TextField label={<span className="text-[12px]">Year * </span>}
+             helpText="" className={scTextFieldClass}>
               <TextField.Input
                 placeholder="YYYY"
                 value={year}
@@ -395,7 +396,7 @@ export default function Awards() {
                 type="button"
                 variant="neutral-secondary"
                 icon={<FeatherPlus />}
-                className="w-full rounded-full h-10 px-4 flex items-center gap-2"
+                className="w-full rounded-full border border-neutral-300 h-10 px-4 flex items-center gap-2"
                 onClick={handleAddAward}
                 disabled={isSubmitting}
               >
@@ -428,8 +429,8 @@ export default function Awards() {
 
         {/* Right panel */}
         <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
-          <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-200">
-            <h3 className="text-lg font-semibold text-neutral-900">
+          <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
+            <h3 className="text-[22px] text-neutral-900">
               Your Experience Index
             </h3>
 
@@ -442,17 +443,17 @@ export default function Awards() {
               </span>
             </div>
 
-            <div className="h-px bg-neutral-100" />
+            <div className="h-px bg-neutral-300" />
 
             <div className="mt-4">
-              <div className="text-sm font-semibold text-neutral-800 mb-3">
+              <div className="text-[16px] text-neutral-800 mb-3">
                 Progress Steps
               </div>
 
               {/* ⚪ Completed — Demographics */}
               <button
                 type="button"
-                className="w-full flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2 mb-3 hover:bg-neutral-50"
+                className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3 hover:bg-neutral-50"
               >
                 <IconWithBackground
                   size="small"
@@ -463,7 +464,7 @@ export default function Awards() {
               </button>
 
               {/* Education — completed (green) */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2 mb-3">
+              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
                 <IconWithBackground
                   size="small"
                   icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
@@ -473,7 +474,7 @@ export default function Awards() {
               </div>
 
               {/* Experience — completed (green) */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2 mb-3">
+              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
                 <IconWithBackground
                   size="small"
                   icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
@@ -483,7 +484,7 @@ export default function Awards() {
               </div>
 
               {/* Certifications — completed (green) */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2 mb-3">
+              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
                 <IconWithBackground
                   size="small"
                   icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
@@ -508,7 +509,7 @@ export default function Awards() {
               </div>
 
               {/* Projects — inactive */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2">
+              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2">
                 <IconWithBackground
                   variant="neutral"
                   size="small"

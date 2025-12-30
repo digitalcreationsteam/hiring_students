@@ -12,10 +12,14 @@ import {
   FeatherX,
 } from "@subframe/core";
 import { useNavigate } from "react-router-dom";
+import API, { URL_PATH } from "src/common/API";
+
 
 export default function Skills() {
   const navigate = useNavigate();
   const [input, setInput] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [skills, setSkills] = useState<string[]>([
     "Product Strategy",
     "User Research",
@@ -66,15 +70,41 @@ export default function Skills() {
     setSkills((prev) => prev.filter((k) => k !== s));
   };
 
-  const handleContinue = () => {
-    if (skills.length === 0) {
-      alert("Add at least one skill to continue.");
-      return;
-    }
+ const handleContinue = async () => {
+  if (skills.length === 0) {
+    alert("Add at least one skill to continue.");
+    return;
+  }
 
-    // ✅ NEXT STEP → Skill Assessment
+  try {
+    setIsSubmitting(true);
+
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+
+    await API(
+      "POST",
+      URL_PATH.jobDomain || "/user/userDomainSkill",
+      {
+        userId,
+        skills,
+      },
+      {
+        Authorization: `Bearer ${token}`,
+      }
+    );
+
     navigate("/assessment-intro");
-  };
+  } catch (error: any) {
+    console.error("Skill save failed:", error);
+    alert(
+      error?.response?.data?.message ||
+        "Failed to save skills. Please try again."
+    );
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-neutral-50 px-6 py-10">
@@ -191,13 +221,14 @@ export default function Skills() {
 
         <footer>
           <Button
-            className="w-full h-10 rounded-full bg-gradient-to-r from-violet-600 to-violet-600 
-               text-white shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
-            onClick={handleContinue}
-            disabled={skills.length === 0}
-          >
-            Continue
-          </Button>
+  className="w-full h-10 rounded-full bg-gradient-to-r from-violet-600 to-violet-600 
+    text-white shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
+  onClick={handleContinue}
+  disabled={skills.length === 0 || isSubmitting}
+>
+  {isSubmitting ? "Saving..." : "Continue"}
+</Button>
+
         </footer>
       </main>
     </div>

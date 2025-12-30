@@ -8,119 +8,162 @@ import { useNavigate } from "react-router-dom";
 import * as SubframeCore from "@subframe/core";
 import API, { URL_PATH } from "src/common/API";
 
-
-
 const notify = (msg: string) => {
   console.warn(msg);
 };
 
 function JobDomain() {
-
-
   const navigate = useNavigate();
-
   const userId = React.useMemo(() => localStorage.getItem("userId"), []);
 
-  const [domain, setDomain] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
+  // Domain
+  const [domain, setDomain] = useState<{ id: string; name: string } | null>(
+    null
+  );
+  const [domains, setDomains] = useState<{ _id: string; name: string }[]>([]);
 
-  const domains = [
-    "Product Management",
-    "Design",
-    "Data Analytics",
-    "Marketing",
-    "Software Engineering",
-    "Human Resources",
-    "Sales",
-    "Finance",
-    "Operations",
-    "Customer Support",
-    "Content Writing",
-    "Quality Assurance",
-    "Business Analysis",
-    "Digital Marketing",
-    "UI/UX Design",
-    "Project Management",
-    "Data Science",
-    "Machine Learning",
-    "AI Research",
-    "Legal",
-    "Administration",
-    "Healthcare",
-    "Education",
-    "Supply Chain",
-    "Hospitality",
-    "Other",
-  ];
+  // SubDomain
+  const [subDomain, setSubDomain] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [subDomains, setSubDomains] = useState<{ _id: string; name: string }[]>(
+    []
+  );
 
-  ///POST API ////
+  // -------------------- SAVE DOMAIN + SUBDOMAIN --------------------
   const handleContinue = async () => {
-  if (!domain) {
-    notify("Please select a job domain.");
-    return;
-  }
+    if (!domain || !subDomain) {
+      notify("Please select both domain and sub domain.");
+      return;
+    }
 
-  const token = localStorage.getItem("token");
-  if (!token) {
-    notify("Session expired. Please login again.");
-    navigate("/login");
-    return;
-  }
+    const token = localStorage.getItem("token");
+    if (!token) {
+      notify("Session expired. Please login again.");
+      navigate("/login");
+      return;
+    }
 
-  try {
-    setIsSubmitting(true);
+    try {
+      setIsSubmitting(true);
 
-    await API(
-      "POST",
-      URL_PATH.jobDomain,
-      { name:domain }, 
-      {
-        Authorization: `Bearer ${token}`, 
+      await API(
+        "POST",
+        URL_PATH.jobDomain,
+        {
+          userId,
+          domainId: domain.id,
+          subDomainId: subDomain.id,
+        },
+        {
+          Authorization: `Bearer ${token}`,
+        }
+      );
+
+      localStorage.setItem("jobDomain", domain.name);
+      localStorage.setItem("subDomain", subDomain.name);
+
+      navigate("/skills");
+    } catch (err: any) {
+      console.error(err);
+      notify(err?.response?.data?.message || "Failed to save job domain");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // -------------------- FETCH USER SELECTED DOMAIN --------------------
+  useEffect(() => {
+    const fetchUserSelectedDomain = async () => {
+      if (!userId) return;
+
+      try {
+        const res = await API("GET", URL_PATH.jobDomain, undefined, {
+          "user-id": userId,
+        });
+
+        if (res?.domainId && res?.domainName) {
+          setDomain({
+            id: res.domainId,
+            name: res.domainName,
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch job domain", err);
       }
-    );
-    localStorage.setItem("jobDomain", domain);
+    };
 
+    fetchUserSelectedDomain();
+  }, [userId]);
 
-    navigate("/skills");
-  } catch (err: any) {
-    console.error(err);
-    notify(
-      err?.response?.data?.message ||
-      "Failed to save job domain"
+  // -------------------- FETCH ALL DOMAINS --------------------
+  useEffect(() => {
+    const fetchAvailableDomains = async () => {
+      try {
+        const res = await API("GET", URL_PATH.getJobDomain);
+
+        const activeDomains = res.map((d: any) => ({
+          _id: d._id,
+          name: d.name,
+        }));
+
+        setDomains(activeDomains);
+      } catch (err) {
+        console.error("Failed to load domains", err);
+        notify("Unable to load job domains");
+      }
+    };
+
+    fetchAvailableDomains();
+  }, []);
+
+  // -------------------- FETCH SUBDOMAINS BY DOMAIN --------------------
+  useEffect(() => {
+    if (!domain) {
+      setSubDomains([]);
+      setSubDomain(null);
+      return;
+    }
+
+const fetchSubDomains = async () => {
+  try {
+    const res = await API(
+      "GET",
+      `${URL_PATH.getSubDomain}?domainId=${domain.id}`
     );
-  } finally {
-    setIsSubmitting(false);
+
+    setSubDomains(
+      res.data.map((item: any) => ({
+        _id: item._id,
+        name: item.name,
+      }))
+    );
+  } catch (err) {
+    console.error("Failed to fetch sub domains", err);
+    notify("Unable to load sub domains");
   }
 };
 
 
-useEffect(() => {
-  const saved = localStorage.getItem("jobDomain");
+    fetchSubDomains();
+  }, [domain]);
 
-  if (saved) {
-    setDomain(saved);
-  }
-
-  setIsLoading(false);
-}, []);
-
-  
-
+  // -------------------- UI --------------------
   return (
     <div className="min-h-screen bg-neutral-50 px-8 py-10 flex items-center justify-center">
       <div className="flex max-w-[660px] w-full mx-auto">
-        <div className="flex w-full flex-col gap-8 rounded-3xl border border-neutral-border bg-white px-10 py-8 shadow-lg">
+        <div className="flex w-full flex-col gap-8 rounded-3xl border bg-white px-10 py-8 shadow-lg">
           {/* Header */}
-          <div className="flex w-full items-center gap-4">
+          <div className="flex items-center gap-4">
             <IconButton
               size="small"
               icon={<FeatherArrowLeft />}
               onClick={() => navigate(-1)}
             />
 
-            {/* Progress */}
             <div className="flex flex-1 gap-2">
               {[...Array(7)].map((_, i) => (
                 <div
@@ -133,7 +176,7 @@ useEffect(() => {
           </div>
 
           {/* Title */}
-          <div className="flex flex-col">
+          <div>
             <h2 className="text-[24px] text-neutral-900">
               Choose your job domain
             </h2>
@@ -142,81 +185,117 @@ useEffect(() => {
             </p>
           </div>
 
-          {/* Form */}
-          <div className="flex flex-col gap-6 w-full">
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-neutral-900">
-                Job Domain <span className="text-red-500">*</span>
-              </label>
+          {/* Domain Dropdown */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-neutral-900">
+              Job Domain <span className="text-red-500">*</span>
+            </label>
 
-              <SubframeCore.DropdownMenu.Root>
-                <SubframeCore.DropdownMenu.Trigger asChild>
-                  <div className=" flex w-full h-10 items-center justify-between rounded-3xl border border-neutral-200 bg-neutral-50 px-4 cursor-pointer shadow-sm hover:shadow-md transitio ">
-                    <span
-                      className={`text-sm truncate ${
-                        domain ? "text-neutral-900" : "text-neutral-400"
+            <SubframeCore.DropdownMenu.Root>
+              <SubframeCore.DropdownMenu.Trigger asChild>
+                <div className="flex h-10 items-center justify-between rounded-3xl border px-4 bg-neutral-50 cursor-pointer">
+                  <span
+                    className={domain ? "text-neutral-900" : "text-neutral-400"}
+                  >
+                    {domain?.name || "Select your domain"}
+                  </span>
+                  <FeatherChevronDown />
+                </div>
+              </SubframeCore.DropdownMenu.Trigger>
+
+              <SubframeCore.DropdownMenu.Content
+                asChild
+                align="start"
+                sideOffset={4}
+              >
+                <div className="bg-white rounded-2xl shadow-lg py-2 max-h-[260px] overflow-y-auto">
+                  {domains.map((item) => (
+                    <div
+                      key={item._id}
+                      onClick={() => {
+                        setDomain({ id: item._id, name: item.name });
+                        setSubDomain(null); // reset subdomain when domain changes
+                      }}
+                      className={`px-4 py-2 cursor-pointer text-sm hover:bg-violet-50 ${
+                        domain?.id === item._id
+                          ? "bg-violet-100 font-semibold"
+                          : ""
                       }`}
                     >
-                      {domain || "Select your domain"}
-                    </span>
-
-                    <FeatherChevronDown className="text-neutral-600 shrink-0" />
-                  </div>
-                </SubframeCore.DropdownMenu.Trigger>
-
-                <SubframeCore.DropdownMenu.Portal>
-                  <SubframeCore.DropdownMenu.Content
-                    sideOffset={6}
-                    align="start"
-                    side="bottom"
-                    collisionPadding={18}
-                    asChild
-                  >
-                    <div
-                      className="
-      bg-white
-      rounded-2xl
-      shadow-lg
-      py-2
-      w-full
-      max-h-[260px]
-      overflow-y-auto
-      animate-fade-out
-    "
-                    >
-                      {domains.map((item) => (
-                        <div
-                          key={item}
-                          onClick={() => setDomain(item)}
-                          className={`px-4 py-2 cursor-pointer text-sm rounded-lg hover:bg-violet-50 ${
-                            domain === item ? "bg-violet-100 font-semibold" : ""
-                          } transition`}
-                        >
-                          {item}
-                        </div>
-                      ))}
+                      {item.name}
                     </div>
-                  </SubframeCore.DropdownMenu.Content>
-                </SubframeCore.DropdownMenu.Portal>
-              </SubframeCore.DropdownMenu.Root>
-            </div>
+                  ))}
+                </div>
+              </SubframeCore.DropdownMenu.Content>
+            </SubframeCore.DropdownMenu.Root>
+          </div>
+
+          {/* SubDomain Dropdown */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-neutral-900">
+              Sub Domain <span className="text-red-500">*</span>
+            </label>
+
+            <SubframeCore.DropdownMenu.Root>
+              <SubframeCore.DropdownMenu.Trigger asChild>
+                <div
+                  className={`flex h-10 items-center justify-between rounded-3xl border px-4 cursor-pointer ${
+                    !domain
+                      ? "bg-neutral-100 cursor-not-allowed"
+                      : "bg-neutral-50"
+                  }`}
+                >
+                  <span
+                    className={
+                      subDomain ? "text-neutral-900" : "text-neutral-400"
+                    }
+                  >
+                    {subDomain?.name || "Select sub domain"}
+                  </span>
+                  <FeatherChevronDown />
+                </div>
+              </SubframeCore.DropdownMenu.Trigger>
+
+              {domain && (
+                <SubframeCore.DropdownMenu.Content
+                  asChild
+                  align="start"
+                  sideOffset={4}
+                >
+                  <div className="bg-white rounded-2xl shadow-lg py-2 max-h-[260px] overflow-y-auto">
+                    {subDomains.map((item) => (
+                      <div
+                        key={item._id}
+                        onClick={() =>
+                          setSubDomain({ id: item._id, name: item.name })
+                        }
+                        className={`px-4 py-2 cursor-pointer text-sm hover:bg-violet-50 ${
+                          subDomain?.id === item._id
+                            ? "bg-violet-100 font-semibold"
+                            : ""
+                        }`}
+                      >
+                        {item.name}
+                      </div>
+                    ))}
+                  </div>
+                </SubframeCore.DropdownMenu.Content>
+              )}
+            </SubframeCore.DropdownMenu.Root>
           </div>
 
           {/* Footer */}
-          <div className="flex w-full border-t border-neutral-200 pt-6">
-            <Button
-              className={`h-9 w-full rounded-2xl text-sm font-medium text-white transition
-    ${
-      isSubmitting
-        ? "bg-violet-300 cursor-not-allowed"
-        : "bg-violet-600 hover:bg-violet-700"
-    }`}
-              onClick={handleContinue}
-              disabled={!domain || isSubmitting}
-            >
-              {isSubmitting ? "Saving..." : "Continue"}
-            </Button>
-          </div>
+          <Button
+            onClick={handleContinue}
+            disabled={!domain || !subDomain || isSubmitting}
+            className={`h-9 w-full rounded-2xl text-white ${
+              isSubmitting
+                ? "bg-violet-300"
+                : "bg-violet-600 hover:bg-violet-700"
+            }`}
+          >
+            {isSubmitting ? "Saving..." : "Continue"}
+          </Button>
         </div>
       </div>
     </div>

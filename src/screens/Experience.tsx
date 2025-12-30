@@ -361,7 +361,7 @@ export default function Experience() {
     <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-4 sm:px-6 py-20 sm:py-32">
       <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
         {/* Left card */}
-        <main className="w-full md:max-w-[480px] bg-white rounded-3xl border px-4 sm:px-6 md:px-8 py-6 ...">
+        <main className="w-full md:max-w-[480px] bg-white rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6 ...">
           {/* top row - back + progress */}
           <div className="flex items-center gap-4">
             <IconButton
@@ -391,7 +391,7 @@ export default function Experience() {
 
           {/* header */}
           <div className="mt-6">
-            <h2 className="text-[20px] font-semibold text-neutral-900">
+            <h2 className="text-[22px] text-neutral-900">
               Add your experience
             </h2>
             <p className="mt-1 text-sm text-neutral-500">
@@ -465,7 +465,7 @@ export default function Experience() {
             className="mt-6 flex flex-col gap-4"
           >
             <TextField
-              label="Role Title *"
+              label={<span className="text-[12px]">Role Title * </span>}
               helpText=""
               className={`${scTextFieldClass}`}
             >
@@ -481,8 +481,8 @@ export default function Experience() {
             </TextField>
 
             <TextField
-              label="Type of Role"
-              helpText="e.g., Internship, Full Time, Contract"
+              label={<span className="text-[12px]">Type of Role </span>}
+              helpText={<span className="text-[12px]">e.g., Internship, Full Time, Contract" </span>}
               className={scTextFieldClass}
             >
               <TextField.Input
@@ -497,7 +497,7 @@ export default function Experience() {
             </TextField>
 
             <TextField
-              label="Company *"
+              label={<span className="text-[12px]">Company * </span>}
               helpText=""
               className={`${scTextFieldClass}`}
             >
@@ -514,7 +514,7 @@ export default function Experience() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <TextField
-                label="Start Date *"
+                label={<span className="text-[12px]">Start Date * </span>}
                 helpText=""
                 className="[&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300 flex-1"
               >
@@ -551,7 +551,7 @@ export default function Experience() {
               </TextField>
 
               <TextField
-                label="End Date"
+                label={<span className="text-[12px]">End Date </span>}
                 helpText=""
                 className="[&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300 flex-1"
               >
@@ -626,7 +626,7 @@ export default function Experience() {
             </div>
 
             <TextField
-              label="Description"
+              label={<span className="text-[12px]">Description  </span>}
               helpText=""
               className={`${scTextFieldClass}`}
             >
@@ -649,7 +649,7 @@ export default function Experience() {
                 disabled={isSubmitting}
                 variant="neutral-secondary"
                 icon={<FeatherPlus />}
-                className="w-full rounded-full h-10 px-4"
+                className="w-full rounded-full h-10 px-4 border-neutral-300"
                 onClick={handleAddExperience}
               >
                 {isSubmitting ? "Adding..." : "Add another experience"}
@@ -681,8 +681,8 @@ export default function Experience() {
         {/* Right panel - SC2 style with Experience active */}
         {/* Right panel */}
         <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
-          <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-200">
-            <h3 className="text-base font-semibold text-neutral-900">
+          <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
+            <h3 className="text-[22px] text-neutral-900">
               Your Experience Index
             </h3>
 
@@ -695,17 +695,17 @@ export default function Experience() {
               </span>
             </div>
 
-            <div className="h-px bg-neutral-100" />
+            <div className="h-px bg-neutral-300" />
 
             <div className="mt-4">
-              <div className="text-sm font-semibold text-neutral-800 mb-3">
+              <div className="text-[16px] text-neutral-800 mb-3">
                 Progress Steps
               </div>
 
               {/* ⚪ Completed — Demographics */}
               <button
                 type="button"
-                className="w-full flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2 mb-3 hover:bg-neutral-50"
+                className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3"
               >
                 <IconWithBackground
                   size="small"
@@ -716,7 +716,7 @@ export default function Experience() {
               </button>
 
               {/* ✔ Education — Completed */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2 mb-3">
+              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
                 <IconWithBackground
                   size="small"
                   icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
@@ -726,7 +726,7 @@ export default function Experience() {
               </div>
 
               {/* 🟣 Experience — Active */}
-              <div className="flex items-center gap-3 rounded-2xl border border-violet-200 bg-violet-50 px-4 py-2 mb-3">
+              <div className="flex items-center gap-3 rounded-2xl border border-violet-300 bg-violet-50 px-4 py-2 mb-3">
                 <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white shadow-sm">
                   <IconWithBackground
                     size="small"
@@ -741,7 +741,7 @@ export default function Experience() {
               </div>
 
               {/* Certifications — Inactive */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2 mb-3">
+              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
                 <IconWithBackground
                   size="small"
                   variant="neutral"
@@ -752,7 +752,7 @@ export default function Experience() {
               </div>
 
               {/* Awards — Inactive */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2 mb-3">
+              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
                 <IconWithBackground
                   size="small"
                   variant="neutral"
@@ -763,7 +763,7 @@ export default function Experience() {
               </div>
 
               {/* Projects — Inactive */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2">
+              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2">
                 <IconWithBackground
                   size="small"
                   variant="neutral"

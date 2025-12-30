@@ -323,7 +323,7 @@ export default function Projects() {
 
           {/* Header */}
           <header className="w-full">
-            <h2 className="text-[20px] text-neutral-900">Add your projects</h2>
+            <h2 className="text-[22px] text-neutral-900">Add your projects</h2>
             <p className="text-xs text-neutral-500">Share your best work</p>
           </header>
 
@@ -360,7 +360,7 @@ export default function Projects() {
         <Avatar
           size="large"
           square
-          className="!rounded-2xl bg-violet-100 text-violet-700 font-semibold"
+          className="!rounded-2xl bg-violet-200 text-violet-700 font-semibold"
         >
           {p.name
             .split(" ")
@@ -468,7 +468,7 @@ export default function Projects() {
             className="flex flex-col gap-4"
           >
             <TextField
-              label="Project name *"
+              label={<span className="text-[12px]">Project name * </span>}
               helpText=""
               className={scTextFieldClass}
             >
@@ -481,7 +481,7 @@ export default function Projects() {
             </TextField>
 
             <TextField
-              label="Your role *"
+              label={<span className="text-[12px]">Your role * </span>}
               helpText=""
               className={scTextFieldClass}
             >
@@ -494,7 +494,7 @@ export default function Projects() {
             </TextField>
 
             <TextField
-              label="Summary *"
+              label={<span className="text-[12px]">Summary * </span>}
               helpText=""
               className={scTextFieldClass}
             >
@@ -508,7 +508,7 @@ export default function Projects() {
             </TextField>
 
             <TextField
-              label="Outcome (optional)"
+              label={<span className="text-[12px]">Outcome (optional)" </span>}
               helpText=""
               className={scTextFieldClass}
             >
@@ -520,7 +520,9 @@ export default function Projects() {
               />
             </TextField>
 
-            <TextField label="Link" helpText="" className={scTextFieldClass}>
+            <TextField label={<span className="text-[12px]">Link </span>}
+            helpText="" 
+            className={scTextFieldClass}>
               <TextField.Input
                 placeholder="https://"
                 value={link}
@@ -540,7 +542,7 @@ export default function Projects() {
                 type="button"
                 variant="neutral-secondary"
                 icon={<FeatherPlus />}
-                className="w-full rounded-full h-10 px-4 flex items-center gap-2"
+                className="w-full rounded-full border border-neutral-300 h-10 px-4 flex items-center gap-2"
                 onClick={handleAddProject}
                 disabled={isSubmitting}
               >
@@ -574,7 +576,7 @@ export default function Projects() {
         {/* Right panel */}
         <aside className="w-full lg:w-72 shrink-0 mt-6 lg:mt-0">
           <div className="lg:sticky lg:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
-            <h3 className="text-lg text-neutral-900">Your Experience Index</h3>
+            <h3 className="text-[22px] text-neutral-900">Your Experience Index</h3>
 
             <div className="flex items-center justify-center py-6">
               <span
@@ -589,12 +591,12 @@ export default function Projects() {
             <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
 
             <div className="mt-4">
-              <div className="text-sm font-semibold text-neutral-800 mb-3">
+              <div className="text-[16px] text-neutral-800 mb-3">
                 Progress Steps
               </div>
 
               {/* Demographics — completed (green) */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2 mb-3">
+              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
                 <IconWithBackground
                   size="small"
                   icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
@@ -604,7 +606,7 @@ export default function Projects() {
               </div>
 
               {/* Education — completed (green) */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2 mb-3">
+              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
                 <IconWithBackground
                   size="small"
                   icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
@@ -614,7 +616,7 @@ export default function Projects() {
               </div>
 
               {/* Experience — completed (green) */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2 mb-3">
+              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
                 <IconWithBackground
                   size="small"
                   icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
@@ -624,7 +626,7 @@ export default function Projects() {
               </div>
 
               {/* Certifications — completed (green) */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2 mb-3">
+              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
                 <IconWithBackground
                   size="small"
                   icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
@@ -634,7 +636,7 @@ export default function Projects() {
               </div>
 
               {/* Awards — completed (green) */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2 mb-3">
+              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
                 <IconWithBackground
                   size="small"
                   icon={<FeatherCheck className="w-4 h-4 text-green-900" />}

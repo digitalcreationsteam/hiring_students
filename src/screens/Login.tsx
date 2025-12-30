@@ -72,7 +72,7 @@ function Login() {
 
   const handleOAuth = (provider: "google" | "linkedin") => {
     if (provider === "google") {
-      window.location.href = `http://localhost:5000/api/auth/google`;
+      window.location.href = `http://localhost:5001/api/auth/google`;
     }
     if (provider === "linkedin") {
       // future implementation
@@ -92,13 +92,13 @@ function Login() {
                 src="https://res.cloudinary.com/subframe/image/upload/v1711417507/shared/y2rsnhq3mex4auk54aye.png"
                 alt="Company logo"
               />
-              <h1 className="text-3xl leading-snug">
+              <h1 className="text-3xl leading-snug inter-font-family">
                 Welcome back to your career journey
               </h1>
             </div>
 
             <div className="flex flex-col gap-4">
-              <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
+              <div className="w-full h-[1px] bg-gray-400 my-4 flex-shrink-0" />
               <div className="flex flex-col gap-4">
                 <div className="flex items-start gap-3">
                   <div className="flex items-center justify-center w-8 h-8 rounded-full bg-violet-100">
@@ -142,23 +142,23 @@ function Login() {
           </div>
 
           {/* VERTICAL LINE */}
-          <div className="hidden lg:block w-[1px] bg-gray-200" />
+          <div className="hidden lg:block w-[1px] bg-gray-400" />
 
           {/* RIGHT */}
           <div className="w-full lg:w-1/2 px-4 sm:px-6 py-6 sm:py-8 flex flex-col gap-4 bg-white min-h-0">
             <div>
-              <h2 className="text-lg font-semibold">Sign in to your account</h2>
+              <h2 className="text-[22px] font-">Sign in to your account</h2>
               <p className="text-xs text-subtext-color">
                 Welcome back! Sign in to access your job applications and
                 profile
               </p>
             </div>
 
-            <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
+            <div className="w-full h-[1px] bg-gray-400 my-4 flex-shrink-0" />
 
             <div className="flex flex-col gap-2">
               <OAuthSocialButton
-                className="w-full h-10 sm:h-9 border border-gray-300 rounded-full flex items-center justify-center gap-2 hover:bg-gray-100"
+                className="w-full h-10 sm:h-9 border border-gray-400 rounded-full flex items-center justify-center gap-2 hover:bg-gray-100"
                 logo="https://res.cloudinary.com/subframe/image/upload/v1711417516/shared/z0i3zyjjqkobzuaecgno.svg"
                 onClick={() => handleOAuth("google")}
                 aria-label="Log in with Google"
@@ -167,7 +167,7 @@ function Login() {
               </OAuthSocialButton>
 
               <OAuthSocialButton
-                className="w-full h-10 sm:h-9 border border-gray-300 rounded-full flex items-center justify-center gap-2 hover:bg-gray-100"
+                className="w-full h-10 sm:h-9 border border-gray-400 rounded-full flex items-center justify-center gap-2 hover:bg-gray-100"
                 logo="https://res.cloudinary.com/subframe/image/upload/v1763187518/uploads/27890/y6jwljmmuzopthb00ld5.png"
                 onClick={() => handleOAuth("linkedin")}
                 aria-label="Log in with LinkedIn"
@@ -177,11 +177,11 @@ function Login() {
             </div>
 
             <div className="flex items-center w-full my-4">
-              <div className="flex-1 h-[1px] bg-gray-300" />
+              <div className="flex-1 h-[1px] bg-gray-400" />
               <span className="px-2 text-xs text-gray-500 whitespace-nowrap">
                 or continue with email
               </span>
-              <div className="flex-1 h-[1px] bg-gray-300" />
+              <div className="flex-1 h-[1px] bg-gray-400" />
             </div>
 
             {/* FORM */}
@@ -201,7 +201,7 @@ function Login() {
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-9 w-full rounded-full border border-gray-300 px-3 outline-none focus:border-black"
+                className="h-9 w-full rounded-full border border-gray-400 px-3 outline-none focus:border-black"
                 aria-required="true"
                 aria-invalid={!!error}
               />
@@ -216,7 +216,7 @@ function Login() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="h-9 w-full rounded-full border border-gray-300 px-3 outline-none focus:border-black"
+                className="h-9 w-full rounded-full border border-gray-400 px-3 outline-none focus:border-black"
                 aria-required="true"
               />
 
@@ -251,7 +251,7 @@ function Login() {
               </button>
             </form>
 
-            <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
+            <div className="w-full h-[1px] bg-gray-400 my-4 flex-shrink-0" />
 
             <div className="flex flex-wrap justify-center gap-1 text-xs text-center">
               <span className="text-subtext-color">Don't have an account?</span>

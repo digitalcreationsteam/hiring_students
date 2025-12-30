@@ -39,10 +39,11 @@ export default function Demographics() {
   const userId = React.useMemo(() => localStorage.getItem("userId"), []);
 
   const scTextFieldClass =
-    "w-full [&>label]:text-[8px] [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-200 [&>div]:h-8";
+  "w-full [&>label]:text-[8px] [&>label]:font-small [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300 [&>div]:h-8 focus:border-black";
 
-  const scInputClass =
-    "w-full h-9 rounded-full px-3 text-[14px] bg-transparent focus:bg-transparent focus:outline-none focus:ring-0";
+const scInputClass =
+  "w-full h-7 rounded-full px-2 text-[14px] leading-none bg-transparent focus:bg-transparent focus:outline-none focus:ring-0";
+
 
   /* -------------------- VALIDATION RULES -------------------- */
   const normalizeText = (v: string) => v.replace(/\s+/g, " ").trim();
@@ -258,7 +259,7 @@ export default function Demographics() {
     <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-4 sm:px-6 py-20 sm:py-32">
 <div className="w-full max-w-[1000px] mx-auto flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
         {/* LEFT CARD */}
-        <main className="w-full md:max-w-[480px] bg-white rounded-3xl border border-solid px-4 sm:px-6 md:px-8 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.06)]">
+        <main className="w-full md:max-w-[480px] bg-white rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.06)]">
           <div className="flex items-center gap-4">
             <IconButton
               size="small"
@@ -280,7 +281,7 @@ export default function Demographics() {
           </div>
 
           <div className="mt-6">
-            <h2 className="text-[20px] font-semibold text-neutral-900">
+            <h2 className="text-[22px] text-neutral-900">
               Let's Calculate Your Experience Index
             </h2>
             <p className="text-xs text-neutral-500">
@@ -427,35 +428,32 @@ export default function Demographics() {
 
         {/* RIGHT PANEL */}
         <aside className="w-full md:w-72 shrink-0">
-          <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-200">
-            <h3 className="text-base font-semibold text-neutral-900">
+          <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
+            <h3 className="text-[20px] text-neutral-900">
               Your Experience Index
             </h3>
 
-            <div className="flex justify-center py-6">
-              {isExpIndexLoading ? (
-                <span className="text-[32px] font-medium text-neutral-300">
-                  Calculating…
-                </span>
-              ) : (
-                <span className="text-[32px] sm:text-[40px] md:text-[48px] font-semibold text-neutral-300">
-                  {displayedIndex}
-                </span>
-              )}
+            <div className="flex items-center justify-center py-6">
+              <span
+                aria-live="polite"
+                className="font-['Afacad_Flux'] text-[32px] sm:text-[40px] md:text-[48px] font-[500] leading-[56px] text-neutral-300"
+              >
+                {displayedIndex ?? 0}
+              </span>
             </div>
 
-            <div className="h-px bg-neutral-100" />
+            <div className="h-px bg-neutral-300" />
 
             <div className="mt-4">
-              <div className="text-sm font-semibold text-neutral-800 mb-3">
+              <div className="text-[16px] text-neutral-800 mb-3">
                 Progress Steps
               </div>
 
               <button
                 type="button"
-                className="w-full flex items-center gap-3 rounded-2xl border border-violet-200 bg-violet-50 px-4 py-2 mb-3 hover:shadow-sm"
+                className="w-full flex items-center gap-3 rounded-2xl border border-violet-300 bg-violet-100 px-4 py-2 mb-3 hover:shadow-sm"
               >
-                <div className="flex items-center justify-center h-6 w-6 rounded-2xl bg-white shadow-sm">
+                <div className="flex items-center justify-center h-6 w-6 rounded-2xl bg-violet-200 shadow-sm">
                   <IconWithBackground size="small" icon={<FeatherUser />} />
                 </div>
                 <span className="text-sm text-neutral-900">Demographics</span>
@@ -470,7 +468,7 @@ export default function Demographics() {
               ].map(([label, icon], i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 rounded-2xl border border-neutral-200 px-4 py-2 mb-3"
+                  className="flex items-center gap-3 rounded-2xl border border-neutral-300 px-4 py-2 mb-3"
                 >
                   <IconWithBackground
                     size="small"

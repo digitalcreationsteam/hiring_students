@@ -89,7 +89,7 @@ function Dashboard() {
   return (
     <DefaultPageLayout>
       <div className="min-h-screen w-full bg-yellow-50 overflow-y-auto px-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
-        <div className="flex w-full px-[10em] justify-center px-4 sm:px-6 lg:px-8 xl:px-12">
+        <div className="flex w-full px-[em] justify-center px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="flex flex-col gap-8 py-6 lg:flex-row">
             {/* LEFT */}
             <div className="flex w-full flex-col gap-6 lg:w-[320px] xl:w-[340px] lg:flex-none">

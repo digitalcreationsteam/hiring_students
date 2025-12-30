@@ -392,7 +392,7 @@ export default function Certifications() {
     <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-4 sm:px-6 py-20 sm:py-32">
       <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
         {/* Left card */}
-        <main className="w-full md:max-w-[448px] flex flex-col gap-6 rounded-3xl border px-4 sm:px-6 md:px-8 py-6 sm:py-8">
+        <main className="w-full md:max-w-[448px] flex flex-col gap-6 rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6 sm:py-8">
           {/* top - back + progress */}
           <div className="flex w-full items-center justify-center gap-4">
             <IconButton
@@ -422,7 +422,7 @@ export default function Certifications() {
 
           {/* Header */}
           <header className="mt-1 w-full">
-            <h2 className="text-[20px] font-semibold text-neutral-900">
+            <h2 className="text-[22px] text-neutral-900">
               Add your certifications
             </h2>
             <p className="mt-1 text-xs text-neutral-500">
@@ -483,7 +483,7 @@ export default function Certifications() {
             className="flex w-full flex-col gap-4"
           >
             <TextField
-              label="Certification Name *"
+              label={<span className="text-[12px]">Certification Name * </span>}
               helpText=""
               className={scTextFieldClass}
             >
@@ -498,7 +498,9 @@ export default function Certifications() {
               />
             </TextField>
 
-            <TextField label="Issuer *" className={scTextFieldClass}>
+            <TextField label={<span className="text-[12px]">Issuer * </span>}
+            className={scTextFieldClass}
+            >
               <TextField.Input
                 placeholder="Issuing organization"
                 value={issuer}
@@ -511,7 +513,7 @@ export default function Certifications() {
             </TextField>
 
             <TextField
-              label="Issue Date *"
+              label={<span className="text-[12px]">Issue Date * </span>}
               helpText=""
               className={scTextFieldClass}
             >
@@ -548,7 +550,7 @@ export default function Certifications() {
             </TextField>
 
             <TextField
-              label="Credential Link"
+              label={<span className="text-[12px]">Credential Link" </span>}
               helpText=""
               className={scTextFieldClass}
             >
@@ -570,7 +572,7 @@ export default function Certifications() {
 
             {/* Upload */}
             <div className="w-full">
-              <div className="text-sm font-medium text-neutral-800 mb-2">
+              <div className="text-[12px] text-neutral-800 mb-2">
                 Upload Certificate (PDF)
               </div>
 
@@ -607,7 +609,7 @@ export default function Certifications() {
 
               {/* file preview */}
               {file && (
-                <div className="mt-4 rounded-2xl border border-neutral-200 bg-gray-50 px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:justify-between">
+                <div className="mt-4 rounded-2xl border border-neutral-300 bg-gray-50 px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:justify-between">
                   <div className="flex items-center gap-3">
                     <IconWithBackground
                       size="medium"
@@ -640,7 +642,7 @@ export default function Certifications() {
                 type="button"
                 variant="neutral-secondary"
                 icon={<FeatherPlus />}
-                className="w-full rounded-full h-10 px-4 flex items-center gap-2"
+                className="w-full rounded-full border-neutral-300 h-10 px-4 flex items-center gap-2"
                 onClick={handleAdd}
                 disabled={isSubmitting}
               >
@@ -671,8 +673,8 @@ export default function Certifications() {
 
         {/* Right panel */}
         <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
-          <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-200">
-            <h3 className="text-xl font-semibold text-neutral-900">
+          <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
+            <h3 className="text-[22px] text-neutral-900">
               Your Experience Index
             </h3>
 
@@ -689,14 +691,14 @@ export default function Certifications() {
             <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
 
             <div className="mt-4">
-              <div className="text-sm font-semibold text-neutral-800 mb-3">
+              <div className="text-[16px] text-neutral-800 mb-3">
                 Progress Steps
               </div>
 
               {/* ⚪ Completed — Demographics */}
               <button
                 type="button"
-                className="w-full flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2 mb-3 hover:bg-neutral-50"
+                className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3 hover:bg-neutral-50"
               >
                 <IconWithBackground
                   size="small"
@@ -707,7 +709,7 @@ export default function Certifications() {
               </button>
 
               {/* ⚪ Completed — Education */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2 mb-3">
+              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
                 <IconWithBackground
                   size="small"
                   icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
@@ -717,7 +719,7 @@ export default function Certifications() {
               </div>
 
               {/* Experience — completed (green) */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2 mb-3">
+              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
                 <IconWithBackground
                   size="small"
                   icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
@@ -742,7 +744,7 @@ export default function Certifications() {
               </div>
 
               {/* Awards — Inactive */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2 mb-3">
+              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
                 <IconWithBackground
                   size="small"
                   variant="neutral"
@@ -753,7 +755,7 @@ export default function Certifications() {
               </div>
 
               {/* Projects — Inactive */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2">
+              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2">
                 <IconWithBackground
                   size="small"
                   variant="neutral"

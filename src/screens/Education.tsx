@@ -320,7 +320,7 @@ setEducations((prev) => [
     <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-4 sm:px-6 py-20 sm:py-32">
       <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
         {/* Left card */}
-        <main className="w-full md:max-w-[480px] bg-white rounded-3xl border px-4 sm:px-6 md:px-8 py-6 ...">
+        <main className="w-full md:max-w-[480px] bg-white rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6 ...">
           {/* Top: back + progress */}
           <div className="flex items-center gap-4">
             <IconButton
@@ -351,7 +351,7 @@ setEducations((prev) => [
 
           {/* Header */}
           <header className="mt-6">
-            <h2 className="text-[20px] font-semibold text-neutral-900">
+            <h2 className="text-[22px] text-neutral-900">
               Add your education
             </h2>
             <p className="mt-1 text-xs text-neutral-500">
@@ -420,9 +420,9 @@ setEducations((prev) => [
           >
             {/* Degree */}
             <TextField
-              label="Degree *"
-              helpText="e.g., Bachelor's, Master's, MBA"
-              className="w-full [&>label]:text-xs [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-200"
+              label={<span className="text-[12px]">Degree *  </span>}
+              helpText={<span className="text-[12px]">e.g., Bachelor's, Master's, MBA </span>}
+              className="w-full [&>label]:text-xs [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
             >
               <TextField.Input
                 placeholder="Select or type your degree"
@@ -434,9 +434,9 @@ setEducations((prev) => [
 
             {/* Field of Study */}
             <TextField
-              className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-200"
-              label="Field of Study *"
-              helpText="Your major or concentration"
+              className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
+              label={<span className="text-[12px]">Field of Study * </span>}
+              helpText={<span className="text-[12px]">Your major or concentration  </span>}
             >
               <TextField.Input
                 className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0"
@@ -450,8 +450,8 @@ setEducations((prev) => [
 
             {/* School Name */}
             <TextField
-              className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-200"
-              label="School Name *"
+              className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
+              label={<span className="text-[12px]">School Name *  </span>}
               helpText=""
             >
               <TextField.Input
@@ -467,9 +467,9 @@ setEducations((prev) => [
             {/* Years */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <TextField
-                label="Start Year *"
+                label={<span className="text-[12px]">Start Year * </span>}
                 helpText=""
-                className="[&>div]:rounded-full [&>div]:border [&>div]:border-neutral-200 flex-1"
+                className="[&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300 flex-1"
               >
                 <TextField.Input
                   className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0"
@@ -484,9 +484,9 @@ setEducations((prev) => [
               </TextField>
 
               <TextField
-                label="End Year *"
+                label={<span className="text-[12px]">End Year * </span>}
                 helpText=""
-                className="[&>div]:rounded-full [&>div]:border [&>div]:border-neutral-200 flex-1"
+                className="[&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300 flex-1"
               >
                 <TextField.Input
                   className={`rounded-full h-10 px-4 focus:ring-0 ${
@@ -535,8 +535,8 @@ setEducations((prev) => [
 
             {/* GPA */}
             <TextField
-              className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-200"
-              label="GPA"
+              className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
+              label={<span className="text-[12px]">GPA </span>}
               helpText=""
             >
               <TextField.Input
@@ -555,7 +555,7 @@ setEducations((prev) => [
                 disabled={isSubmitting}
                 variant="neutral-secondary"
                 icon={<FeatherPlus />}
-                className="w-full rounded-full h-10 px-4"
+                className="w-full rounded-full h-10 px-4 border-neutral-300"
                 onClick={handleAddEducation}
               >
                 {isSubmitting ? "Adding..." : "Add another education"}
@@ -586,8 +586,8 @@ setEducations((prev) => [
         {/* Right panel */}
 
         <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
-          <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-200">
-            <h3 className="text-base font-semibold text-neutral-900">
+          <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
+            <h3 className="text-[20px] text-neutral-900">
               Your Experience Index
             </h3>
 
@@ -605,14 +605,14 @@ setEducations((prev) => [
             <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
 
             <div className="mt-4">
-              <div className="text-sm font-semibold text-neutral-800 mb-3">
+              <div className="text-[16px] text-neutral-800 mb-3">
                 Progress Steps
               </div>
 
               {/* ⚪ Completed — Demographics */}
               <button
                 type="button"
-                className="w-full flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2 mb-3 hover:bg-neutral-50"
+                className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3 hover:bg-neutral-50"
               >
                 <IconWithBackground
                   size="small"
@@ -625,7 +625,7 @@ setEducations((prev) => [
               {/* 🟣 Active — Education */}
               <button
                 type="button"
-                className="w-full flex items-center gap-3 rounded-2xl border border-violet-200 bg-violet-50 px-4 py-2 mb-3 hover:shadow-sm"
+                className="w-full flex items-center gap-3 rounded-2xl border border-violet-300 bg-violet-50 px-4 py-2 mb-3 hover:shadow-sm"
               >
                 <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white shadow-sm">
                   <IconWithBackground
@@ -641,7 +641,7 @@ setEducations((prev) => [
               {/* Inactive steps */}
               <button
                 type="button"
-                className="w-full flex items-center gap-3 rounded-2xl border border-neutral-200 bg-default-background px-4 py-2 mb-3 hover:bg-neutral-50"
+                className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-default-background px-4 py-2 mb-3 hover:bg-neutral-50"
               >
                 <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white">
                   <IconWithBackground
@@ -655,7 +655,7 @@ setEducations((prev) => [
 
               <button
                 type="button"
-                className="w-full flex items-center gap-3 rounded-2xl border border-neutral-200 bg-default-background px-4 py-2 mb-3 hover:bg-neutral-50"
+                className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-default-background px-4 py-2 mb-3 hover:bg-neutral-50"
               >
                 <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white">
                   <IconWithBackground
@@ -669,7 +669,7 @@ setEducations((prev) => [
 
               <button
                 type="button"
-                className="w-full flex items-center gap-3 rounded-2xl border border-neutral-200 bg-default-background px-4 py-2 mb-3 hover:bg-neutral-50"
+                className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-default-background px-4 py-2 mb-3 hover:bg-neutral-50"
               >
                 <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white">
                   <IconWithBackground
@@ -683,7 +683,7 @@ setEducations((prev) => [
 
               <button
                 type="button"
-                className="w-full flex items-center gap-3 rounded-2xl border border-neutral-200 bg-default-background px-4 py-2 hover:bg-neutral-50"
+                className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-default-background px-4 py-2 hover:bg-neutral-50"
               >
                 <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white">
                   <IconWithBackground
