@@ -44,7 +44,9 @@ export default function Awards() {
   const [description, setDescription] = useState("");
   const [year, setYear] = useState("");
   const [isExpIndexLoading, setIsExpIndexLoading] = useState(true);
-  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [selectedAward, setSelectedAward] = useState<any | null>(null);
+  const [deleteAwardId, setDeleteAwardId] = useState<string | null>(null);
+
 
   type ExperiencePoints = {
     demographics?: number;
@@ -189,35 +191,39 @@ export default function Awards() {
   };
 
   // -------------------- DELETE AWARD --------------------
-  const handleRemove = async () => {
-    if (!deleteId || isSubmitting) return;
+const handleRemove = async () => {
+  if (!deleteAwardId || isSubmitting) return;
 
-    if (!userId) {
-      alert("Session expired. Please login again.");
-      navigate("/login");
-      return;
+  if (!userId) {
+    alert("Session expired. Please login again.");
+    navigate("/login");
+    return;
+  }
+
+  try {
+    setIsSubmitting(true);
+
+    await API(
+      "DELETE",
+      `${URL_PATH.deleteAward}/${deleteAwardId}`,
+      undefined,
+      { "user-id": userId }
+    );
+
+    setAwards((prev) => prev.filter((a) => a.id !== deleteAwardId));
+
+    if (selectedAward?.id === deleteAwardId) {
+      setSelectedAward(null);
     }
 
-    try {
-      setIsSubmitting(true);
-
-      await API(
-        "DELETE",
-        `${URL_PATH.deleteAward}/${deleteId}`,
-        undefined,
-        { "user-id": userId } 
-      );
-
-      setAwards((prev) => prev.filter((a) => a.id !== deleteId));
-      await fetchExperienceIndex();
-
-      setDeleteId(null);
-    } catch (err: any) {
-      alert(err?.response?.data?.message || "Failed to delete award");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    await fetchExperienceIndex();
+    setDeleteAwardId(null);
+  } catch (err: any) {
+    alert(err?.response?.data?.message || "Failed to delete award");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const buildAwardsPayload = (list: AwardEntry[]) => {
     if (!userId) {
@@ -288,21 +294,34 @@ export default function Awards() {
             </p>
           </header>
 
-         {/* Selected awards preview */}
-{/* Selected awards preview list */}
-<section className="flex w-full flex-col gap-3">
+        <section className="flex w-full flex-col gap-3">
   {awards.map((a) => (
     <div
       key={a.id}
+      role="button"
+      tabIndex={0}
+      onClick={() => setSelectedAward(a)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setSelectedAward(a);
+        }
+      }}
       className="
         rounded-2xl
         border border-neutral-300
         bg-gray-50
         px-4 py-3
         flex items-center justify-between
+        cursor-pointer
+        hover:bg-neutral-100
+        transition
+        focus:outline-none
+        focus:ring-2
+        focus:ring-violet-500
       "
     >
-      {/* Left: icon + text */}
+      {/* Left */}
       <div className="flex items-center gap-3 min-w-0">
         <Avatar
           size="large"
@@ -317,7 +336,7 @@ export default function Awards() {
         </Avatar>
 
         <div className="flex flex-col min-w-0">
-          <span className="text-sm font-semibold text-neutral-900 leading-tight truncate">
+          <span className="text-sm font-semibold text-neutral-900 truncate">
             {a.name}
           </span>
 
@@ -329,19 +348,70 @@ export default function Awards() {
         </div>
       </div>
 
-      {/* Right: delete + year */}
+      {/* Right */}
       <div className="flex flex-col items-end gap-2 shrink-0">
-        <IconButton
-          size="small"
-          icon={<FeatherX />}
-          onClick={() => setDeleteId(a.id)}
-          className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
-        />
+    <IconButton
+  size="small"
+  icon={<FeatherX />}
+  aria-label={`Delete award ${a.name}`}
+  onClick={(e) => {
+    e.stopPropagation(); 
+    setDeleteAwardId(a.id);
+  }}
+  onKeyDown={(e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      e.stopPropagation();
+      setDeleteAwardId(a.id);
+    }
+  }}
+  className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
+/>
+
         <span className="text-xs text-neutral-500">{a.year}</span>
       </div>
     </div>
   ))}
 </section>
+
+{selectedAward && (
+  <div className="rounded-3xl border border-neutral-300 bg-white px-6 py-5">
+    <div className="flex items-center justify-between mb-4">
+      <h3 className="text-sm font-semibold text-neutral-900">
+        Award Details
+      </h3>
+
+      <IconButton
+        size="small"
+        icon={<FeatherX />}
+        onClick={() => setSelectedAward(null)}
+        className="!bg-transparent !text-neutral-500"
+      />
+    </div>
+
+    <div className="flex flex-col gap-3 text-sm text-neutral-800">
+      <div>
+        <span className="font-medium">Award name:</span>{" "}
+        {selectedAward.name}
+      </div>
+
+      {selectedAward.description && (
+        <div>
+          <span className="font-medium">Description:</span>{" "}
+          {selectedAward.description}
+        </div>
+      )}
+
+      {selectedAward.year && (
+        <div>
+          <span className="font-medium">Year:</span>{" "}
+          {selectedAward.year}
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
 
 
 
@@ -367,7 +437,7 @@ export default function Awards() {
             </TextField>
 
             <TextField
-              label={<span className="text-[12px]">Description (optional)" </span>}
+              label={<span className="text-[12px]">Description (optional) </span>}
               helpText=""
               className={scTextFieldClass}
             >
@@ -522,7 +592,7 @@ export default function Awards() {
           </div>
         </aside>
       </div>
-      {deleteId && (
+      {deleteAwardId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="w-[360px] rounded-2xl bg-white p-6 shadow-xl">
             <div className="flex justify-between items-center mb-4">
@@ -530,7 +600,7 @@ export default function Awards() {
                 Are you sure?
               </h3>
               <button
-                onClick={() => setDeleteId(null)}
+                onClick={() => setDeleteAwardId(null)}
                 className="text-neutral-400 hover:text-neutral-600"
               >
                 ✕
@@ -538,15 +608,14 @@ export default function Awards() {
             </div>
 
             <p className="text-sm text-neutral-600 mb-6">
-              Do you really want to delete this award? This action cannot be
-              undone.
+              Do you really want to delete this award? 
             </p>
 
             <div className="flex gap-3">
               <Button
                 variant="neutral-secondary"
                 className="flex-1"
-                onClick={() => setDeleteId(null)}
+                onClick={() => setDeleteAwardId(null)}
               >
                 Cancel
               </Button>

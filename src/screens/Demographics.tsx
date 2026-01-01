@@ -42,7 +42,7 @@ export default function Demographics() {
   "w-full [&>label]:text-[8px] [&>label]:font-small [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300 [&>div]:h-8 focus:border-black";
 
 const scInputClass =
-  "w-full h-7 rounded-full px-2 text-[14px] leading-none bg-transparent focus:bg-transparent focus:outline-none focus:ring-0";
+  "w-full h-7 rounded-full px-2 text-[12px] leading-none bg-transparent focus:bg-transparent focus:outline-none focus:ring-0";
 
 
   /* -------------------- VALIDATION RULES -------------------- */
@@ -292,7 +292,8 @@ const scInputClass =
 
           {/* FORM */}
           <div className="mt-6 flex flex-col gap-4">
-            <TextField label="Name *" className={scTextFieldClass}>
+            <TextField label={<span className="text-[12px]">Name * </span>} 
+            className={scTextFieldClass}>
               <TextField.Input
                 value={form.fullName}
                 onChange={(e) => handleChange("fullName", e.target.value)}
@@ -302,8 +303,8 @@ const scInputClass =
             </TextField>
 
             <TextField
-              label="Email *"
-              helpText="Used for account access and recruiter outreach"
+              label={<span className="text-[12px]">Email * </span>}
+              helpText={<span className="text-[12px]">Used for account access and recruiter outreach </span>}
               className={scTextFieldClass}
             >
               <TextField.Input
@@ -315,8 +316,8 @@ const scInputClass =
             </TextField>
 
             <TextField
-              label="Phone Number"
-              helpText="Optional for recruiter contact"
+              label={<span className="text-[12px]">Phone Number </span>}
+              helpText={<span className="text-[12px]">Optional for recruiter contact" </span>}
               className={scTextFieldClass}
             >
               <TextField.Input
@@ -357,7 +358,7 @@ const scInputClass =
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <TextField
-                label="City *"
+                label={<span className="text-[12px]">City * </span>}
                 className="flex-1 [&>div]:h-8 [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300 [&>div]:focus-within:border-black-900"
               >
                 <TextField.Input
@@ -369,7 +370,7 @@ const scInputClass =
               </TextField>
 
               <TextField
-                label="State *"
+                label={<span className="text-[12px]">State * </span>}
                 className="flex-1 [&>div]:h-8 [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300 [&>div]:focus-within:border-black-900"
               >
                 <TextField.Input
@@ -382,7 +383,7 @@ const scInputClass =
             </div>
 
             <TextField
-              label="Country *"
+              label={<span className="text-[12px]">Country * </span>}
               className="w-full [&>div]:h-8 [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300 [&>div]:focus-within:border-black-900"
             >
               <TextField.Input

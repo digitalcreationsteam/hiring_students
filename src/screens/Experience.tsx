@@ -21,6 +21,29 @@ import {
 } from "@subframe/core";
 import API, { URL_PATH } from "src/common/API";
 
+import * as SubframeCore from "@subframe/core";
+import { FeatherChevronDown } from "@subframe/core";
+
+const ROLE_TITLES = [
+  "Software Engineer",
+  "Frontend Developer",
+  "Backend Developer",
+  "Full Stack Developer",
+  "Product Manager",
+  "UI/UX Designer",
+  "Data Analyst",
+  "Intern",
+];
+
+const ROLE_TYPES = [
+  "Internship",
+  "Full Time",
+  "Part Time",
+  "Contract",
+  "Freelance",
+];
+
+
 type ExperiencePoints = {
   demographics?: number;
   education?: number;
@@ -74,6 +97,8 @@ export default function Experience() {
 
   // stored entries
   const [experiences, setExperiences] = useState<ExperienceEntry[]>([]);
+  const [selectedExperience, setSelectedExperience] =
+    useState<ExperienceEntry | null>(null);
 
   // small SC2-style TextField wrapper classes (one-line)
   const scTextFieldClass =
@@ -189,6 +214,17 @@ export default function Experience() {
       return;
     }
 
+    const isDuplicate = experiences.some(
+      (e) =>
+        e.roleTitle.toLowerCase() === roleTitle.toLowerCase().trim() &&
+        e.company.toLowerCase() === company.toLowerCase().trim()
+    );
+
+    if (isDuplicate) {
+      alert("This experience already exists.");
+      return;
+    }
+
     const startYearNum = Number(startDate.split("/")[1]);
     const endYearNum = currentlyWorking
       ? new Date().getFullYear()
@@ -218,19 +254,20 @@ export default function Experience() {
         "user-id": userId,
       });
 
-      const created = res.data[0];
+      const created = res.data[0]; // backend returns array
 
       setExperiences((prev) => [
         {
-          id: res.data._id,
-          roleTitle: res.data.jobTitle,
-          company: res.data.companyName,
-          startDate: `01/${res.data.startYear}`,
-          endDate: res.data.currentlyWorking
+          id: created._id,
+          roleTitle: created.jobTitle,
+          typeOfRole: created.typeOfRole || undefined,
+          company: created.companyName,
+          startDate: `01/${created.startYear}`,
+          endDate: created.currentlyWorking
             ? undefined
-            : `01/${res.data.endYear}`,
-          currentlyWorking: res.data.currentlyWorking,
-          description: res.data.description || undefined,
+            : `01/${created.endYear}`,
+          currentlyWorking: created.currentlyWorking,
+          description: created.description || undefined,
         },
         ...prev,
       ]);
@@ -265,6 +302,11 @@ export default function Experience() {
       );
 
       setExperiences((prev) => prev.filter((e) => e.id !== deleteId));
+
+      if (selectedExperience?.id === deleteId) {
+        setSelectedExperience(null);
+      }
+
       await fetchExperienceIndex();
       setDeleteId(null);
     } catch (err: any) {
@@ -280,18 +322,16 @@ export default function Experience() {
     if (!userId) return;
 
     try {
-      const res = await API(
-        "GET",
-        URL_PATH.getExperience,
-        undefined,
-        { "user-id": userId }
-      );
+      const res = await API("GET", URL_PATH.getExperience, undefined, {
+        "user-id": userId,
+      });
 
       const apiExperiences = res?.data ?? [];
 
       const mapped: ExperienceEntry[] = apiExperiences.map((e: any) => ({
         id: e._id,
         roleTitle: typeof e.jobTitle === "string" ? e.jobTitle : "",
+        typeOfRole: typeof e.typeOfRole === "string" ? e.typeOfRole : undefined,
         company: typeof e.companyName === "string" ? e.companyName : "",
         startDate: e.startYear ? `01/${e.startYear}` : "",
         endDate: e.currentlyWorking
@@ -401,60 +441,142 @@ export default function Experience() {
           </div>
 
           {/* Selected experience preview list */}
-          <section className="mt-6 flex flex-col gap-3">
+          {/* Selected experience preview list */}
+          <section className="mt-6 flex w-full flex-col gap-3">
             {experiences.map((exp) => (
               <div
                 key={exp.id}
-                className="flex w-full flex-col items-start gap-3 rounded-3xl border border-neutral-300 bg-neutral-50 px-4 py-4"
+                role="button"
+                tabIndex={0}
+                onClick={() => setSelectedExperience(exp)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setSelectedExperience(exp);
+                  }
+                }}
+                className="
+        rounded-2xl
+        border border-neutral-300
+        bg-gray-50
+        px-4 py-3
+        flex items-center justify-between
+        cursor-pointer
+        hover:bg-neutral-100
+        transition
+        focus:outline-none
+        focus:ring-2
+        focus:ring-violet-500
+      "
               >
-                <div className="flex w-full items-center justify-between">
-                  {/* Left */}
-                  <div className="flex items-center gap-3">
-                    <Avatar
-                      size="large"
-                      square
-                      image="https://res.cloudinary.com/subframe/image/upload/v1711417525/shared/elkoy8wipvhulayviq7t.png"
-                      className="!rounded-2xl shadow-sm"
-                    >
-                      {(exp.company || "")
-                        .split(" ")
-                        .filter(Boolean)
-                        .slice(0, 2)
-                        .map((w) => w[0])
-                        .join("")}
-                    </Avatar>
+                {/* Left */}
+                <div className="flex items-center gap-3 min-w-0">
+                  <Avatar
+                    size="large"
+                    square
+                    image="https://res.cloudinary.com/subframe/image/upload/v1711417525/shared/elkoy8wipvhulayviq7t.png"
+                    className="!rounded-2xl shadow-sm"
+                  >
+                    {(exp.company || "")
+                      .split(" ")
+                      .slice(0, 2)
+                      .map((w) => w[0])
+                      .join("")}
+                  </Avatar>
 
-                    <div className="flex flex-col gap-1">
-                      <span className="text-sm font-medium text-neutral-900">
-                        {exp.roleTitle}
-                      </span>
-                      <span className="text-xs text-neutral-500">
-                        {exp.company}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col items-end gap-2">
-                    <IconButton
-                      size="small"
-                      icon={<FeatherX />}
-                      onClick={() => setDeleteId(exp.id)}
-                      className="!bg-transparent !text-neutral-500"
-                    />
-
-                    <span className="text-xs text-neutral-500">
-                      {exp.startDate || "—"}{" "}
-                      {exp.currentlyWorking
-                        ? " - Present"
-                        : exp.endDate
-                        ? ` - ${exp.endDate}`
-                        : ""}
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-sm font-semibold text-neutral-900 truncate">
+                      {exp.roleTitle}
+                    </span>
+                    <span className="text-xs text-neutral-500 truncate">
+                      {exp.company}
                     </span>
                   </div>
+                </div>
+
+                {/* Right */}
+                <div className="flex flex-col items-end gap-2 shrink-0">
+                  <IconButton
+                    size="small"
+                    icon={<FeatherX />}
+                    aria-label={`Delete experience ${exp.roleTitle}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteId(exp.id);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setDeleteId(exp.id);
+                      }
+                    }}
+                    className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
+                  />
+
+                  <span className="text-xs text-neutral-500">
+                    {exp.startDate || "—"}
+                    {exp.currentlyWorking
+                      ? " - Present"
+                      : exp.endDate
+                      ? ` - ${exp.endDate}`
+                      : ""}
+                  </span>
                 </div>
               </div>
             ))}
           </section>
+
+          {selectedExperience && (
+            <div className="rounded-3xl border border-neutral-300 bg-white px-6 py-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-semibold text-neutral-900">
+                  Experience Details
+                </h3>
+
+                <IconButton
+                  size="small"
+                  icon={<FeatherX />}
+                  onClick={() => setSelectedExperience(null)}
+                  className="!bg-transparent !text-neutral-500"
+                />
+              </div>
+
+              <div className="flex flex-col gap-3 text-sm text-neutral-800">
+                <div>
+                  <span className="font-medium">Role:</span>{" "}
+                  {selectedExperience.roleTitle}
+                </div>
+
+                <div>
+                  <span className="font-medium">Type:</span>{" "}
+                  {selectedExperience.typeOfRole}
+                </div>
+
+                <div>
+                  <span className="font-medium">Company:</span>{" "}
+                  {selectedExperience.company}
+                </div>
+
+                <div>
+                  <span className="font-medium">Duration:</span>{" "}
+                  {selectedExperience.startDate}
+                  {selectedExperience.currentlyWorking
+                    ? " - Present"
+                    : selectedExperience.endDate
+                    ? ` - ${selectedExperience.endDate}`
+                    : ""}
+                </div>
+
+                {selectedExperience.description && (
+                  <div>
+                    <span className="font-medium">Description:</span>{" "}
+                    {selectedExperience.description}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* form */}
           <form
@@ -464,37 +586,69 @@ export default function Experience() {
             }}
             className="mt-6 flex flex-col gap-4"
           >
-            <TextField
-              label={<span className="text-[12px]">Role Title * </span>}
-              helpText=""
-              className={`${scTextFieldClass}`}
-            >
-              <TextField.Input
-                placeholder="e.g., Product Manager"
-                value={roleTitle}
-                onChange={(e) =>
-                  setRoleTitle(e.target.value.replace(/[^A-Za-z\s.&-]/g, ""))
-                }
-                onBlur={() => setRoleTitle(toTitleCase(roleTitle))}
-                className={scInputClass}
-              />
-            </TextField>
+            <div className="flex flex-col gap-1">
+  <label className="text-[12px] font-medium text-neutral-900">
+    Role Title *
+  </label>
 
-            <TextField
-              label={<span className="text-[12px]">Type of Role </span>}
-              helpText={<span className="text-[12px]">e.g., Internship, Full Time, Contract" </span>}
-              className={scTextFieldClass}
-            >
-              <TextField.Input
-                placeholder="e.g., Internship, Full Time"
-                value={typeOfRole}
-                onChange={(e) =>
-                  setTypeOfRole(e.target.value.replace(/[^A-Za-z\s.&-]/g, ""))
-                }
-                onBlur={() => setTypeOfRole(toTitleCase(typeOfRole))}
-                className={scInputClass}
-              />
-            </TextField>
+  <SubframeCore.DropdownMenu.Root>
+    <SubframeCore.DropdownMenu.Trigger asChild>
+      <div className="flex h-9 items-center justify-between rounded-full border border-neutral-300 bg-white px-3 cursor-pointer">
+        <span className={roleTitle ? "text-neutral-900 text-[12px]" : "text-neutral-400 text-[12px]"}>
+          {roleTitle || "Select role title"}
+        </span>
+        <FeatherChevronDown className="text-neutral-500" />
+      </div>
+    </SubframeCore.DropdownMenu.Trigger>
+
+    <SubframeCore.DropdownMenu.Content asChild>
+      <div className="bg-white rounded-2xl shadow-lg py-1 max-h-[220px] overflow-y-auto">
+        {ROLE_TITLES.map((item) => (
+          <div
+            key={item}
+            onClick={() => setRoleTitle(item)}
+            className="px-4 py-2 text-sm cursor-pointer hover:bg-neutral-100"
+          >
+            {item}
+          </div>
+        ))}
+      </div>
+    </SubframeCore.DropdownMenu.Content>
+  </SubframeCore.DropdownMenu.Root>
+</div>
+
+
+           <div className="flex flex-col gap-1">
+  <label className="text-[12px] font-medium text-neutral-900">
+    Type of Role
+  </label>
+
+  <SubframeCore.DropdownMenu.Root>
+    <SubframeCore.DropdownMenu.Trigger asChild>
+      <div className="flex h-9 items-center justify-between rounded-full border border-neutral-300 bg-white px-3 cursor-pointer">
+        <span className={typeOfRole ? "text-neutral-900 text-[12px]" : "text-neutral-400 text-[12px]"}>
+          {typeOfRole || "Select type of role"}
+        </span>
+        <FeatherChevronDown className="text-neutral-500" />
+      </div>
+    </SubframeCore.DropdownMenu.Trigger>
+
+    <SubframeCore.DropdownMenu.Content asChild>
+      <div className="bg-white rounded-2xl shadow-lg py-1">
+        {ROLE_TYPES.map((item) => (
+          <div
+            key={item}
+            onClick={() => setTypeOfRole(item)}
+            className="px-4 py-2 text-sm cursor-pointer hover:bg-neutral-100"
+          >
+            {item}
+          </div>
+        ))}
+      </div>
+    </SubframeCore.DropdownMenu.Content>
+  </SubframeCore.DropdownMenu.Root>
+</div>
+
 
             <TextField
               label={<span className="text-[12px]">Company * </span>}
@@ -626,7 +780,7 @@ export default function Experience() {
             </div>
 
             <TextField
-              label={<span className="text-[12px]">Description  </span>}
+              label={<span className="text-[12px]">Description </span>}
               helpText=""
               className={`${scTextFieldClass}`}
             >
@@ -686,7 +840,7 @@ export default function Experience() {
               Your Experience Index
             </h3>
 
-           <div className="flex items-center justify-center py-6">
+            <div className="flex items-center justify-center py-6">
               <span
                 aria-live="polite"
                 className="font-['Afacad_Flux'] text-[32px] sm:text-[40px] md:text-[48px] font-[500] leading-[56px] text-neutral-300"
@@ -777,45 +931,44 @@ export default function Experience() {
         </aside>
       </div>
       {deleteId && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-    <div className="w-[360px] rounded-2xl bg-white p-6 shadow-xl">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-neutral-900">
-          Are you sure?
-        </h3>
-        <button
-          onClick={() => setDeleteId(null)}
-          className="text-neutral-400 hover:text-neutral-600"
-        >
-          ✕
-        </button>
-      </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-[360px] rounded-2xl bg-white p-6 shadow-xl">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-neutral-900">
+                Are you sure?
+              </h3>
+              <button
+                onClick={() => setDeleteId(null)}
+                className="text-neutral-400 hover:text-neutral-600"
+              >
+                ✕
+              </button>
+            </div>
 
-      <p className="text-sm text-neutral-600 mb-6">
-        Do you really want to delete this experience? 
-      </p>
+            <p className="text-sm text-neutral-600 mb-6">
+              Do you really want to delete this experience?
+            </p>
 
-      <div className="flex gap-3">
-        <Button
-          variant="neutral-secondary"
-          className="flex-1"
-          onClick={() => setDeleteId(null)}
-        >
-          Cancel
-        </Button>
+            <div className="flex gap-3">
+              <Button
+                variant="neutral-secondary"
+                className="flex-1"
+                onClick={() => setDeleteId(null)}
+              >
+                Cancel
+              </Button>
 
-        <Button
-          className="flex-1 rounded-3xl bg-violet-600 text-white hover:bg-violet-700"
-          onClick={handleRemove}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "Deleting..." : "Yes"}
-        </Button>
-      </div>
-    </div>
-  </div>
-)}
-
+              <Button
+                className="flex-1 rounded-3xl bg-violet-600 text-white hover:bg-violet-700"
+                onClick={handleRemove}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Deleting..." : "Yes"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

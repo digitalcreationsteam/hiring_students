@@ -142,12 +142,12 @@ function Login() {
           </div>
 
           {/* VERTICAL LINE */}
-          <div className="hidden lg:block w-[1px] bg-gray-400" />
+          <div className="hidden lg:block w-[1px] bg-gray-300" />
 
           {/* RIGHT */}
           <div className="w-full lg:w-1/2 px-4 sm:px-6 py-6 sm:py-8 flex flex-col gap-4 bg-white min-h-0">
             <div>
-              <h2 className="text-[22px] font-">Sign in to your account</h2>
+              <h2 className="text-[22px]">Sign in to your account</h2>
               <p className="text-xs text-subtext-color">
                 Welcome back! Sign in to access your job applications and
                 profile
@@ -251,7 +251,7 @@ function Login() {
               </button>
             </form>
 
-            <div className="w-full h-[1px] bg-gray-400 my-4 flex-shrink-0" />
+            <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
 
             <div className="flex flex-wrap justify-center gap-1 text-xs text-center">
               <span className="text-subtext-color">Don't have an account?</span>

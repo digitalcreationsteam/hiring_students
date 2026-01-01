@@ -11,34 +11,29 @@ import { useNavigate } from "react-router-dom";
 function SkillIndexIntro() {
   const navigate = useNavigate();
   return (
-    <div className="min-h-screen py-24 items-center justify-center bg-neutral-50 px-8 py-16">
-      <div className="flex max-w-[660px] grow shrink-0 basis-0 items-start justify-center gap-6 mx-auto">
-        <div className="flex w-full grow shrink-0 basis-0 flex-col items-start gap-9 rounded-3xl border border-solid border-neutral-border bg-white px-10 py-14 shadow-lg">
-          <div className="flex w-full items-center justify-center gap-4">
+    <div className="min-h-screen bg-neutral-50 px-4 sm:px-6 md:px-8 py-10 sm:py-16 md:py-24 flex items-center justify-center">
+      <div className="w-full max-w-[660px] mx-auto relative">
+        <div className="flex w-full flex-col items-start gap-9 rounded-3xl border border-solid border-neutral-border bg-white px-5 sm:px-8 md:px-10 py-8 sm:py-12 md:py-14 shadow-lg">
+          <div className="flex w-full items-center gap-3">
             <IconButton
               size="small"
               icon={<FeatherArrowLeft />}
               onClick={() => navigate(-1)}
             />
-            <div className="flex grow shrink-0 basis-0 items-center justify-center gap-4">
-              <div className="flex grow shrink-0 basis-0 items-center gap-2">
-                <div className="flex h-1 grow shrink-0 basis-0 items-start rounded-full bg-violet-700" />
-                <div className="flex h-1 grow shrink-0 basis-0 items-start rounded-full bg-violet-700" />
-                <div className="flex h-1 grow shrink-0 basis-0 items-start rounded-full bg-violet-700" />
-                <div className="flex h-1 grow shrink-0 basis-0 items-start rounded-full bg-violet-700" />
-                <div className="flex h-1 grow shrink-0 basis-0 items-start rounded-full bg-violet-700" />
-                <div className="flex h-1 grow shrink-0 basis-0 items-start rounded-full bg-violet-700" />
-                <div className="flex h-1 grow shrink-0 basis-0 items-start rounded-full bg-violet-700" />
-                <div className="flex h-1 grow shrink-0 basis-0 items-start rounded-full bg-violet-300" />
-              </div>
+            <div className="flex flex-1 items-center gap-2">
+              <div className="h-1 flex-1 rounded-full bg-violet-700" />
+              <div className="h-1 flex-1 rounded-full bg-gray-300" />
+              <div className="h-1 flex-1 rounded-full bg-gray-300" />
+              <div className="h-1 flex-1 rounded-full bg-gray-300" />
+              <div className="h-1 flex-1 rounded-full bg-gray-300" />
             </div>
           </div>
           <div className="flex w-full flex-col items-start gap-3">
-            <h2 className="text-[30px] text-neutral-900">
+            <h2 className="text-xl sm:text-2xl md:text-[30px] text-neutral-900">
               Now let's calculate your Skill Index
             </h2>
 
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs sm:text-sm text-neutral-500">
               The Skill Index is the foundation of UniTalent’s hiring system and
               the most important step in your evaluation. It provides evidence
               of job readiness and role-relevant knowledge, enabling
@@ -51,7 +46,7 @@ function SkillIndexIntro() {
             </span>
             {/* Step 1 */}
             <div className="flex items-start gap-4">
-              <div className="mt-1 h-6 w-6 rounded-full bg-violet-100" />
+              <div className="mt-1 h-6 w-6 rounded-full bg-violet-200 shrink-0" />
               <div className="flex flex-col gap-1">
                 <p className="text-sm font-medium text-neutral-900">
                   Choose your job domain
@@ -65,7 +60,7 @@ function SkillIndexIntro() {
 
             {/* Step 2 */}
             <div className="flex items-start gap-4">
-              <div className="mt-1 h-6 w-6 rounded-full bg-violet-100" />
+              <div className="mt-1 h-6 w-6 rounded-full bg-violet-200 shrink-0" />
               <div className="flex flex-col gap-1">
                 <p className="text-sm font-medium text-neutral-900">
                   Take the Skill Index Assessment
@@ -79,7 +74,7 @@ function SkillIndexIntro() {
 
             {/* Step 3 */}
             <div className="flex items-start gap-4">
-              <div className="mt-1 h-6 w-6 rounded-full bg-violet-100" />
+              <div className="mt-1 h-6 w-6 rounded-full bg-violet-200 shrink-0" />
               <div className="flex flex-col gap-1">
                 <p className="text-sm font-medium text-neutral-900">
                   Get your Hireability Score
@@ -91,7 +86,7 @@ function SkillIndexIntro() {
               </div>
             </div>
 
-            <div className="w-full rounded-2xl border border-violet-200 bg-violet-50 px-6 py-5">
+            <div className="w-full rounded-2xl border border-violet-300 bg-violet-50 px-4 sm:px-6 py-4 sm:py-5">
               <div className="flex items-start gap-4">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-100">
                   <FeatherInfo className="h-4 w-4 text-violet-600" />
@@ -119,7 +114,6 @@ function SkillIndexIntro() {
             </Button>
           </div>
         </div>
-        <div className="flex grow shrink-0 basis-0 flex-col items-start bg-gradient-to-br from-brand-500 to-brand-700 absolute inset-0 -z-10" />
       </div>
     </div>
   );
