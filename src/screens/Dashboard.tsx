@@ -67,16 +67,16 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
     /* -------------------- NAVIGATION (UPDATED) -------------------- */
-  const handleNavigate = (path: string) => {
-    // if (path === "/assessment") {
-    //   const res = await fetch("/api/assessment/status");
-    //   const data = await res.json();
+  const handleNavigate = async (path: string) => {
+    if (path === "/assessment") {
+      const res = await fetch("/api/assessment/status");
+      const data = await res.json();
 
-    //   if (data.status === "IN_PROGRESS") {
-    //     navigate(`/assessment/continue/${data.attemptId}`);
-    //     return;
-    //   }
-    // }
+      if (data.status === "IN_PROGRESS") {
+        navigate(`/assessment/continue/${data.attemptId}`);
+        return;
+      }
+    }
     navigate(path);
   };
 
@@ -92,6 +92,8 @@ export default function Dashboard() {
     domain: "",
     location: "",
   });
+
+         /* -------------------- PROFETIONAL PROFILE -------------------- */
 
   const [profile, setProfile] = useState({
     
@@ -215,6 +217,8 @@ export default function Dashboard() {
       })
       .catch(() => {});
 
+      
+
   }, []);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -241,6 +245,31 @@ export default function Dashboard() {
     valueColor: "text-violet-600",
     badge: "brand",
   };
+
+         /* --------------------    USER PROFILE API -------------------- */
+
+const fetchUserProfile = React.useCallback(async () => {
+  // if (!userId)return;
+  try {
+    const res = await API(
+      "GET",
+      URL_PATH.getDemographics
+    );
+
+    setuser({
+      name: res.name,
+      domain: res.domain,
+      location: res.location,
+    });
+
+    setAvatar(res.avatar);
+  } catch (err) {
+    console.warn("Failed to fetch user profile", err);
+  }
+}, []);
+
+         /* --------------------    USER PROFILE API -------------------- */
+
 
   
 
