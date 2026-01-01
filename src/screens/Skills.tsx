@@ -20,11 +20,7 @@ export default function Skills() {
   const [input, setInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [skills, setSkills] = useState<string[]>([
-    "Product Strategy",
-    "User Research",
-    "Roadmapping",
-  ]);
+  const [skills, setSkills] = useState<string[]>([]);
 
   const suggested = [
     "Data Analysis",

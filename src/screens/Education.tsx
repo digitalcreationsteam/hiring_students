@@ -66,7 +66,7 @@ export default function Education() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
- 
+
   const userId = localStorage.getItem("userId");
   // local form state
   const [degree, setDegree] = useState("");
@@ -82,6 +82,8 @@ export default function Education() {
 
   // stored entries
   const [educations, setEducations] = useState<EducationEntry[]>([]);
+  const [selectedEducation, setSelectedEducation] =
+    useState<EducationEntry | null>(null);
 
   const displayedIndex =
     (experiencePoints?.demographics ?? 0) + (experiencePoints?.education ?? 0);
@@ -154,28 +156,25 @@ export default function Education() {
 
     const currentYear = new Date().getFullYear();
 
-const duration =
-  currentlyStudying
-    ? currentYear - Number(startYear)
-    : Number(endYear) - Number(startYear);
+    const duration = currentlyStudying
+      ? currentYear - Number(startYear)
+      : Number(endYear) - Number(startYear);
 
     // ✅ API payload
-   const payload = {
-  educations: [
-    {
-      degree: toTitleCase(degree),
-      fieldOfStudy: toTitleCase(fieldOfStudy),
-      schoolName: toTitleCase(schoolName),
-      startYear: Number(startYear),
-      endYear: currentlyStudying ? null : Number(endYear),
-      currentlyStudying,
-      duration,
-      gpa: gpa ? Number(gpa) : null,
-    },
-  ],
-};
-
-
+    const payload = {
+      educations: [
+        {
+          degree: toTitleCase(degree),
+          fieldOfStudy: toTitleCase(fieldOfStudy),
+          schoolName: toTitleCase(schoolName),
+          startYear: Number(startYear),
+          endYear: currentlyStudying ? null : Number(endYear),
+          currentlyStudying,
+          duration,
+          gpa: gpa ? Number(gpa) : null,
+        },
+      ],
+    };
 
     try {
       setIsSubmitting(true);
@@ -184,23 +183,23 @@ const duration =
         "user-id": userId,
       });
 
-const created = res.data[0];
+      const created = res.data[0];
 
-setEducations((prev) => [
-  {
-    id: created._id,
-    degree: created.degree,
-    fieldOfStudy: created.fieldOfStudy,
-    schoolName: created.schoolName,
-    startYear: String(created.startYear),
-    endYear: created.currentlyStudying
-      ? undefined
-      : String(created.endYear),
-    currentlyStudying: created.currentlyStudying,
-    gpa: created.gpa ? String(created.gpa) : undefined,
-  },
-  ...prev,
-]);
+      setEducations((prev) => [
+        {
+          id: created._id,
+          degree: created.degree,
+          fieldOfStudy: created.fieldOfStudy,
+          schoolName: created.schoolName,
+          startYear: String(created.startYear),
+          endYear: created.currentlyStudying
+            ? undefined
+            : String(created.endYear),
+          currentlyStudying: created.currentlyStudying,
+          gpa: created.gpa ? String(created.gpa) : undefined,
+        },
+        ...prev,
+      ]);
 
       await fetchExperienceIndex();
       resetForm();
@@ -249,12 +248,9 @@ setEducations((prev) => [
     if (!userId) return;
 
     try {
-      const res = await API(
-        "GET",
-        URL_PATH.getEducation,
-        undefined,
-        { "user-id": userId }
-      );
+      const res = await API("GET", URL_PATH.getEducation, undefined, {
+        "user-id": userId,
+      });
 
       const apiEducations = res?.data || [];
 
@@ -351,64 +347,141 @@ setEducations((prev) => [
 
           {/* Header */}
           <header className="mt-6">
-            <h2 className="text-[22px] text-neutral-900">
-              Add your education
-            </h2>
+            <h2 className="text-[22px] text-neutral-900">Add your education</h2>
             <p className="mt-1 text-xs text-neutral-500">
               Your academic background helps shape your Experience Index
             </p>
           </header>
 
           {/* Selected education preview list */}
-          <section className="mt-6 flex flex-col gap-3">
+          <section className="mt-6 flex w-full flex-col gap-3">
             {educations.map((ed) => (
               <div
                 key={ed.id}
-                className="flex w-full flex-col items-start gap-3 rounded-3xl border border-neutral-300 bg-neutral-50 px-4 py-4"
+                role="button"
+                tabIndex={0}
+                onClick={() => setSelectedEducation(ed)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setSelectedEducation(ed);
+                  }
+                }}
+                className="
+        rounded-2xl
+        border border-neutral-300
+        bg-neutral-50
+        px-4 py-3
+        flex items-center justify-between
+        cursor-pointer
+        hover:bg-neutral-100
+        transition
+        focus:outline-none
+        focus:ring-2
+        focus:ring-violet-500
+      "
               >
-                <div className="flex w-full items-center justify-between">
-                  {/* Left */}
-                  <div className="flex items-center gap-3">
-                    <Avatar
-                      size="large"
-                      image="https://images.unsplash.com/photo-1562774053-701939374585?w=400&h=400&fit=crop"
-                      square
-                      className="!rounded-2xl shadow-sm"
-                    >
-                      {ed.schoolName
-                        .split(" ")
-                        .slice(0, 2)
-                        .map((s) => s[0])
-                        .join("")}
-                    </Avatar>
+                {/* Left */}
+                <div className="flex items-center gap-3 min-w-0">
+                  <Avatar
+                    size="large"
+                    image="https://images.unsplash.com/photo-1562774053-701939374585?w=400&h=400&fit=crop"
+                    square
+                    className="!rounded-2xl shadow-sm"
+                  >
+                    {ed.schoolName
+                      .split(" ")
+                      .slice(0, 2)
+                      .map((s) => s[0])
+                      .join("")}
+                  </Avatar>
 
-                    <div className="flex flex-col gap-1">
-                      <span className="text-sm font-medium text-neutral-900">
-                        {ed.degree}
-                      </span>
-                      <span className="text-xs text-neutral-500">
-                        {ed.schoolName}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col items-end gap-2">
-                    <IconButton
-                      size="small"
-                      icon={<FeatherX />}
-                      onClick={() => setDeleteId(ed.id)}
-                      className="!bg-transparent !text-neutral-500"
-                    />
-
-                    <span className="text-xs text-neutral-500">
-                      {ed.startYear}{" "}
-                      {ed.currentlyStudying ? " - Present" : ` - ${ed.endYear}`}
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-sm font-semibold text-neutral-900 truncate">
+                      {ed.degree}
+                    </span>
+                    <span className="text-xs text-neutral-500 truncate">
+                      {ed.schoolName}
                     </span>
                   </div>
+                </div>
+
+                {/* Right */}
+                <div className="flex flex-col items-end gap-2 shrink-0">
+                  <IconButton
+                    size="small"
+                    icon={<FeatherX />}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteId(ed.id);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setDeleteId(ed.id);
+                      }
+                    }}
+                    className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
+                  />
+
+                  <span className="text-xs text-neutral-500">
+                    {ed.startYear}
+                    {ed.currentlyStudying ? " - Present" : ` - ${ed.endYear}`}
+                  </span>
                 </div>
               </div>
             ))}
           </section>
+
+          {selectedEducation && (
+            <div className="rounded-3xl border border-neutral-300 bg-white px-6 py-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-semibold text-neutral-900">
+                  Education Details
+                </h3>
+
+                <IconButton
+                  size="small"
+                  icon={<FeatherX />}
+                  onClick={() => setSelectedEducation(null)}
+                  className="!bg-transparent !text-neutral-500"
+                />
+              </div>
+
+              <div className="flex flex-col gap-3 text-sm text-neutral-800">
+                <div>
+                  <span className="font-medium">Degree:</span>{" "}
+                  {selectedEducation.degree}
+                </div>
+
+                <div>
+                  <span className="font-medium">Field of Study:</span>{" "}
+                  {selectedEducation.fieldOfStudy}
+                </div>
+
+                <div>
+                  <span className="font-medium">Institution:</span>{" "}
+                  {selectedEducation.schoolName}
+                </div>
+
+                <div>
+                  <span className="font-medium">Duration:</span>{" "}
+                  {selectedEducation.startYear}
+                  {selectedEducation.currentlyStudying
+                    ? " – Present"
+                    : ` – ${selectedEducation.endYear}`}
+                </div>
+
+                {selectedEducation.gpa && (
+                  <div>
+                    <span className="font-medium">GPA:</span>{" "}
+                    {selectedEducation.gpa}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Form */}
           <form
@@ -420,8 +493,12 @@ setEducations((prev) => [
           >
             {/* Degree */}
             <TextField
-              label={<span className="text-[12px]">Degree *  </span>}
-              helpText={<span className="text-[12px]">e.g., Bachelor's, Master's, MBA </span>}
+              label={<span className="text-[12px]">Degree * </span>}
+              helpText={
+                <span className="text-[12px]">
+                  e.g., Bachelor's, Master's, MBA{" "}
+                </span>
+              }
               className="w-full [&>label]:text-xs [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
             >
               <TextField.Input
@@ -436,7 +513,11 @@ setEducations((prev) => [
             <TextField
               className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
               label={<span className="text-[12px]">Field of Study * </span>}
-              helpText={<span className="text-[12px]">Your major or concentration  </span>}
+              helpText={
+                <span className="text-[12px]">
+                  Your major or concentration{" "}
+                </span>
+              }
             >
               <TextField.Input
                 className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0"
@@ -451,7 +532,7 @@ setEducations((prev) => [
             {/* School Name */}
             <TextField
               className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-              label={<span className="text-[12px]">School Name *  </span>}
+              label={<span className="text-[12px]">School Name * </span>}
               helpText=""
             >
               <TextField.Input
@@ -591,7 +672,7 @@ setEducations((prev) => [
               Your Experience Index
             </h3>
 
-             <div className="flex items-center justify-center py-6">
+            <div className="flex items-center justify-center py-6">
               <span
                 aria-live="polite"
                 className="font-['Afacad_Flux'] text-[32px] sm:text-[40px] md:text-[48px] font-[500] leading-[56px] text-neutral-300"
@@ -599,7 +680,6 @@ setEducations((prev) => [
                 {displayedIndex ?? 0}
               </span>
             </div>
-
 
             {/* Top form horizontal line */}
             <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
@@ -698,48 +778,46 @@ setEducations((prev) => [
           </div>
         </aside>
       </div>
-       {/* ✅ DELETE CONFIRMATION MODAL — ADD HERE */}
-    {deleteId && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-        <div className="w-[360px] rounded-2xl bg-white p-6 shadow-xl">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-neutral-900">
-              Are you sure?
-            </h3>
-            <button
-              onClick={() => setDeleteId(null)}
-              className="text-neutral-400 hover:text-neutral-600"
-            >
-              ✕
-            </button>
-          </div>
+      {/* ✅ DELETE CONFIRMATION MODAL — ADD HERE */}
+      {deleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-[360px] rounded-2xl bg-white p-6 shadow-xl">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-neutral-900">
+                Are you sure?
+              </h3>
+              <button
+                onClick={() => setDeleteId(null)}
+                className="text-neutral-400 hover:text-neutral-600"
+              >
+                ✕
+              </button>
+            </div>
 
-          <p className="text-sm text-neutral-600 mb-6">
-            Do you really want to delete this education?
-          </p>
+            <p className="text-sm text-neutral-600 mb-6">
+              Do you really want to delete this education?
+            </p>
 
-          <div className="flex gap-3">
-            <Button
-              variant="neutral-secondary"
-              className="flex-1"
-              onClick={() => setDeleteId(null)}
-            >
-              Cancel
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                variant="neutral-secondary"
+                className="flex-1"
+                onClick={() => setDeleteId(null)}
+              >
+                Cancel
+              </Button>
 
-            <Button
-              className="flex-1 rounded-3xl bg-violet-600 text-white hover:bg-violet-700"
-              onClick={handleRemove}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Deleting..." : "Yes"}
-            </Button>
+              <Button
+                className="flex-1 rounded-3xl bg-violet-600 text-white hover:bg-violet-700"
+                onClick={handleRemove}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Deleting..." : "Yes"}
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
-    )}
-
-  </div>
-);
-  
+      )}
+    </div>
+  );
 }
