@@ -94,6 +94,12 @@ export const URL_PATH = {
   getSubDomain:"/user/by-domain/694e588f2af883559ebe9540",
   getUserDomainSkils:"/user/getUserDomainSkills",
 
+
+  /*=======Skill Assesment=========*/
+  startAssessment:"/user/assessment/start",
+  getAttemptQuestions:"/user/assessment/getAttemptQuestions",
+  saveAnswer:"/user/assessment/saveAnswer",
+  submitAssessment:"/user/assessment/submit",
 };
 
 /* =========================================

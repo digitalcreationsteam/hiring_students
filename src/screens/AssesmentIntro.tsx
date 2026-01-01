@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "../ui/components/Button";
 import { useNavigate } from "react-router-dom";
 import { IconWithBackground } from "../ui/components/IconWithBackground";
@@ -13,9 +13,55 @@ import { FeatherFileText } from "@subframe/core";
 import { FeatherTarget } from "@subframe/core";
 import { FeatherTrendingUp } from "@subframe/core";
 import { FeatherZap } from "@subframe/core";
+import API, { URL_PATH } from "src/common/API";
 
 function AssessmentIntro3() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const userId = React.useMemo(() => localStorage.getItem("userId"), []);
+
+
+
+  const handleBeginAssessment = async () => {
+  if (loading) return;
+
+  if (!userId) {
+    console.error("Session expired. Please login again.");
+    navigate("/login");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const response = await API(
+      "POST",
+      URL_PATH.startAssessment,
+      {
+      },
+      { "user-id": userId }
+    );
+
+    if (response?.attemptId) {
+  navigate("/assessment", {
+    state: {
+      attemptId: response.attemptId,
+      expiresAt: response.expiresAt,
+    },
+  });
+  return;
+}
+ else {
+      console.error(response?.message || "Failed to start assessment");
+    }
+  } catch (err: any) {
+    console.error(err?.message || "Failed to start assessment");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
   return (
     <div className="flex min-h-screen w-full justify-center bg-neutral-50 px-6 py-12">
       <div className="mx-auto flex w-full max-w-[1200px] flex-col items-start gap-8">
@@ -44,7 +90,7 @@ function AssessmentIntro3() {
           </div>
         </div>
 
-<div className="grid w-full grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-3">
           <div className="flex grow shrink-0 basis-0 flex-col items-start gap-4 rounded-3xl border border-solid border-neutral-border bg-white px-6 py-6 shadow-sm">
             <div className="flex w-full items-center gap-3">
               <IconWithBackground
@@ -178,17 +224,18 @@ function AssessmentIntro3() {
         </div>
         <div className="flex w-full items-center justify-center gap-6 pt-8">
           <Button
-            className="w-full max-w-[260px] h-10 rounded-2xl bg-violet-600 hover:bg-violet-700 text-white font-semibold"
+            disabled={loading}
+            className="w-full max-w-[260px] h-10 rounded-2xl bg-violet-600 hover:bg-violet-700 text-white font-semibold disabled:opacity-60"
             size="large"
             icon={<FeatherZap />}
-            onClick={() => {navigate("/assessment");}}
+            onClick={handleBeginAssessment}
           >
-            Begin Skill Index Assessment
+            {loading ? "Starting..." : "Begin Skill Index Assessment"}
           </Button>
 
           <button
             className="text-body font-body text-subtext-color hover:text-gray-700 transition"
-            onClick={() => { navigate("/"); }}
+            onClick={() => navigate("/dashboard")}
           >
             Skip for now
           </button>
