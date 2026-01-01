@@ -83,6 +83,8 @@ export default function Certifications() {
   const [file, setFile] = useState<File | null>(null);
   const [experiencePoints, setExperiencePoints] = useState<any>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [selectedCert, setSelectedCert] = useState<CertEntry | null>(null);
+
 
   const displayedIndex =
     (experiencePoints?.demographics ?? 0) +
@@ -314,6 +316,10 @@ export default function Certifications() {
       );
 
       setCerts((prev) => prev.filter((c) => c.id !== deleteId));
+       if (selectedCert?.id === deleteId) {
+      setSelectedCert(null); 
+    }
+
       await fetchExperienceIndex();
 
       setDeleteId(null);
@@ -431,48 +437,134 @@ export default function Certifications() {
           </header>
 
           {/* selected cert preview list */}
-          <section className="flex w-full flex-col gap-3">
-            {certs.map((c) => (
-              <div
-                key={c.id}
-                className="rounded-2xl border border-neutral-300 bg-gray-50 px-4 py-3 flex items-center justify-between"
-              >
-                <div className="flex items-center gap-3">
-                  <Avatar
-                    size="large"
-                    image="https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=100&h=100&fit=crop"
-                    square
-                  >
-                    {c.issuer
-                      ? c.issuer
-                          .split(" ")
-                          .slice(0, 2)
-                          .map((s) => s[0])
-                          .join("")
-                      : "C"}
-                  </Avatar>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-semibold text-neutral-900 leading-tight">
-                      {c.name}
-                    </span>
-                    <span className="text-xs text-neutral-500">{c.issuer}</span>
-                  </div>
-                </div>
 
-                <div className="flex flex-col items-end gap-2">
-                  <IconButton
-                    size="small"
-                    icon={<FeatherX />}
-                    onClick={() => setDeleteId(c.id)}
-                    className="!bg-transparent !text-neutral-500"
-                  />
-                  <span className="text-xs text-neutral-500">
-                    {c.issueDate}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </section>
+  <section className="flex w-full flex-col gap-3">
+  {certs.map((c) => (
+    <div
+      key={c.id}
+      role="button"
+      tabIndex={0}
+      onClick={() => setSelectedCert(c)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setSelectedCert(c);
+        }
+      }}
+      className="
+        rounded-2xl
+        border border-neutral-300
+        bg-gray-50
+        px-4 py-3
+        flex items-center justify-between
+        cursor-pointer
+        hover:bg-neutral-100
+        transition
+        focus:outline-none
+        focus:ring-2
+        focus:ring-violet-500
+      "
+    >
+      {/* Left */}
+      <div className="flex items-center gap-3 min-w-0">
+        <Avatar
+          size="large"
+          square
+          image="https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=100&h=100&fit=crop"
+          className="!rounded-2xl"
+        >
+          {c.issuer
+            ? c.issuer
+                .split(" ")
+                .slice(0, 2)
+                .map((s) => s[0])
+                .join("")
+            : "C"}
+        </Avatar>
+
+        <div className="flex flex-col min-w-0">
+          <span className="text-sm font-semibold text-neutral-900 truncate">
+            {c.name}
+          </span>
+          <span className="text-xs text-neutral-500 truncate">
+            {c.issuer}
+          </span>
+        </div>
+      </div>
+
+      {/* Right */}
+      <div className="flex flex-col items-end gap-2 shrink-0">
+        <IconButton
+          size="small"
+          icon={<FeatherX />}
+          aria-label={`Delete certificate ${c.name}`}
+          onClick={(e) => {
+            e.stopPropagation(); 
+            setDeleteId(c.id);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              e.stopPropagation();
+              setDeleteId(c.id);
+            }
+          }}
+          className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
+        />
+        <span className="text-xs text-neutral-500">
+          {c.issueDate}
+        </span>
+      </div>
+    </div>
+  ))}
+</section>
+{selectedCert && (
+  <div className="rounded-3xl border border-neutral-300 bg-white px-6 py-5">
+    <div className="flex items-center justify-between mb-4">
+      <h3 className="text-sm font-semibold text-neutral-900">
+        Certification Details
+      </h3>
+
+      <IconButton
+        size="small"
+        icon={<FeatherX />}
+        onClick={() => setSelectedCert(null)}
+        className="!bg-transparent !text-neutral-500"
+      />
+    </div>
+
+    <div className="flex flex-col gap-3 text-sm text-neutral-800">
+      <div>
+        <span className="font-medium">Name:</span> {selectedCert.name}
+      </div>
+
+      <div>
+        <span className="font-medium">Issuer:</span> {selectedCert.issuer}
+      </div>
+
+      <div>
+        <span className="font-medium">Issue date:</span>{" "}
+        {selectedCert.issueDate}
+      </div>
+
+      {selectedCert.credentialLink && (
+        <div>
+          <span className="font-medium">Credential:</span>{" "}
+          <a
+            href={selectedCert.credentialLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-violet-700 underline"
+          >
+            View
+          </a>
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
+
 
           {/* form */}
           <form

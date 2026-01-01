@@ -82,13 +82,13 @@ function SignUp() {
                 src="https://res.cloudinary.com/subframe/image/upload/v1711417507/shared/y2rsnhq3mex4auk54aye.png"
                 alt="logo"
               />
-              <h1 className="text-3xl text-default-font">
+              <h1 className="text-3xl leading-snug inter-font-family">
                 Everything you need to find your next role
               </h1>
             </div>
 
             <div className="flex flex-col gap-4">
-              <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
+              <div className="w-full h-[1px] bg-gray-400 my-4 flex-shrink-0" />
 
               <div className="flex flex-col gap-4">
                 <div className="flex items-start gap-3">
@@ -138,12 +138,12 @@ function SignUp() {
           </div>
 
           {/* VERTICAL LINE */}
-          <div className="hidden lg:block w-[1px] bg-gray-200" />
+          <div className="hidden lg:block w-[1px] bg-gray-300" />
 
           {/* RIGHT */}
           <div className="w-full lg:w-1/2 px-6 py-8 flex flex-col gap-4 bg-white min-h-[620px] overflow-y-auto">
             <div>
-              <h2 className="text-lg font-semibold">Create your account</h2>
+              <h2 className="text-[22px]">Create your account</h2>
               <p className="text-xs text-subtext-color">
                 Discover opportunities matched to your verified skills
               </p>
@@ -153,7 +153,7 @@ function SignUp() {
 
             <div className="flex flex-col gap-2">
               <OAuthSocialButton
-                className="w-full h-9 border border-gray-300 rounded-full flex items-center justify-center gap-2 hover:bg-gray-100"
+                className="w-full h-9 border border-gray-400 rounded-full flex items-center justify-center gap-2 hover:bg-gray-100"
                 logo="https://res.cloudinary.com/subframe/image/upload/v1711417516/shared/z0i3zyjjqkobzuaecgno.svg"
                 onClick={() => handleOAuth("google")}
                 aria-label="Sign up with Google"
@@ -162,7 +162,7 @@ function SignUp() {
               </OAuthSocialButton>
 
               <OAuthSocialButton
-                className="w-full h-9 mt-2 border border-gray-300 rounded-full flex items-center justify-center gap-2 hover:bg-gray-100"
+                className="w-full h-9 mt-2 border border-gray-400 rounded-full flex items-center justify-center gap-2 hover:bg-gray-100"
                 logo="https://res.cloudinary.com/subframe/image/upload/v1763187518/uploads/27890/y6jwljmmuzopthb00ld5.png"
                 onClick={() => handleOAuth("linkedin")}
                 aria-label="Sign up with LinkedIn"
@@ -198,7 +198,7 @@ function SignUp() {
                   placeholder="hello@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-8 w-full rounded-full border border-gray-300 px-3 outline-none focus:border-black"
+                  className="h-8 w-full rounded-full border border-gray-400 px-3 outline-none focus:border-black"
                   aria-required="true"
                 />
               </div>
@@ -217,7 +217,7 @@ function SignUp() {
                     placeholder="Alex"
                     value={firstname}
                     onChange={(e) => setFirstName(e.target.value)}
-                    className="h-8 w-full rounded-full border border-gray-300 px-3 outline-none focus:border-black"
+                    className="h-8 w-full rounded-full border border-gray-400 px-3 outline-none focus:border-black"
                     aria-required="true"
                   />
                 </div>
@@ -234,7 +234,7 @@ function SignUp() {
                     placeholder="Rivera"
                     value={lastname}
                     onChange={(e) => setLastName(e.target.value)}
-                    className="h-8 w-full rounded-full border border-gray-300 px-3 outline-none focus:border-black"
+                    className="h-8 w-full rounded-full border border-gray-400 px-3 outline-none focus:border-black"
                     aria-required="true"
                   />
                 </div>
@@ -254,7 +254,7 @@ function SignUp() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-8 w-full rounded-full border border-gray-300 px-3 outline-none focus:border-black"
+                  className="h-8 w-full rounded-full border border-gray-400 px-3 outline-none focus:border-black"
                   aria-required="true"
                 />
                 {/* Supportive text (SC1 style) */}

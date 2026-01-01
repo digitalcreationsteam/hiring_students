@@ -61,11 +61,52 @@ type DashboardResponse = {
   };
 };
 
+
+
 function Dashboard() {
   const navigate = useNavigate();
   const handleNavigate = (path: string) => {
     navigate(path);
   };
+
+  type DemographicsResponse = {
+  fullName: string;
+  role?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  avatar?: string;
+  verified?: boolean;
+};
+
+const userId = React.useMemo(() => localStorage.getItem("userId"), []);
+
+const [profile, setProfile] =
+  React.useState<DemographicsResponse | null>(null);
+
+
+  const fetchProfile = React.useCallback(async () => {
+  if (!userId) return;
+
+  try {
+    const res = await API(
+      "GET",
+      URL_PATH.getDemographics,
+      undefined,
+      { "user-id": userId }
+    );
+
+    setProfile(res as DemographicsResponse);
+  } catch (err) {
+    console.warn("Failed to fetch profile", err);
+  }
+}, [userId]);
+
+React.useEffect(() => {
+  fetchProfile();
+}, [fetchProfile]);
+
+
 
   type BadgeVariant = "brand" | "neutral" | "warning" | "error" | "success";
   type RankTheme = {
@@ -92,31 +133,43 @@ function Dashboard() {
         <div className="flex w-full px-[em] justify-center px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="flex flex-col gap-8 py-6 lg:flex-row">
             {/* LEFT */}
-            <div className="flex w-full flex-col gap-6 lg:w-[320px] xl:w-[340px] lg:flex-none">
-              <div className="flex w-full flex-col items-center gap-3 rounded-3xl bg-white px-6 py-6 border border-neutral-200/70 shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
-                <div className="flex w-full flex-col items-center gap-3">
-                  <Avatar
-                    size="x-large"
-                    image="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400"
-                  >
-                    PP
-                  </Avatar>
-                  <div className="flex w-full flex-col items-center justify-center gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-heading-2 font-heading-2 text-default-font">
-                        Preetam Patil
-                      </span>
-                      <FeatherCheckCircle className="text-body font-body text-green-600" />
-                    </div>
-                    <span className="text-body text-[16px] text-gray-600 text-center">
-                      Senior Product Manager
-                    </span>
-                    <div className="flex items-center gap-1">
-                      <FeatherMapPin className="text-caption font-caption text-subtext-color" />
-                      <span className="text-caption text-[14px] text-gray-600">
-                        San Francisco, CA
-                      </span>
-                    </div>
+         <div className="flex w-full flex-col gap-6 lg:w-[320px] xl:w-[340px] lg:flex-none">
+  <div className="flex w-full flex-col items-center gap-3 rounded-3xl bg-white px-6 py-6 border border-neutral-200/70 shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
+    <div className="flex w-full flex-col items-center gap-3">
+      <Avatar
+        size="x-large"
+        image={profile?.avatar}
+      >
+        {profile?.fullName
+          ? profile.fullName
+              .split(" ")
+              .map((n) => n[0])
+              .join("")
+          : "PP"}
+      </Avatar>
+
+      <div className="flex w-full flex-col items-center justify-center gap-2">
+        <div className="flex items-center gap-2">
+          <span className="text-heading-2 font-heading-2 text-default-font">
+            {profile?.fullName || "Preetam Patil"}
+          </span>
+          <FeatherCheckCircle className="text-body font-body text-green-600" />
+        </div>
+
+        <span className="text-body text-[16px] text-gray-600 text-center">
+          {profile?.role || "Senior Product Manager"}
+        </span>
+
+        <div className="flex items-center gap-1">
+          <FeatherMapPin className="text-caption font-caption text-subtext-color" />
+          <span className="text-caption text-[14px] text-gray-600">
+            {[profile?.city, profile?.state]
+              .filter(Boolean)
+              .join(", ") || "San Francisco, CA"}
+          </span>
+        </div>
+
+
                     <div className="flex h-px w-full flex-none flex-col items-center gap-2 bg-gray-300" />
                   </div>
                   <div className="flex w-full flex-col items-center justify-center gap-3">
