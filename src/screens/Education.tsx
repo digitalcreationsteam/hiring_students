@@ -1,7 +1,7 @@
 // src/components/Education.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef  } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Avatar } from "../ui/components/Avatar";
@@ -22,6 +22,20 @@ import {
   FeatherCheck,
 } from "@subframe/core";
 import API, { URL_PATH } from "src/common/API";
+import * as SubframeCore from "@subframe/core";
+import { FeatherChevronDown } from "@subframe/core";
+
+const DEGREE_OPTIONS = [
+  "High School Diploma",
+  "Associate's Degree",
+  "Bachelor's Degree",
+  "Master's Degree",
+  "Doctorate (PhD)",
+  "Professional Degree",
+  "Certificate",
+  "Diploma",
+  "Other",
+];
 
 type ExperiencePoints = {
   demographics?: number;
@@ -60,6 +74,122 @@ const toTitleCase = (v: string) =>
 const notify = (msg: string) => {
   alert(msg);
 };
+ 
+
+// -------------------Year Picker------------------
+function YearPicker({
+  value,
+  onChange,
+  disabled = false,
+  minYear = 1950,
+  maxYear = new Date().getFullYear(),
+}: {
+  value: string;
+  onChange: (year: string) => void;
+  disabled?: boolean;
+  minYear?: number;
+  maxYear?: number;
+}) {
+  const currentYear = new Date().getFullYear();
+  const selectedYear = value ? Number(value) : currentYear;
+
+  const [open, setOpen] = useState(false);
+  const [decadeStart, setDecadeStart] = useState(
+    Math.floor(selectedYear / 10) * 10
+  );
+
+  const ref = useRef<HTMLDivElement>(null);
+
+  // close on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const years = Array.from({ length: 12 }, (_, i) => decadeStart - 1 + i);
+
+  return (
+    <div className="relative" ref={ref}>
+      {/* INPUT */}
+      <input
+        readOnly
+        disabled={disabled}
+        value={value}
+        placeholder="YYYY"
+        onClick={() => !disabled && setOpen((v) => !v)}
+        className={`w-full h-10 px-4 rounded-full cursor-pointer border border-neutral-300 focus:outline-none ${
+          disabled ? "bg-neutral-100 text-neutral-400" : "bg-white"
+        }`}
+      />
+
+      {/* PICKER */}
+      {open && (
+        <div className="absolute z-50 mt-2 w-64 rounded-2xl border border-neutral-300 bg-white shadow-lg p-3">
+          {/* HEADER */}
+          <div className="flex items-center justify-between mb-3">
+            <button
+              type="button"
+              onClick={() => setDecadeStart((d) => d - 10)}
+              className="px-2 text-lg"
+            >
+              «
+            </button>
+
+            <span className="text-sm font-medium">
+              {decadeStart} – {decadeStart + 9}
+            </span>
+
+            <button
+              type="button"
+              onClick={() => setDecadeStart((d) => d + 10)}
+              className="px-2 text-lg"
+            >
+              »
+            </button>
+          </div>
+
+          {/* YEARS GRID */}
+          <div className="grid grid-cols-4 gap-2 text-sm">
+            {years.map((year) => {
+              const isDisabled =
+                year < minYear ||
+                year > maxYear ||
+                year > currentYear;
+
+              return (
+                <button
+                  key={year}
+                  type="button"
+                  disabled={isDisabled}
+                  onClick={() => {
+                    onChange(String(year));
+                    setOpen(false);
+                  }}
+                  className={`
+                    py-2 rounded-lg transition
+                    ${
+                      value === String(year)
+                        ? "bg-violet-600 text-white"
+                        : "hover:bg-neutral-100"
+                    }
+                    ${isDisabled ? "text-neutral-400" : ""}
+                  `}
+                >
+                  {year}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Education() {
   const navigate = useNavigate();
@@ -451,10 +581,9 @@ export default function Education() {
 
               <div className="flex flex-col gap-3 text-sm text-neutral-800">
                 <div>
-                  <span className="font-medium">Degree:</span>{" "}
+                  <span className="font-medium">Degeree Name:</span>{" "}
                   {selectedEducation.degree}
                 </div>
-
                 <div>
                   <span className="font-medium">Field of Study:</span>{" "}
                   {selectedEducation.fieldOfStudy}
@@ -492,22 +621,48 @@ export default function Education() {
             className="mt-6 flex flex-col gap-4"
           >
             {/* Degree */}
-            <TextField
-              label={<span className="text-[12px]">Degree * </span>}
-              helpText={
-                <span className="text-[12px]">
-                  e.g., Bachelor's, Master's, MBA{" "}
-                </span>
-              }
-              className="w-full [&>label]:text-xs [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-            >
-              <TextField.Input
-                placeholder="Select or type your degree"
-                value={degree}
-                onChange={(e) => setDegree(e.target.value)}
-                className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0"
-              />
-            </TextField>
+            <div className="flex flex-col gap-1">
+              {/* Degree Dropdown - Fixed */}
+              <div className="flex flex-col gap-1">
+                <label className="text-[12px] font-medium text-neutral-900">
+                  Degree *
+                </label>
+
+                <SubframeCore.DropdownMenu.Root>
+                  <SubframeCore.DropdownMenu.Trigger asChild>
+                    <div className="flex h-9 items-center justify-between rounded-full border border-neutral-300 bg-white px-3 cursor-pointer hover:bg-neutral-50">
+                      <span
+                        className={
+                          degree
+                            ? "text-neutral-900 text-[12px]"
+                            : "text-neutral-400 text-[12px]"
+                        }
+                      >
+                        {degree || "Select Degree"}
+                      </span>
+                      <FeatherChevronDown className="text-neutral-500" />
+                    </div>
+                  </SubframeCore.DropdownMenu.Trigger>
+
+                  <SubframeCore.DropdownMenu.Portal>
+                    <SubframeCore.DropdownMenu.Content
+                      className="bg-white rounded-2xl shadow-lg py-1 max-h-[220px] overflow-y-auto border border-neutral-300 min-w-[200px]"
+                      sideOffset={4}
+                    >
+                      {DEGREE_OPTIONS.map((item) => (
+                        <SubframeCore.DropdownMenu.Item
+                          key={item}
+                          className="px-4 py-2 text-sm cursor-pointer hover:bg-neutral-100 outline-none"
+                          onSelect={() => setDegree(item)}
+                        >
+                          {item}
+                        </SubframeCore.DropdownMenu.Item>
+                      ))}
+                    </SubframeCore.DropdownMenu.Content>
+                  </SubframeCore.DropdownMenu.Portal>
+                </SubframeCore.DropdownMenu.Root>
+              </div>
+            </div>
 
             {/* Field of Study */}
             <TextField
@@ -545,47 +700,37 @@ export default function Education() {
               />
             </TextField>
 
-            {/* Years */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <TextField
-                label={<span className="text-[12px]">Start Year * </span>}
-                helpText=""
-                className="[&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300 flex-1"
-              >
-                <TextField.Input
-                  className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0"
-                  placeholder="YYYY"
-                  value={startYear}
-                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) => {
-                    // enforce numeric-ish input
-                    setStartYear(ev.target.value.replace(/[^\d]/g, ""));
-                  }}
-                  maxLength={4}
-                />
-              </TextField>
+      {/* Years */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Start Year */}
+        <div className="flex flex-col gap-1">
+          <label className="text-[12px] font-medium">
+            Start Year <span className="text-red-500">*</span>
+          </label>
+          <YearPicker
+            value={startYear}
+            onChange={setStartYear}
+            minYear={1950}
+            maxYear={new Date().getFullYear()}
+          />
+        </div>
 
-              <TextField
-                label={<span className="text-[12px]">End Year * </span>}
-                helpText=""
-                className="[&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300 flex-1"
-              >
-                <TextField.Input
-                  className={`rounded-full h-10 px-4 focus:ring-0 ${
-                    currentlyStudying
-                      ? "bg-neutral-100/50 !border-none"
-                      : "bg-white !border-none"
-                  }`}
-                  placeholder="YYYY"
-                  value={endYear}
-                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                    setEndYear(ev.target.value.replace(/[^\d]/g, ""))
-                  }
-                  maxLength={4}
-                  disabled={currentlyStudying}
-                />
-              </TextField>
-            </div>
+        {/* End Year */}
+        <div className="flex flex-col gap-1">
+          <label className="text-[12px] font-medium">
+            End Year <span className="text-red-500">*</span>
+          </label>
+          <YearPicker
+            value={endYear}
+            onChange={setEndYear}
+            disabled={currentlyStudying}
+            minYear={Number(startYear) || 1950}
+            maxYear={new Date().getFullYear()}
+          />
+        </div>
+      </div>
 
+{/* // --------------------------------------- */}
             <div className="flex items-center gap-3">
               <Switch
                 checked={currentlyStudying}

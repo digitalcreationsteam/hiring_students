@@ -177,7 +177,7 @@ const scInputClass =
   const handleContinue = async () => {
     const error = isFormValid();
     if (error) {
-      notify(error);
+      alert(error);
       return;
     }
 
@@ -317,7 +317,7 @@ const scInputClass =
 
             <TextField
               label={<span className="text-[12px]">Phone Number </span>}
-              helpText={<span className="text-[12px]">Optional for recruiter contact" </span>}
+              helpText={<span className="text-[12px]">Optional for recruiter contact </span>}
               className={scTextFieldClass}
             >
               <TextField.Input

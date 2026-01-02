@@ -1,7 +1,7 @@
 // src/components/Experience.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Avatar } from "../ui/components/Avatar";
 import { Button } from "../ui/components/Button";
@@ -43,7 +43,6 @@ const ROLE_TYPES = [
   "Freelance",
 ];
 
-
 type ExperiencePoints = {
   demographics?: number;
   education?: number;
@@ -77,6 +76,124 @@ const isEndAfterStart = (start: string, end: string) => {
 
   return ey > sy || (ey === sy && em >= sm);
 };
+
+// -----------------Month And Year Picker----------
+
+function MonthYearPicker({
+  value,
+  onChange,
+  disabled = false,
+  maxDate = new Date(),
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  disabled?: boolean;
+  maxDate?: Date;
+}) {
+  const today = new Date();
+  const initialYear = value ? Number(value.split("/")[1]) : today.getFullYear();
+
+  const [open, setOpen] = useState(false);
+  const [year, setYear] = useState(initialYear);
+
+  const ref = useRef<HTMLDivElement>(null);
+
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const isFutureMonth = (monthIndex: number) => {
+    return (
+      year > maxDate.getFullYear() ||
+      (year === maxDate.getFullYear() && monthIndex > maxDate.getMonth())
+    );
+  };
+
+  return (
+    <div className="relative" ref={ref}>
+      {/* INPUT */}
+      <input
+        readOnly
+        disabled={disabled}
+        value={value}
+        placeholder="MM/YYYY"
+        onClick={() => !disabled && setOpen((o) => !o)}
+        className={`w-full h-10 px-4 rounded-full border border-neutral-300 cursor-pointer focus:outline-none ${
+          disabled ? "bg-neutral-100 text-neutral-400" : "bg-white"
+        }`}
+      />
+
+      {/* PICKER */}
+      {open && (
+        <div className="absolute z-50 mt-2 w-64 rounded-2xl border border-neutral-300 bg-white shadow-lg p-3">
+          {/* HEADER */}
+          <div className="flex items-center justify-between mb-3">
+            <button type="button" onClick={() => setYear((y) => y - 1)}>
+              «
+            </button>
+            <span className="text-sm font-medium">{year}</span>
+            <button type="button" onClick={() => setYear((y) => y + 1)}>
+              »
+            </button>
+          </div>
+
+          {/* MONTH GRID */}
+          <div className="grid grid-cols-3 gap-2 text-sm">
+            {months.map((m, idx) => {
+              const disabledMonth = isFutureMonth(idx);
+              const formatted = `${String(idx + 1).padStart(2, "0")}/${year}`;
+
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  disabled={disabledMonth}
+                  onClick={() => {
+                    onChange(formatted);
+                    setOpen(false);
+                  }}
+                  className={`
+                    py-2 rounded-lg transition
+                    ${
+                      value === formatted
+                        ? "bg-violet-600 text-white"
+                        : "hover:bg-neutral-100"
+                    }
+                    ${disabledMonth ? "text-neutral-400" : ""}
+                  `}
+                >
+                  {m}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Experience() {
   const navigate = useNavigate();
@@ -586,69 +703,60 @@ export default function Experience() {
             }}
             className="mt-6 flex flex-col gap-4"
           >
+            <TextField
+              className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
+              label={<span className="text-[12px]">Role Title * </span>}
+              helpText=""
+            >
+              <TextField.Input
+                // className="rounded-full h-10 px-4 text-[12px] bg-white !border-none focus:ring-0"
+                className="h-20 text-[12px]"
+                placeholder="Name of institution"
+                value={roleTitle}
+                onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                  setRoleTitle(ev.target.value)
+                }
+              />
+            </TextField>
+
             <div className="flex flex-col gap-1">
-  <label className="text-[12px] font-medium text-neutral-900">
-    Role Title *
-  </label>
+              <label className="text-[12px] font-medium text-neutral-900">
+                Type of Role
+              </label>
 
-  <SubframeCore.DropdownMenu.Root>
-    <SubframeCore.DropdownMenu.Trigger asChild>
-      <div className="flex h-9 items-center justify-between rounded-full border border-neutral-300 bg-white px-3 cursor-pointer">
-        <span className={roleTitle ? "text-neutral-900 text-[12px]" : "text-neutral-400 text-[12px]"}>
-          {roleTitle || "Select role title"}
-        </span>
-        <FeatherChevronDown className="text-neutral-500" />
-      </div>
-    </SubframeCore.DropdownMenu.Trigger>
+              <SubframeCore.DropdownMenu.Root>
+                <SubframeCore.DropdownMenu.Trigger asChild>
+                  <div className="flex h-9 items-center justify-between rounded-full border border-neutral-300 bg-white px-3 cursor-pointer">
+                    <span
+                      className={
+                        typeOfRole
+                          ? "text-neutral-900 text-[12px]"
+                          : "text-neutral-400 text-[12px]"
+                      }
+                    >
+                      {typeOfRole || "Select type of role"}
+                    </span>
+                    <FeatherChevronDown className="text-neutral-500" />
+                  </div>
+                </SubframeCore.DropdownMenu.Trigger>
 
-    <SubframeCore.DropdownMenu.Content asChild>
-      <div className="bg-white rounded-2xl shadow-lg py-1 max-h-[220px] overflow-y-auto">
-        {ROLE_TITLES.map((item) => (
-          <div
-            key={item}
-            onClick={() => setRoleTitle(item)}
-            className="px-4 py-2 text-sm cursor-pointer hover:bg-neutral-100"
-          >
-            {item}
-          </div>
-        ))}
-      </div>
-    </SubframeCore.DropdownMenu.Content>
-  </SubframeCore.DropdownMenu.Root>
-</div>
-
-
-           <div className="flex flex-col gap-1">
-  <label className="text-[12px] font-medium text-neutral-900">
-    Type of Role
-  </label>
-
-  <SubframeCore.DropdownMenu.Root>
-    <SubframeCore.DropdownMenu.Trigger asChild>
-      <div className="flex h-9 items-center justify-between rounded-full border border-neutral-300 bg-white px-3 cursor-pointer">
-        <span className={typeOfRole ? "text-neutral-900 text-[12px]" : "text-neutral-400 text-[12px]"}>
-          {typeOfRole || "Select type of role"}
-        </span>
-        <FeatherChevronDown className="text-neutral-500" />
-      </div>
-    </SubframeCore.DropdownMenu.Trigger>
-
-    <SubframeCore.DropdownMenu.Content asChild>
-      <div className="bg-white rounded-2xl shadow-lg py-1">
-        {ROLE_TYPES.map((item) => (
-          <div
-            key={item}
-            onClick={() => setTypeOfRole(item)}
-            className="px-4 py-2 text-sm cursor-pointer hover:bg-neutral-100"
-          >
-            {item}
-          </div>
-        ))}
-      </div>
-    </SubframeCore.DropdownMenu.Content>
-  </SubframeCore.DropdownMenu.Root>
-</div>
-
+                <SubframeCore.DropdownMenu.Portal>
+                  <SubframeCore.DropdownMenu.Content asChild>
+                    <div className="bg-white rounded-2xl shadow-lg py-1">
+                      {ROLE_TYPES.map((item) => (
+                        <div
+                          key={item}
+                          onClick={() => setTypeOfRole(item)}
+                          className="px-4 py-2 text-sm cursor-pointer hover:bg-neutral-100"
+                        >
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                  </SubframeCore.DropdownMenu.Content>
+                </SubframeCore.DropdownMenu.Portal>
+              </SubframeCore.DropdownMenu.Root>
+            </div>
 
             <TextField
               label={<span className="text-[12px]">Company * </span>}
@@ -666,117 +774,49 @@ export default function Experience() {
               />
             </TextField>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <TextField
-                label={<span className="text-[12px]">Start Date * </span>}
-                helpText=""
-                className="[&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300 flex-1"
-              >
-                <TextField.Input
-                  placeholder="MM/YYYY"
-                  value={startDate}
-                  onChange={(e) => {
-                    let value = e.target.value.replace(/[^\d]/g, "");
+            {/* // date------------------------- */}
+            <div className="flex flex-col gap-6 max-w-lg">
+              {/* Dates */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label
+                    htmlFor="startdate"
+                    className="text-[12px] font-medium text-neutral-700"
+                  >
+                    Start Date
+                  </label>
+                  <MonthYearPicker value={startDate} onChange={setStartDate} />
+                </div>
 
-                    if (value.length >= 2) {
-                      const month = value.slice(0, 2);
-                      const year = value.slice(2, 6);
-                      value = month + (year ? "/" + year : "");
-                    }
+                <div>
+                  <label
+                    htmlFor="startdate"
+                    className="text-[12px] font-medium text-neutral-700"
+                  >
+                    End Date
+                  </label>
+                  <MonthYearPicker value={endDate} onChange={setEndDate} />
+                </div>
+              </div>
 
-                    setStartDate(value.slice(0, 7));
-                  }}
-                  onBlur={() => {
-                    if (!startDate) return;
-
-                    if (!isValidMonthYear(startDate)) {
-                      alert("Invalid date format. Use MM/YYYY");
-                      setStartDate("");
-                      return;
-                    }
-
-                    if (!isValidPastOrCurrentDate(startDate)) {
-                      alert("Start date cannot be in the future.");
-                      setStartDate("");
-                    }
-                  }}
-                  className={scInputClass}
+              {/* Switch */}
+              <div className="flex items-center gap-3">
+                <Switch
+                  checked={currentlyWorking}
+                  onCheckedChange={setCurrentlyWorking}
+                  className="
+            h-5 w-9
+            data-[state=checked]:bg-violet-700
+            data-[state=unchecked]:bg-neutral-300
+            [&>span]:h-4 [&>span]:w-3
+            [&>span]:data-[state=checked]:translate-x-4
+            [&>span]:data-[state=unchecked]:translate-x-0
+          "
                 />
-              </TextField>
-
-              <TextField
-                label={<span className="text-[12px]">End Date </span>}
-                helpText=""
-                className="[&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300 flex-1"
-              >
-                <TextField.Input
-                  placeholder="MM/YYYY"
-                  value={endDate}
-                  onChange={(e) => {
-                    let value = e.target.value.replace(/[^\d]/g, "");
-
-                    if (value.length >= 2) {
-                      const month = value.slice(0, 2);
-                      const year = value.slice(2, 6);
-                      value = month + (year ? "/" + year : "");
-                    }
-
-                    setEndDate(value.slice(0, 7));
-                  }}
-                  onBlur={() => {
-                    if (!endDate || currentlyWorking) return;
-
-                    if (!isValidMonthYear(endDate)) {
-                      alert("Invalid date format. Use MM/YYYY");
-                      setEndDate("");
-                      return;
-                    }
-
-                    if (!isValidPastOrCurrentDate(endDate)) {
-                      alert("End date cannot be in the future.");
-                      setEndDate("");
-                      return;
-                    }
-
-                    if (!isEndAfterStart(startDate, endDate)) {
-                      alert("End date must be after start date.");
-                      setEndDate("");
-                    }
-                  }}
-                  disabled={currentlyWorking}
-                  className={`${scInputClass} ${
-                    currentlyWorking ? "bg-neutral-100/50 !border-none" : ""
-                  }`}
-                />
-              </TextField>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Switch
-                checked={currentlyWorking}
-                onCheckedChange={setCurrentlyWorking}
-                tabIndex={0}
-                role="switch"
-                aria-checked={currentlyWorking}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setCurrentlyWorking((prev) => !prev);
-                  }
-                }}
-                className="
-    h-5 w-9
-    data-[state=checked]:bg-violet-700
-    data-[state=unchecked]:bg-neutral-300
-    [&>span]:h-4 [&>span]:w-3
-    [&>span]:data-[state=checked]:translate-x-4
-    [&>span]:data-[state=unchecked]:translate-x-0
-  "
-              />
-
-              <span className="text-sm text-neutral-700">
-                I currently work here
-              </span>
+                <span className="text-sm text-neutral-700">
+                  I currently work here
+                </span>
+              </div>
             </div>
 
             <TextField
