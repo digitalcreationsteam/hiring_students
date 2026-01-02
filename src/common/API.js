@@ -3,7 +3,7 @@ import axios from "axios";
 /* =========================================
    🌐 BASE URL
 ========================================= */
-export const BASE_URL = "http://localhost:5001/api";
+export const BASE_URL = "http://localhost:5000/api";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -99,20 +99,17 @@ export const URL_PATH = {
 /* =========================================
    🚀 API WRAPPER
 ========================================= */
-export default async function API(
-  method,
-  url,
-  data = {},
-  headers = {}
-) {
+export default async function API(method, url, data = {}, headers = {}) {
   try {
     const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
 
     const config = {
       method: method.toLowerCase(),
       url,
       headers: {
         ...(token && { Authorization: `Bearer ${token}` }),
+        ...(userId && { "user-id": userId }), // 👈 CRITICAL: use "user-id" with hyphen
         ...headers,
       },
     };
@@ -121,7 +118,6 @@ export default async function API(
       config.params = data;
     } else {
       config.data = data;
-
       if (data instanceof FormData) {
         delete config.headers["Content-Type"];
       } else {
@@ -130,21 +126,17 @@ export default async function API(
     }
 
     const response = await apiClient(config);
+
+    console.log("responseresponse:::::::",response)
     return response.data;
   } catch (error) {
     if (error.response) {
       const { data, status } = error.response;
       throw { ...data, status };
     } else if (error.request) {
-      throw {
-        success: false,
-        message: "No response from server.",
-      };
+      throw { success: false, message: "No response from server." };
     } else {
-      throw {
-        success: false,
-        message: error.message || "Unknown error occurred.",
-      };
+      throw { success: false, message: error.message || "Unknown error occurred." };
     }
   }
 }

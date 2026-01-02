@@ -188,7 +188,7 @@ function AssessmentIntro3() {
 
           <button
             className="text-body font-body text-subtext-color hover:text-gray-700 transition"
-            onClick={() => { navigate("/"); }}
+            onClick={() => {navigate("/dashboard"); }}
           >
             Skip for now
           </button>

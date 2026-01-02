@@ -72,7 +72,7 @@ function Login() {
 
   const handleOAuth = (provider: "google" | "linkedin") => {
     if (provider === "google") {
-      window.location.href = `http://localhost:5001/api/auth/google`;
+      window.location.href = `http://localhost:5000/api/auth/google`;
     }
     if (provider === "linkedin") {
       // future implementation

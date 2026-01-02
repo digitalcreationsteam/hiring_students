@@ -33,7 +33,47 @@ import { FeatherUsers } from "@subframe/core";
 import { FeatherZap } from "@subframe/core";
 import API, { URL_PATH } from "src/common/API";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import Projects from "./Projects";
+
+type UserProfile = {
+  name: string;
+  domain: string;
+  location: string;
+};
+
+type WorkExperience = {
+  jobTitle: string;
+  companyName: string;
+  startYear: number | null;
+  endYear: number | null;
+  duration: number | null;
+  description: string;
+  location: string;
+  currentlyWorking: boolean;
+};
+
+type education = {
+  schoolName: string;
+  degree: string;
+  startYear: number | null;
+  endYear: number | null;
+  currentlyStudying?: boolean;
+};
+
+type Skill = {
+  name: string;              
+};
+type Certification = {
+  name: string;              
+  issuedBy: string;         
+  issueYear: number | null;  
+};
+type project ={
+  title: string;              
+  summary: string;          
+  endYear: number | null;     
+};
 
 
 type DashboardResponse = {
@@ -44,6 +84,37 @@ type DashboardResponse = {
     avatar: string;
     verified: boolean;
   };
+  exp: {
+    jobTitle: string;
+    companyName: string;
+    startYear: number;
+    endYear: number;
+    duration: number;
+    description: string;
+    location: string;
+    currentlyWorking: boolean;
+  };
+  edu:{
+    schoolName: string;
+    degree: string;
+    startYear: number;
+    endYear: number;
+  };
+  skills:{
+    skill : string;
+  };
+
+  certifications:{
+  name: string;             
+  issuedBy: string;          
+  issueYear: number | null;  
+};
+project :{
+  title: string;              
+  summary: string;          
+  endYear: number | null;     
+};
+
   rank: {
     global: number;
     university: number;
@@ -87,11 +158,12 @@ export default function Dashboard() {
     "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400"
   );
 
-  const [user, setuser] = useState({
-    name: "",
-    domain: "",
-    location: "",
-  });
+const [user, setUser] = useState<UserProfile>({
+  name: "",
+  domain: "",
+  location: "",
+});
+
 
          /* -------------------- PROFETIONAL PROFILE -------------------- */
 
@@ -104,6 +176,21 @@ export default function Dashboard() {
     projects: [],
   });
 
+  const [workExperience, setWorkExperience] = useState<WorkExperience[]>([]);
+
+  const [education, setEducation] = useState<education[]>([]);
+
+  const [skills, setSkills] = useState<Skill[]>([]);
+
+  const [certifications, setcertifications] = useState<Certification[]>([]);
+
+  const [project, setProject] = useState<project[]>([]);
+
+
+
+
+
+
   
   /* -------------------- GLOBAL RANK STATE -------------------- */
   const [globalRank, setGlobalRank] = useState({
@@ -111,12 +198,15 @@ export default function Dashboard() {
     percentile: 0,
     betterThan: 0,
   });
+  /* -------------------- California, San Francisco, Stanford RANK STATE --------- */
 
     const [locationRank, setLocationRank] = useState({
     state: { rank: 0, percentile: 0, betterThan: 0 },
     city: { rank: 0, percentile: 0, betterThan: 0 },
     university: { rank: 0, percentile: 0, betterThan: 0 },
   });
+
+    /* -------------------- Hireability Index -------------------- */
 
     const [hireability, setHireability] = useState({
     totalScore: 0,
@@ -135,18 +225,104 @@ export default function Dashboard() {
    /* -------------------- RECRUITER VISIBILITY -------------------- */
   const [recruiterVisibility, setRecruiterVisibility] = useState(0);
 
+
   /* -------------------- FETCH DATA -------------------- */
   useEffect(() => {
-    fetch("/api/user/profile")
-      .then((res) => res.json())
-      .then((data) => {
-        setuser({
-          name: data.name,
-          domain: data.domain,
-          location: data.location,
+  // Fetch all dashboard data on component mount
+  const fetchDashboardData = async () => {
+    try {
+      // 1. User Profile
+      await fetchUserProfile();
+
+      // 2. Profile Details
+      const profileData = await API("GET", URL_PATH.getDemographics);
+      setProfile(profileData);
+
+      //     Working Experience
+      
+
+      // 3. Global Rank
+      try {
+        const globalRankData = await API("GET", "/user/global-rank");
+        setGlobalRank({
+          rank: globalRankData?.rank ?? 0,
+          percentile: globalRankData?.percentile ?? 0,
+          betterThan: globalRankData?.betterThan ?? 0,
         });
-        setAvatar(data.avatar);
-      });
+      } catch (err) {
+        console.warn("Global rank not available:", err);
+      }
+
+      // 4. Location Rank
+      try {
+        const locationData = await API("GET", "/user/location-rank");
+        setLocationRank({
+          state: {
+            rank: locationData?.state?.rank ?? 0,
+            percentile: locationData?.state?.percentile ?? 0,
+            betterThan: locationData?.state?.betterThan ?? 0,
+          },
+          city: {
+            rank: locationData?.city?.rank ?? 0,
+            percentile: locationData?.city?.percentile ?? 0,
+            betterThan: locationData?.city?.betterThan ?? 0,
+          },
+          university: {
+            rank: locationData?.university?.rank ?? 0,
+            percentile: locationData?.university?.percentile ?? 0,
+            betterThan: locationData?.university?.betterThan ?? 0,
+          },
+        });
+      } catch (err) {
+        console.warn("Location rank not available:", err);
+      }
+
+      // 5. Hireability Index
+      try {
+        const hireabilityData = await API("GET", "/user/hireability-index");
+        setHireability({
+          totalScore: hireabilityData?.totalScore ?? 0,
+          weeklyChange: hireabilityData?.weeklyChange ?? 0,
+          nextRankPoints: hireabilityData?.nextRankPoints ?? 0,
+          skill: {
+            score: hireabilityData?.skill?.score ?? 0,
+            max: hireabilityData?.skill?.max ?? 400,
+          },
+          experience: {
+            score: hireabilityData?.experience?.score ?? 0,
+            max: hireabilityData?.experience?.max ?? 5000,
+          },
+        });
+      } catch (err) {
+        console.warn("Hireability index not available:", err);
+      }
+
+      // 6. Recruiter Visibility
+      try {
+        const visibilityData = await API("GET", "/user/recruiter-visibility");
+        setRecruiterVisibility(visibilityData?.probability ?? 0);
+      } catch (err) {
+        console.warn("Recruiter visibility not available:", err);
+      }
+
+    } catch (error) {
+      console.error("Error loading dashboard:", error);
+    }
+  };
+
+  fetchDashboardData();
+}, []);
+  // useEffect(() => {
+  //   fetch("/api/user/profile")
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       setuser({
+  //         name: data.name,
+  //         domain: data.domain,
+  //         location: data.location,
+  //       });
+  //       setAvatar(data.avatar);
+  //     });  }, []);
 
         /* -------------------- GlobalRank DATA -------------------- */
 
@@ -163,6 +339,7 @@ export default function Dashboard() {
         });
       })
       .catch(() => { }); // new user → defaults remain 0
+      
 
               /* -------------------- State Rank DATA -------------------- */
       fetch("/api/user/location-rank")
@@ -187,6 +364,7 @@ export default function Dashboard() {
         });
       })
       .catch(() => {});
+      
 
                     /* -------------------- Hireability DATA -------------------- */
       fetch("/api/user/hireability-index")
@@ -219,7 +397,7 @@ export default function Dashboard() {
 
       
 
-  }, []);
+  // }, []);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -246,27 +424,168 @@ export default function Dashboard() {
     badge: "brand",
   };
 
-         /* --------------------    USER PROFILE API -------------------- */
 
-const fetchUserProfile = React.useCallback(async () => {
-  // if (!userId)return;
+/* --------------------  USER PROFILE API -------------------- */
+const fetchUserProfile = useCallback(async () => {
   try {
-    const res = await API(
-      "GET",
-      URL_PATH.getDemographics
-    );
+    const res = await API("GET", URL_PATH.getDemographics);
+console.log("Response in Dashboard :::::::::::::::::::", res)
+    // Map API response to UI state (API returns fullName, not name)
+ 
+setUser({
+  name: res.fullName || "",           // User's full name
+  domain: res.domain || "Professional", // User's role/domain
+  location: `${res.city || ""}, ${res.state || ""}`
+    .trim()
+    .replace(/^,\s*|,\s*$/g, ""),     // City + State
+});
 
-    setuser({
-      name: res.name,
-      domain: res.domain,
-      location: res.location,
-    });
-
-    setAvatar(res.avatar);
+    setAvatar(res.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400");
   } catch (err) {
-    console.warn("Failed to fetch user profile", err);
+    console.error("Failed to fetch user profile:", err);
   }
 }, []);
+
+/* --------------------  Work Experience API -------------------- */
+const fetchworkexp = useCallback(async () => {
+  try {
+    const response = await API("GET", URL_PATH.experience);
+    const data = response?.data;
+
+    if (!Array.isArray(data)) return;
+
+    setWorkExperience(
+      data.map((item: any) => ({
+        jobTitle: item.jobTitle || "",
+        companyName: item.companyName || "",
+        startYear: item.startYear ?? null,
+        endYear: item.endYear ?? null,
+        duration: item.duration ?? null,
+        description: item.description || "",
+        location: `${item.city || ""}, ${item.state || ""}`
+          .trim()
+          .replace(/^,\s*|,\s*$/g, ""),
+        currentlyWorking: item.currentlyWorking ?? false,
+      }))
+    );
+  } catch (err) {
+    console.error("Failed to fetch work experience:", err);
+  }
+}, []);
+
+/* -------------------- Education API -------------------- */
+ const fetcheducation = useCallback(async () => {
+  try {
+    const response = await API("GET", URL_PATH.education);
+    const data = response?.data;
+
+    if (!Array.isArray(data)) return;
+
+    setEducation(
+      data.map((item: any) => ({
+    schoolName: item.schoolName || "",
+    degree: item.degree || "",
+    startYear: item.startYear ?? null,
+    endYear: item.endYear ?? null,
+  }))
+    );
+  } catch (err) {
+    console.error("Failed to fetch Education: ", err);
+  }
+}, []);
+
+/* -------------------- Skills API -------------------- */
+  const fetchskill = useCallback(async () => {
+  try {
+    const response = await API("GET", URL_PATH.getUserDomainSkils);
+    const data = response?.data;
+
+    if (!Array.isArray(data)) return;
+
+    setSkills(
+      data.map((item: any) => ({
+    name: item.name || item.skill || "",
+   
+  }))
+    );
+  } catch (err) {
+    console.error("Failed to fetch Skills: ", err);
+  }
+}, []);
+
+/* -------------------- Certification API -------------------- */
+
+const fetchcertification = useCallback(async () => {
+  try {
+    const response = await API("GET", URL_PATH.certification);
+    const data = response?.data;
+
+    if (!Array.isArray(data)) return;
+
+    setEducation(
+      data.map((item: any) => ({
+    schoolName: item.schoolName || "",
+    degree: item.degree || "",
+    startYear: item.startYear ?? null,
+    endYear: item.endYear ?? null,
+  }))
+    );
+  } catch (err) {
+    console.error("Failed to fetch Certification ", err);
+  }
+}, []);
+
+/* -------------------- Project API -------------------- */
+
+const fetchprojects = useCallback(async () => {
+  try {
+    const response = await API("GET", URL_PATH.projects);
+    const data = response?.data;
+
+    if (!Array.isArray(data)) return;
+
+    setProject(
+      data.map((item: any) => ({
+   title: item.title || "",
+    summary: item.description || "",
+    endYear: item.endYear ?? null,
+  }))
+    );
+  } catch (err) {
+    console.error("Failed to fetch Projects ", err);
+  }
+}, []);
+
+/* -------------------- FETCH ALL DATA -------------------- */
+useEffect(() => {
+  const fetchDashboardData = async () => {
+    try {
+      // 1. User Profile (demographics)
+      await fetchUserProfile();
+
+      // 2. workExperience (experience)
+       await fetchworkexp();
+
+      // 3. education (education)
+       await fetcheducation();
+
+       // 4. Skill
+       await fetchskill();
+
+       // 5. Certification (certification)
+       await fetchcertification();
+
+       // 6. Projects (projects)
+       await fetchprojects();
+
+
+    } catch (error) {
+      console.error("Error loading dashboard:", error);
+    }
+  };
+
+  fetchDashboardData();
+}, [fetchUserProfile, fetchworkexp, fetcheducation, fetchskill, fetchcertification, fetchprojects]);
 
          /* --------------------    USER PROFILE API -------------------- */
 
@@ -424,7 +743,8 @@ const fetchUserProfile = React.useCallback(async () => {
                         </div>
                       </div>
 
-                      {profile.workExperience.map((exp: any, i: number) => (
+                      
+                      {workExperience?.map((exp: any, i: number) => (
                         <div key={i}>
                           <div className="flex w-full flex-col items-start gap-2">
                             <div className="flex w-full items-start justify-between">
@@ -439,7 +759,7 @@ const fetchUserProfile = React.useCallback(async () => {
                                   {exp.startYear} –{" "}
                                   {exp.currentlyWorking
                                     ? "Present"
-                                    : exp.endYear}
+                                    : exp.endYear || ""}
                                   {" · "}
                                   {exp.duration}
                                 </span>
@@ -455,6 +775,8 @@ const fetchUserProfile = React.useCallback(async () => {
                         </div>
                       ))}
 
+        
+
                       {/* EDUCATION */}
                       <div className="flex h-px w-full flex-none flex-col items-center gap-2 bg-neutral-200" />
                       <div className="flex w-full flex-col items-start gap-3">
@@ -469,44 +791,26 @@ const fetchUserProfile = React.useCallback(async () => {
                             </span>
                           </div>
                         </div>
-
-                      {profile.education.map((edu: any, i: number) => (
-                       <div key={i}>
-
-                        <div className="flex w-full flex-col items-start gap-2">
-                          <div className="flex w-full items-start justify-between">
-                            <div className="flex flex-col items-start gap-1">
-                              <span className="text-[14px] text-neutral-800">
-                                 {edu.schoolName}
-                              </span>
-                              <span className="text-[12px] text-neutral-400">
-                                  {edu.degree}
-                              </span>
-                              <span className="text-[12px] text-neutral-400">
-                              {edu.startYear} – {edu.endYear}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* <div className="flex w-full items-start justify-between">
-                            <div className="flex flex-col items-start gap-1">
-                              <span className="text-[14px] text-neutral-800">
-                                University of California, Berkeley
-                              </span>
-                              <span className="text-[12px] text-neutral-400">
-                                Bachelor of Science, Computer Science
-                              </span>
-                              <span className="text-[12px] text-neutral-400">
-                                2014 - 2018
-                              </span>
-                            </div>
-                          </div> */}
-
-                        </div>
-                      </div>
-
-                     ))}
-                    </div>
+                     {education?.map((edu: any, i: number) => (
+                      <div key={i}>
+                       <div className="flex w-full flex-col items-start gap-2">
+                         <div className="flex w-full items-start justify-between">
+                           <div className="flex flex-col items-start gap-1">
+                             <span className="text-[14px] text-neutral-800">
+                                {edu.schoolName}
+                             </span>
+                             <span className="text-[12px] text-neutral-400">
+                                 {edu.degree}
+                             </span>
+                             <span className="text-[12px] text-neutral-400">
+                             {edu.startYear} – {edu.endYear || ""}
+                             </span>
+                           </div>
+                         </div>
+                       </div>
+                     </div>
+                    ))}
+                  </div>
 
                       <div className="h-px w-full bg-neutral-200/60" />
 
@@ -521,7 +825,7 @@ const fetchUserProfile = React.useCallback(async () => {
                         </div>
 
                         <div className="flex w-full flex-wrap gap-2">
-                          {profile.skills.length > 0 ? (
+                          {skills?.length > 0 ? (
                             profile.skills.map((skill: any, i: number) => (
                             <Badge key={i}>
                              {typeof skill === "string" ? skill : skill.name}
@@ -548,26 +852,28 @@ const fetchUserProfile = React.useCallback(async () => {
                             </span>
                           </div>
                         </div>
+                         {certifications?.map((cert: any, i: number) => (
+                      <div key={i}>
+                       <div className="flex w-full flex-col items-start gap-2">
+                         <div className="flex w-full items-start justify-between">
+                           <div className="flex flex-col items-start gap-1">
+                             <span className="text-[14px] text-neutral-800">
+                                {cert.certificationName}
+                             </span>
+                             <span className="text-[12px] text-neutral-400">
+                                {cert.issuer}
+                             </span>
+                             <span className="text-[12px] text-neutral-400">
+                         Issued {cert.issueDate}
+                             </span>
+                           </div>
+                         </div>
+                       </div>
+                       </div>
+                       ))}
+                     </div>
 
-                      {profile.certifications.map((cert: any, i: number) => (
-                       <div key={i}>
-                        <div className="flex w-full flex-col items-start gap-2">
-                          <div className="flex w-full items-start justify-between">
-                            <div className="flex flex-col items-start gap-1">
-                              <span className="text-[14px] text-neutral-800">
-                                 {cert.certificationName}
-                              </span>
-                              <span className="text-[12px] text-neutral-400">
-                                 {cert.issuer}
-                              </span>
-                              <span className="text-[12px] text-neutral-400">
-                          Issued {cert.issueDate}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        </div>
-                        ))}
+
                       </div>
 
                      {/* FEATURED PROJECTS */}
@@ -584,25 +890,23 @@ const fetchUserProfile = React.useCallback(async () => {
                             </span>
                           </div>
                         </div>
-
-                      {profile.projects.map((project: any, i: number) => (
-                       <div key={i}>
-                        <div className="flex w-full flex-col items-start gap-2">
-                          <div className="flex w-full items-start justify-between">
-                            <div className="flex flex-col items-start gap-1">
-                              <span className="text-[14px] text-neutral-800">
-                                {project.projectName}
-                              </span>
-                              <span className="text-[12px] text-neutral-400">
-                               {project.summary}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
+                        {project?.map((project: any, i: number) => (
+                      <div key={i}>
+                       <div className="flex w-full flex-col items-start gap-2">
+                         <div className="flex w-full items-start justify-between">
+                           <div className="flex flex-col items-start gap-1">
+                             <span className="text-[14px] text-neutral-800">
+                               {project.projectName}
+                             </span>
+                             <span className="text-[12px] text-neutral-400">
+                              {project.summary}
+                             </span>
+                           </div>
+                         </div>
                        </div>
-                      ))}
+                      </div>
+                     ))}
                      </div>
-
                   </div>
                 </div>
               </div>
@@ -1398,7 +1702,7 @@ const fetchUserProfile = React.useCallback(async () => {
             </div>
           </div>
         </div>
-      </div>
+      {/* </div> */}
     </DefaultPageLayout>
   );
 }
