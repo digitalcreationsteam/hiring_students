@@ -37,22 +37,17 @@ function AssessmentPage() {
   const location = useLocation();
   const userId = useMemo(() => localStorage.getItem("userId"), []);
 
-  const [attemptId, setAttemptId] = useState<string | null>(() => {
-    return (
-      location.state?.attemptId ||
-      sessionStorage.getItem("activeAttemptId") ||
-      null
-    );
-  });
+  const [attemptId, setAttemptId] = useState<string | null>(
+    location.state?.attemptId ?? null
+  );
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<(OptionKey | null)[]>([]);
   const [remainingSeconds, setRemainingSeconds] = useState(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const saveTimeoutRef = useRef<Record<string, ReturnType<typeof setTimeout>>>(
-    {}
-  );
+  const saveTimeoutRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const [durationMinutes, setDurationMinutes] = useState<number | null>(null);
   const [expiryReady, setExpiryReady] = useState(false);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
 
@@ -81,13 +76,6 @@ function AssessmentPage() {
   //   }, [location.state?.expiresAt]);
 
   //============ SAVE ANSWERS ON REFRESH / CRASH =================//
-
-  useEffect(() => {
-    if (!attemptId) return;
-
-    sessionStorage.setItem("activeAttemptId", attemptId);
-  }, [attemptId]);
-
   useEffect(() => {
     if (!attemptId) return;
 
@@ -113,8 +101,6 @@ function AssessmentPage() {
 
   //====== USE EFFECT TO PREVENT ACCIDENTAL REFRESH / TAB CLOSE ====//
   useEffect(() => {
-    if (saving) return;
-
     const handler = (e: BeforeUnloadEvent) => {
       e.preventDefault();
       e.returnValue = "";
@@ -122,7 +108,7 @@ function AssessmentPage() {
 
     window.addEventListener("beforeunload", handler);
     return () => window.removeEventListener("beforeunload", handler);
-  }, [saving]);
+  }, []);
 
   // --- COMPUTED VALUES ---
   const answeredCount = useMemo(
@@ -208,66 +194,45 @@ function AssessmentPage() {
     startAssessment();
   }, [attemptId, userId, navigate]);
 
-  // TIMER=============>>>>>>>>
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  //=============== GET API FOR TO FETCH QUESTIONS============//
 
   const startTimer = (expiryTime: number) => {
-    if (timerRef.current) return;
-
     const tick = () => {
-      const diff = Math.max(0, Math.floor((expiryTime - Date.now()) / 1000));
+      const now = Date.now();
+      const diff = Math.max(0, Math.floor((expiryTime - now) / 1000));
 
       setRemainingSeconds(diff);
 
       if (diff === 0 && !submitLockRef.current) {
-        submitLockRef.current = true;
         handleSubmit();
       }
     };
 
     tick();
-    timerRef.current = setInterval(tick, 1000);
+    const id = setInterval(tick, 1000);
+
+    return () => clearInterval(id);
   };
 
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-    };
-  }, []);
+useEffect(() => {
+  if (!attemptId || !expiryReady) return;
 
-  //=============== GET API FOR TO FETCH QUESTIONS============//
+  let expiry: number | null = null;
 
-  useEffect(() => {
-    if (!attemptId) return;
+  if (location.state?.expiresAt) {
+    expiry = new Date(location.state.expiresAt).getTime();
+  }
 
-    const existing = sessionStorage.getItem(`expiresAt-${attemptId}`);
-    if (existing) {
-      setExpiryReady(true);
-      return;
-    }
-
-    if (location.state?.expiresAt) {
-      sessionStorage.setItem(
-        `expiresAt-${attemptId}`,
-        new Date(location.state.expiresAt).getTime().toString()
-      );
-    }
-
-    setExpiryReady(true);
-  }, [attemptId]);
-
-  useEffect(() => {
-    if (!attemptId || !expiryReady) return;
-
+  if (!expiry) {
     const saved = sessionStorage.getItem(`expiresAt-${attemptId}`);
-    if (!saved) return;
+    if (saved) expiry = Number(saved);
+  }
 
-    const expiry = Number(saved);
-    return startTimer(expiry);
-  }, [attemptId, expiryReady]);
+  if (!expiry) return;
+
+  return startTimer(expiry);
+}, [attemptId, expiryReady]);
+
 
   useEffect(() => {
     if (!attemptId || !userId) return;
@@ -280,14 +245,15 @@ function AssessmentPage() {
         { "user-id": userId }
       );
 
-      if (res.status === "completed" || res.status === "expired") {
-        sessionStorage.removeItem("activeAttemptId");
-        sessionStorage.removeItem(`attempt-${attemptId}`);
-        sessionStorage.removeItem(`expiresAt-${attemptId}`);
+      setDurationMinutes(res.durationMinutes);
 
-        navigate("/assessment-results", { state: { attemptId } });
-        return;
+      // ✅ Create expiresAt if not coming from route state
+      if (!location.state?.expiresAt) {
+        const expiry = Date.now() + res.durationMinutes * 60 * 1000;
+
+        sessionStorage.setItem(`expiresAt-${attemptId}`, expiry.toString());
       }
+      setExpiryReady(true);
 
       const mapped: Question[] = res.questions.map((q: any) => ({
         id: q._id,
@@ -300,11 +266,9 @@ function AssessmentPage() {
       }));
 
       setQuestions(mapped);
-      setAnswers((prev) => {
-        if (prev.length) return prev;
-        return Array(mapped.length).fill(null);
-      });
-
+      setAnswers((prev) =>
+        prev.length ? prev : Array(mapped.length).fill(null)
+      );
       setLoading(false);
     };
 
@@ -355,10 +319,6 @@ function AssessmentPage() {
         { attemptId },
         { "user-id": userId }
       );
-
-      sessionStorage.removeItem("activeAttemptId");
-      sessionStorage.removeItem(`attempt-${attemptId}`);
-      sessionStorage.removeItem(`expiresAt-${attemptId}`);
 
       navigate("/assessment-results", { state: { attemptId } });
     } catch (err) {
@@ -423,13 +383,9 @@ function AssessmentPage() {
   // For display: mm:ss
   const minutes = Math.floor(remainingSeconds / 60);
   const seconds = remainingSeconds % 60;
-  const isLastFiveMinutes = remainingSeconds <= 300;
 
   // Current question to show
   const currentQuestion = questions[currentIndex];
-  if (!currentQuestion) {
-    return <div>Loading question...</div>;
-  }
 
   if (loading) return <div>Loading assessment...</div>;
 
@@ -494,30 +450,15 @@ function AssessmentPage() {
                 Question {currentIndex + 1} of {questions.length}
               </span>
               <div className="flex items-center gap-2">
-                <FeatherClock
-                  className={`text-body font-body ${
-                    isLastFiveMinutes ? "text-red-600" : "text-default-font"
-                  }`}
-                />
+  <FeatherClock className="text-body font-body text-default-font" />
+  <div className="flex items-center gap-1">
+    <span className="text-sm font-body-bold text-default-font">
+      {pad2(minutes)}:{pad2(seconds)}
+    </span>
+    <span className="text-sm text-default-font">remaining</span>
+  </div>
+</div>
 
-                <div className="flex items-center gap-1">
-                  <span
-                    className={`text-sm font-body-bold ${
-                      isLastFiveMinutes ? "text-red-600" : "text-default-font"
-                    }`}
-                  >
-                    {pad2(minutes)}:{pad2(seconds)}
-                  </span>
-
-                  <span
-                    className={`text-sm ${
-                      isLastFiveMinutes ? "text-red-600" : "text-default-font"
-                    }`}
-                  >
-                    remaining
-                  </span>
-                </div>
-              </div>
             </div>
 
             {/* progress bar (custom accessible) */}
