@@ -63,10 +63,8 @@ function JobDomain() {
         }
       );
 
-      
       localStorage.setItem("domainId", domain.id);
       localStorage.setItem("subDomainId", subDomain.id);
-
 
       localStorage.setItem("jobDomain", domain.name);
       localStorage.setItem("subDomain", subDomain.name);
@@ -181,13 +179,15 @@ function JobDomain() {
             />
 
             <div className="flex flex-1 gap-2">
-              {[...Array(7)].map((_, i) => (
+              {[...Array(2)].map((_, i) => (
                 <div
                   key={i}
                   className="h-1 flex-1 rounded-full bg-violet-700"
                 />
               ))}
-              <div className="h-1 flex-1 rounded-full bg-violet-300" />
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-1 flex-1 rounded-full bg-gray-300" />
+              ))}
             </div>
           </div>
 
@@ -211,7 +211,7 @@ function JobDomain() {
               <SubframeCore.DropdownMenu.Trigger asChild>
                 <div className="flex h-10 items-center justify-between rounded-3xl border border-neutral-300 px-4 bg-neutral-50 cursor-pointer">
                   <span
-                    className={domain ? "text-neutral-900" : "text-neutral-400"}
+                    className={domain ? "text-neutral-600" : "text-neutral-400"}
                   >
                     {domain?.name || "Select your domain"}
                   </span>
@@ -263,7 +263,7 @@ function JobDomain() {
                 >
                   <span
                     className={
-                      subDomain ? "text-neutral-900" : "text-neutral-400"
+                      subDomain ? "text-neutral-600" : "text-neutral-400"
                     }
                   >
                     {subDomain?.name || "Select sub domain"}

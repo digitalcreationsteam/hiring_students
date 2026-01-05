@@ -140,7 +140,7 @@ const normalizeText = (value: string): string => {
     }
   }, [userId]);
 
-  // GET
+  // -------------------- GET DEMOGRAPHICS --------------------
   const fetchDemographics = React.useCallback(async () => {
     if (!userId) return;
 
@@ -204,10 +204,8 @@ const normalizeText = (value: string): string => {
       email: form.email.trim(),
       phoneNumber: form.phoneNumber.trim() || null,
       city: normalizeText(form.city),
-
       state: normalizeText(form.state),
       country: normalizeText(form.country),
-
       phoneVisibleToRecruiters,
     };
 
@@ -235,7 +233,7 @@ const normalizeText = (value: string): string => {
     }
 
     const confirmDelete = window.confirm(
-      "Are you sure you want to delete your demographics data? This action cannot be undone."
+      "Are you sure you want to delete your demographics data?"
     );
 
     if (!confirmDelete) return;
@@ -247,7 +245,6 @@ const normalizeText = (value: string): string => {
         "user-id": userId,
       });
 
-      // Clear local state after successful delete
       setForm({
         fullName: "",
         email: "",
