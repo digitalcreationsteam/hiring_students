@@ -8,15 +8,16 @@ export default function LoginSuccess() {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
 
+    // ❌ If backend did NOT send token
     if (!token) {
       navigate("/login", { replace: true });
       return;
     }
 
-    // store token
+    // ✅ Save JWT
     localStorage.setItem("token", token);
 
-    // clean URL + redirect
+    // ✅ Redirect user after login
     navigate("/demographics", { replace: true });
   }, [navigate]);
 

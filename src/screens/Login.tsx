@@ -70,15 +70,16 @@ function Login() {
     }
   };
 
-  const handleOAuth = (provider: "google" | "linkedin") => {
-    if (provider === "google") {
-      window.location.href = `http://localhost:5001/api/auth/google`;
-    }
-    if (provider === "linkedin") {
-      // future implementation
-      alert("LinkedIn login coming soon");
-    }
-  };
+ const handleOAuth = (provider: "google" | "linkedin") => {
+  if (provider === "google") {
+    window.location.href = "http://localhost:5001/api/auth/google";
+  }
+
+  if (provider === "linkedin") {
+    window.location.href = "http://localhost:5001/api/auth/linkedin";
+  }
+};
+
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-neutral-50 px-4 sm:px-6">
