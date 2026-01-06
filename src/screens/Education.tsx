@@ -266,25 +266,48 @@ export default function Education() {
     }
 
     // ✅ DUPLICATE CHECK (CORRECT PLACE)
-    const normalizedNew = {
-      degree: normalize(toTitleCase(degree)),
-      fieldOfStudy: normalize(toTitleCase(fieldOfStudy)),
-      schoolName: normalize(toTitleCase(schoolName)),
-      startYear,
-    };
+   // ✅ HIERARCHICAL DUPLICATE CHECK (DEGREE → FIELD → SCHOOL)
+const normalizedNew = {
+  degree: normalize(toTitleCase(degree)).trim(),
+  fieldOfStudy: normalize(toTitleCase(fieldOfStudy)).trim(),
+  schoolName: normalize(toTitleCase(schoolName)).trim(),
+  startYear,
+};
 
-    const isDuplicate = educations.some(
-      (ed) =>
-        normalize(ed.degree) === normalizedNew.degree &&
-        normalize(ed.fieldOfStudy) === normalizedNew.fieldOfStudy &&
-        normalize(ed.schoolName) === normalizedNew.schoolName &&
-        ed.startYear === normalizedNew.startYear
-    );
+// 1️⃣ Check if degree already exists
+const degreeExists = educations.some(
+  (ed) => normalize(ed.degree).trim() === normalizedNew.degree
+);
+if (degreeExists) {
+  notify("You have already added this degree.");
+  return;
+}
 
-    if (isDuplicate) {
-      notify("This education entry already exists.");
-      return;
-    }
+// 2️⃣ Check if field of study exists under this degree
+const fieldExists = educations.some(
+  (ed) =>
+    normalize(ed.degree).trim() === normalizedNew.degree &&
+    normalize(ed.fieldOfStudy).trim() === normalizedNew.fieldOfStudy
+);
+if (fieldExists) {
+  notify("This field of study already exists for this degree.");
+  return;
+}
+
+// 3️⃣ Check if school exists under this degree + field
+const schoolExists = educations.some(
+  (ed) =>
+    normalize(ed.degree).trim() === normalizedNew.degree &&
+    normalize(ed.fieldOfStudy).trim() === normalizedNew.fieldOfStudy &&
+    normalize(ed.schoolName).trim() === normalizedNew.schoolName
+);
+if (schoolExists) {
+  notify(
+    "This school is already added for this degree and field of study."
+  );
+  return;
+}
+
 
     const currentYear = new Date().getFullYear();
 

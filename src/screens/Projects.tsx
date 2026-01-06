@@ -163,10 +163,27 @@ export default function Projects() {
   const handleAddProject = async () => {
     if (isSubmitting) return;
 
-    if (!name.trim() || !summary.trim()) {
-      alert("Project name and summary are required.");
-      return;
+    if (!name.trim()) {
+      alert("Project name is required.");
+      return false;
     }
+
+    if (!role.trim()) {
+      alert("Role is required.");
+      return false;
+    }
+
+    if (!summary.trim()) {
+      alert("Project Summary is required.");
+      return false;
+    }
+
+    if (!link.trim()) {
+      alert("Project Link required.");
+      return false;
+    }
+
+    
     const normalizedName = toTitleCase(normalizeSpaces(name));
 
     const duplicate = projects.some(
@@ -411,7 +428,7 @@ export default function Projects() {
               </div>
               <div>
                 <span className="font-medium">Your Role:</span>{" "}
-                {p.name}
+                {p.role}
               </div>
               {p.summary && (
                 <div>
@@ -527,7 +544,7 @@ export default function Projects() {
             </TextField>
 
             <TextField
-              label={<span className="text-[12px]">Your role * </span>}
+              label={<span className="text-[12px]">Your Role * </span>}
               helpText=""
               className={scTextFieldClass}
             >
@@ -554,7 +571,7 @@ export default function Projects() {
             </TextField>
 
             <TextField
-              label={<span className="text-[12px]">Outcome (optional)" </span>}
+              label={<span className="text-[12px]">Outcome (optional) </span>}
               helpText=""
               className={scTextFieldClass}
             >

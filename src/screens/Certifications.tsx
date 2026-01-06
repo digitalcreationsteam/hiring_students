@@ -75,61 +75,53 @@ const notify = (msg: string) => {
 
 // -----------------Month And Year Picker----------
 
+const MONTHS = [
+  "Jan", "Feb", "Mar", "Apr",
+  "May", "Jun", "Jul", "Aug",
+  "Sep", "Oct", "Nov", "Dec",
+];
+
+type MonthYearPickerProps = {
+  value: string; // "MM/YYYY"
+  onChange: (value: string) => void;
+  disabled?: boolean;
+  minYear?: number;
+  maxYear?: number;
+};
 
 
 
-
-function MonthYearPicker({
+ function MonthYearPicker({
   value,
   onChange,
   disabled = false,
-  maxDate = new Date(),
-}: {
-  value: string;
-  onChange: (val: string) => void;
-  disabled?: boolean;
-  maxDate?: Date;
-}) {
-  const today = new Date();
-  const initialYear = value ? Number(value.split("/")[1]) : today.getFullYear();
-
+  minYear = 1950,
+  maxYear = new Date().getFullYear(),
+}: MonthYearPickerProps) {
   const [open, setOpen] = useState(false);
-  const [year, setYear] = useState(initialYear);
+  const [step, setStep] = useState<"month" | "year">("month");
+  const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
 
   const ref = useRef<HTMLDivElement>(null);
 
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-
-  // Close on outside click
+  // close on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpen(false);
+        setStep("month");
       }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const isFutureMonth = (monthIndex: number) => {
-    return (
-      year > maxDate.getFullYear() ||
-      (year === maxDate.getFullYear() && monthIndex > maxDate.getMonth())
-    );
-  };
+  const years = Array.from(
+    { length: maxYear - minYear + 1 },
+    (_, i) => maxYear - i
+  );
+
+  const displayValue = value || "MM / YYYY";
 
   return (
     <div className="relative" ref={ref}>
@@ -137,10 +129,9 @@ function MonthYearPicker({
       <input
         readOnly
         disabled={disabled}
-        value={value}
-        placeholder="MM/YYYY"
-        onClick={() => !disabled && setOpen((o) => !o)}
-        className={`w-full h-10 px-4 rounded-full border border-neutral-300 cursor-pointer focus:outline-none ${
+        value={displayValue}
+        onClick={() => !disabled && setOpen((v) => !v)}
+        className={`w-full h-10 px-4 rounded-full cursor-pointer border border-neutral-300 focus:outline-none ${
           disabled ? "bg-neutral-100 text-neutral-400" : "bg-white"
         }`}
       />
@@ -148,47 +139,50 @@ function MonthYearPicker({
       {/* PICKER */}
       {open && (
         <div className="absolute z-50 mt-2 w-64 rounded-2xl border border-neutral-300 bg-white shadow-lg p-3">
-          {/* HEADER */}
-          <div className="flex items-center justify-between mb-3">
-            <button type="button" onClick={() => setYear((y) => y - 1)}>
-              «
-            </button>
-            <span className="text-sm font-medium">{year}</span>
-            <button type="button" onClick={() => setYear((y) => y + 1)}>
-              »
-            </button>
-          </div>
-
-          {/* MONTH GRID */}
-          <div className="grid grid-cols-3 gap-2 text-sm">
-            {months.map((m, idx) => {
-              const disabledMonth = isFutureMonth(idx);
-              const formatted = `${String(idx + 1).padStart(2, "0")}/${year}`;
-
-              return (
+          {/* MONTH STEP */}
+          {step === "month" && (
+            <div className="grid grid-cols-3 gap-2 text-sm">
+              {MONTHS.map((month, index) => (
                 <button
-                  key={m}
+                  key={month}
                   type="button"
-                  disabled={disabledMonth}
                   onClick={() => {
-                    onChange(formatted);
-                    setOpen(false);
+                    setSelectedMonth(index + 1);
+                    setStep("year");
                   }}
-                  className={`
-                    py-2 rounded-lg transition
-                    ${
-                      value === formatted
-                        ? "bg-violet-600 text-white"
-                        : "hover:bg-neutral-100"
-                    }
-                    ${disabledMonth ? "text-neutral-400" : ""}
-                  `}
+                  className="py-2 rounded-lg hover:bg-neutral-100 transition"
                 >
-                  {m}
+                  {month}
                 </button>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+          )}
+
+          {/* YEAR STEP */}
+          {step === "year" && (
+            <div className="max-h-56 overflow-auto">
+              <div className="grid grid-cols-4 gap-2 text-sm">
+                {years.map((year) => (
+                  <button
+                    key={year}
+                    type="button"
+                    onClick={() => {
+                      if (!selectedMonth) return;
+
+                      const month = String(selectedMonth).padStart(2, "0");
+                      onChange(`${month}/${year}`);
+                      setOpen(false);
+                      setStep("month");
+                      setSelectedMonth(null);
+                    }}
+                    className="py-2 rounded-lg hover:bg-neutral-100 transition"
+                  >
+                    {year}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -205,8 +199,6 @@ export default function Certifications() {
   const [name, setName] = useState("");
   const [issuer, setIssuer] = useState("");
   const [issueDate, setIssueDate] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
   const [credentialLink, setCredentialLink] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [experiencePoints, setExperiencePoints] = useState<any>(null);
@@ -325,11 +317,13 @@ export default function Certifications() {
       return false;
     }
 
+    
+
    // ✅ Date validation (fixed)
-  if (!isValidMonthYear(startDate)) {
-    notify("Please select an issue date.");
-    return false;
-  }
+   if (!issueDate.trim()) {
+      notify("Date is required.");
+      return false;
+    }
 
   if (!isValidPastOrCurrentDate(trimmedIssueDate)) {
     notify("Issue date must be in MM/YYYY format and not in the future.");
@@ -341,8 +335,15 @@ export default function Certifications() {
       return false;
     }
 
+   
+
     if (credentialLink.trim() && !isValidUrl(credentialLink)) {
       alert("Credential link must be a valid URL (https://...)");
+      return false;
+    }
+
+  if (!credentialLink.trim()) {
+      notify("Certification Link is required.");
       return false;
     }
 
@@ -740,35 +741,27 @@ export default function Certifications() {
 {/* ------------Date------------------ */}
 
  {/* // date------------------------- */}
-            <div className="flex flex-col gap-6 max-w-lg">
-              {/* Dates */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label
-                    htmlFor="startdate"
-                    className="text-[12px] font-medium text-neutral-700"
-                  >
-                    Start Date
-                  </label>
-                  <MonthYearPicker value={startDate} onChange={setStartDate} />
-                </div>
+           <div className="flex flex-col gap-6 max-w-lg">
+  {/* Issue Month & Year */}
+  <div className="flex flex-col gap-1">
+    <label
+      htmlFor="issueDate"
+      className="text-[12px] font-medium text-neutral-700"
+    >
+      Issue Month & Year <span className="text-red-500">*</span>
+    </label>
 
-                <div>
-                  <label
-                    htmlFor="startdate"
-                    className="text-[12px] font-medium text-neutral-700"
-                  >
-                    End Date
-                  </label>
-                  <MonthYearPicker value={endDate} onChange={setEndDate} />
-                </div>
-              </div>
-            </div>
+    <MonthYearPicker
+      value={issueDate}
+      onChange={setIssueDate}
+    />
+  </div>
+</div>
 
   {/* ---------------End Date-------------- */}
 
             <TextField
-              label={<span className="text-[12px]">Credential Link" </span>}
+              label={<span className="text-[12px]">Credential Link * </span>}
               helpText=""
               className={scTextFieldClass}
             >

@@ -33,9 +33,597 @@ import { FeatherUsers } from "@subframe/core";
 import { FeatherZap } from "@subframe/core";
 import API, { URL_PATH } from "src/common/API";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import Projects from "./Projects";
 
+
+// // ==================== TYPES ====================
+// type UserProfile = {
+//   name: string;
+//   domain: string;
+//   location: string;
+// };
+
+// type WorkExperience = {
+//   jobTitle: string;
+//   companyName: string;
+//   startYear: number | null;
+//   endYear: number | null;
+//   duration: number | null;
+//   description: string;
+//   location: string;
+//   currentlyWorking: boolean;
+// };
+
+// type education = {
+//   schoolName: string;
+//   degree: string;
+//   startYear: number | null;
+//   endYear: number | null;
+//   currentlyStudying?: boolean;
+// };
+
+// type Skill = {
+//   name: string;              
+// };
+// type Certification = {
+//   name: string;              
+//   issuedBy: string;         
+//   issueYear: number | null;  
+// };
+// type project ={
+//   title: string;              
+//   summary: string;          
+//   endYear: number | null;     
+// };
+// type RankData = {
+//   rank: number;
+//   percentile: number;
+//   betterThan: number;
+// };
+
+// type LocationRank = {
+//   state: RankData;
+//   city: RankData;
+//   university: RankData;
+// };
+
+// type Hireability = {
+//   totalScore: number;
+//   weeklyChange: number;
+//   nextRankPoints: number;
+//   skill: {
+//     score: number;
+//     max: number;
+//   };
+//   experience: {
+//     score: number;
+//     max: number;
+//   };
+// };
+
+//  type BadgeVariant = "brand" | "neutral" | "warning" | "error" | "success";
+//   type RankTheme = {
+//     border: string;
+//     bg: string;
+//     iconBg: string;
+//     iconColor: string;
+//     valueColor: string;
+//     badge: BadgeVariant;
+//   };
+
+
+// // type DashboardResponse = {
+// //   user: {
+// //     name: string;
+// //     role: string;
+// //     location: string;
+// //     avatar: string;
+// //     verified: boolean;
+// //   };
+// //   exp: {
+// //     jobTitle: string;
+// //     companyName: string;
+// //     startYear: number;
+// //     endYear: number;
+// //     duration: number;
+// //     description: string;
+// //     location: string;
+// //     currentlyWorking: boolean;
+// //   };
+// //   edu:{
+// //     schoolName: string;
+// //     degree: string;
+// //     startYear: number;
+// //     endYear: number;
+// //   };
+// //   skills:{
+// //     skill : string;
+// //   };
+
+// //   certifications:{
+// //   name: string;             
+// //   issuedBy: string;          
+// //   issueYear: number | null;  
+// // };
+// // project :{
+// //   title: string;              
+// //   summary: string;          
+// //   endYear: number | null;     
+// // };
+
+// //   rank: {
+// //     global: number;
+// //     university: number;
+// //     city: number;
+// //     percentile: string;
+// //   };
+// //   hireability: {
+// //     score: number;
+// //     skillIndex: number;
+// //     experienceIndex: number;
+// //     weeklyChange: number;
+// //   };
+// //   activity: {
+// //     caseStudies: { done: number; total: number };
+// //     hackathons: { done: number; total: number };
+// //     interviewPrep: { done: number; total: number };
+// //   };
+// // };
+
+// export default function Dashboard() {
+//   const navigate = useNavigate();
+
+//     /* -------------------- NAVIGATION (UPDATED) -------------------- */
+//   const handleNavigate = async (path: string) => {
+//     if (path === "/assessment") {
+//       const res = await fetch("/api/assessment/status");
+//       const data = await res.json();
+
+//       if (data.status === "IN_PROGRESS") {
+//         navigate(`/assessment/continue/${data.attemptId}`);
+//         return;
+//       }
+//     }
+//     navigate(path);
+//   };
+
+
+//   /* -------------------- AVATAR -------------------- */
+//   const fileRef = useRef<HTMLInputElement>(null);
+//   const [avatar, setAvatar] = useState(
+//     "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400"
+//   );
+
+// const [user, setUser] = useState<UserProfile>({
+//   name: "",
+//   domain: "",
+//   location: "",
+// });
+
+
+//          /* -------------------- PROFETIONAL PROFILE -------------------- */
+
+//   const [profile, setProfile] = useState({
+    
+//     workExperience: [],
+//     education: [],
+//     skills: [],
+//     certifications: [],
+//     projects: [],
+//   });
+
+//   const [workExperience, setWorkExperience] = useState<WorkExperience[]>([]);
+
+//   const [education, setEducation] = useState<education[]>([]);
+
+//   const [skills, setSkills] = useState<Skill[]>([]);
+
+//   const [certifications, setcertifications] = useState<Certification[]>([]);
+
+//   const [project, setProject] = useState<project[]>([]);
+
+
+
+
+
+
+  
+//   /* -------------------- GLOBAL RANK STATE -------------------- */
+//   const [globalRank, setGlobalRank] = useState({
+//     rank: 0,
+//     percentile: 0,
+//     betterThan: 0,
+//   });
+//   /* -------------------- California, San Francisco, Stanford RANK STATE --------- */
+
+//     const [locationRank, setLocationRank] = useState({
+//     state: { rank: 0, percentile: 0, betterThan: 0 },
+//     city: { rank: 0, percentile: 0, betterThan: 0 },
+//     university: { rank: 0, percentile: 0, betterThan: 0 },
+//   });
+
+//     /* -------------------- Hireability Index -------------------- */
+
+//     const [hireability, setHireability] = useState({
+//     totalScore: 0,
+//     weeklyChange: 0,
+//     nextRankPoints: 0,
+//     skill: {
+//       score: 0,
+//       max: 400,
+//     },
+//     experience: {
+//       score: 0,
+//       max: 5000,
+//     },
+//   });
+
+//    /* -------------------- RECRUITER VISIBILITY -------------------- */
+//   const [recruiterVisibility, setRecruiterVisibility] = useState(0);
+
+
+//   /* -------------------- FETCH DATA -------------------- */
+//   useEffect(() => {
+//   // Fetch all dashboard data on component mount
+//   const fetchDashboardData = async () => {
+//     try {
+//       // 1. User Profile
+//       await fetchUserProfile();
+
+//       // 2. Profile Details
+//       const profileData = await API("GET", URL_PATH.getDemographics);
+//       setProfile(profileData);
+
+//       //     Working Experience
+      
+
+//       // 3. Global Rank
+//       try {
+//         const globalRankData = await API("GET", "/user/global-rank");
+//         setGlobalRank({
+//           rank: globalRankData?.rank ?? 0,
+//           percentile: globalRankData?.percentile ?? 0,
+//           betterThan: globalRankData?.betterThan ?? 0,
+//         });
+//       } catch (err) {
+//         console.warn("Global rank not available:", err);
+//       }
+
+//       // 4. Location Rank
+//       try {
+//         const locationData = await API("GET", "/user/location-rank");
+//         setLocationRank({
+//           state: {
+//             rank: locationData?.state?.rank ?? 0,
+//             percentile: locationData?.state?.percentile ?? 0,
+//             betterThan: locationData?.state?.betterThan ?? 0,
+//           },
+//           city: {
+//             rank: locationData?.city?.rank ?? 0,
+//             percentile: locationData?.city?.percentile ?? 0,
+//             betterThan: locationData?.city?.betterThan ?? 0,
+//           },
+//           university: {
+//             rank: locationData?.university?.rank ?? 0,
+//             percentile: locationData?.university?.percentile ?? 0,
+//             betterThan: locationData?.university?.betterThan ?? 0,
+//           },
+//         });
+//       } catch (err) {
+//         console.warn("Location rank not available:", err);
+//       }
+
+//       // 5. Hireability Index
+//       try {
+//         const hireabilityData = await API("GET", "/user/hireability-index");
+//         setHireability({
+//           totalScore: hireabilityData?.totalScore ?? 0,
+//           weeklyChange: hireabilityData?.weeklyChange ?? 0,
+//           nextRankPoints: hireabilityData?.nextRankPoints ?? 0,
+//           skill: {
+//             score: hireabilityData?.skill?.score ?? 0,
+//             max: hireabilityData?.skill?.max ?? 400,
+//           },
+//           experience: {
+//             score: hireabilityData?.experience?.score ?? 0,
+//             max: hireabilityData?.experience?.max ?? 5000,
+//           },
+//         });
+//       } catch (err) {
+//         console.warn("Hireability index not available:", err);
+//       }
+
+//       // 6. Recruiter Visibility
+//       try {
+//         const visibilityData = await API("GET", "/user/recruiter-visibility");
+//         setRecruiterVisibility(visibilityData?.probability ?? 0);
+//       } catch (err) {
+//         console.warn("Recruiter visibility not available:", err);
+//       }
+
+//     } catch (error) {
+//       console.error("Error loading dashboard:", error);
+//     }
+//   };
+
+//   fetchDashboardData();
+// }, []);
+//   // useEffect(() => {
+//   //   fetch("/api/user/profile")
+//   //     .then((res) => res.json())
+//   //     .then((data) => {
+//   //       setuser({
+//   //         name: data.name,
+//   //         domain: data.domain,
+//   //         location: data.location,
+//   //       });
+//   //       setAvatar(data.avatar);
+//   //     });  }, []);
+
+//         /* -------------------- GlobalRank DATA -------------------- */
+
+//     fetch("/api/user/profile-details")
+//       .then((res) => res.json())
+//       .then((data) => setProfile(data));
+//       fetch("/api/user/global-rank")
+//       .then((res) => res.json())
+//       .then((data) => {
+//         setGlobalRank({
+//           rank: data?.rank ?? 0,
+//           percentile: data?.percentile ?? 0,
+//           betterThan: data?.betterThan ?? 0,
+//         });
+//       })
+//       .catch(() => { }); // new user → defaults remain 0
+      
+
+//               /* -------------------- State Rank DATA -------------------- */
+//       fetch("/api/user/location-rank")
+//       .then((res) => res.json())
+//       .then((data) => {
+//         setLocationRank({
+//           state: {
+//             rank: data?.state?.rank ?? 0,
+//             percentile: data?.state?.percentile ?? 0,
+//             betterThan: data?.state?.betterThan ?? 0,
+//           },
+//           city: {
+//             rank: data?.city?.rank ?? 0,
+//             percentile: data?.city?.percentile ?? 0,
+//             betterThan: data?.city?.betterThan ?? 0,
+//           },
+//           university: {
+//             rank: data?.university?.rank ?? 0,
+//             percentile: data?.university?.percentile ?? 0,
+//             betterThan: data?.university?.betterThan ?? 0,
+//           },
+//         });
+//       })
+//       .catch(() => {});
+      
+
+//                     /* -------------------- Hireability DATA -------------------- */
+//       fetch("/api/user/hireability-index")
+//       .then((res) => res.json())
+//       .then((data) => {
+//         setHireability({
+//           totalScore: data?.totalScore ?? 0,
+//           weeklyChange: data?.weeklyChange ?? 0,
+//           nextRankPoints: data?.nextRankPoints ?? 0,
+//           skill: {
+//             score: data?.skill?.score ?? 0,
+//             max: data?.skill?.max ?? 400,
+//           },
+//           experience: {
+//             score: data?.experience?.score ?? 0,
+//             max: data?.experience?.max ?? 5000,
+//           },
+//         });
+//       })
+//       .catch(() => {}); // new user → keep defaults (0)
+
+
+//          /* -------------------- RECRUITER VISIBILITY -------------------- */
+//         fetch("/api/user/recruiter-visibility")
+//       .then((res) => res.json())
+//       .then((data) => {
+//         setRecruiterVisibility(data?.probability ?? 0);
+//       })
+//       .catch(() => {});
+
+      
+
+//   // }, []);
+
+//   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const file = e.target.files?.[0];
+//     if (!file) return;
+//     setAvatar(URL.createObjectURL(file));
+//   };
+
+ 
+// // ==================== CONSTANTS ====================
+
+//   const GLOBAL_THEME: RankTheme = {
+//     border: "border-violet-200",
+//     bg: "bg-violet-50",
+//     iconBg: "bg-violet-100",
+//     iconColor: "text-violet-600",
+//     valueColor: "text-violet-600",
+//     badge: "brand",
+//   };
+
+
+// /* --------------------  USER PROFILE API -------------------- */
+// const fetchUserProfile = useCallback(async () => {
+//   try {
+//     const res = await API("GET", URL_PATH.getDemographics);
+// console.log("Response in Dashboard :::::::::::::::::::", res)
+//     // Map API response to UI state (API returns fullName, not name)
+ 
+// setUser({
+//   name: res.fullName || "",           // User's full name
+//   domain: res.domain || "Professional", // User's role/domain
+//   location: `${res.city || ""}, ${res.state || ""}`
+//     .trim()
+//     .replace(/^,\s*|,\s*$/g, ""),     // City + State
+// });
+
+//     setAvatar(res.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400");
+//   } catch (err) {
+//     console.error("Failed to fetch user profile:", err);
+//   }
+// }, []);
+
+// /* --------------------  Work Experience API -------------------- */
+// const fetchworkexp = useCallback(async () => {
+//   try {
+//     const response = await API("GET", URL_PATH.experience);
+//     const data = response?.data;
+
+//     if (!Array.isArray(data)) return;
+
+//     setWorkExperience(
+//       data.map((item: any) => ({
+//         jobTitle: item.jobTitle || "",
+//         companyName: item.companyName || "",
+//         startYear: item.startYear ?? null,
+//         endYear: item.endYear ?? null,
+//         duration: item.duration ?? null,
+//         description: item.description || "",
+//         location: `${item.city || ""}, ${item.state || ""}`
+//           .trim()
+//           .replace(/^,\s*|,\s*$/g, ""),
+//         currentlyWorking: item.currentlyWorking ?? false,
+//       }))
+//     );
+//   } catch (err) {
+//     console.error("Failed to fetch work experience:", err);
+//   }
+// }, []);
+
+// /* -------------------- Education API -------------------- */
+//  const fetcheducation = useCallback(async () => {
+//   try {
+//     const response = await API("GET", URL_PATH.education);
+//     const data = response?.data;
+
+//     if (!Array.isArray(data)) return;
+
+//     setEducation(
+//       data.map((item: any) => ({
+//     schoolName: item.schoolName || "",
+//     degree: item.degree || "",
+//     startYear: item.startYear ?? null,
+//     endYear: item.endYear ?? null,
+//   }))
+//     );
+//   } catch (err) {
+//     console.error("Failed to fetch Education: ", err);
+//   }
+// }, []);
+
+// /* -------------------- Skills API -------------------- */
+//   const fetchskill = useCallback(async () => {
+//   try {
+//     const response = await API("GET", URL_PATH.getUserDomainSkils);
+//     const data = response?.data;
+
+//     if (!Array.isArray(data)) return;
+
+//     setSkills(
+//       data.map((item: any) => ({
+//     name: item.name || item.skill || "",
+   
+//   }))
+//     );
+//   } catch (err) {
+//     console.error("Failed to fetch Skills: ", err);
+//   }
+// }, []);
+
+// /* -------------------- Certification API -------------------- */
+
+// const fetchcertification = useCallback(async () => {
+//   try {
+//     const response = await API("GET", URL_PATH.certification);
+//     const data = response?.data;
+
+//     if (!Array.isArray(data)) return;
+
+//     setEducation(
+//       data.map((item: any) => ({
+//     schoolName: item.schoolName || "",
+//     degree: item.degree || "",
+//     startYear: item.startYear ?? null,
+//     endYear: item.endYear ?? null,
+//   }))
+//     );
+//   } catch (err) {
+//     console.error("Failed to fetch Certification ", err);
+//   }
+// }, []);
+
+// /* -------------------- Project API -------------------- */
+
+// const fetchprojects = useCallback(async () => {
+//   try {
+//     const response = await API("GET", URL_PATH.projects);
+//     const data = response?.data;
+
+//     if (!Array.isArray(data)) return;
+
+//     setProject(
+//       data.map((item: any) => ({
+//    title: item.title || "",
+//     summary: item.description || "",
+//     endYear: item.endYear ?? null,
+//   }))
+//     );
+//   } catch (err) {
+//     console.error("Failed to fetch Projects ", err);
+//   }
+// }, []);
+
+// /* -------------------- FETCH ALL DATA -------------------- */
+// useEffect(() => {
+//   const fetchDashboardData = async () => {
+//     try {
+//       // 1. User Profile (demographics)
+//       await fetchUserProfile();
+
+//       // 2. workExperience (experience)
+//        await fetchworkexp();
+
+//       // 3. education (education)
+//        await fetcheducation();
+
+//        // 4. Skill
+//        await fetchskill();
+
+//        // 5. Certification (certification)
+//        await fetchcertification();
+
+//        // 6. Projects (projects)
+//        await fetchprojects();
+
+
+//     } catch (error) {
+//       console.error("Error loading dashboard:", error);
+//     }
+//   };
+
+//   fetchDashboardData();
+// }, [fetchUserProfile, fetchworkexp, fetcheducation, fetchskill, fetchcertification, fetchprojects]);
+
+//          /* --------------------    USER PROFILE API -------------------- */
+
+
+//    console.log("education", education)
+
+
+// ==================== TYPES ====================
 type UserProfile = {
   name: string;
   domain: string;
@@ -53,7 +641,7 @@ type WorkExperience = {
   currentlyWorking: boolean;
 };
 
-type education = {
+type Education = {
   schoolName: string;
   degree: string;
   startYear: number | null;
@@ -62,393 +650,171 @@ type education = {
 };
 
 type Skill = {
-  name: string;              
+  name: string;
 };
+
 type Certification = {
-  name: string;              
-  issuedBy: string;         
-  issueYear: number | null;  
-};
-type project ={
-  title: string;              
-  summary: string;          
-  endYear: number | null;     
+  name: string;
+  issuedBy: string;
+  issueYear: number | null;
 };
 
-
-type DashboardResponse = {
-  user: {
-    name: string;
-    role: string;
-    location: string;
-    avatar: string;
-    verified: boolean;
-  };
-  exp: {
-    jobTitle: string;
-    companyName: string;
-    startYear: number;
-    endYear: number;
-    duration: number;
-    description: string;
-    location: string;
-    currentlyWorking: boolean;
-  };
-  edu:{
-    schoolName: string;
-    degree: string;
-    startYear: number;
-    endYear: number;
-  };
-  skills:{
-    skill : string;
-  };
-
-  certifications:{
-  name: string;             
-  issuedBy: string;          
-  issueYear: number | null;  
-};
-project :{
-  title: string;              
-  summary: string;          
-  endYear: number | null;     
+type Project = {
+  title: string;
+  summary: string;
+  endYear: number | null;
 };
 
-  rank: {
-    global: number;
-    university: number;
-    city: number;
-    percentile: string;
-  };
-  hireability: {
+type RankData = {
+  rank: number;
+  percentile: number;
+  betterThan: number;
+};
+
+type LocationRank = {
+  state: RankData;
+  city: RankData;
+  university: RankData;
+};
+
+type Hireability = {
+  totalScore: number;
+  weeklyChange: number;
+  nextRankPoints: number;
+  skill: {
     score: number;
-    skillIndex: number;
-    experienceIndex: number;
-    weeklyChange: number;
+    max: number;
   };
-  activity: {
-    caseStudies: { done: number; total: number };
-    hackathons: { done: number; total: number };
-    interviewPrep: { done: number; total: number };
+  experience: {
+    score: number;
+    max: number;
   };
 };
 
+type BadgeVariant = "brand" | "neutral" | "warning" | "error" | "success";
+
+type RankTheme = {
+  border: string;
+  bg: string;
+  iconBg: string;
+  iconColor: string;
+  valueColor: string;
+  badge: BadgeVariant;
+};
+
+// ==================== CONSTANTS ====================
+const GLOBAL_THEME: RankTheme = {
+  border: "border-violet-200",
+  bg: "bg-violet-50",
+  iconBg: "bg-violet-100",
+  iconColor: "text-violet-600",
+  valueColor: "text-violet-600",
+  badge: "brand",
+};
+
+const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400";
+
+const PROFILE_VIEWERS = [
+  {
+    name: "Sarah Kim",
+    role: "Senior Recruiter at Google",
+    time: "2h ago",
+    img: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=64",
+    initials: "SK",
+  },
+  {
+    name: "Michael Johnson",
+    role: "Hiring Manager at Meta",
+    time: "5h ago",
+    img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=64",
+    initials: "MJ",
+  },
+  {
+    name: "Emily Patel",
+    role: "Product Lead at Amazon",
+    time: "1d ago",
+    img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64",
+    initials: "EP",
+  },
+  {
+    name: "David Lee",
+    role: "VP of Product at Stripe",
+    time: "2d ago",
+    img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64",
+    initials: "DL",
+  },
+];
+
+// ==================== HELPER FUNCTIONS ====================
+const formatLocation = (city?: string, state?: string): string => {
+  return `${city || ""}, ${state || ""}`.trim().replace(/^,\s*|,\s*$/g, "");
+};
+
+const safeApiCall = async <T,>(
+  apiCall: () => Promise<T>,
+  defaultValue: T,
+  errorMessage: string
+): Promise<T> => {
+  try {
+    return await apiCall();
+  } catch (err) {
+    console.warn(errorMessage, err);
+    return defaultValue;
+  }
+};
+
+// ==================== MAIN COMPONENT ====================
 export default function Dashboard() {
   const navigate = useNavigate();
-
-    /* -------------------- NAVIGATION (UPDATED) -------------------- */
-  const handleNavigate = async (path: string) => {
-    if (path === "/assessment") {
-      const res = await fetch("/api/assessment/status");
-      const data = await res.json();
-
-      if (data.status === "IN_PROGRESS") {
-        navigate(`/assessment/continue/${data.attemptId}`);
-        return;
-      }
-    }
-    navigate(path);
-  };
-
-
-  /* -------------------- AVATAR -------------------- */
   const fileRef = useRef<HTMLInputElement>(null);
-  const [avatar, setAvatar] = useState(
-    "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400"
-  );
 
-const [user, setUser] = useState<UserProfile>({
-  name: "",
-  domain: "",
-  location: "",
-});
-
-
-         /* -------------------- PROFETIONAL PROFILE -------------------- */
-
-  const [profile, setProfile] = useState({
-    
-    workExperience: [],
-    education: [],
-    skills: [],
-    certifications: [],
-    projects: [],
+  // ==================== STATE ====================
+  const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
+  const [user, setUser] = useState<UserProfile>({
+    name: "",
+    domain: "",
+    location: "",
   });
-
   const [workExperience, setWorkExperience] = useState<WorkExperience[]>([]);
-
-  const [education, setEducation] = useState<education[]>([]);
-
+  const [education, setEducation] = useState<Education[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
-
-  const [certifications, setcertifications] = useState<Certification[]>([]);
-
-  const [project, setProject] = useState<project[]>([]);
-
-
-
-
-
-
-  
-  /* -------------------- GLOBAL RANK STATE -------------------- */
-  const [globalRank, setGlobalRank] = useState({
+  const [certifications, setCertifications] = useState<Certification[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [globalRank, setGlobalRank] = useState<RankData>({
     rank: 0,
     percentile: 0,
     betterThan: 0,
   });
-  /* -------------------- California, San Francisco, Stanford RANK STATE --------- */
-
-    const [locationRank, setLocationRank] = useState({
+  const [locationRank, setLocationRank] = useState<LocationRank>({
     state: { rank: 0, percentile: 0, betterThan: 0 },
     city: { rank: 0, percentile: 0, betterThan: 0 },
     university: { rank: 0, percentile: 0, betterThan: 0 },
   });
-
-    /* -------------------- Hireability Index -------------------- */
-
-    const [hireability, setHireability] = useState({
+  const [hireability, setHireability] = useState<Hireability>({
     totalScore: 0,
     weeklyChange: 0,
     nextRankPoints: 0,
-    skill: {
-      score: 0,
-      max: 400,
-    },
-    experience: {
-      score: 0,
-      max: 5000,
-    },
+    skill: { score: 0, max: 400 },
+    experience: { score: 0, max: 5000 },
   });
-
-   /* -------------------- RECRUITER VISIBILITY -------------------- */
   const [recruiterVisibility, setRecruiterVisibility] = useState(0);
+  
 
-
-  /* -------------------- FETCH DATA -------------------- */
-  useEffect(() => {
-  // Fetch all dashboard data on component mount
-  const fetchDashboardData = async () => {
-    try {
-      // 1. User Profile
-      await fetchUserProfile();
-
-      // 2. Profile Details
-      const profileData = await API("GET", URL_PATH.getDemographics);
-      setProfile(profileData);
-
-      //     Working Experience
-      
-
-      // 3. Global Rank
-      try {
-        const globalRankData = await API("GET", "/user/global-rank");
-        setGlobalRank({
-          rank: globalRankData?.rank ?? 0,
-          percentile: globalRankData?.percentile ?? 0,
-          betterThan: globalRankData?.betterThan ?? 0,
-        });
-      } catch (err) {
-        console.warn("Global rank not available:", err);
-      }
-
-      // 4. Location Rank
-      try {
-        const locationData = await API("GET", "/user/location-rank");
-        setLocationRank({
-          state: {
-            rank: locationData?.state?.rank ?? 0,
-            percentile: locationData?.state?.percentile ?? 0,
-            betterThan: locationData?.state?.betterThan ?? 0,
-          },
-          city: {
-            rank: locationData?.city?.rank ?? 0,
-            percentile: locationData?.city?.percentile ?? 0,
-            betterThan: locationData?.city?.betterThan ?? 0,
-          },
-          university: {
-            rank: locationData?.university?.rank ?? 0,
-            percentile: locationData?.university?.percentile ?? 0,
-            betterThan: locationData?.university?.betterThan ?? 0,
-          },
-        });
-      } catch (err) {
-        console.warn("Location rank not available:", err);
-      }
-
-      // 5. Hireability Index
-      try {
-        const hireabilityData = await API("GET", "/user/hireability-index");
-        setHireability({
-          totalScore: hireabilityData?.totalScore ?? 0,
-          weeklyChange: hireabilityData?.weeklyChange ?? 0,
-          nextRankPoints: hireabilityData?.nextRankPoints ?? 0,
-          skill: {
-            score: hireabilityData?.skill?.score ?? 0,
-            max: hireabilityData?.skill?.max ?? 400,
-          },
-          experience: {
-            score: hireabilityData?.experience?.score ?? 0,
-            max: hireabilityData?.experience?.max ?? 5000,
-          },
-        });
-      } catch (err) {
-        console.warn("Hireability index not available:", err);
-      }
-
-      // 6. Recruiter Visibility
-      try {
-        const visibilityData = await API("GET", "/user/recruiter-visibility");
-        setRecruiterVisibility(visibilityData?.probability ?? 0);
-      } catch (err) {
-        console.warn("Recruiter visibility not available:", err);
-      }
-
-    } catch (error) {
-      console.error("Error loading dashboard:", error);
-    }
-  };
-
-  fetchDashboardData();
-}, []);
-  // useEffect(() => {
-  //   fetch("/api/user/profile")
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       setuser({
-  //         name: data.name,
-  //         domain: data.domain,
-  //         location: data.location,
-  //       });
-  //       setAvatar(data.avatar);
-  //     });  }, []);
-
-        /* -------------------- GlobalRank DATA -------------------- */
-
-    fetch("/api/user/profile-details")
-      .then((res) => res.json())
-      .then((data) => setProfile(data));
-      fetch("/api/user/global-rank")
-      .then((res) => res.json())
-      .then((data) => {
-        setGlobalRank({
-          rank: data?.rank ?? 0,
-          percentile: data?.percentile ?? 0,
-          betterThan: data?.betterThan ?? 0,
-        });
-      })
-      .catch(() => { }); // new user → defaults remain 0
-      
-
-              /* -------------------- State Rank DATA -------------------- */
-      fetch("/api/user/location-rank")
-      .then((res) => res.json())
-      .then((data) => {
-        setLocationRank({
-          state: {
-            rank: data?.state?.rank ?? 0,
-            percentile: data?.state?.percentile ?? 0,
-            betterThan: data?.state?.betterThan ?? 0,
-          },
-          city: {
-            rank: data?.city?.rank ?? 0,
-            percentile: data?.city?.percentile ?? 0,
-            betterThan: data?.city?.betterThan ?? 0,
-          },
-          university: {
-            rank: data?.university?.rank ?? 0,
-            percentile: data?.university?.percentile ?? 0,
-            betterThan: data?.university?.betterThan ?? 0,
-          },
-        });
-      })
-      .catch(() => {});
-      
-
-                    /* -------------------- Hireability DATA -------------------- */
-      fetch("/api/user/hireability-index")
-      .then((res) => res.json())
-      .then((data) => {
-        setHireability({
-          totalScore: data?.totalScore ?? 0,
-          weeklyChange: data?.weeklyChange ?? 0,
-          nextRankPoints: data?.nextRankPoints ?? 0,
-          skill: {
-            score: data?.skill?.score ?? 0,
-            max: data?.skill?.max ?? 400,
-          },
-          experience: {
-            score: data?.experience?.score ?? 0,
-            max: data?.experience?.max ?? 5000,
-          },
-        });
-      })
-      .catch(() => {}); // new user → keep defaults (0)
-
-
-         /* -------------------- RECRUITER VISIBILITY -------------------- */
-        fetch("/api/user/recruiter-visibility")
-      .then((res) => res.json())
-      .then((data) => {
-        setRecruiterVisibility(data?.probability ?? 0);
-      })
-      .catch(() => {});
-
-      
-
-  // }, []);
-
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setAvatar(URL.createObjectURL(file));
-  };
-
-  type BadgeVariant = "brand" | "neutral" | "warning" | "error" | "success";
-  type RankTheme = {
-    border: string;
-    bg: string;
-    iconBg: string;
-    iconColor: string;
-    valueColor: string;
-    badge: BadgeVariant;
-  };
-
-  const GLOBAL_THEME: RankTheme = {
-    border: "border-violet-200",
-    bg: "bg-violet-50",
-    iconBg: "bg-violet-100",
-    iconColor: "text-violet-600",
-    valueColor: "text-violet-600",
-    badge: "brand",
-  };
-
-
-/* --------------------  USER PROFILE API -------------------- */
-const fetchUserProfile = useCallback(async () => {
-  try {
+  // ==================== API FETCH FUNCTIONS ====================
+  const fetchUserProfile = useCallback(async () => {
     const res = await API("GET", URL_PATH.getDemographics);
-console.log("Response in Dashboard :::::::::::::::::::", res)
-    // Map API response to UI state (API returns fullName, not name)
- 
-setUser({
-  name: res.fullName || "",           // User's full name
-  domain: res.domain || "Professional", // User's role/domain
-  location: `${res.city || ""}, ${res.state || ""}`
-    .trim()
-    .replace(/^,\s*|,\s*$/g, ""),     // City + State
-});
+    console.log("Response in Dashboard:", res);
 
-    setAvatar(res.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400");
-  } catch (err) {
-    console.error("Failed to fetch user profile:", err);
-  }
-}, []);
+    setUser({
+      name: res.fullName || "",
+      domain: res.domain || "Professional",
+      location: formatLocation(res.city, res.state),
+    });
 
-/* --------------------  Work Experience API -------------------- */
-const fetchworkexp = useCallback(async () => {
-  try {
+    setAvatar(res.avatar || DEFAULT_AVATAR);
+  }, []);
+
+  const fetchWorkExperience = useCallback(async () => {
     const response = await API("GET", URL_PATH.experience);
     const data = response?.data;
 
@@ -462,20 +828,13 @@ const fetchworkexp = useCallback(async () => {
         endYear: item.endYear ?? null,
         duration: item.duration ?? null,
         description: item.description || "",
-        location: `${item.city || ""}, ${item.state || ""}`
-          .trim()
-          .replace(/^,\s*|,\s*$/g, ""),
+        location: formatLocation(item.city, item.state),
         currentlyWorking: item.currentlyWorking ?? false,
       }))
     );
-  } catch (err) {
-    console.error("Failed to fetch work experience:", err);
-  }
-}, []);
+  }, []);
 
-/* -------------------- Education API -------------------- */
- const fetcheducation = useCallback(async () => {
-  try {
+  const fetchEducation = useCallback(async () => {
     const response = await API("GET", URL_PATH.education);
     const data = response?.data;
 
@@ -483,114 +842,167 @@ const fetchworkexp = useCallback(async () => {
 
     setEducation(
       data.map((item: any) => ({
-    schoolName: item.schoolName || "",
-    degree: item.degree || "",
-    startYear: item.startYear ?? null,
-    endYear: item.endYear ?? null,
-  }))
+        schoolName: item.schoolName || "",
+        degree: item.degree || "",
+        startYear: item.startYear ?? null,
+        endYear: item.endYear ?? null,
+      }))
     );
-  } catch (err) {
-    console.error("Failed to fetch Education: ", err);
-  }
-}, []);
+  }, []);
 
-/* -------------------- Skills API -------------------- */
-  const fetchskill = useCallback(async () => {
-  try {
+  const fetchSkills = useCallback(async () => {
     const response = await API("GET", URL_PATH.getUserDomainSkils);
     const data = response?.data;
 
     if (!Array.isArray(data)) return;
 
-    setSkills(
-      data.map((item: any) => ({
-    name: item.name || item.skill || "",
-   
-  }))
-    );
-  } catch (err) {
-    console.error("Failed to fetch Skills: ", err);
-  }
-}, []);
+    setSkills(data.map((item: any) => ({ name: item.name || item.skill || "" })));
+  }, []);
 
-/* -------------------- Certification API -------------------- */
-
-const fetchcertification = useCallback(async () => {
-  try {
+  const fetchCertifications = useCallback(async () => {
     const response = await API("GET", URL_PATH.certification);
     const data = response?.data;
 
     if (!Array.isArray(data)) return;
 
-    setEducation(
+    setCertifications(
       data.map((item: any) => ({
-    schoolName: item.schoolName || "",
-    degree: item.degree || "",
-    startYear: item.startYear ?? null,
-    endYear: item.endYear ?? null,
-  }))
+        name: item.certificationName || "",
+        issuedBy: item.issuer || "",
+        issueYear: item.issueDate ?? null,
+      }))
     );
-  } catch (err) {
-    console.error("Failed to fetch Certification ", err);
-  }
-}, []);
+  }, []);
 
-/* -------------------- Project API -------------------- */
-
-const fetchprojects = useCallback(async () => {
-  try {
+  const fetchProjects = useCallback(async () => {
     const response = await API("GET", URL_PATH.projects);
     const data = response?.data;
 
     if (!Array.isArray(data)) return;
 
-    setProject(
+    setProjects(
       data.map((item: any) => ({
-   title: item.title || "",
-    summary: item.description || "",
-    endYear: item.endYear ?? null,
-  }))
+        title: item.title || "",
+        summary: item.description || "",
+        endYear: item.endYear ?? null,
+      }))
     );
-  } catch (err) {
-    console.error("Failed to fetch Projects ", err);
-  }
+  }, []);
+
+  const fetchGlobalRank = useCallback(async () => {
+  const defaultRank: RankData = { rank: 0, percentile: 0, betterThan: 0 };
+
+  const data = await safeApiCall(
+    () => API("GET", "/user/global-rank"), // <-- your actual API path
+    defaultRank,
+    "Failed to fetch global rank"
+  );
+
+  setGlobalRank(data);
 }, []);
 
-/* -------------------- FETCH ALL DATA -------------------- */
-useEffect(() => {
-  const fetchDashboardData = async () => {
-    try {
-      // 1. User Profile (demographics)
-      await fetchUserProfile();
 
-      // 2. workExperience (experience)
-       await fetchworkexp();
+  // ==================== FETCH ALL DATA ====================
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        // Fetch user profile and related data
+        await Promise.all([
+          fetchUserProfile(),
+          fetchWorkExperience(),
+          fetchEducation(),
+          fetchSkills(),
+          fetchCertifications(),
+          fetchProjects(),
+        ]);
 
-      // 3. education (education)
-       await fetcheducation();
+        await fetchGlobalRank();
 
-       // 4. Skill
-       await fetchskill();
+        // Fetch rankings with error handling
+        const globalRankData = await safeApiCall(
+          () => API("GET", "/user/global-rank"),
+          { rank: 0, percentile: 0, betterThan: 0 },
+          "Global rank not available"
+        );
+        setGlobalRank(globalRankData);
 
-       // 5. Certification (certification)
-       await fetchcertification();
+        const locationData = await safeApiCall(
+          () => API("GET", "/user/location-rank"),
+          {
+            state: { rank: 0, percentile: 0, betterThan: 0 },
+            city: { rank: 0, percentile: 0, betterThan: 0 },
+            university: { rank: 0, percentile: 0, betterThan: 0 },
+          },
+          "Location rank not available"
+        );
+        setLocationRank(locationData);
 
-       // 6. Projects (projects)
-       await fetchprojects();
+        const hireabilityData = await safeApiCall(
+          () => API("GET", "/user/hireability-index"),
+          {
+            totalScore: 0,
+            weeklyChange: 0,
+            nextRankPoints: 0,
+            skill: { score: 0, max: 400 },
+            experience: { score: 0, max: 5000 },
+          },
+          "Hireability index not available"
+        );
+        setHireability(hireabilityData);
 
+        const visibilityData = await safeApiCall(
+          () => API("GET", "/user/recruiter-visibility"),
+          { probability: 0 },
+          "Recruiter visibility not available"
+        );
+        setRecruiterVisibility(visibilityData?.probability ?? 0);
+      } catch (error) {
+        console.error("Error loading dashboard:", error);
+      }
+    };
 
-    } catch (error) {
-      console.error("Error loading dashboard:", error);
+    fetchDashboardData();
+  }, [
+    fetchUserProfile,
+    fetchWorkExperience,
+    fetchEducation,
+    fetchSkills,
+    fetchCertifications,
+    fetchProjects,
+    fetchGlobalRank,
+  ]);
+
+  // ==================== HANDLERS ====================
+  const handleNavigate = async (path: string) => {
+    if (path === "/assessment") {
+      const res = await fetch("/api/assessment/status");
+      const data = await res.json();
+
+      if (data.status === "IN_PROGRESS") {
+        navigate(`/assessment/continue/${data.attemptId}`);
+        return;
+      }
     }
+    navigate(path);
   };
 
-  fetchDashboardData();
-}, [fetchUserProfile, fetchworkexp, fetcheducation, fetchskill, fetchcertification, fetchprojects]);
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatar(URL.createObjectURL(file));
+  };
 
-         /* --------------------    USER PROFILE API -------------------- */
+  // ==================== MEMOIZED VALUES ====================
+  const skillProgress = useMemo(
+    () => (hireability.skill.score / hireability.skill.max) * 100,
+    [hireability.skill.score, hireability.skill.max]
+  );
 
+  const experienceProgress = useMemo(
+    () => (hireability.experience.score / hireability.experience.max) * 100,
+    [hireability.experience.score, hireability.experience.max]
+  );
 
-   console.log("education", education)
 
   return (
     <DefaultPageLayout>
@@ -646,14 +1058,14 @@ useEffect(() => {
                       variant="warning"
                       icon={<FeatherTrophy />}
                     >
-                      Global Rank #383,635
+                      Global Rank{globalRank.rank}
                     </Badge>
                     <Badge
                       className="text-violet-700 bg-violet-100 rounded-full text-[12px]"
                       variant="brand"
                       icon={<FeatherAward />}
                     >
-                      University Top 5%
+                      {locationRank.university.rank}
                     </Badge>
                   </div>
                 </div>
@@ -826,7 +1238,7 @@ useEffect(() => {
 
                         <div className="flex w-full flex-wrap gap-2">
                           {skills?.length > 0 ? (
-                            profile.skills.map((skill: any, i: number) => (
+                            skills.map((skill: any, i: number) => (
                             <Badge key={i}>
                              {typeof skill === "string" ? skill : skill.name}
                             </Badge>
@@ -890,16 +1302,16 @@ useEffect(() => {
                             </span>
                           </div>
                         </div>
-                        {project?.map((project: any, i: number) => (
+                        {projects?.map((proj: any, i: number) => (
                       <div key={i}>
                        <div className="flex w-full flex-col items-start gap-2">
                          <div className="flex w-full items-start justify-between">
                            <div className="flex flex-col items-start gap-1">
                              <span className="text-[14px] text-neutral-800">
-                               {project.projectName}
+                               {proj.title}
                              </span>
                              <span className="text-[12px] text-neutral-400">
-                              {project.summary}
+                              {proj.summary}
                              </span>
                            </div>
                          </div>
@@ -1164,7 +1576,7 @@ useEffect(() => {
                       <div className="flex grow shrink-0 basis-0 flex-col items-start gap-2">
                         <div className="flex items-center gap-2">
                           <span className="text-heading-3 font-heading-3 text-default-font">
-                            You&#39;re Almost There, Preetam! 🎯
+                            You&#39;re Almost There, {user.name}! 🎯
                           </span>
                           <FeatherZap className="text-body font-body text-yellow-600" />
                         </div>
