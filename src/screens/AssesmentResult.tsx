@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Badge } from "../ui/components/Badge";
 import { Button } from "../ui/components/Button";
 import { IconWithBackground } from "../ui/components/IconWithBackground";
@@ -17,9 +17,64 @@ import { FeatherTarget } from "@subframe/core";
 import { FeatherUsers } from "@subframe/core";
 import { FeatherArrowLeft } from "@subframe/core";
 import { useNavigate } from "react-router-dom";
+import API, { URL_PATH } from "src/common/API";
 
 function AssessmentResult() {
   const navigate = useNavigate();
+
+  const [isResultLoading, setIsResultLoading] = useState(true);
+
+  const [result, setResult] = useState<{
+    skillIndex: number;
+    maxSkillIndex: number;
+    percentage: number;
+  } | null>(null);
+
+  const fetchResult = React.useCallback(async () => {
+    const attemptId =
+      localStorage.getItem("attemptId") || sessionStorage.getItem("attemptId");
+
+    if (!attemptId) {
+      console.error("Attempt ID missing");
+      setIsResultLoading(false);
+      return;
+    }
+
+    try {
+      const res = await API("GET", URL_PATH.result, undefined, {
+        attemptId
+      });
+
+      const { skillIndex, maxSkillIndex } = res;
+
+      const percentage =
+        maxSkillIndex > 0 ? Math.round((skillIndex / maxSkillIndex) * 100) : 0;
+
+      setResult({
+        skillIndex,
+        maxSkillIndex,
+        percentage,
+      });
+    } catch (err) {
+      console.error("Failed to fetch result", err);
+      setResult(null);
+    } finally {
+      setIsResultLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchResult();
+  }, [fetchResult]);
+
+  if (isResultLoading) {
+    return (
+      <div className="w-full h-[60vh] flex items-center justify-center">
+        <span className="text-subtext-color text-lg">Loading result...</span>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full bg-neutral-50 py-12">
       <div className="mx-auto flex w-full max-w-[1024px] flex-col gap-8 px-4">
@@ -40,10 +95,11 @@ function AssessmentResult() {
           <div className="flex flex-col items-center gap-6">
             <div className="flex items-end gap-3">
               <span className="text-[64px] sm:text-[80px] lg:text-[96px] font-bold leading-none text-violet-600">
-                87
+                {result?.skillIndex ?? "--"}
               </span>
+
               <span className="text-[20px] sm:text-[28px] lg:text-[32px] font-medium text-subtext-color pb-2 sm:pb-4">
-                / 100
+                / {result?.maxSkillIndex ?? "--"}
               </span>
             </div>
           </div>

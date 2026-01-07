@@ -101,6 +101,9 @@ export const URL_PATH = {
   getAttemptQuestions:"/user/assessment/getAttemptQuestions",
   saveAnswer:"/user/assessment/saveAnswer",
   submitAssessment:"/user/assessment/submit",
+
+  /*========= Result ================*/
+  result: "/user/experience_index",
 };
 
 /* =========================================
