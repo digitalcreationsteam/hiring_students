@@ -50,7 +50,9 @@ export const URL_PATH = {
 
 
   /*-----------UPLOAD RESUME-----------*/
-  uploadResume:"user/resume",
+  uploadResume:"/user/resume",
+  uploadProfile:"/user/profile",
+
 
   /* ---------- EXPERIENCE INDEX ---------- */
   calculateExperienceIndex: "/user/experience_index",

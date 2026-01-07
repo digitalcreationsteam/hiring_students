@@ -295,7 +295,7 @@ export default function Projects() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-6 py-20">
+    <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-6 py-10">
       <div className="w-full max-w-[1100px] flex flex-col lg:flex-row gap-6 lg:gap-8 justify-center">
         {/* Left card */}
         <main

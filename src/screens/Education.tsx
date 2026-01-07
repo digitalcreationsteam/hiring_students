@@ -468,7 +468,7 @@ if (schoolExists) {
   };
 
   return (
-    <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-4 sm:px-6 py-20 sm:py-32">
+    <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-4 sm:px-6 py-10 sm:py-22">
       <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
         {/* Left card */}
         <main className="w-full md:max-w-[480px] bg-white rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6 ...">
@@ -649,7 +649,7 @@ if (schoolExists) {
               {/* Degree Dropdown - Fixed */}
               <div className="flex flex-col gap-1">
                 <label className="text-[12px] font-medium text-neutral-900">
-                  Degree *
+                  Degree <span className="text-red-500">*</span>
                 </label>
 
                 <SubframeCore.DropdownMenu.Root>
@@ -691,7 +691,7 @@ if (schoolExists) {
             {/* Field of Study */}
             <TextField
               className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-              label={<span className="text-[12px]">Field of Study * </span>}
+              label={<span className="text-[12px]">Field of Study <span className="text-red-500">*</span> </span>}
               helpText={
                 <span className="text-[12px]">
                   Your major or concentration{" "}
@@ -699,7 +699,8 @@ if (schoolExists) {
               }
             >
               <TextField.Input
-                className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0"
+                className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0
+             text-sm placeholder:text-xs placeholder:text-neutral-400"
                 placeholder="e.g., Computer Science, Business Administration"
                 value={fieldOfStudy}
                 onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
@@ -711,11 +712,12 @@ if (schoolExists) {
             {/* School Name */}
             <TextField
               className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-              label={<span className="text-[12px]">School Name * </span>}
+              label={<span className="text-[12px]">School Name  <span className="text-red-500">*</span> </span>}
               helpText=""
             >
               <TextField.Input
-                className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0"
+                className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0
+             text-sm placeholder:text-xs placeholder:text-neutral-400"
                 placeholder="Name of institution"
                 value={schoolName}
                 onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
@@ -731,7 +733,8 @@ if (schoolExists) {
           <label className="text-[12px] font-medium">
             Start Year <span className="text-red-500">*</span>
           </label>
-          <YearPicker
+          
+          <YearPicker 
             value={startYear}
             onChange={setStartYear}
             minYear={1950}

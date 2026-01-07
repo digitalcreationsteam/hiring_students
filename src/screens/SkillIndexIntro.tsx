@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 function SkillIndexIntro() {
   const navigate = useNavigate();
   return (
-    <div className="min-h-screen bg-neutral-50 px-4 sm:px-6 md:px-8 py-10 sm:py-16 md:py-24 flex items-center justify-center">
+    <div className="min-h-screen bg-neutral-50 px-4 sm:px-6 md:px-8 py-10 sm:py-16 md:py-14 flex items-center justify-center ">
       <div className="w-full max-w-[660px] mx-auto relative">
         <div className="flex w-full flex-col items-start gap-9 rounded-3xl border border-solid border-neutral-border bg-white px-5 sm:px-8 md:px-10 py-8 sm:py-12 md:py-14 shadow-lg">
           <div className="flex w-full items-center gap-3">

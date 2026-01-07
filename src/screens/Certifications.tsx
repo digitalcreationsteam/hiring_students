@@ -98,9 +98,12 @@ type MonthYearPickerProps = {
   minYear = 1950,
   maxYear = new Date().getFullYear(),
 }: MonthYearPickerProps) {
+  const currentYear = value
+    ? Number(value.split("/")[1])
+    : new Date().getFullYear();
+
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState<"month" | "year">("month");
-  const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
+  const [year, setYear] = useState(currentYear);
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -109,19 +112,19 @@ type MonthYearPickerProps = {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpen(false);
-        setStep("month");
       }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const years = Array.from(
-    { length: maxYear - minYear + 1 },
-    (_, i) => maxYear - i
-  );
-
-  const displayValue = value || "MM / YYYY";
+  const isFutureMonth = (monthIndex: number) => {
+    const now = new Date();
+    return (
+      year > now.getFullYear() ||
+      (year === now.getFullYear() && monthIndex > now.getMonth())
+    );
+  };
 
   return (
     <div className="relative" ref={ref}>
@@ -129,60 +132,69 @@ type MonthYearPickerProps = {
       <input
         readOnly
         disabled={disabled}
-        value={displayValue}
-        onClick={() => !disabled && setOpen((v) => !v)}
-        className={`w-full h-10 px-4 rounded-full cursor-pointer border border-neutral-300 focus:outline-none ${
-          disabled ? "bg-neutral-100 text-neutral-400" : "bg-white"
-        }`}
+       value={value || ""}
+        placeholder="MM / YYYY"
+        onClick={() => !disabled && setOpen((o) => !o)}
+        className={`w-full h-10 px-4 rounded-full cursor-pointer border border-neutral-300
+          focus:outline-none text-sm placeholder:text-xs
+          ${disabled ? "bg-neutral-100 text-neutral-400" : "bg-white"}`}
       />
 
       {/* PICKER */}
       {open && (
         <div className="absolute z-50 mt-2 w-64 rounded-2xl border border-neutral-300 bg-white shadow-lg p-3">
-          {/* MONTH STEP */}
-          {step === "month" && (
-            <div className="grid grid-cols-3 gap-2 text-sm">
-              {MONTHS.map((month, index) => (
+          {/* HEADER */}
+          <div className="flex items-center justify-between mb-3">
+            <button
+              type="button"
+              disabled={year <= minYear}
+              onClick={() => setYear((y) => y - 1)}
+              className="px-2 text-lg disabled:text-neutral-300"
+            >
+              «
+            </button>
+
+            <span className="text-sm font-medium">{year}</span>
+
+            <button
+              type="button"
+              disabled={year >= maxYear}
+              onClick={() => setYear((y) => y + 1)}
+              className="px-2 text-lg disabled:text-neutral-300"
+            >
+              »
+            </button>
+          </div>
+
+          {/* MONTH GRID */}
+          <div className="grid grid-cols-3 gap-2 text-sm">
+            {MONTHS.map((month, index) => {
+              const disabledMonth = isFutureMonth(index);
+              const formatted = `${String(index + 1).padStart(2, "0")}/${year}`;
+
+              return (
                 <button
                   key={month}
                   type="button"
+                  disabled={disabledMonth}
                   onClick={() => {
-                    setSelectedMonth(index + 1);
-                    setStep("year");
+                    onChange(formatted);
+                    setOpen(false);
                   }}
-                  className="py-2 rounded-lg hover:bg-neutral-100 transition"
+                  className={`py-2 rounded-lg transition
+                    ${
+                      value === formatted
+                        ? "bg-violet-600 text-white"
+                        : "hover:bg-neutral-100"
+                    }
+                    ${disabledMonth ? "text-neutral-400 cursor-not-allowed" : ""}
+                  `}
                 >
                   {month}
                 </button>
-              ))}
-            </div>
-          )}
-
-          {/* YEAR STEP */}
-          {step === "year" && (
-            <div className="max-h-56 overflow-auto">
-              <div className="grid grid-cols-4 gap-2 text-sm">
-                {years.map((year) => (
-                  <button
-                    key={year}
-                    type="button"
-                    onClick={() => {
-                      if (!selectedMonth) return;
-
-                      const month = String(selectedMonth).padStart(2, "0");
-                      onChange(`${month}/${year}`);
-                      setOpen(false);
-                      setStep("month");
-                      setSelectedMonth(null);
-                    }}
-                    className="py-2 rounded-lg hover:bg-neutral-100 transition"
-                  >
-                    {year}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
@@ -532,7 +544,7 @@ export default function Certifications() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-4 sm:px-6 py-20 sm:py-32">
+    <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-4 sm:px-6 py-10 sm:py-22">
       <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
         {/* Left card */}
         <main className="w-full md:max-w-[448px] flex flex-col gap-6 rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6 sm:py-8">
@@ -710,7 +722,7 @@ export default function Certifications() {
             className="flex w-full flex-col gap-4"
           >
             <TextField
-              label={<span className="text-[12px]">Certification Name * </span>}
+              label={<span className="text-[12px]">Certification Name <span className="text-red-500">*</span></span>}
               helpText=""
               className={scTextFieldClass}
             >
@@ -741,7 +753,7 @@ export default function Certifications() {
 {/* ------------Date------------------ */}
 
  {/* // date------------------------- */}
-           <div className="flex flex-col gap-6 max-w-lg">
+          <div className="flex flex-col gap-6 max-w-lg">
   {/* Issue Month & Year */}
   <div className="flex flex-col gap-1">
     <label
@@ -761,7 +773,7 @@ export default function Certifications() {
   {/* ---------------End Date-------------- */}
 
             <TextField
-              label={<span className="text-[12px]">Credential Link * </span>}
+              label={<span className="text-[12px]">Credential Link <span className="text-red-500">*</span> </span>}
               helpText=""
               className={scTextFieldClass}
             >
@@ -784,7 +796,7 @@ export default function Certifications() {
             {/* Upload */}
             <div className="w-full">
               <div className="text-[12px] text-neutral-800 mb-2">
-                Upload Certificate (PDF)
+                Upload Certificate (PDF) <span className="text-red-500">*</span>
               </div>
 
               <div

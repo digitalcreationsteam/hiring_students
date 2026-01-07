@@ -24,25 +24,26 @@ import API, { URL_PATH } from "src/common/API";
 import * as SubframeCore from "@subframe/core";
 import { FeatherChevronDown } from "@subframe/core";
 
+// const ROLE_TITLES = [
+//   "Software Engineer",
+//   "Frontend Developer",
+//   "Backend Developer",
+//   "Full Stack Developer",
+//   "Product Manager",
+//   "UI/UX Designer",
+//   "Data Analyst",
+//   "Intern",
+// ];
+
 const ROLE_TITLES = [
-  "Software Engineer",
-  "Frontend Developer",
-  "Backend Developer",
-  "Full Stack Developer",
-  "Product Manager",
-  "UI/UX Designer",
-  "Data Analyst",
-  "Intern",
-];
-
-const ROLE_TYPES = [
-  "Internship",
-  "Full Time",
-  "Part Time",
-  "Contract",
-  "Freelance",
-];
-
+  { label: "Internship", value: "internship" },
+  { label: "Full Time", value: "full_time" },
+  { label: "Part Time", value: "part_time" },
+  { label: "Contract", value: "contract" },
+  { label: "Freelance", value: "freelance" },
+  { label: "Entrepreneurship", value: "entrepreneurship" },
+] as const;
+type RoleType = typeof ROLE_TITLES[number]
 type ExperiencePoints = {
   demographics?: number;
   education?: number;
@@ -205,7 +206,7 @@ export default function Experience() {
 
   // form state
   const [roleTitle, setRoleTitle] = useState("");
-  const [typeOfRole, setTypeOfRole] = useState("");
+  const [typeOfRole, setTypeOfRole] = useState<string>("");
   const [company, setCompany] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -305,7 +306,7 @@ export default function Experience() {
 
     const [mm, yyyy] = value.split("/").map(Number);
 
-    const inputDate = new Date(yyyy, mm - 1); // first day of that month
+    const inputDate = new Date(yyyy, mm ); // first day of that month
     const now = new Date();
     const currentMonth = new Date(now.getFullYear(), now.getMonth());
 
@@ -321,6 +322,19 @@ export default function Experience() {
     setCurrentlyWorking(false);
     setDescription("");
   };
+
+  const calculateDurationInMonths = (
+  startMonth: number, // 1–12
+  startYear: number,
+  endMonth: number,   // 1–12
+  endYear: number
+): number => {
+  const months =
+    (endYear - startYear) * 12 + (endMonth - startMonth);
+
+  return Math.max(0, months);
+};
+
 
   const handleAddExperience = async () => {
     if (!isAddable()) return;
@@ -342,27 +356,58 @@ export default function Experience() {
       return;
     }
 
-    const startYearNum = Number(startDate.split("/")[1]);
-    const endYearNum = currentlyWorking
-      ? new Date().getFullYear()
-      : Number(endDate.split("/")[1]);
+    // const startYearNum = Number(startDate.split("/")[1]);
+    // const endYearNum = currentlyWorking
+    //   ? new Date().getFullYear()
+    //   : Number(endDate.split("/")[1]);
 
-    const duration = Math.max(0, endYearNum - startYearNum);
+    // const duration = Math.max(0, endYearNum - startYearNum);
 
-    const payload = {
-      workExperiences: [
-        {
-          jobTitle: toTitleCase(roleTitle.trim()),
-          companyName: toTitleCase(company.trim()),
-          startYear: startYearNum,
-          endYear: currentlyWorking ? null : endYearNum,
-          currentlyWorking,
-          duration,
-          description: description.trim() || "",
-          typeOfRole: typeOfRole ? toTitleCase(typeOfRole.trim()) : undefined,
-        },
-      ],
-    };
+    // const payload = {
+    //   workExperiences: [
+    //     {
+    //       jobTitle: toTitleCase(roleTitle.trim()),
+    //       companyName: toTitleCase(company.trim()),
+    //       startYear: startYearNum,
+    //       endYear: currentlyWorking ? null : endYearNum,
+    //       currentlyWorking,
+    //       duration,
+    //       description: description.trim() || "",
+    //       typeOfRole: typeOfRole ? toTitleCase(typeOfRole.trim()) : undefined,
+    //     },
+    //   ],
+    // };
+const [startMonthNum, startYearNum] = startDate
+  .split("/")
+  .map(Number);
+
+const [endMonthNum, endYearNum] = currentlyWorking
+  ? [new Date().getMonth() + 1, new Date().getFullYear()]
+  : endDate.split("/").map(Number);
+const  duration= calculateDurationInMonths(
+  startMonthNum,
+  startYearNum,
+  endMonthNum,
+  endYearNum
+);
+const payload = {
+  workExperiences: [
+    {
+      jobTitle: toTitleCase(roleTitle.trim()),
+      companyName: toTitleCase(company.trim()),
+      startYear: startYearNum,
+      startMonth: startMonthNum,
+      endYear: currentlyWorking ? null : endYearNum,
+      endMonth: currentlyWorking ? null : endMonthNum,
+      currentlyWorking,
+      duration, // ✅ months only
+      description: description.trim() || "",
+      typeOfRole: typeOfRole
+        ? toTitleCase(typeOfRole.trim())
+        : undefined,
+    },
+  ],
+};
 
     try {
       setIsSubmitting(true);
@@ -373,22 +418,36 @@ export default function Experience() {
 
       const created = res.data[0]; // backend returns array
 
-      setExperiences((prev) => [
+      // setExperiences((prev) => [
+      //   {
+      //     id: created._id,
+      //     roleTitle: created.jobTitle,
+      //     typeOfRole: created.typeOfRole || undefined,
+      //     company: created.companyName,
+      //     startDate: `01/${created.startYear}`,
+      //     endDate: created.currentlyWorking
+      //       ? undefined
+      //       : `01/${created.endYear}`,
+      //     currentlyWorking: created.currentlyWorking,
+      //     description: created.description || undefined,
+      //   },
+      //   ...prev,
+      // ]);
+setExperiences((prev) => [
         {
           id: created._id,
           roleTitle: created.jobTitle,
           typeOfRole: created.typeOfRole || undefined,
           company: created.companyName,
-          startDate: `01/${created.startYear}`,
+          startDate: `${String(created.startMonth).padStart(2, "0")}/${created.startYear}`,
           endDate: created.currentlyWorking
             ? undefined
-            : `01/${created.endYear}`,
+            : `${String(created.endMonth).padStart(2, "0")}/${created.endYear}`,
           currentlyWorking: created.currentlyWorking,
           description: created.description || undefined,
         },
         ...prev,
       ]);
-
       await fetchExperienceIndex();
       resetForm();
     } catch (err: any) {
@@ -516,7 +575,7 @@ export default function Experience() {
   }, [userId, fetchExperiences, fetchExperienceIndex]);
 
   return (
-    <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-4 sm:px-6 py-20 sm:py-32">
+    <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-4 sm:px-6 py-10 sm:py-22">
       <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
         {/* Left card */}
         <main className="w-full md:max-w-[480px] bg-white rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6 ...">
@@ -697,13 +756,13 @@ export default function Experience() {
           >
             <TextField
               className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-              label={<span className="text-[12px]">Role Title * </span>}
+              label={<span className="text-[12px]">Role Title <span className="text-red-500">*</span> </span>}
               helpText=""
             >
               <TextField.Input
                 // className="rounded-full h-10 px-4 text-[12px] bg-white !border-none focus:ring-0"
                 className="h-20 text-[12px]"
-                placeholder="Name of institution"
+                placeholder="Name of Role"
                 value={roleTitle}
                 onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
                   setRoleTitle(ev.target.value)
@@ -713,45 +772,46 @@ export default function Experience() {
 
             <div className="flex flex-col gap-1">
               <label className="text-[12px] font-medium text-neutral-900">
-                Type of Role
+                Type of Role <span className="text-red-500">*</span>
               </label>
 
-              <SubframeCore.DropdownMenu.Root>
-                <SubframeCore.DropdownMenu.Trigger asChild>
-                  <div className="flex h-9 items-center justify-between rounded-full border border-neutral-300 bg-white px-3 cursor-pointer">
-                    <span
-                      className={
-                        typeOfRole
-                          ? "text-neutral-900 text-[12px]"
-                          : "text-neutral-400 text-[12px]"
-                      }
-                    >
-                      {typeOfRole || "Select type of role"}
-                    </span>
-                    <FeatherChevronDown className="text-neutral-500" />
-                  </div>
-                </SubframeCore.DropdownMenu.Trigger>
+  <SubframeCore.DropdownMenu.Root>
+    <SubframeCore.DropdownMenu.Trigger asChild>
+      <div className="flex h-9 items-center justify-between rounded-full border border-neutral-300 bg-white px-3 cursor-pointer">
+        <span
+          className={
+            typeOfRole
+              ? "text-neutral-900 text-[12px]"
+              : "text-neutral-400 text-[12px]"
+          }
+        >
+          {typeOfRole || "Select type of role"}
+        </span>
+        <FeatherChevronDown className="text-neutral-500" />
+      </div>
+    </SubframeCore.DropdownMenu.Trigger>
 
-                <SubframeCore.DropdownMenu.Portal>
-                  <SubframeCore.DropdownMenu.Content asChild>
-                    <div className="bg-white rounded-2xl shadow-lg py-1">
-                      {ROLE_TYPES.map((item) => (
-                        <div
-                          key={item}
-                          onClick={() => setTypeOfRole(item)}
-                          className="px-4 py-2 text-sm cursor-pointer hover:bg-neutral-100"
-                        >
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-                  </SubframeCore.DropdownMenu.Content>
-                </SubframeCore.DropdownMenu.Portal>
-              </SubframeCore.DropdownMenu.Root>
+              <SubframeCore.DropdownMenu.Portal>
+  <SubframeCore.DropdownMenu.Content asChild>
+    <div className="bg-white rounded-2xl shadow-lg py-1">
+      {ROLE_TITLES.map((item) => (
+        <div
+          key={item.value}
+          onClick={() => setTypeOfRole(item.value)}
+          className="px-4 py-2 text-sm cursor-pointer hover:bg-neutral-100"
+        >
+          {item.label}
+        </div>
+      ))}
+    </div>
+  </SubframeCore.DropdownMenu.Content>
+</SubframeCore.DropdownMenu.Portal>
+  </SubframeCore.DropdownMenu.Root>
+
             </div>
 
             <TextField
-              label={<span className="text-[12px]">Company * </span>}
+              label={<span className="text-[12px]">Company <span className="text-red-500">*</span></span>}
               helpText=""
               className={`${scTextFieldClass}`}
             >
@@ -775,7 +835,7 @@ export default function Experience() {
                     htmlFor="startdate"
                     className="text-[12px] font-medium text-neutral-700"
                   >
-                    Start Date
+                    Start Date <span className="text-red-500">*</span>
                   </label>
                   <MonthYearPicker value={startDate} onChange={setStartDate} />
                 </div>
@@ -785,7 +845,7 @@ export default function Experience() {
                     htmlFor="startdate"
                     className="text-[12px] font-medium text-neutral-700"
                   >
-                    End Date
+                    End Date <span className="text-red-500">*</span>
                   </label>
                   <MonthYearPicker value={endDate} onChange={setEndDate} />
                 </div>

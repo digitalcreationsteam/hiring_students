@@ -770,6 +770,9 @@ export default function Dashboard() {
 
   // ==================== STATE ====================
   const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
+  const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null);
+const [isSavingAvatar, setIsSavingAvatar] = useState(false);
+
   const [user, setUser] = useState<UserProfile>({
     name: "",
     domain: "",
@@ -986,11 +989,93 @@ export default function Dashboard() {
     navigate(path);
   };
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setAvatar(URL.createObjectURL(file));
-  };
+// POST API for the profile  
+const handleSaveProfile = async () => {
+  if (!selectedAvatarFile) return;
+
+  const formData = new FormData();
+  formData.append("avatar", selectedAvatarFile);
+
+  try {
+    setIsSavingAvatar(true);
+
+    await API(
+      "POST", // or "PUT" based on backend
+      URL_PATH.uploadProfile, // "user/profile"
+      formData
+      // ❌ DO NOT pass headers here
+    );
+
+    // Refresh profile image from server
+    await fetchUserProfile();
+
+    // Cleanup
+    setSelectedAvatarFile(null);
+  } catch (error) {
+    console.error("Failed to save profile image", error);
+    alert("Failed to save profile image");
+  } finally {
+    setIsSavingAvatar(false);
+  }
+};
+
+const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  // Validate file size (e.g., max 5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    alert("File size should be less than 5MB");
+    return;
+  }
+
+  // Validate file type
+  const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+  if (!validTypes.includes(file.type)) {
+    alert("Please select a valid image (JPEG, PNG, or WebP)");
+    return;
+  }
+
+  // Cleanup old preview
+  if (avatar && avatar.startsWith('blob:')) {
+    URL.revokeObjectURL(avatar);
+  }
+
+  // Create preview
+  const previewUrl = URL.createObjectURL(file);
+  setAvatar(previewUrl);
+
+  try {
+    setIsSavingAvatar(true);
+    
+    // Upload to server
+    const formData = new FormData();
+    formData.append("avatar", file);
+    
+    await API("POST", URL_PATH.uploadProfile, formData);
+    
+    // Refresh from server
+    await fetchUserProfile();
+    
+    // Revoke preview after successful upload
+    setTimeout(() => {
+      if (previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    }, 1000);
+    
+  } catch (error) {
+    console.error("Upload failed:", error);
+    alert("Failed to upload profile picture");
+    // Revert to old avatar if available
+    // if (user?.avatarUrl) {
+    //   setAvatar(user.avatarUrl);
+    // }
+  } finally {
+    setIsSavingAvatar(false);
+  }
+};
+
 
   // ==================== MEMOIZED VALUES ====================
   const skillProgress = useMemo(
@@ -1029,9 +1114,15 @@ export default function Dashboard() {
                       ref={fileRef}
                       type="file"
                       accept="image/*"
-                      hidden
                       onChange={handleAvatarChange}
+                      className="hidden"
                     />
+                    <Button
+          onClick={() => handleSaveProfile()}
+    disabled={!selectedAvatarFile || isSavingAvatar}
+  >
+    {isSavingAvatar ? "Saving..." : "Save Profile"}
+  </Button>
                   </div>
 
                   <div className="flex w-full flex-col items-center justify-center gap-2">
