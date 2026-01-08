@@ -27,13 +27,15 @@ import { FeatherChevronDown } from "@subframe/core";
 
 const DEGREE_OPTIONS = [
   "High School Diploma",
+  "Diploma",
   "Associate's Degree",
   "Bachelor's Degree",
+  "B.Tech",
+  "BSC",
   "Master's Degree",
+  "M.Tech",
   "Doctorate (PhD)",
   "Professional Degree",
-  "Certificate",
-  "Diploma",
   "Other",
 ];
 

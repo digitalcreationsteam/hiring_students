@@ -36,12 +36,14 @@ import { FeatherChevronDown } from "@subframe/core";
 // ];
 
 const ROLE_TITLES = [
-  { label: "Internship", value: "internship" },
-  { label: "Full Time", value: "full_time" },
-  { label: "Part Time", value: "part_time" },
-  { label: "Contract", value: "contract" },
-  { label: "Freelance", value: "freelance" },
-  { label: "Entrepreneurship", value: "entrepreneurship" },
+  { label: "internship", value: "Internship" },
+  { label: "full_time", value: "Full Time" },
+  { label: "part_ime", value: "Part Time" },
+  { label: "contract", value: "Contract" },
+  { label: "freelance", value: "Freelance" },
+  { label: "entrepreneurship", value: "Entrepreneurship" },
+
+
 ] as const;
 type RoleType = typeof ROLE_TITLES[number]
 type ExperiencePoints = {
@@ -63,7 +65,7 @@ type ExperienceEntry = {
 
 const DATE_REGEX = /^(0[1-9]|1[0-2])\/\d{4}$/;
 
-const isValidMonthYear = (value: string) => {
+const isValidMonthYear = (value: string) =>  {
   if (!DATE_REGEX.test(value)) return false;
   const [Month, year] = value.split("/").map(Number);
   const currentYear = new Date().getFullYear();
