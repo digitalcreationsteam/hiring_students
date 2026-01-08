@@ -27,12 +27,24 @@ import SkillIndexIntro from "./screens/SkillIndexIntro";
 import './App.css';
 import Dashboard from "./screens/Dashboard";
 import LoginSuccess from "./screens/LoginSuccess";
+import CompleteProfile from "./screens/CompleteProfile";
+import ForgotPassword from "./screens/ForgotPassword";
+import ForgotPassword2 from "./screens/ForgotPassword2";
+import ForgotPassword3 from "./screens/ForgotPassword3";
+import ForgotPassword4 from "./screens/ForgotPassword4";
 
 const router = createBrowserRouter([
   { path: "/", element: <LogIn /> },
   { path: "/signup", element: <SignUp /> },
   { path: "/login", element: <LogIn /> },
   {path:"/login-success", element: <LoginSuccess/>},
+  { path: "/complete-profile", element: <CompleteProfile /> },
+
+  { path: "/forgot-password", element: <ForgotPassword /> },
+  { path: "/verify-code", element: <ForgotPassword2 /> },
+  { path: "/set-password", element: <ForgotPassword3 /> },
+  { path: "/success-password", element: <ForgotPassword4 /> },
+
 
   
   { path: "/verify-email", element: <EmailVerification /> },
