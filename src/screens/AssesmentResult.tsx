@@ -25,48 +25,57 @@ function AssessmentResult() {
   const [isResultLoading, setIsResultLoading] = useState(true);
 
   const [result, setResult] = useState<{
-    skillIndex: number;
-    maxSkillIndex: number;
-    percentage: number;
-  } | null>(null);
+  skillIndex: number;
+  maxSkillIndex: number;
+} | null>(null);
 
-  const fetchResult = React.useCallback(async () => {
-    const attemptId =
-      localStorage.getItem("attemptId") || sessionStorage.getItem("attemptId");
 
-    if (!attemptId) {
-      console.error("Attempt ID missing");
-      setIsResultLoading(false);
-      return;
-    }
 
-    try {
-      const res = await API("GET", URL_PATH.result, undefined, {
-        attemptId
-      });
 
-      const { skillIndex, maxSkillIndex } = res;
 
-      const percentage =
-        maxSkillIndex > 0 ? Math.round((skillIndex / maxSkillIndex) * 100) : 0;
 
-      setResult({
-        skillIndex,
-        maxSkillIndex,
-        percentage,
-      });
-    } catch (err) {
-      console.error("Failed to fetch result", err);
-      setResult(null);
-    } finally {
-      setIsResultLoading(false);
-    }
-  }, []);
+  // GET API TO FETCH THE RESULT
+const fetchResult = React.useCallback(async () => {
+  const attemptId =
+    localStorage.getItem("attemptId") ||
+    sessionStorage.getItem("attemptId");
 
-  useEffect(() => {
+  if (!attemptId) {
+    setIsResultLoading(false);
+    return;
+  }
+
+  try {
+    // API helper already returns JSON
+    const res = await API("GET", URL_PATH.result, undefined, {
+      attemptId,
+    });
+
+    console.log("FINAL RESPONSE:", res);
+
+    // 🔥 THIS IS THE CORRECT PATH
+    setResult({
+      skillIndex: res.hireabilityIndex.skillIndexScore,
+      maxSkillIndex: res.hireabilityIndex.skillIndexTotal,
+    });
+  } catch (error) {
+    console.error("Failed to fetch result", error);
+    setResult(null);
+  } finally {
+    setIsResultLoading(false);
+  }
+}, []);
+
+
+
+
+
+useEffect(() => {
     fetchResult();
   }, [fetchResult]);
 
+
+  ////////////////////////////
   if (isResultLoading) {
     return (
       <div className="w-full h-[60vh] flex items-center justify-center">

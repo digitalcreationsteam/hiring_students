@@ -8,6 +8,7 @@ export const BASE_URL = "http://localhost:5001/api";
 
 const isDev = process.env.NODE_ENV === "development";
 
+
 /* =========================================
    🧪 LOGGER
 ========================================= */
@@ -29,6 +30,7 @@ const apiClient = axios.create({
   },
 });
 
+
 /* =========================================
    🔗 ALL API PATHS
 ========================================= */
@@ -36,7 +38,7 @@ export const URL_PATH = {
   /* ---------- AUTH ---------- */
   signup: "/auth/signup",
   login: "/auth/login",
-  loginGoogle: "/auth/google",
+  loginGoogle:"/auth/google",
 
   logout: "/auth/logout",
   verifyEmail:
@@ -46,9 +48,11 @@ export const URL_PATH = {
   getUser: "/user",
   updateUser: "/user",
 
+
   /*-----------UPLOAD RESUME-----------*/
-  uploadResume: "/user/resume",
-  uploadProfile: "/user/profile",
+  uploadResume:"/user/resume",
+  uploadProfile:"/user/profile",
+
 
   /* ---------- EXPERIENCE INDEX ---------- */
   calculateExperienceIndex: "/user/experience_index",
@@ -83,26 +87,33 @@ export const URL_PATH = {
   getProjects: "/user/projects",
   deleteProject: "/user/projects",
 
+
+
+
   /*========Skill Indes==========*/
-  jobDomain: "/user/addUserDomainSubDomain",
-  updateUserDomainSkills: "/user/updateUserDomainSkills",
-  getJobDomain: "/user/domain",
-  getSubDomain: "/user/by-domain/694e588f2af883559ebe9540",
-  getUserDomainSkils: "/user/getUserDomainSkills",
+  jobDomain:"/user/addUserDomainSubDomain",
+  updateUserDomainSkills:"/user/updateUserDomainSkills",
+  getJobDomain:"/user/domain",
+  getSubDomain:"/user/by-domain/694e588f2af883559ebe9540",
+  getUserDomainSkils:"/user/getUserDomainSkills",
+
 
   /*=======Skill Assesment=========*/
-  startAssessment: "/user/assessment/start",
-  getAttemptQuestions: "/user/assessment/getAttemptQuestions",
-  saveAnswer: "/user/assessment/saveAnswer",
-  submitAssessment: "/user/assessment/submit",
+  startAssessment:"/user/assessment/start",
+  getAttemptQuestions:"/user/assessment/getAttemptQuestions",
+  saveAnswer:"/user/assessment/saveAnswer",
+  submitAssessment:"/user/assessment/submit",
 
   /*========= Result ================*/
   result: "/user/experience_index",
 
+
+
   /* ---------- FORGOT PASSWORD ---------- */
   forgotPassword: "/auth/forgot-password",
-  verifyResetCode: "/auth/verify-reset-otp",
+  verifyResetCode: "/auth/verify-reset-code",
   resetPassword: "/auth/reset-password",
+
 };
 
 /* =========================================
@@ -118,7 +129,7 @@ export default async function API(method, url, data = {}, headers = {}) {
       url,
       headers: {
         ...(token && { Authorization: `Bearer ${token}` }),
-        ...(userId && { "user-id": userId }),
+        ...(userId && { "user-id": userId }), 
         ...headers,
       },
     };
@@ -136,7 +147,7 @@ export default async function API(method, url, data = {}, headers = {}) {
 
     const response = await apiClient(config);
 
-    console.log("responseresponse:::::::", response);
+    console.log("responseresponse:::::::",response)
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -145,10 +156,7 @@ export default async function API(method, url, data = {}, headers = {}) {
     } else if (error.request) {
       throw { success: false, message: "No response from server." };
     } else {
-      throw {
-        success: false,
-        message: error.message || "Unknown error occurred.",
-      };
+      throw { success: false, message: error.message || "Unknown error occurred." };
     }
   }
 }
