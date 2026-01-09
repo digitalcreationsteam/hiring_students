@@ -139,6 +139,9 @@ export default function Dashboard() {
 
   const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
   const [isSavingAvatar, setIsSavingAvatar] = useState(false);
+  const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null);
+
+  
 
   const [user, setUser] = useState<UserProfile>({
     name: "",
@@ -189,149 +192,118 @@ export default function Dashboard() {
       domain: res?.domain || "Professional",
       location: formatLocation(res?.city, res?.state),
     });
-
-    setAvatar(res?.avatar || DEFAULT_AVATAR);
+    
   }, []);
 
-  const calculateExperienceIndex = useCallback(async () => {
-    const res = await API("GET", URL_PATH.calculateExperienceIndex);
-    const rank = res?.rank;
+const fetchDashboardData = useCallback(async () => {
+  const res = await API("GET", URL_PATH.calculateExperienceIndex);
 
-    setRankData({
-      global: {
-        rank: rank?.globalrank ?? "-",
-        percentile: calculatePercentile(rank?.globalrank),
-      },
-      country: {
-        rank: rank?.countryRank ?? "-",
-        percentile: calculatePercentile(rank?.countryRank),
-      },
-      state: {
-        rank: rank?.stateRank ?? "-",
-        percentile: calculatePercentile(rank?.stateRank),
-      },
-      city: {
-        rank: rank?.cityRank ?? "-",
-        percentile: calculatePercentile(rank?.cityRank),
-      },
-      university: {
-        rank: rank?.universityrank ?? "-",
-        percentile: calculatePercentile(rank?.universityrank),
-      },
-    });
-  }, []);
+  if (!res) return;
 
-  const fetchHireabilityIndex = useCallback(async () => {
-    const res = await API("GET", URL_PATH.calculateExperienceIndex);
-    mapHireabilityFromAPI(res.hireabilityIndex);
-  }, []);
+  /* ==================== AVATAR ==================== */
+  setAvatar(res?.profileUrl || DEFAULT_AVATAR);
 
-  const mapHireabilityFromAPI = (hireabilityIndex: any) => {
-    setHireability({
-      totalScore: hireabilityIndex.hireabilityIndex,
-      weeklyChange: 0,
-      nextRankPoints:
-        hireabilityIndex.experienceIndexTotal -
-        hireabilityIndex.experienceIndexScore,
-      skill: {
-        score: hireabilityIndex.skillIndexScore,
-        max: hireabilityIndex.skillIndexTotal,
-      },
-      experience: {
-        score: hireabilityIndex.experienceIndexScore,
-        max: hireabilityIndex.experienceIndexTotal,
-      },
-    });
-  };
+  /* ==================== RANK ==================== */
+  const rank = res?.rank;
+  setRankData({
+    global: {
+      rank: rank?.globalRank ?? "-",
+      percentile: calculatePercentile(rank?.globalRank),
+    },
+    country: {
+      rank: rank?.countryRank ?? "-",
+      percentile: calculatePercentile(rank?.countryRank),
+    },
+    state: {
+      rank: rank?.stateRank ?? "-",
+      percentile: calculatePercentile(rank?.stateRank),
+    },
+    city: {
+      rank: rank?.cityRank ?? "-",
+      percentile: calculatePercentile(rank?.cityRank),
+    },
+    university: {
+      rank: rank?.universityrank ?? "0",
+      percentile: calculatePercentile(rank?.universityrank),
+    },
+  });
 
-  const fetchWorkExperience = useCallback(async () => {
-    const res = await API("GET", URL_PATH.calculateExperienceIndex);
+  /* ==================== HIREABILITY ==================== */
+  const hireabilityIndex = res?.hireabilityIndex;
+  setHireability({
+    totalScore: hireabilityIndex?.hireabilityIndex,
+    weeklyChange: 0,
+    nextRankPoints:
+      hireabilityIndex?.experienceIndexTotal -
+      hireabilityIndex?.experienceIndexScore,
+    skill: {
+      score: hireabilityIndex?.skillIndexScore,
+      max: hireabilityIndex?.skillIndexTotal,
+    },
+    experience: {
+      score: hireabilityIndex?.experienceIndexScore,
+      max: hireabilityIndex?.experienceIndexTotal,
+    },
+  });
 
-    setWorkExperience(
-      (res?.data.workExperience || []).map((item: any) => ({
-        jobTitle: item.jobTitle,
-        companyName: item.companyName,
-        startYear: item.startYear ?? null,
-        endYear: item.endYear ?? null,
-        duration: item.duration ?? null,
-        description: item.description ?? "",
-        location: item.location ?? "",
-        currentlyWorking: item.currentlyWorking ?? false,
-      }))
-    );
-  }, []);
+  /* ==================== WORK EXPERIENCE ==================== */
+  setWorkExperience(
+    (res?.data?.workExperience || []).map((item: any) => ({
+      jobTitle: item.jobTitle,
+      companyName: item.companyName,
+      startYear: item.startYear ?? null,
+      endYear: item.endYear ?? null,
+      duration: item.duration ?? null,
+      description: item.description ?? "",
+      location: item.location ?? "",
+      currentlyWorking: item.currentlyWorking ?? false,
+    }))
+  );
 
-  const fetchProjects = useCallback(async () => {
-    const res = await API("GET", URL_PATH.calculateExperienceIndex);
+  /* ==================== PROJECTS ==================== */
+  setProjects(
+    (res?.data?.projects || []).map((item: any) => ({
+      title: item.projectName,
+      summary: item.summary,
+    }))
+  );
 
-    setProjects(
-      (res?.data.projects || []).map((item: any) => ({
-        title: item.projectName,
-        summary: item.summary,
-      }))
-    );
-  }, []);
+  /* ==================== CERTIFICATIONS ==================== */
+  setCertifications(
+    (res?.data?.certifications || []).map((item: any) => ({
+      name: item.certificationName,
+      issuedBy: item.issuer,
+      issueYear: item.issueDate,
+    }))
+  );
 
-  const fetchCertifications = useCallback(async () => {
-    const res = await API("GET", URL_PATH.calculateExperienceIndex);
+  /* ==================== EDUCATION ==================== */
+  setEducation(
+    (res?.data?.education || []).map((item: any) => ({
+      schoolName: item.schoolName,
+      degree: item.degree,
+      startYear: item.startYear,
+      endYear: item.endYear,
+      currentlyStudying: item.currentlyStudying,
+    }))
+  );
 
-    setCertifications(
-      (res?.data.certifications || []).map((item: any) => ({
-        name: item.certificationName,
-        issuedBy: item.issuer,
-        issueYear: item.issueDate,
-      }))
-    );
-  }, []);
+  /* ==================== SKILLS ==================== */
+  setSkills(
+    (res?.skills?.list || []).map((skill: string) => ({
+      name: skill,
+    }))
+  );
+}, []);
 
-  const fetchEducation = useCallback(async () => {
-    const res = await API("GET", URL_PATH.calculateExperienceIndex);
 
-    setEducation(
-      (res?.data.education || []).map((item: any) => ({
-        schoolName: item.schoolName,
-        degree: item.degree,
-        startYear: item.startYear,
-        endYear: item.endYear,
-        currentlyStudying: item.currentlyStudying,
-      }))
-    );
-  }, []);
-
-  const fetchSkills = useCallback(async () => {
-    const res = await API("GET", URL_PATH.calculateExperienceIndex);
-    console.log("SKILLS DOC =>", res?.skill?.skills);
-
-    setSkills(
-      (res?.skill?.skills || []).map((skill: string) => ({
-        name: skill,
-      }))
-    );
-  }, []);
 
   /* ==================== EFFECTS ==================== */
 
-  useEffect(() => {
-    Promise.all([
-      fetchUserProfile(),
-      calculateExperienceIndex(),
-      fetchHireabilityIndex(),
-      fetchWorkExperience(),
-      fetchProjects(),
-      fetchCertifications(),
-      fetchEducation(),
-      fetchSkills(),
-    ]).catch(console.error);
-  }, [
-    fetchUserProfile,
-    calculateExperienceIndex,
-    fetchHireabilityIndex,
-    fetchWorkExperience,
-    fetchProjects,
-    fetchCertifications,
-    fetchEducation,
-    fetchSkills,
-  ]);
+ useEffect(() => {
+  fetchUserProfile(); // separate API
+  fetchDashboardData(); // 👈 ONLY ONE CALL
+}, [fetchUserProfile, fetchDashboardData]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -351,24 +323,93 @@ export default function Dashboard() {
 
   const handleNavigate = (path: string) => navigate(path);
 
-  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("avatar", file);
-
-    try {
-      setIsSavingAvatar(true);
-      await API("POST", URL_PATH.uploadProfile, formData);
-      await fetchUserProfile();
-    } catch (err) {
-      console.error(err);
-      alert("Avatar upload failed");
-    } finally {
-      setIsSavingAvatar(false);
-    }
-  };
+ // POST API for the profile
+   const handleSaveProfile = async () => {
+     if (!selectedAvatarFile) return;
+ 
+     const formData = new FormData();
+     formData.append("avatar", selectedAvatarFile);
+ 
+     try {
+       setIsSavingAvatar(true);
+ 
+       await API(
+         "POST", // or "PUT" based on backend
+         URL_PATH.uploadProfile, // "user/profile"
+         formData
+         // ❌ DO NOT pass headers here
+       );
+ 
+       // Refresh profile image from server
+       await fetchUserProfile();
+ 
+       // Cleanup
+       setSelectedAvatarFile(null);
+     } catch (error) {
+       console.error("Failed to save profile image", error);
+       alert("Failed to save profile image");
+     } finally {
+       setIsSavingAvatar(false);
+     }
+   };
+ 
+   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("",e)
+     const file = e.target.files?.[0];
+     if (!file) return;
+ 
+     // Validate file size (e.g., max 5MB)
+     if (file.size > 5 * 1024 * 1024) {
+       alert("File size should be less than 5MB");
+       return;
+     }
+ 
+     // Validate file type
+     const validTypes = ["image/jpeg", "image/png", "image/webp"];
+     if (!validTypes.includes(file.type)) {
+       alert("Please select a valid image (JPEG, PNG, or WebP)");
+       return;
+     }
+ 
+     // Cleanup old preview
+     if (avatar && avatar.startsWith("blob:")) {
+       URL.revokeObjectURL(avatar);
+     }
+ 
+     // Create preview
+     const previewUrl = URL.createObjectURL(file);
+     setAvatar(previewUrl);
+ 
+     try {
+       setIsSavingAvatar(true);
+ 
+       // Upload to server
+       const formData = new FormData();
+       formData.append("avatar", file);
+ 
+       await API("POST", URL_PATH.uploadProfile, formData);
+ 
+       // Refresh from server
+       await fetchUserProfile();
+ 
+       // Revoke preview after successful upload
+       setTimeout(() => {
+         if (previewUrl.startsWith("blob:")) {
+           URL.revokeObjectURL(previewUrl);
+         }
+       }, 1000);
+     } catch (error) {
+       console.error("Upload failed:", error);
+       alert("Failed to upload profile picture");
+       // Revert to old avatar if available
+       // if (user?.avatarUrl) {
+       //   setAvatar(user.avatarUrl);
+       // }
+     } finally {
+       setIsSavingAvatar(false);
+     }
+   };
+ 
 
   const handleLogout = () => {
     localStorage.clear();
@@ -671,83 +712,112 @@ export default function Dashboard() {
                   ))}
                 </div>
               </div>
+ {/* Projects */}
+<div className="space-y-3">
+  <p
+    className="text-[10px] font-black uppercase tracking-widest"
+    style={{ color: colors.primary }}
+  >
+    Projects
+  </p>
 
-              {/* Projects */}
-              <div className="space-y-3">
-                <p
-                  className="text-[10px] font-black uppercase tracking-widest"
-                  style={{ color: colors.primary }}
-                >
-                  Projects
-                </p>
-                {projects?.slice(0, 2).map((proj, i) => (
-                  <div
-                    key={i}
-                    className="p-2.5 rounded-xl border"
-                    style={{
-                      backgroundColor: colors.cream,
-                      borderColor: colors.aqua,
-                    }}
-                  >
-                    <h4
-                      className="text-[11px] font-bold truncate"
-                      style={{ color: colors.primary }}
-                    >
-                      {proj.title}
-                    </h4>
-                    <p
-                      className="text-[10px] line-clamp-1 opacity-70"
-                      style={{ color: colors.secondary }}
-                    >
-                      {proj.summary}
-                    </p>
-                  </div>
-                ))}
-              </div>
+  {projects?.slice(0, 2).map((proj, i) => (
+    <div
+      key={i}
+      className="relative pl-4 pr-3 py-3 rounded-xl border transition hover:shadow-md"
+      style={{
+        backgroundColor: colors.cream,
+        borderColor: colors.aqua,
+      }}
+    >
+      {/* Left accent bar */}
+      <span
+        className="absolute left-0 top-3 bottom-3 w-1 rounded-full"
+        style={{ backgroundColor: colors.accent }}
+      />
 
-              {/* Certifications */}
-              <div className="space-y-3">
-                <p
-                  className="text-[10px] font-black uppercase tracking-widest"
-                  style={{ color: colors.secondary }}
-                >
-                  Certifications
-                </p>
-                {certifications?.slice(0, 2).map((cert, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-2 p-2 rounded-xl border"
-                    style={{
-                      backgroundColor: colors.mint,
-                      borderColor: colors.aqua,
-                    }}
-                  >
-                    <FeatherAward
-                      className="w-3.5 h-3.5 shrink-0"
-                      style={{ color: colors.accent }}
-                    />
-                    <p
-                      className="text-[10px] font-bold truncate"
-                      style={{ color: colors.primary }}
-                    >
-                      {cert.name}
-                    </p>
-                    <p
-                      className="ml-auto text-[10px] font-bold whitespace-nowrap"
-                      style={{ color: colors.primary }}
-                    >
-                      {cert.issueYear}
-                    </p>
+      {/* Project index */}
+      <span
+        className="text-[9px] font-bold mb-1 inline-block"
+        style={{ color: colors.accent }}
+      >
+        Project {i + 1}
+      </span>
 
-                    <p
-                      className="text-[9px] opacity-70 ml-5 truncate"
-                      style={{ color: colors.secondary }}
-                    >
-                      Issued by {cert.issuedBy}
-                    </p>
-                  </div>
-                ))}
-              </div>
+      <h4
+        className="text-[12px] font-bold leading-tight truncate"
+        style={{ color: colors.primary }}
+      >
+        {proj.title}
+      </h4>
+
+      <p
+        className="text-[10px] mt-1 leading-snug line-clamp-2"
+        style={{ color: colors.secondary }}
+      >
+        {proj.summary}
+      </p>
+    </div>
+  ))}
+</div>
+
+
+
+ {/* Certifications */}
+<div className="space-y-3">
+  <p
+    className="text-[10px] font-black uppercase tracking-widest"
+    style={{ color: colors.secondary }}
+  >
+    Certifications
+  </p>
+
+  {certifications?.slice(0, 2).map((cert, i) => (
+    <div
+      key={i}
+      className="flex items-start gap-3 p-3 rounded-xl border shadow-sm"
+      style={{
+        backgroundColor: colors.mint,
+        borderColor: colors.aqua,
+      }}
+    >
+      {/* Icon */}
+      <div className="mt-0.5">
+        <FeatherAward
+          className="w-4 h-4"
+          style={{ color: colors.accent }}
+        />
+      </div>
+
+      {/* Text */}
+      <div className="flex-1 min-w-0">
+        <p
+          className="text-[11px] font-bold truncate"
+          style={{ color: colors.primary }}
+        >
+          {cert.name}
+        </p>
+
+        <p
+          className="text-[9px] mt-0.5 truncate"
+          style={{ color: colors.secondary }}
+        >
+          Issued by {cert.issuedBy}
+        </p>
+      </div>
+
+      {/* Date */}
+      <p
+        className="text-[10px] font-semibold whitespace-nowrap"
+        style={{ color: colors.primary }}
+      >
+        {cert.issueYear}
+      </p>
+    </div>
+  ))}
+</div>
+
+
               {/* Education & Certs */}
               <div className="space-y-3 pt-2">
                 <div className="flex items-center justify-between">
