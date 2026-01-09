@@ -41,9 +41,8 @@ export const URL_PATH = {
   loginGoogle:"/auth/google",
 
   logout: "/auth/logout",
-  verifyEmail:
-    "/auth/verify/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MzZhNTY3Y2YxOTlkZWM3NzgxY2E4ZSIsImlhdCI6MTc2NTE4ODk2NywiZXhwIjoxNzY1NzkzNzY3fQ.OkuphrcwOBFyOuAjV3HyNMd-IaeiJa5lR_y7whS3PAc",
-
+  verifyEmail: "/auth/verify",          
+  resendVerification: "/auth/resend-verification",
   /* ---------- USER ---------- */
   getUser: "/user",
   updateUser: "/user",

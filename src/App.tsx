@@ -24,7 +24,7 @@ import SkillAssessmentCard from "./screens/SkillsAssesment";
 import TalentRankingPlatform from "./screens/TalentRankingPlatform";
 import Demographics from "./screens/Demographics";
 import SkillIndexIntro from "./screens/SkillIndexIntro";
-import './App.css';
+import "./App.css";
 import Dashboard from "./screens/Dashboard";
 import LoginSuccess from "./screens/LoginSuccess";
 import CompleteProfile from "./screens/CompleteProfile";
@@ -37,7 +37,7 @@ const router = createBrowserRouter([
   { path: "/", element: <LogIn /> },
   { path: "/signup", element: <SignUp /> },
   { path: "/login", element: <LogIn /> },
-  {path:"/login-success", element: <LoginSuccess/>},
+  { path: "/login-success", element: <LoginSuccess /> },
   { path: "/complete-profile", element: <CompleteProfile /> },
 
   { path: "/forgot-password", element: <ForgotPassword /> },
@@ -45,9 +45,10 @@ const router = createBrowserRouter([
   { path: "/set-password", element: <ForgotPassword3 /> },
   { path: "/success-password", element: <ForgotPassword4 /> },
 
-
-  
+  // { path: "/verify-email", element: <EmailVerification /> },
   { path: "/verify-email", element: <EmailVerification /> },
+  { path: "/verify-email/:token", element: <EmailVerification /> },
+
   { path: "/paywall", element: <Paywall /> },
   { path: "/talent-ranking", element: <TalentRankingPlatform /> },
   { path: "/how-it-works", element: <HowItWorks /> },
@@ -79,4 +80,3 @@ const router = createBrowserRouter([
 export default function App() {
   return <RouterProvider router={router} />;
 }
-

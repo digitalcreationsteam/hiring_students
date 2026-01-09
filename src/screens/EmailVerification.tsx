@@ -1,33 +1,25 @@
-// src/components/EmailVerification.tsx
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams, useParams } from "react-router-dom";
 import { Button } from "../ui/components/Button";
 import { IconWithBackground } from "../ui/components/IconWithBackground";
 import { FeatherClock, FeatherMailCheck } from "@subframe/core";
-import { useSearchParams } from "react-router-dom";
 
 import API, { URL_PATH } from "src/common/API";
 
 function EmailVerification() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
+  const hasVerifiedRef = useRef(false);
   const INITIAL = 30;
-
-  // Use number | null so DOM setInterval (which returns a number) matches
   const timerRef = useRef<number | null>(null);
-
   const [countdown, setCountdown] = useState<number>(INITIAL);
   const [canResend, setCanResend] = useState<boolean>(false);
   const [isSending, setIsSending] = useState<boolean>(false);
-
-  // user-visible status message (announced via aria-live)
   const [statusMessage, setStatusMessage] = useState<string>("");
 
   const startTimer = (startFrom = INITIAL) => {
-    // clear existing timer
     if (timerRef.current !== null) {
       window.clearInterval(timerRef.current);
       timerRef.current = null;
@@ -53,9 +45,8 @@ function EmailVerification() {
   };
 
   useEffect(() => {
-  setCanResend(countdown <= 0);
-}, [countdown]);
-
+    setCanResend(countdown <= 0);
+  }, [countdown]);
 
   // start on mount
   useEffect(() => {
@@ -69,32 +60,38 @@ function EmailVerification() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ✅ Verify email token and redirect
-  useEffect(() => {
-    const verifyEmail = async () => {
-      const token = searchParams.get("token");
-      if (!token) return;
+  // =============== GET API for Email verification ================
+ const { token } = useParams();
 
-      try {
-        await API("POST", URL_PATH.verifyEmail, { token });
+useEffect(() => {
+  if (!token) return;
 
-        // ✅ SUCCESS → navigate to TalentRankingPlatform
-        navigate("/talent-ranking");
-      } catch (err) {
-        setStatusMessage("Email verification failed. Please try again.");
+  const verify = async () => {
+    try {
+      const res = await API("GET", `${URL_PATH.verifyEmail}/${token}`);
+      if (res.success) {
+        setStatusMessage("Email verified. Redirecting to login...");
+        setTimeout(() => navigate("/login"), 1500);
       }
-    };
+    } catch {
+      setStatusMessage("Invalid or expired link.");
+    }
+  };
 
-    verifyEmail();
-  }, [navigate, searchParams]);
-
-  const handleResend = async () => {
-  if (!canResend || isSending) return;
-
-  setIsSending(true);
-  setStatusMessage("");
+  verify();
+}, [token]);
 
 
+
+ const handleResend = async () => {
+  try {
+    await API("POST", URL_PATH.resendVerification, {
+      email: localStorage.getItem("signupEmail"),
+    });
+    setStatusMessage("Verification email sent again");
+  } catch {
+    setStatusMessage("Failed to resend email");
+  }
 };
 
 

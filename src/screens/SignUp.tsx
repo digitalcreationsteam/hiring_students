@@ -36,31 +36,37 @@ function SignUp() {
     return true;
   };
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    if (loading) return;
-    if (!validate()) return;
+ const handleSubmit = async (e: any) => {
+  e.preventDefault();
+  if (loading) return;
+  if (!validate()) return;
 
-    setLoading(true);
-    setError("");
+  setLoading(true);
+  setError("");
 
-    // ✅ CREATE PAYLOAD
-    const formData = {
-      email,
-      firstname,
-      lastname,
-      password,
-    };
-
-    try {
-      await API("POST", URL_PATH.signup, formData);
-      navigate("/verify-email");
-    } catch (err: any) {
-      setError(err?.message || "Unable to create account. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+  const formData = {
+    email,
+    firstname,
+    lastname,
+    password,
   };
+
+  try {
+    const res = await API("POST", URL_PATH.signup, formData);
+
+    if (res?.success) {
+      // ✅ store email ONLY for verification resend
+      localStorage.setItem("signupEmail", email);
+
+      // ✅ move user to info page
+      navigate("/verify-email");
+    }
+  } catch (err: any) {
+    setError(err?.message || "Unable to create account. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleOAuth = (provider: any) => {
     setLoading(true);
