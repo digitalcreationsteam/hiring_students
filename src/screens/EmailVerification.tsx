@@ -71,7 +71,7 @@ useEffect(() => {
       const res = await API("GET", `${URL_PATH.verifyEmail}/${token}`);
       if (res.success) {
         setStatusMessage("Email verified. Redirecting to login...");
-        setTimeout(() => navigate("/login"), 1500);
+        setTimeout(() => navigate("/email-verified"), 1500);
       }
     } catch {
       setStatusMessage("Invalid or expired link.");

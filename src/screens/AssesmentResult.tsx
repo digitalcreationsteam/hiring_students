@@ -16,60 +16,51 @@ import { FeatherShield } from "@subframe/core";
 import { FeatherTarget } from "@subframe/core";
 import { FeatherUsers } from "@subframe/core";
 import { FeatherArrowLeft } from "@subframe/core";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import API, { URL_PATH } from "src/common/API";
 
 function AssessmentResult() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [isResultLoading, setIsResultLoading] = useState(true);
 
   const [result, setResult] = useState<{
-  skillIndex: number;
-  maxSkillIndex: number;
-} | null>(null);
-
-
-
-
-
+    skillIndex: number;
+    maxSkillIndex: number;
+  } | null>(null);
 
   // GET API TO FETCH THE RESULT
-const fetchResult = React.useCallback(async () => {
-  const attemptId =
-    localStorage.getItem("attemptId") ||
-    sessionStorage.getItem("attemptId");
+  const fetchResult = React.useCallback(async () => {
+    const attemptId =
+      location.state?.attemptId ||
+      localStorage.getItem("attemptId") ||
+      sessionStorage.getItem("attemptId");
 
-  if (!attemptId) {
-    setIsResultLoading(false);
-    return;
-  }
+    if (!attemptId) {
+      setIsResultLoading(false);
+      return;
+    }
 
-  try {
-    const res = await API("GET", URL_PATH.result, undefined, {
-      attemptId,
-    });
-    console.log("FINAL RESPONSE:", res);
-    setResult({
-      skillIndex: res.hireabilityIndex.skillIndexScore,
-      maxSkillIndex: res.hireabilityIndex.skillIndexTotal,
-    });
-  } catch (error) {
-    console.error("Failed to fetch result", error);
-    setResult(null);
-  } finally {
-    setIsResultLoading(false);
-  }
-}, []);
+    try {
+      const res = await API("GET", `${URL_PATH.result}?attemptId=${attemptId}`);
 
+      console.log("FINAL RESPONSE:", res);
+      setResult({
+        skillIndex: res.hireabilityIndex.skillIndexScore,
+        maxSkillIndex: res.hireabilityIndex.skillIndexTotal,
+      });
+    } catch (error) {
+      console.error("Failed to fetch result", error);
+      setResult(null);
+    } finally {
+      setIsResultLoading(false);
+    }
+  }, []);
 
-
-
-
-useEffect(() => {
+  useEffect(() => {
     fetchResult();
   }, [fetchResult]);
-
 
   ////////////////////////////
   if (isResultLoading) {

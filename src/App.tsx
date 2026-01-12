@@ -34,6 +34,7 @@ import ForgotPassword from "./screens/ForgotPassword";
 import ForgotPassword2 from "./screens/ForgotPassword2";
 import ForgotPassword3 from "./screens/ForgotPassword3";
 import ForgotPassword4 from "./screens/ForgotPassword4";
+import EmailVerifiedSuccess from "./screens/EmailVerifiedSuccess";
 
 const router = createBrowserRouter([
   { path: "/", element: <LogIn /> },
@@ -50,6 +51,8 @@ const router = createBrowserRouter([
   // { path: "/verify-email", element: <EmailVerification /> },
   { path: "/verify-email", element: <EmailVerification /> },
   { path: "/verify-email/:token", element: <EmailVerification /> },
+  { path: "/email-verified", element: <EmailVerifiedSuccess /> },
+
 
   { path: "/paywall", element: <Paywall /> },
   { path: "/talent-ranking", element: <TalentRankingPlatform /> },

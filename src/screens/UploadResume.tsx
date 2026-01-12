@@ -108,39 +108,33 @@ function UploadResume() {
     }
   };
 
+  const uploadResume = async () => {
+    if (!file || uploading) return;
 
- const uploadResume = async () => {
-  if (!file || uploading) return; // 🛑 prevents loop
+    try {
+      setUploading(true);
+      const userId = localStorage.getItem("userId");
+      const token = localStorage.getItem("token");
 
-  try {
-    setUploading(true);
-
-    const userId = localStorage.getItem("userId");
-
-    const formData = new FormData();
-    formData.append("resume", file);
-
-    await API(
-      "POST",
-      URL_PATH.uploadResume,
-      formData,
-      {
-        "user-id": userId,
+      if (!token) {
+        alert("Session expired. Please login again.");
+        return;
       }
-    );
+      const formData = new FormData();
+      formData.append("resume", file);
 
-    navigate("/demographics");
-  } catch (error: any) {
-    console.error(error);
-    alert(
-      error?.response?.data?.message || "Resume upload failed"
-    );
-  } finally {
-    setUploading(false);
-  }
-};
-
-
+      await API("POST", URL_PATH.uploadResume, formData, {
+        "user-id": userId,
+        Authorization: `Bearer ${token}`,
+      });
+      navigate("/demographics");
+    } catch (error: any) {
+      console.error("UPLOAD ERROR:", error);
+      alert(error?.response?.data?.message || "Resume upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-neutral-50 px-4 sm:px-6 py-6 sm:py-8">
@@ -257,16 +251,15 @@ function UploadResume() {
 
         {/* Continue Button */}
         <div className="flex w-full justify-center sm:justify-end border-t border-neutral-border pt-4">
-         <Button
-  className={`h-10 w-full sm:max-w-[520px] rounded-full bg-violet-600 font-semibold shadow-md ${
-    uploading ? "pointer-events-none opacity-70" : ""
-  }`}
-  onClick={uploadResume}
-  disabled={!file || uploading}
->
-  {uploading ? "Uploading..." : "Continue"}
-</Button>
-
+          <Button
+            className={`h-10 w-full sm:max-w-[520px] rounded-full bg-violet-600 font-semibold shadow-md ${
+              uploading ? "pointer-events-none opacity-70" : ""
+            }`}
+            onClick={uploadResume}
+            disabled={!file || uploading}
+          >
+            {uploading ? "Uploading..." : "Continue"}
+          </Button>
         </div>
       </div>
     </div>

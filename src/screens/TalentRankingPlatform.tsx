@@ -40,9 +40,10 @@ function TalentRankingPlatform() {
             </Badge>
             <span
               className="font-['Inter']
-  text-[28px] sm:text-[36px] lg:text-[56px]
+  text-[24px] sm:text-[32px] md:text-[26px] sm:text-[32px] lg:text-[40px]
+ lg:text-[56px]
   font-[600]
-  leading-tight sm:leading-[44px] lg:leading-[60px]
+  leading-tight sm:leading-[40px] lg:leading-[60px]
   text-default-font -tracking-[0.04em]"
             >
               Welcome to UniTalent: A New Data-Driven Approach To Early-Career
@@ -50,7 +51,7 @@ function TalentRankingPlatform() {
             </span>
 
             <div className="flex flex-col items-start gap-6">
-              <div className="flex items-start gap-4 rounded-3xl border border-solid border-yellow-200 bg-violet-100 px-6 py-5 shadow-lg">
+              <div className="flex items-start gap-4 rounded-3xl border border-solid border-yellow-400 bg-violet-200 px-6 py-5 shadow-lg">
                 <div className="flex grow shrink-0 basis-0 flex-col items-start gap-3">
                   <span className="font-['Inter'] text-[16px] font-[600] leading-[24px] text-default-font -tracking-[0.01em]">
                     The Traditional Résumé Paradox
@@ -129,7 +130,11 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
         <div className="flex w-full max-w-[1280px] flex-col items-start gap-12">
           {/* Heading */}
           <div className="flex flex-col items-start gap-3">
-            <span className="font-['Georgia'] text-[40px] font-[500] leading-[48px] tracking-tight text-default-font">
+            <span
+              className="font-['Georgia'] text-[26px] sm:text-[32px] lg:text-[40px]
+ font-[500] leading-tight sm:leading-[40px] lg:leading-[48px]
+ tracking-tight text-default-font"
+            >
               How UniTalent Works
             </span>
             <span className="font-['Inter'] text-[20px] font-[400] leading-[24px] text-neutral-600">
@@ -208,10 +213,13 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
         </div>
       </div>
 
-      <div className="flex w-full flex-col items-center px-6 py-32">
+      <div className="flex w-full flex-col items-center px-4 py-16 sm:px-6 sm:py-24 lg:py-32">
         <div className="flex w-full max-w-[1280px] flex-col items-start gap-16">
           <div className="flex flex-col items-start gap-4">
-            <span className="font-['Inter'] text-[44px] font-[600] leading-[48px] text-default-font text-center -tracking-[0.04em]">
+            <span
+              className="font-['Inter'] text-[26px] sm:text-[32px] lg:text-[40px] font-[600] leading-tight sm:leading-[40px] lg:leading-[48px]
+ text-default-font text-center -tracking-[0.04em]"
+            >
               The Three-Score Architecture
             </span>
             <span className="w-full max-w-[768px] font-['Inter'] text-[19px] font-[400] leading-[24px] text-gray-600 -tracking-[0.01em]">
@@ -222,7 +230,7 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
             </span>
           </div>
           <div className="flex w-full flex-col items-start gap-8">
-            <div className="flex w-full flex-col gap-6 md:flex-row md:items-start">
+            <div className="flex w-full flex-col items-center gap-6 md:flex-row md:items-start">
               <div className="flex w-16 rounded-xl flex-col items-center pt-2">
                 <IconWithBackground
                   className="text-violet-700 bg-violet-100 rounded-2xl text-[28px]"
@@ -299,7 +307,7 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
               </div>
             </div>
 
-            <div className="flex w-full flex-col gap-6 md:flex-row md:items-start">
+            <div className="flex w-full flex-col items-center gap-6 md:flex-row md:items-start">
               <div className="flex w-16 flex-none flex-col items-center pt-2">
                 <IconWithBackground
                   className="text-violet-700 bg-violet-100 rounded-2xl text-[28px]"
@@ -364,7 +372,7 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
                 <div className="flex h-px w-full flex-none flex-col items-center gap-2  bg-gray-200" />
               </div>
             </div>
-            <div className="flex w-full flex-col gap-6 md:flex-row md:items-start">
+            <div className="flex w-full flex-col items-center gap-6 md:flex-row md:items-start">
               <div className="flex w-16 flex-none flex-col items-center pt-2">
                 <IconWithBackground
                   className="text-violet-700 bg-violet-100 rounded-2xl text-[28px]"
@@ -438,7 +446,11 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
             <span className="font-['Inter'] text-[14px] font-[500] leading-[20px] text-violet-700 -tracking-[0.01em] uppercase">
               Global Benchmarking Layer
             </span>
-            <span className="font-['Inter'] text-[40px] font-[600] leading-[48px] text-default-font -tracking-[0.04em]">
+            <span
+              className="font-['Inter'] text-[26px] sm:text-[32px] lg:text-[40px]
+ font-[600] leading-tight sm:leading-[40px] lg:leading-[48px]
+ text-default-font -tracking-[0.04em]"
+            >
               Ranking Methodology
             </span>
             <span className="w-full max-w-[768px] font-['Inter'] text-[16px] font-[400] leading-[24px] text-subtext-color -tracking-[0.01em]">
@@ -459,7 +471,7 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
                 each job role
               </span>
             </div>
-            <div className="flex w-full flex-col items-start overflow-auto">
+            <div className="flex w-full flex-col items-start overflow-x-auto">
               <Table
                 header={
                   <Table.HeaderRow>
@@ -604,7 +616,11 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
 
       <div className="flex w-full flex-col items-center px-6 py-24">
         <div className="flex w-full max-w-[768px] flex-col items-start gap-12">
-          <span className="font-['Inter'] text-[40px] font-[600] leading-[48px] text-default-font -tracking-[0.04em]">
+          <span
+            className="font-['Inter'] text-[26px] sm:text-[32px] lg:text-[40px]
+ font-[600] leading-tight sm:leading-[40px] lg:leading-[48px]
+ text-default-font -tracking-[0.04em]"
+          >
             Impact on Hiring Operations
           </span>
           <div className="flex w-full flex-col items-start gap-4 rounded-3xl border border-solid border-neutral-border bg-white px-8 py-8">
@@ -670,7 +686,10 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
       <div className="flex w-full flex-col items-center bg-neutral-50 px-6 py-24">
         <div className="flex w-full max-w-[768px] flex-col items-center gap-8">
           <div className="flex flex-col items-center gap-4">
-            <span className="font-['Inter'] text-[40px] font-[600] leading-[48px] text-default-font text-center -tracking-[0.04em]">
+            <span
+              className="font-['Inter'] text-[26px] sm:text-[32px] lg:text-[40px]
+ font-[600] leading-[48px] text-default-font text-center -tracking-[0.04em]"
+            >
               Generate Your Hireability Index
             </span>
             <span className="w-full font-['Inter'] text-[16px] font-[400] leading-[24px] text-subtext-color text-center -tracking-[0.01em]">
@@ -678,7 +697,7 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
             </span>
           </div>
           <Button
-            className="w-full max-w-full h-10 rounded-3xl bg-violet-600 hover:bg-violet-700 text-white font-semibold"
+            className="w-full max-w-full h-10 rounded-3xl text-[16px] bg-violet-600 hover:bg-violet-700 text-white font-semibold"
             size="large"
             onClick={() => navigate("/upload-resume")}
           >
@@ -687,84 +706,74 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
         </div>
       </div>
 
-      <div className="flex w-full flex-col items-center justify-center gap-6 border-t border-solid border-neutral-100 px-6 py-12">
-       <div className="grid w-full max-w-[1024px] grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-
-          <div className="flex w-full sm:w-auto flex-col items-start gap-6 self-stretch">
-
-            <div className="flex w-full min-w-[320px] grow shrink-0 basis-0 items-start gap-4">
+      <div className="w-full border-t border-neutral-100 px-6 py-12">
+        <div className="mx-auto grid w-full max-w-[1024px] grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Brand */}
+          <div className="flex w-full flex-col gap-4 items-center sm:items-start">
+            <div className="flex items-center gap-3">
               <img
-                className="h-5 w-5 flex-none object-cover"
+                className="h-5 w-5 object-cover"
                 src="https://res.cloudinary.com/subframe/image/upload/v1711417507/shared/y2rsnhq3mex4auk54aye.png"
               />
-              <span className="grow shrink-0 basis-0 font-['Inter'] text-[14px] font-[500] leading-[20px] text-default-font -tracking-[0.01em]">
+              <span className="text-[14px] font-[500] text-default-font">
                 UniTalent
               </span>
             </div>
-            <div className="flex w-full items-center gap-2">
+            <div className="flex items-center gap-3 justify-center sm:justify-start">
               <IconButton
                 icon={<FeatherTwitter />}
-                onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
+                onClick={() =>
+                  window.open("https://twitter.com/your_handle", "_blank")
+                } // add twitter account link
               />
               <IconButton
                 icon={<FeatherLinkedin />}
-                onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
+                onClick={() =>
+                  window.open(
+                    "https://www.linkedin.com/company/your-company",
+                    "_blank"
+                  )
+                } // add linkedin account link
               />
               <IconButton
                 icon={<FeatherInstagram />}
-                onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
+                onClick={() =>
+                  window.open("https://www.instagram.com/your_handle", "_blank")
+                } // add instagram account link
               />
             </div>
           </div>
-          <div className="flex grow shrink-0 basis-0 flex-wrap items-start gap-4 self-stretch">
-            <div className="flex min-w-[144px] grow shrink-0 basis-0 flex-col items-start gap-4">
-              <span className="w-full font-['Inter'] text-[14px] font-[500] leading-[20px] text-default-font -tracking-[0.01em]">
-                For Candidates
-              </span>
-              <span className="font-['Inter'] text-[12px] font-[400] leading-[20px] text-gray-500 -tracking-[0.01em]">
-                How It Works
-              </span>
-              <span className="font-['Inter'] text-[12px] font-[400] leading-[20px] text-gray-500 -tracking-[0.01em]">
-                Job Tracks
-              </span>
-              <span className="font-['Inter'] text-[12px] font-[400] leading-[20px] text-gray-500 -tracking-[0.01em]">
-                Rankings
-              </span>
-              <span className="font-['Inter'] text-[12px] font-[400] leading-[20px] text-gray-500 -tracking-[0.01em]">
-                Resources
-              </span>
-            </div>
-            <div className="flex min-w-[144px] grow shrink-0 basis-0 flex-col items-start gap-4">
-              <span className="w-full font-['Inter'] text-[14px] font-[500] leading-[20px] text-default-font -tracking-[0.01em]">
-                For Recruiters
-              </span>
-              <span className="font-['Inter'] text-[12px] font-[400] leading-[20px] text-gray-500 -tracking-[0.01em]">
-                Find Talent
-              </span>
-              <span className="font-['Inter'] text-[12px] font-[400] leading-[20px] text-gray-500 -tracking-[0.01em]">
-                Post Jobs
-              </span>
-              <span className="font-['Inter'] text-[12px] font-[400] leading-[20px] text-gray-500 -tracking-[0.01em]">
-                Pricing
-              </span>
-            </div>
-            <div className="flex min-w-[144px] grow shrink-0 basis-0 flex-col items-start gap-4">
-              <span className="w-full font-['Inter'] text-[14px] font-[500] leading-[20px] text-default-font -tracking-[0.01em]">
-                Company
-              </span>
-              <span className="font-['Inter'] text-[12px] font-[400] leading-[20px] text-gray-500 -tracking-[0.01em]">
-                About
-              </span>
-              <span className="font-['Inter'] text-[12px] font-[400] leading-[20px] text-gray-500 -tracking-[0.01em]">
-                Blog
-              </span>
-              <span className="font-['Inter'] text-[12px] font-[400] leading-[20px] text-gray-500 -tracking-[0.01em]">
-                Contact
-              </span>
-              <span className="font-['Inter'] text-[12px] font-[400] leading-[20px] text-gray-500 -tracking-[0.01em]">
-                Privacy
-              </span>
-            </div>
+
+          {/* For Candidates */}
+          <div className="flex flex-col gap-4 items-center sm:items-start">
+            <span className="text-[14px] font-[600] text-default-font">
+              For Candidates
+            </span>
+            <span className="text-[13px] text-gray-500">How It Works</span>
+            <span className="text-[13px] text-gray-500">Job Tracks</span>
+            <span className="text-[13px] text-gray-500">Rankings</span>
+            <span className="text-[13px] text-gray-500">Resources</span>
+          </div>
+
+          {/* For Recruiters */}
+          <div className="flex flex-col gap-4 items-center sm:items-start">
+            <span className="text-[14px] font-[600] text-default-font">
+              For Recruiters
+            </span>
+            <span className="text-[13px] text-gray-500">Find Talent</span>
+            <span className="text-[13px] text-gray-500">Post Jobs</span>
+            <span className="text-[13px] text-gray-500">Pricing</span>
+          </div>
+
+          {/* Company */}
+          <div className="flex flex-col gap-4 items-center sm:items-start">
+            <span className="text-[14px] font-[600] text-default-font">
+              Company
+            </span>
+            <span className="text-[13px] text-gray-500">About</span>
+            <span className="text-[13px] text-gray-500">Blog</span>
+            <span className="text-[13px] text-gray-500">Contact</span>
+            <span className="text-[13px] text-gray-500">Privacy</span>
           </div>
         </div>
       </div>

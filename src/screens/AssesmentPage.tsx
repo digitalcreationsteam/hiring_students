@@ -46,7 +46,9 @@ function AssessmentPage() {
   const [remainingSeconds, setRemainingSeconds] = useState(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const saveTimeoutRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const saveTimeoutRef = useRef<Record<string, ReturnType<typeof setTimeout>>>(
+    {}
+  );
   const [durationMinutes, setDurationMinutes] = useState<number | null>(null);
   const [expiryReady, setExpiryReady] = useState(false);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -194,8 +196,6 @@ function AssessmentPage() {
     startAssessment();
   }, [attemptId, userId, navigate]);
 
-
-
   //=============== GET API FOR TO FETCH QUESTIONS============//
 
   const startTimer = (expiryTime: number) => {
@@ -216,25 +216,24 @@ function AssessmentPage() {
     return () => clearInterval(id);
   };
 
-useEffect(() => {
-  if (!attemptId || !expiryReady) return;
+  useEffect(() => {
+    if (!attemptId || !expiryReady) return;
 
-  let expiry: number | null = null;
+    let expiry: number | null = null;
 
-  if (location.state?.expiresAt) {
-    expiry = new Date(location.state.expiresAt).getTime();
-  }
+    if (location.state?.expiresAt) {
+      expiry = new Date(location.state.expiresAt).getTime();
+    }
 
-  if (!expiry) {
-    const saved = sessionStorage.getItem(`expiresAt-${attemptId}`);
-    if (saved) expiry = Number(saved);
-  }
+    if (!expiry) {
+      const saved = sessionStorage.getItem(`expiresAt-${attemptId}`);
+      if (saved) expiry = Number(saved);
+    }
 
-  if (!expiry) return;
+    if (!expiry) return;
 
-  return startTimer(expiry);
-}, [attemptId, expiryReady]);
-
+    return startTimer(expiry);
+  }, [attemptId, expiryReady]);
 
   useEffect(() => {
     if (!attemptId || !userId) return;
@@ -322,7 +321,8 @@ useEffect(() => {
         { "user-id": userId }
       );
 
-      navigate("/assessment-results", { state: { attemptId } });
+      localStorage.setItem("attemptId", attemptId);
+      navigate("/assessment-results");
     } catch (err) {
       submitLockRef.current = false;
       console.error("Submit failed", err);
@@ -393,9 +393,9 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen w-full bg-neutral-50 flex justify-center px-4 py-4 sm:py-6 lg:py-12">
-<div className="flex w-full max-w-[1024px] flex-col lg:flex-row items-stretch gap-4 lg:gap-6">
-  
-<div className="
+      <div className="flex w-full max-w-[1024px] flex-col lg:flex-row items-stretch gap-4 lg:gap-6">
+        <div
+          className="
   hidden lg:flex
   w-full lg:w-64
   flex-none flex-col items-start gap-4
@@ -403,7 +403,8 @@ useEffect(() => {
   border border-neutral-border
   bg-violet-200 px-6 lg:px-8 py-6
   overflow-y-auto
-">
+"
+        >
           <div className="flex w-full items-start gap-4">
             <div className="flex grow shrink-0 basis-0 flex-col items-start gap-2">
               <span className="text-heading-3 font-heading-3 text-default-font">
@@ -444,16 +445,17 @@ useEffect(() => {
           </div>
         </div>
 
-
         {/* RIGHT PANNEL */}
 
-<div className="flex w-full flex-col items-start justify-start gap-4">
-<div className="
+        <div className="flex w-full flex-col items-start justify-start gap-4">
+          <div
+            className="
   flex w-full flex-wrap items-center gap-2
   justify-between rounded-xl
   border bg-yellow-50
   px-3 py-2
-">
+"
+          >
             <div className="flex items-center gap-2">
               <FeatherAlertCircle className="text-caption font-caption text-yellow-700" />
               <span className="text-xs text-yellow-700">
@@ -463,27 +465,28 @@ useEffect(() => {
             <FeatherX className="text-caption font-caption text-yellow-700" />
           </div>
 
-<div className="
+          <div
+            className="
   flex w-full flex-col items-start gap-5
   rounded-2xl border bg-white shadow-sm
   px-4 py-5
   sm:px-6 sm:py-6
   lg:px-8 lg:py-8
-">
+"
+          >
             <div className="flex w-full items-center justify-between">
               <span className="text-sm text-subtext-color">
                 Question {currentIndex + 1} of {questions.length}
               </span>
               <div className="flex items-center gap-2">
-  <FeatherClock className="text-body font-body text-default-font" />
-  <div className="flex items-center gap-1">
-    <span className="text-sm font-body-bold text-default-font">
-      {pad2(minutes)}:{pad2(seconds)}
-    </span>
-    <span className="text-sm text-default-font">remaining</span>
-  </div>
-</div>
-
+                <FeatherClock className="text-body font-body text-default-font" />
+                <div className="flex items-center gap-1">
+                  <span className="text-sm font-body-bold text-default-font">
+                    {pad2(minutes)}:{pad2(seconds)}
+                  </span>
+                  <span className="text-sm text-default-font">remaining</span>
+                </div>
+              </div>
             </div>
 
             {/* progress bar (custom accessible) */}
@@ -507,7 +510,7 @@ useEffect(() => {
               </span>
             </div>
 
-<span className="w-full text-lg sm:text-xl lg:text-heading-3 font-heading-3 text-neutral-700">
+            <span className="w-full text-lg sm:text-xl lg:text-heading-3 font-heading-3 text-neutral-700">
               Product Management Fundamentals Assessment
             </span>
 
@@ -566,7 +569,7 @@ useEffect(() => {
             {/* Bottom horizontal line */}
             <div className="w-full h-[1px] bg-gray-300 my-2 flex-shrink-0" />
 
-<div className="flex w-full flex-col sm:flex-row gap-3 sm:gap-0 sm:justify-between">
+            <div className="flex w-full flex-col sm:flex-row gap-3 sm:gap-0 sm:justify-between">
               <Button
                 disabled={saving}
                 className="w-10px h-10 rounded-full text-white]"
