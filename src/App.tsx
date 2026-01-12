@@ -1,5 +1,7 @@
 import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Chat from "./ui/components/chat/Chat";
 
 import SignUp from "./screens/SignUp";
 import LogIn from "./screens/Login";
@@ -75,6 +77,11 @@ const router = createBrowserRouter([
   { path: "/assessment-results", element: <AssessmentResult /> },
 
   { path: "/dashboard", element: <Dashboard /> },
+  
+    // ✅ CHAT ROUTE (THIS IS WHAT YOU NEEDED)
+
+  { path: "/chat/:otherUserId", element: <Chat /> }
+
 ]);
 
 export default function App() {

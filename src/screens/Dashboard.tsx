@@ -16,6 +16,7 @@ import { Button } from "../ui/components/Button";
 import { DefaultPageLayout } from "../ui/layouts/DefaultPageLayout";
 import { Progress } from "../ui/components/Progress";
 import { colors } from "../common/Colors";
+import Chat from "../ui/components/chat/Chat";
 
 import {
   FeatherArrowRight,
