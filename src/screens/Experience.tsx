@@ -511,11 +511,11 @@ setExperiences((prev) => [
         roleTitle: typeof e.jobTitle === "string" ? e.jobTitle : "",
         typeOfRole: typeof e.typeOfRole === "string" ? e.typeOfRole : undefined,
         company: typeof e.companyName === "string" ? e.companyName : "",
-        startDate: e.startYear ? `01/${e.startYear}` : "",
+        startDate: e.startYear ? `${e.startYear}` : "",
         endDate: e.currentlyWorking
           ? undefined
           : e.endYear
-          ? `01/${e.endYear}`
+          ? `${e.endYear}`
           : undefined,
         currentlyWorking: Boolean(e.currentlyWorking),
         description:

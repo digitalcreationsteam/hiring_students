@@ -140,9 +140,9 @@ export default function Dashboard() {
 
   const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
   const [isSavingAvatar, setIsSavingAvatar] = useState(false);
-  const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null);
-
-  
+  const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(
+    null,
+  );
 
   const [user, setUser] = useState<UserProfile>({
     name: "",
@@ -183,128 +183,133 @@ export default function Dashboard() {
 
   const [recruiterVisibility, setRecruiterVisibility] = useState(0);
 
+
   /* ==================== API CALLS ==================== */
+  const fetchDashboardData = useCallback(async () => {
+    const res = await API("GET", URL_PATH.calculateExperienceIndex);
 
-  const fetchUserProfile = useCallback(async () => {
-    const res = await API("GET", URL_PATH.getDemographics);
+    if (!res) return;
 
-    setUser({
-      name: res?.fullName || "",
-      domain: res?.domain || "Professional",
-      location: formatLocation(res?.city, res?.state),
+      /* ==================== DEMOGRAPHICS (from same API) ==================== */
+  const demo = res?.data?.demographics?.[0]; // ✅ first item
+  setUser({
+    name: demo?.fullName || "",
+    domain: demo?.domain || "Professional", // if your backend doesn't send domain here, keep default
+    location: formatLocation(demo?.city, demo?.state),
+  });
+
+    /* ==================== AVATAR ==================== */
+    // setAvatar(res?.profileUrl || DEFAULT_AVATAR);
+const url =
+  res?.documents?.profileUrl ||
+  res?.documents?.resumeUrl ||
+  DEFAULT_AVATAR;
+
+// ✅ cache buster so browser always loads latest image
+const cacheBusted =
+  url && url !== DEFAULT_AVATAR ? `${url}?t=${Date.now()}` : url;
+
+setAvatar(cacheBusted);
+
+
+    /* ==================== RANK ==================== */
+    const rank = res?.rank;
+    setRankData({
+      global: {
+        rank: rank?.globalRank ?? "-",
+        percentile: calculatePercentile(rank?.globalRank),
+      },
+      country: {
+        rank: rank?.countryRank ?? "-",
+        percentile: calculatePercentile(rank?.countryRank),
+      },
+      state: {
+        rank: rank?.stateRank ?? "-",
+        percentile: calculatePercentile(rank?.stateRank),
+      },
+      city: {
+        rank: rank?.cityRank ?? "-",
+        percentile: calculatePercentile(rank?.cityRank),
+      },
+      university: {
+        rank: rank?.universityRank ?? "0",
+        percentile: calculatePercentile(rank?.universityRank),
+      },
     });
-    
+
+    /* ==================== HIREABILITY ==================== */
+    const hireabilityIndex = res?.hireabilityIndex;
+    setHireability({
+      totalScore: hireabilityIndex?.hireabilityIndex,
+      weeklyChange: 0,
+      nextRankPoints:
+        hireabilityIndex?.experienceIndexTotal -
+        hireabilityIndex?.experienceIndexScore,
+      skill: {
+        score: hireabilityIndex?.skillIndexScore,
+        max: hireabilityIndex?.skillIndexTotal,
+      },
+      experience: {
+        score: hireabilityIndex?.experienceIndexScore,
+        max: hireabilityIndex?.experienceIndexTotal,
+      },
+    });
+
+    /* ==================== WORK EXPERIENCE ==================== */
+    setWorkExperience(
+      (res?.data?.workExperience || []).map((item: any) => ({
+        jobTitle: item.jobTitle,
+        companyName: item.companyName,
+        startYear: item.startYear ?? null,
+        endYear: item.endYear ?? null,
+        duration: item.duration ?? null,
+        description: item.description ?? "",
+        location: item.location ?? "",
+        currentlyWorking: item.currentlyWorking ?? false,
+      })),
+    );
+
+    /* ==================== PROJECTS ==================== */
+    setProjects(
+      (res?.data?.projects || []).map((item: any) => ({
+        title: item.projectName,
+        summary: item.summary,
+      })),
+    );
+
+    /* ==================== CERTIFICATIONS ==================== */
+    setCertifications(
+      (res?.data?.certifications || []).map((item: any) => ({
+        name: item.certificationName,
+        issuedBy: item.issuer,
+        issueYear: item.issueDate,
+      })),
+    );
+
+    /* ==================== EDUCATION ==================== */
+    setEducation(
+      (res?.data?.education || []).map((item: any) => ({
+        schoolName: item.schoolName,
+        degree: item.degree,
+        startYear: item.startYear,
+        endYear: item.endYear,
+        currentlyStudying: item.currentlyStudying,
+      })),
+    );
+
+    /* ==================== SKILLS ==================== */
+    setSkills(
+      (res?.skills?.list || []).map((skill: string) => ({
+        name: skill,
+      })),
+    );
   }, []);
-
-const fetchDashboardData = useCallback(async () => {
-  const res = await API("GET", URL_PATH.calculateExperienceIndex);
-
-  if (!res) return;
-
-  /* ==================== AVATAR ==================== */
-  setAvatar(res?.profileUrl || DEFAULT_AVATAR);
-
-  /* ==================== RANK ==================== */
-  const rank = res?.rank;
-  setRankData({
-    global: {
-      rank: rank?.globalRank ?? "-",
-      percentile: calculatePercentile(rank?.globalRank),
-    },
-    country: {
-      rank: rank?.countryRank ?? "-",
-      percentile: calculatePercentile(rank?.countryRank),
-    },
-    state: {
-      rank: rank?.stateRank ?? "-",
-      percentile: calculatePercentile(rank?.stateRank),
-    },
-    city: {
-      rank: rank?.cityRank ?? "-",
-      percentile: calculatePercentile(rank?.cityRank),
-    },
-    university: {
-      rank: rank?.universityrank ?? "0",
-      percentile: calculatePercentile(rank?.universityrank),
-    },
-  });
-
-  /* ==================== HIREABILITY ==================== */
-  const hireabilityIndex = res?.hireabilityIndex;
-  setHireability({
-    totalScore: hireabilityIndex?.hireabilityIndex,
-    weeklyChange: 0,
-    nextRankPoints:
-      hireabilityIndex?.experienceIndexTotal -
-      hireabilityIndex?.experienceIndexScore,
-    skill: {
-      score: hireabilityIndex?.skillIndexScore,
-      max: hireabilityIndex?.skillIndexTotal,
-    },
-    experience: {
-      score: hireabilityIndex?.experienceIndexScore,
-      max: hireabilityIndex?.experienceIndexTotal,
-    },
-  });
-
-  /* ==================== WORK EXPERIENCE ==================== */
-  setWorkExperience(
-    (res?.data?.workExperience || []).map((item: any) => ({
-      jobTitle: item.jobTitle,
-      companyName: item.companyName,
-      startYear: item.startYear ?? null,
-      endYear: item.endYear ?? null,
-      duration: item.duration ?? null,
-      description: item.description ?? "",
-      location: item.location ?? "",
-      currentlyWorking: item.currentlyWorking ?? false,
-    }))
-  );
-
-  /* ==================== PROJECTS ==================== */
-  setProjects(
-    (res?.data?.projects || []).map((item: any) => ({
-      title: item.projectName,
-      summary: item.summary,
-    }))
-  );
-
-  /* ==================== CERTIFICATIONS ==================== */
-  setCertifications(
-    (res?.data?.certifications || []).map((item: any) => ({
-      name: item.certificationName,
-      issuedBy: item.issuer,
-      issueYear: item.issueDate,
-    }))
-  );
-
-  /* ==================== EDUCATION ==================== */
-  setEducation(
-    (res?.data?.education || []).map((item: any) => ({
-      schoolName: item.schoolName,
-      degree: item.degree,
-      startYear: item.startYear,
-      endYear: item.endYear,
-      currentlyStudying: item.currentlyStudying,
-    }))
-  );
-
-  /* ==================== SKILLS ==================== */
-  setSkills(
-    (res?.skills?.list || []).map((skill: string) => ({
-      name: skill,
-    }))
-  );
-}, []);
-
-
 
   /* ==================== EFFECTS ==================== */
 
- useEffect(() => {
-  fetchUserProfile(); // separate API
-  fetchDashboardData(); // 👈 ONLY ONE CALL
-}, [fetchUserProfile, fetchDashboardData]);
+  useEffect(() => {
+       fetchDashboardData(); // 👈 ONLY ONE CALL
+  }, [ fetchDashboardData]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -324,98 +329,103 @@ const fetchDashboardData = useCallback(async () => {
 
   const handleNavigate = (path: string) => navigate(path);
 
- // POST API for the profile
-   const handleSaveProfile = async () => {
-     if (!selectedAvatarFile) return;
- 
-     const formData = new FormData();
-     formData.append("avatar", selectedAvatarFile);
- 
-     try {
-       setIsSavingAvatar(true);
- 
-       await API(
-         "POST", // or "PUT" based on backend
-         URL_PATH.uploadProfile, // "user/profile"
-         formData
-         // ❌ DO NOT pass headers here
-       );
- 
-       // Refresh profile image from server
-       await fetchUserProfile();
- 
-       // Cleanup
-       setSelectedAvatarFile(null);
-     } catch (error) {
-       console.error("Failed to save profile image", error);
-       alert("Failed to save profile image");
-     } finally {
-       setIsSavingAvatar(false);
-     }
-   };
- 
-   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("",e)
-     const file = e.target.files?.[0];
-     if (!file) return;
- 
-     // Validate file size (e.g., max 5MB)
-     if (file.size > 5 * 1024 * 1024) {
-       alert("File size should be less than 5MB");
-       return;
-     }
- 
-     // Validate file type
-     const validTypes = ["image/jpeg", "image/png", "image/webp"];
-     if (!validTypes.includes(file.type)) {
-       alert("Please select a valid image (JPEG, PNG, or WebP)");
-       return;
-     }
- 
-     // Cleanup old preview
-     if (avatar && avatar.startsWith("blob:")) {
-       URL.revokeObjectURL(avatar);
-     }
- 
-     // Create preview
-     const previewUrl = URL.createObjectURL(file);
-     setAvatar(previewUrl);
- 
-     try {
-       setIsSavingAvatar(true);
- 
-       // Upload to server
-       const formData = new FormData();
-       formData.append("avatar", file);
- 
-       await API("POST", URL_PATH.uploadProfile, formData);
- 
-       // Refresh from server
-       await fetchUserProfile();
- 
-       // Revoke preview after successful upload
-       setTimeout(() => {
-         if (previewUrl.startsWith("blob:")) {
-           URL.revokeObjectURL(previewUrl);
-         }
-       }, 1000);
-     } catch (error) {
-       console.error("Upload failed:", error);
-       alert("Failed to upload profile picture");
-       // Revert to old avatar if available
-       // if (user?.avatarUrl) {
-       //   setAvatar(user.avatarUrl);
-       // }
-     } finally {
-       setIsSavingAvatar(false);
-     }
-   };
- 
+  // POST API for the profile
+// POST API for the profile
+const handleSaveProfile = async () => {
+  if (!selectedAvatarFile) return;
+
+  const formData = new FormData();
+  formData.append("avatar", selectedAvatarFile);
+
+  try {
+    setIsSavingAvatar(true);
+
+    const uploadRes = await API("POST", URL_PATH.uploadProfile, formData);
+
+
+    // ✅ If backend returns profileUrl, show instantly (optional but best UX)
+    const newUrl = uploadRes?.data?.profileUrl; // ✅ FIX
+if (newUrl) setAvatar(`${newUrl}?t=${Date.now()}`); // ✅ cache-bust
+
+
+
+    // ✅ Refresh from DB (this is the important fix)
+    await fetchDashboardData();
+
+    // Cleanup
+    setSelectedAvatarFile(null);
+  } catch (error) {
+    console.error("Failed to save profile image", error);
+    alert("Failed to save profile image");
+  } finally {
+    setIsSavingAvatar(false);
+  }
+};
+
+const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  // Validate file size (e.g., max 5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    alert("File size should be less than 5MB");
+    return;
+  }
+
+  // Validate file type
+  const validTypes = ["image/jpeg", "image/png", "image/webp"];
+  if (!validTypes.includes(file.type)) {
+    alert("Please select a valid image (JPEG, PNG, or WebP)");
+    return;
+  }
+
+  // Cleanup old preview
+  if (avatar && avatar.startsWith("blob:")) {
+    URL.revokeObjectURL(avatar);
+  }
+
+  // Create preview
+  const previewUrl = URL.createObjectURL(file);
+  setAvatar(previewUrl);
+
+  try {
+    setIsSavingAvatar(true);
+
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    const uploadRes = await API("POST", URL_PATH.uploadProfile, formData);
+
+    // ✅ If backend returns profileUrl, show instantly (optional)
+   const newUrl = uploadRes?.data?.profileUrl; // ✅ FIX
+if (newUrl) setAvatar(`${newUrl}?t=${Date.now()}`); // cache buster
+
+    // ✅ Refresh from DB (this is the important fix)
+    await fetchDashboardData();
+
+    // Revoke preview after successful upload
+    setTimeout(() => {
+      if (previewUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    }, 1000);
+  } catch (error) {
+    console.error("Upload failed:", error);
+    alert("Failed to upload profile picture");
+    // If upload fails, fallback to DB value
+    await fetchDashboardData();
+  } finally {
+    setIsSavingAvatar(false);
+  }
+};
+
 
   const handleLogout = () => {
     localStorage.clear();
     navigate("/login");
   };
+
+  
 
   /* ==================== MEMOS ==================== */
 
@@ -447,10 +457,7 @@ const fetchDashboardData = useCallback(async () => {
       style={{ backgroundColor: colors.white }}
     >
       {/* TOP WELCOME BANNER */}
-      <div
-        className="w-full "
-        style={{  borderColor: colors.aqua }}
-      >
+      <div className="w-full " style={{ borderColor: colors.aqua }}>
         <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-end gap-4 px-4 sm:px-8 py-8 mb-8">
           <div className="space-y-1">
             <h1
@@ -587,40 +594,57 @@ const fetchDashboardData = useCallback(async () => {
                 </div>
               </div>
 
-              <div className="flex w-full gap-2 mt-4">
+              <div className="flex flex-col sm:flex-row w-full gap-3 mt-4">
+                {/* Global Rank */}
                 <Badge
-                  className="flex-1 rounded-xl py-6 justify-center border-none"
+                  className="
+      flex-1
+      rounded-xl
+      py-4 sm:py-6
+      text-sm sm:text-base
+      justify-center
+      items-center
+      border-none
+      text-center
+    "
                   style={{
                     backgroundColor: colors.cream,
                     color: colors.accent,
                   }}
                   variant="warning"
-                  icon={<FeatherTrophy className="w-4 h-4" />}
+                  icon={<FeatherTrophy className="w-4 h-4 sm:w-5 sm:h-5" />}
                 >
-                  Global Rank<br/>
-                   #{rankData.global.rank}
+                  <span className="block font-semibold">Global Rank</span>
+                  <span className="block text-lg sm:text-xl font-black">
+                    #{rankData.global.rank}
+                  </span>
                 </Badge>
 
+                {/* University Rank */}
                 <Badge
-                  className="flex-1 rounded-xl py-6  justify-center border-none"
+                  className="
+      flex-1
+      rounded-xl
+      py-4 sm:py-6
+      text-sm sm:text-base
+      justify-center
+      items-center
+      border-none
+      text-center
+    "
                   style={{
                     backgroundColor: colors.mint,
                     color: colors.secondary,
                   }}
                   variant="brand"
-                  icon={<FeatherAward className="w-4 h-4" />}
+                  icon={<FeatherAward className="w-4 h-4 sm:w-5 sm:h-5" />}
                 >
-                  University Rank<br /> #{rankData.university.rank}
+                  <span className="block font-semibold">University Rank</span>
+                  <span className="block text-lg sm:text-xl font-black">
+                    #{rankData.university.rank}
+                  </span>
                 </Badge>
               </div>
-
-              {/* {selectedAvatarFile && (
-                  <Button className="w-full mt-2 rounded-xl h-10 border-none font-bold" 
-                          style={{ backgroundColor: colors.accent, color: colors.primary }} 
-                          onClick={() => handleSaveProfile()} disabled={isSavingAvatar}>
-                    {isSavingAvatar ? "Saving..." : "Save Profile Image"}
-                  </Button>
-                )} */}
             </div>
             {/* Quick Update Buttons */}
             <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -713,111 +737,108 @@ const fetchDashboardData = useCallback(async () => {
                   ))}
                 </div>
               </div>
- {/* Projects */}
-<div className="space-y-3">
-  <p
-    className="text-[10px] font-black uppercase tracking-widest"
-    style={{ color: colors.primary }}
-  >
-    Projects
-  </p>
+              {/* Projects */}
+              <div className="space-y-3">
+                <p
+                  className="text-[10px] font-black uppercase tracking-widest"
+                  style={{ color: colors.primary }}
+                >
+                  Projects
+                </p>
 
-  {projects?.slice(0, 2).map((proj, i) => (
-    <div
-      key={i}
-      className="relative pl-4 pr-3 py-3 rounded-xl border transition hover:shadow-md"
-      style={{
-        backgroundColor: colors.cream,
-        borderColor: colors.aqua,
-      }}
-    >
-      {/* Left accent bar */}
-      <span
-        className="absolute left-0 top-3 bottom-3 w-1 rounded-full"
-        style={{ backgroundColor: colors.accent }}
-      />
+                {projects?.slice(0, 2).map((proj, i) => (
+                  <div
+                    key={i}
+                    className="relative pl-4 pr-3 py-3 rounded-xl border transition hover:shadow-md"
+                    style={{
+                      backgroundColor: colors.cream,
+                      borderColor: colors.aqua,
+                    }}
+                  >
+                    {/* Left accent bar */}
+                    <span
+                      className="absolute left-0 top-3 bottom-3 w-1 rounded-full"
+                      style={{ backgroundColor: colors.accent }}
+                    />
 
-      {/* Project index */}
-      <span
-        className="text-[9px] font-bold mb-1 inline-block"
-        style={{ color: colors.accent }}
-      >
-        Project {i + 1}
-      </span>
+                    {/* Project index */}
+                    <span
+                      className="text-[9px] font-bold mb-1 inline-block"
+                      style={{ color: colors.accent }}
+                    >
+                      Project {i + 1}
+                    </span>
 
-      <h4
-        className="text-[12px] font-bold leading-tight truncate"
-        style={{ color: colors.primary }}
-      >
-        {proj.title}
-      </h4>
+                    <h4
+                      className="text-[12px] font-bold leading-tight truncate"
+                      style={{ color: colors.primary }}
+                    >
+                      {proj.title}
+                    </h4>
 
-      <p
-        className="text-[10px] mt-1 leading-snug line-clamp-2"
-        style={{ color: colors.secondary }}
-      >
-        {proj.summary}
-      </p>
-    </div>
-  ))}
-</div>
+                    <p
+                      className="text-[10px] mt-1 leading-snug line-clamp-2"
+                      style={{ color: colors.secondary }}
+                    >
+                      {proj.summary}
+                    </p>
+                  </div>
+                ))}
+              </div>
 
+              {/* Certifications */}
+              <div className="space-y-3">
+                <p
+                  className="text-[10px] font-black uppercase tracking-widest"
+                  style={{ color: colors.secondary }}
+                >
+                  Certifications
+                </p>
 
+                {certifications?.slice(0, 2).map((cert, i) => (
+                  <div
+                    key={i}
+                    className="flex items-start gap-3 p-3 rounded-xl border shadow-sm"
+                    style={{
+                      backgroundColor: colors.mint,
+                      borderColor: colors.aqua,
+                    }}
+                  >
+                    {/* Icon */}
+                    <div className="mt-0.5">
+                      <FeatherAward
+                        className="w-4 h-4"
+                        style={{ color: colors.accent }}
+                      />
+                    </div>
 
- {/* Certifications */}
-<div className="space-y-3">
-  <p
-    className="text-[10px] font-black uppercase tracking-widest"
-    style={{ color: colors.secondary }}
-  >
-    Certifications
-  </p>
+                    {/* Text */}
+                    <div className="flex-1 min-w-0">
+                      <p
+                        className="text-[11px] font-bold truncate"
+                        style={{ color: colors.primary }}
+                      >
+                        {cert.name}
+                      </p>
 
-  {certifications?.slice(0, 2).map((cert, i) => (
-    <div
-      key={i}
-      className="flex items-start gap-3 p-3 rounded-xl border shadow-sm"
-      style={{
-        backgroundColor: colors.mint,
-        borderColor: colors.aqua,
-      }}
-    >
-      {/* Icon */}
-      <div className="mt-0.5">
-        <FeatherAward
-          className="w-4 h-4"
-          style={{ color: colors.accent }}
-        />
-      </div>
+                      <p
+                        className="text-[9px] mt-0.5 truncate"
+                        style={{ color: colors.secondary }}
+                      >
+                        Issued by {cert.issuedBy}
+                      </p>
+                    </div>
 
-      {/* Text */}
-      <div className="flex-1 min-w-0">
-        <p
-          className="text-[11px] font-bold truncate"
-          style={{ color: colors.primary }}
-        >
-          {cert.name}
-        </p>
-
-        <p
-          className="text-[9px] mt-0.5 truncate"
-          style={{ color: colors.secondary }}
-        >
-          Issued by {cert.issuedBy}
-        </p>
-      </div>
-
-      {/* Date */}
-      <p
-        className="text-[10px] font-semibold whitespace-nowrap"
-        style={{ color: colors.primary }}
-      >
-        {cert.issueYear}
-      </p>
-    </div>
-  ))}
-</div>
-
+                    {/* Date */}
+                    <p
+                      className="text-[10px] font-semibold whitespace-nowrap"
+                      style={{ color: colors.primary }}
+                    >
+                      {cert.issueYear}
+                    </p>
+                  </div>
+                ))}
+              </div>
 
               {/* Education & Certs */}
               <div className="space-y-3 pt-2">
@@ -1045,95 +1066,173 @@ const fetchDashboardData = useCallback(async () => {
 
             {/* Recommended Actions */}
             <div className="space-y-4">
-               <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-bold text-neutral-900">Recommended Actions</h3>
-                  <span className="text-xs font-bold text-yellow-600 bg-yellow-50 px-3 py-1 rounded-full border border-yellow-100">4 Actions Available</span>
+              {/* Header */}
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <h3 className="text-lg sm:text-xl font-bold text-neutral-900">
+                  Recommended Actions
+                </h3>
+
+                <span className="w-fit text-[10px] sm:text-xs font-bold text-yellow-600 bg-yellow-50 px-3 py-1 rounded-full border border-yellow-100">
+                  4 Actions Available
+                </span>
+              </div>
+
+              {/* Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                {/* Assessment */}
+                <div className="bg-white border border-neutral-200 p-4 sm:p-6 rounded-3xl sm:rounded-[2rem] hover:border-violet-300 transition-all group shadow-sm">
+                  <div className="flex justify-between items-start mb-4 sm:mb-6">
+                    <div className="p-3 bg-violet-50 rounded-2xl text-violet-600 group-hover:bg-violet-600 group-hover:text-white transition-colors">
+                      <FeatherFileText />
+                    </div>
+
+                    <Badge className="bg-violet-50 text-violet-600 border-none font-bold text-[10px] uppercase tracking-wider">
+                      +50 Skill
+                    </Badge>
+                  </div>
+
+                  <h4 className="text-base sm:text-lg font-bold mb-2">
+                    Complete Assessment
+                  </h4>
+                  <p className="text-sm text-neutral-500 mb-4 sm:mb-6 leading-relaxed">
+                    Begin evaluation and boost your credibility with
+                    role-specific eval.
+                  </p>
+
+                  {/* Footer row responsive */}
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[10px] font-bold text-violet-600 flex items-center gap-1">
+                        <FeatherRepeat className="w-3 h-3" /> Paid retakes: 1
+                      </span>
+                      <span className="text-[10px] font-bold text-green-600 flex items-center gap-1">
+                        <FeatherGift className="w-3 h-3" /> Free retakes: 1
+                      </span>
+                    </div>
+
+                    <Button
+                      variant="brand-primary"
+                      className="w-full sm:w-auto rounded-2xl bg-violet-700 hover:bg-violet-800 px-5 sm:px-6"
+                      onClick={() => handleNavigate("/assessment")}
+                    >
+                      Start Now
+                    </Button>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Assessment */}
-                  <div className="bg-white border border-neutral-200 p-6 rounded-[2rem] hover:border-violet-300 transition-all group shadow-sm">
-                    <div className="flex justify-between items-start mb-6">
-                      <div className="p-3 bg-violet-50 rounded-2xl text-violet-600 group-hover:bg-violet-600 group-hover:text-white transition-colors">
-                        <FeatherFileText />
-                      </div>
-                      <Badge className="bg-violet-50 text-violet-600 border-none font-bold text-[10px] uppercase tracking-wider">+50 Skill</Badge>
+                {/* Case Studies */}
+                <div className="bg-white border border-neutral-200 p-4 sm:p-6 rounded-3xl sm:rounded-[2rem] hover:border-green-300 transition-all group shadow-sm">
+                  <div className="flex justify-between items-start mb-4 sm:mb-6">
+                    <div className="p-3 bg-green-50 rounded-2xl text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors">
+                      <FeatherBookOpen />
                     </div>
-                    <h4 className="text-lg font-bold mb-2">Complete Assessment</h4>
-                    <p className="text-sm text-neutral-500 mb-6 leading-relaxed">Begin evaluation and boost your credibility with role-specific eval.</p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex flex-col gap-1">
-                        <span className="text-[10px] font-bold text-violet-600 flex items-center gap-1">
-                          <FeatherRepeat className="w-3 h-3" /> Paid retakes: 1
-                        </span>
-                        <span className="text-[10px] font-bold text-green-600 flex items-center gap-1">
-                          <FeatherGift className="w-3 h-3" /> Free retakes: 1
-                        </span>
-                      </div>
-                      <Button variant="brand-primary" className="rounded-2xl bg-violet-700 hover:bg-violet-800 px-6" onClick={() => handleNavigate("/assessment")}>
-                        Start Now
-                      </Button>
-                    </div>
+
+                    <Badge className="bg-green-50 text-green-600 border-none font-bold text-[10px] uppercase tracking-wider">
+                      +40 Exp
+                    </Badge>
                   </div>
 
-                  {/* Case Studies */}
-                  <div className="bg-white border border-neutral-200 p-6 rounded-[2rem] hover:border-green-300 transition-all group shadow-sm">
-                    <div className="flex justify-between items-start mb-6">
-                      <div className="p-3 bg-green-50 rounded-2xl text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors">
-                        <FeatherBookOpen />
-                      </div>
-                      <Badge className="bg-green-50 text-green-600 border-none font-bold text-[10px] uppercase tracking-wider">+40 Exp</Badge>
-                    </div>
-                    <h4 className="text-lg font-bold mb-2">Solve Case Studies</h4>
-                    <p className="text-sm text-neutral-500 mb-6 leading-relaxed">Solving cases shows recruiters your effort to increase your knowledge base.</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
-                        <FeatherClock className="w-3 h-3" /> 20 min
-                      </span>
-                      <Button variant="brand-primary" className="rounded-2xl bg-violet-700 hover:bg-violet-800 px-6" onClick={() => handleNavigate("/cases")}>
-                        Start Now
-                      </Button>
-                    </div>
+                  <h4 className="text-base sm:text-lg font-bold mb-2">
+                    Solve Case Studies
+                  </h4>
+                  <p className="text-sm text-neutral-500 mb-4 sm:mb-6 leading-relaxed">
+                    Solving cases shows recruiters your effort to increase your
+                    knowledge base.
+                  </p>
+
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
+                      <FeatherClock className="w-3 h-3" /> 20 min
+                    </span>
+
+                    <Button
+                      variant="brand-primary"
+                      className="w-full sm:w-auto rounded-2xl bg-violet-700 hover:bg-violet-800 px-5 sm:px-6"
+                      onClick={() => handleNavigate("/cases")}
+                    >
+                      Start Now
+                    </Button>
                   </div>
- {/* Hackathons */}
-                  <div className="bg-neutral-50 border border-neutral-200 p-6 rounded-[2rem] opacity-80 group shadow-sm">
-                    <div className="flex justify-between items-start mb-6">
-                      <div className="p-3 bg-neutral-200 rounded-2xl text-neutral-500">
-                        <FeatherUsers />
-                      </div>
-                      <Badge variant="neutral" icon={<FeatherLock />} className="bg-gray-100 text-gray-600 border-none font-bold text-[10px] uppercase">Coming Soon</Badge>
+                </div>
+
+                {/* Hackathons */}
+                <div className="bg-neutral-50 border border-neutral-200 p-4 sm:p-6 rounded-3xl sm:rounded-[2rem] opacity-80 group shadow-sm">
+                  <div className="flex justify-between items-start mb-4 sm:mb-6">
+                    <div className="p-3 bg-neutral-200 rounded-2xl text-neutral-500">
+                      <FeatherUsers />
                     </div>
-                    <h4 className="text-lg font-bold mb-2 text-neutral-700">Participate in Hackathons</h4>
-                    <p className="text-sm text-neutral-400 mb-6 leading-relaxed">Collaborate and build visibility with other PMs in upcoming events.</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
-                        <FeatherCalendar className="w-3 h-3" /> Starts in 5 days
-                      </span>
-                      <Button disabled className="rounded-2xl bg-neutral-200 text-neutral-500 cursor-not-allowed border-none px-6">Notify Me</Button>
-                    </div>
+
+                    <Badge
+                      variant="neutral"
+                      icon={<FeatherLock />}
+                      className="bg-gray-100 text-gray-600 border-none font-bold text-[10px] uppercase"
+                    >
+                      Coming Soon
+                    </Badge>
                   </div>
 
-                  {/* Courses */}
-                  <div className="bg-neutral-50 border border-neutral-200 p-6 rounded-[2rem] opacity-80 group shadow-sm">
-                    <div className="flex justify-between items-start mb-6">
-                      <div className="p-3 bg-neutral-200 rounded-2xl text-neutral-500">
-                        <FeatherBook />
-                      </div>
-                      <Badge variant="neutral" icon={<FeatherLock />} className="bg-gray-100 text-gray-600 border-none font-bold text-[10px] uppercase">Coming Soon</Badge>
+                  <h4 className="text-base sm:text-lg font-bold mb-2 text-neutral-700">
+                    Participate in Hackathons
+                  </h4>
+                  <p className="text-sm text-neutral-400 mb-4 sm:mb-6 leading-relaxed">
+                    Collaborate and build visibility with other PMs in upcoming
+                    events.
+                  </p>
+
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
+                      <FeatherCalendar className="w-3 h-3" /> Starts in 5 days
+                    </span>
+
+                    <Button
+                      disabled
+                      className="w-full sm:w-auto rounded-2xl bg-neutral-200 text-neutral-500 cursor-not-allowed border-none px-5 sm:px-6"
+                    >
+                      Notify Me
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Courses */}
+                <div className="bg-neutral-50 border border-neutral-200 p-4 sm:p-6 rounded-3xl sm:rounded-[2rem] opacity-80 group shadow-sm">
+                  <div className="flex justify-between items-start mb-4 sm:mb-6">
+                    <div className="p-3 bg-neutral-200 rounded-2xl text-neutral-500">
+                      <FeatherBook />
                     </div>
-                    <h4 className="text-lg font-bold mb-2 text-neutral-700">Courses</h4>
-                    <p className="text-sm text-neutral-400 mb-6 leading-relaxed">Complete structured learning path to earn verified PM badges.</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
-                        <FeatherClock className="w-3 h-3" /> 8 weeks
-                      </span>
-                      <Button disabled className="rounded-2xl bg-neutral-200 text-neutral-500 cursor-not-allowed border-none px-6">Notify Me</Button>
-                    </div>
+
+                    <Badge
+                      variant="neutral"
+                      icon={<FeatherLock />}
+                      className="bg-gray-100 text-gray-600 border-none font-bold text-[10px] uppercase"
+                    >
+                      Coming Soon
+                    </Badge>
+                  </div>
+
+                  <h4 className="text-base sm:text-lg font-bold mb-2 text-neutral-700">
+                    Courses
+                  </h4>
+                  <p className="text-sm text-neutral-400 mb-4 sm:mb-6 leading-relaxed">
+                    Complete structured learning path to earn verified PM
+                    badges.
+                  </p>
+
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
+                      <FeatherClock className="w-3 h-3" /> 8 weeks
+                    </span>
+
+                    <Button
+                      disabled
+                      className="w-full sm:w-auto rounded-2xl bg-neutral-200 text-neutral-500 cursor-not-allowed border-none px-5 sm:px-6"
+                    >
+                      Notify Me
+                    </Button>
                   </div>
                 </div>
               </div>
             </div>
-
+          </div>
 
           {/* --- RIGHT SIDEBAR --- */}
           <div className="flex w-full flex-col gap-6 lg:w-[340px] lg:flex-none">
