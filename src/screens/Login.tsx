@@ -99,15 +99,6 @@ function Login() {
     }
   };
 
-  // OAuth handlers
-  // const handleOAuth = (provider: "google" | "linkedin") => {
-  //   if (provider === "google") {
-  //     window.location.href = `${BASE_URL}/auth/google`;
-  //   }
-  //   if (provider === "linkedin") {
-  //     window.location.href = `${BASE_URL}/auth/linkedin`;
-  //   }
-  // };
  const handleOAuth = (provider: "google" | "linkedin") => {
   if (provider === "google") {
     window.location.href = "http://localhost:5000/api/auth/google";

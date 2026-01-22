@@ -509,12 +509,12 @@ export default function Experience() {
         roleTitle: typeof e.jobTitle === "string" ? e.jobTitle : "",
         typeOfRole: typeof e.typeOfRole === "string" ? e.typeOfRole : undefined,
         company: typeof e.companyName === "string" ? e.companyName : "",
-        startDate: e.startYear && e.startMonth ? `${String(e.startMonth).padStart(2, "0")}/${e.startYear}` : "",
+        startDate: e.startYear ? `${e.startYear}` : "",
         endDate: e.currentlyWorking
           ? undefined
-          : e.endYear && e.endMonth
-            ? `${String(e.endMonth).padStart(2, "0")}/${e.endYear}`
-            : undefined,
+          : e.endYear
+          ? `${e.endYear}`
+          : undefined,
         currentlyWorking: Boolean(e.currentlyWorking),
         description:
           typeof e.description === "string" ? e.description : undefined,
