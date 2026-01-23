@@ -183,7 +183,7 @@ export default function Projects() {
       return false;
     }
 
-    
+
     const normalizedName = toTitleCase(normalizeSpaces(name));
 
     const duplicate = projects.some(
@@ -296,12 +296,12 @@ export default function Projects() {
 
   return (
     <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-6 py-10">
-      <div className="w-full max-w-[1100px] flex flex-col lg:flex-row gap-6 lg:gap-8 justify-center">
+      <div className="w-full max-w-[1100px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
         {/* Left card */}
         <main
           className="
     w-full
-    lg:max-w-[480px]
+    md:max-w-[480px]
     flex flex-col gap-6
     rounded-[28px]
     border border-neutral-300
@@ -318,7 +318,7 @@ export default function Projects() {
               icon={<FeatherArrowLeft />}
               onClick={() => navigate(-1)}
             />
-            <div className="flex-1 w-full max-w-full lg:max-w-[420px]">
+            <div className="flex-1 w-full max-w-full md:max-w-[420px]">
               <div className="flex items-center gap-3">
                 {[...Array(6)].map((_, i) => (
                   <div
@@ -344,26 +344,26 @@ export default function Projects() {
             <p className="text-xs text-neutral-500">Share your best work</p>
           </header>
 
-        {/* Selected projects preview list */}
-<section className="flex w-full flex-col gap-3">
-  {projects.map((p) => {
-    const isSelected = selectedProject?.id === p.id;
+          {/* Selected projects preview list */}
+          <section className="flex w-full flex-col gap-3">
+            {projects.map((p) => {
+              const isSelected = selectedProject?.id === p.id;
 
-    return (
-      <div
-        key={p.id}
-        role="button"
-        tabIndex={0}
-        onClick={() =>
-          setSelectedProject(isSelected ? null : p)
-        }
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            setSelectedProject(isSelected ? null : p);
-          }
-        }}
-        className="
+              return (
+                <div
+                  key={p.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() =>
+                    setSelectedProject(isSelected ? null : p)
+                  }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setSelectedProject(isSelected ? null : p);
+                    }
+                  }}
+                  className="
           rounded-3xl
           border border-neutral-300
           bg-white
@@ -375,100 +375,100 @@ export default function Projects() {
           focus:ring-2
           focus:ring-violet-500
         "
-      >
-        {/* 🔹 TOP ROW */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3 min-w-0">
-            <Avatar
-              size="large"
-              square
-              className="!rounded-2xl bg-violet-200 text-violet-700 font-semibold"
-            >
-              {p.name
-                .split(" ")
-                .slice(0, 2)
-                .map((s) => s[0])
-                .join("")}
-            </Avatar>
+                >
+                  {/* 🔹 TOP ROW */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <Avatar
+                        size="large"
+                        square
+                        className="!rounded-2xl bg-violet-200 text-violet-700 font-semibold"
+                      >
+                        {p.name
+                          .split(" ")
+                          .slice(0, 2)
+                          .map((s) => s[0])
+                          .join("")}
+                      </Avatar>
 
-            <div className="flex flex-col min-w-0">
-              <span className="text-sm font-semibold text-neutral-900 truncate">
-                {p.name}
-              </span>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-sm font-semibold text-neutral-900 truncate">
+                          {p.name}
+                        </span>
 
-              {p.role && (
-                <span className="text-xs text-neutral-500 truncate">
-                  {p.role}
-                </span>
-              )}
-            </div>
-          </div>
+                        {p.role && (
+                          <span className="text-xs text-neutral-500 truncate">
+                            {p.role}
+                          </span>
+                        )}
+                      </div>
+                    </div>
 
-          <IconButton
-            size="small"
-            icon={<FeatherX />}
-            aria-label={`Delete project ${p.name}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              setDeleteProjectId(p.id);
-            }}
-            className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
-          />
-        </div>
+                    <IconButton
+                      size="small"
+                      icon={<FeatherX />}
+                      aria-label={`Delete project ${p.name}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteProjectId(p.id);
+                      }}
+                      className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
+                    />
+                  </div>
 
-        {/* 🔹 EXPANDED DETAILS */}
-        {isSelected && (
-          <>
-            <div className="my-4 border-t border-neutral-200" />
+                  {/* 🔹 EXPANDED DETAILS */}
+                  {isSelected && (
+                    <>
+                      <div className="my-4 border-t border-neutral-200" />
 
-            <div className="flex flex-col gap-3 text-sm text-neutral-800 px-1">
-              <div>
-                <span className="font-medium">Project name:</span>{" "}
-                {p.name}
-              </div>
-              <div>
-                <span className="font-medium">Your Role:</span>{" "}
-                {p.role}
-              </div>
-              {p.summary && (
-                <div>
-                  <span className="font-medium">Summary:</span>{" "}
-                  {p.summary}
+                      <div className="flex flex-col gap-3 text-sm text-neutral-800 px-1">
+                        <div>
+                          <span className="font-medium">Project name:</span>{" "}
+                          {p.name}
+                        </div>
+                        <div>
+                          <span className="font-medium">Your Role:</span>{" "}
+                          {p.role}
+                        </div>
+                        {p.summary && (
+                          <div>
+                            <span className="font-medium">Summary:</span>{" "}
+                            {p.summary}
+                          </div>
+                        )}
+
+                        {p.outcome && (
+                          <div>
+                            <span className="font-medium">Outcome:</span>{" "}
+                            {p.outcome}
+                          </div>
+
+                        )}
+
+                        {p.link && (
+                          <div>
+                            <span className="font-medium">Project link:</span>{" "}
+                            <a
+                              href={p.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-violet-700 underline break-all"
+                              onClick={(e) => e.stopPropagation()} // 🚫 don’t collapse card
+                            >
+                              {p.link}
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
-              )}
-
-              {p.outcome && (
-                <div>
-                  <span className="font-medium">Outcome:</span>{" "}
-                  {p.outcome}
-                </div>
-                
-              )}
-
-              {p.link && (
-        <div>
-          <span className="font-medium">Project link:</span>{" "}
-          <a
-            href={p.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-violet-700 underline break-all"
-            onClick={(e) => e.stopPropagation()} // 🚫 don’t collapse card
-          >
-            {p.link}
-          </a>
-        </div>
-      )}
-            </div>
-          </>
-        )}
-      </div>
-    );
-  })}
-</section>
+              );
+            })}
+          </section>
 
 
-{/* 
+          {/* 
           {selectedProject && (
             <div className="rounded-3xl border border-neutral-300 bg-white px-6 py-5">
               <div className="flex items-center justify-between mb-4">
@@ -584,8 +584,8 @@ export default function Projects() {
             </TextField>
 
             <TextField label={<span className="text-[12px]">Link </span>}
-            helpText="" 
-            className={scTextFieldClass}>
+              helpText=""
+              className={scTextFieldClass}>
               <TextField.Input
                 placeholder="https://"
                 value={link}
@@ -624,11 +624,10 @@ export default function Projects() {
               disabled={!canContinue || isSubmitting}
               className={`
     w-full h-10 rounded-full transition-all
-    ${
-      !canContinue || isSubmitting
-        ? "bg-violet-300 text-white cursor-not-allowed"
-        : "bg-violet-700 text-white shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
-    }
+    ${!canContinue || isSubmitting
+                  ? "bg-violet-300 text-white cursor-not-allowed"
+                  : "bg-violet-700 text-white shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
+                }
   `}
             >
               {isSubmitting ? "Saving..." : "Continue"}
@@ -637,7 +636,7 @@ export default function Projects() {
         </main>
 
         {/* Right panel */}
-        <aside className="w-full lg:w-72 shrink-0 mt-6 lg:mt-0">
+        <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
           <div className="lg:sticky lg:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
             <h3 className="text-[22px] text-neutral-900">Your Experience Index</h3>
 
