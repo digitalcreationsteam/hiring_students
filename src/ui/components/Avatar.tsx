@@ -82,6 +82,12 @@ const AvatarRoot = React.forwardRef<HTMLDivElement, AvatarRootProps>(
               }
             )}
             src={image}
+            onError={(e) => {
+              // fallback to a safe default image if load fails
+              const target = e.currentTarget as HTMLImageElement;
+              target.onerror = null;
+              target.src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400";
+            }}
           />
         ) : null}
       </div>
