@@ -185,6 +185,10 @@ function AssessmentPage() {
 
       setAttemptId(res.attemptId);
 
+      // ✅ ADD THIS
+  sessionStorage.setItem(`startedAt-${res.attemptId}`, Date.now().toString());
+  sessionStorage.setItem("attemptId", res.attemptId);
+
       navigate("/assessment", {
         replace: true,
         state: {
@@ -236,8 +240,18 @@ function AssessmentPage() {
     return startTimer(expiry);
   }, [attemptId, expiryReady]);
 
+  
+
   useEffect(() => {
     if (!attemptId || !userId) return;
+
+      // ✅ ADD THIS (store start time only once per attempt)
+  const startedKey = `startedAt-${attemptId}`;
+  if (!sessionStorage.getItem(startedKey)) {
+    sessionStorage.setItem(startedKey, Date.now().toString());
+  }
+  // optional safety
+  sessionStorage.setItem("attemptId", attemptId);
 
     const fetchQuestions = async () => {
       const res = await API(
@@ -292,7 +306,7 @@ function AssessmentPage() {
     };
 
     fetchQuestions();
-  }, [attemptId, userId]);
+  }, [attemptId, userId, location.state?.expiresAt]);
 
   //=============== POST API FOR SAVE Q OPTION ==============//
   const saveAnswerToServer = (
@@ -325,27 +339,38 @@ function AssessmentPage() {
   };
 
   //=============== GET API FOR SUBMIT ASSESSMENT============//
-  const handleSubmit = async () => {
-    if (!attemptId || submitLockRef.current) return;
+const handleSubmit = async () => {
+  if (!attemptId || submitLockRef.current) return;
 
-    submitLockRef.current = true;
-    setSaving(true);
+  submitLockRef.current = true;
+  setSaving(true);
 
-    try {
-      await API(
-        "POST",
-        URL_PATH.submitAssessment,
-        { attemptId },
-        { "user-id": userId }
-      );
+  try {
+    await API(
+      "POST",
+      URL_PATH.submitAssessment,
+      { attemptId },
+      { "user-id": userId }
+    );
 
-      localStorage.setItem("attemptId", attemptId);
-      navigate("/assessment-results");
-    } catch (err) {
-      submitLockRef.current = false;
-      console.error("Submit failed", err);
-    }
-  };
+    localStorage.setItem("attemptId", attemptId);
+    sessionStorage.setItem("attemptId", attemptId);
+
+    sessionStorage.setItem(`submittedAt-${attemptId}`, Date.now().toString());
+
+
+    
+
+    navigate("/assessment-results", { state: { attemptId } });
+  } catch (err) {
+    submitLockRef.current = false;
+    console.error("Submit failed", err);
+  } finally {
+    setSaving(false);
+  }
+};
+
+
 
   // --- RENDER NAVIGATOR NUMBERS (keeps UI markup/style) ---
   const renderNavigatorItem = (qIndex: number) => {
@@ -416,6 +441,8 @@ const totalMarks = useMemo(() => {
 
 
   if (loading) return <div>Loading assessment...</div>;
+
+
 
   return (
     <div className="min-h-screen w-full bg-neutral-50 flex justify-center px-4 py-4 sm:py-6 lg:py-12">
@@ -551,11 +578,6 @@ const totalMarks = useMemo(() => {
                     Product Management Fundamentals Assessment
                   </span>
                 </div>
-
-                {/* ✅ Total marks info */}
-                <span className="text-xs font-semibold text-neutral-500 whitespace-nowrap">
-                  Total: {totalMarks}
-                </span>
                 <span className="px-3 py-1 rounded-full text-xs font-bold bg-violet-100 text-violet-700 border border-violet-200">
                     {currentMarks} Marks
                   </span>

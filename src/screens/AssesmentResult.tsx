@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Badge } from "../ui/components/Badge";
 import { Button } from "../ui/components/Button";
 import { IconWithBackground } from "../ui/components/IconWithBackground";
@@ -19,6 +19,11 @@ import { FeatherArrowLeft } from "@subframe/core";
 import { useNavigate, useLocation } from "react-router-dom";
 import API, { URL_PATH } from "src/common/API";
 
+
+type RankItem = {
+  rank: number | string;
+};
+
 function AssessmentResult() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -30,8 +35,25 @@ function AssessmentResult() {
     maxSkillIndex: number;
   } | null>(null);
 
-  // GET API TO FETCH THE RESULT
-  const fetchResult = React.useCallback(async () => {
+  const [submittedAt, setSubmittedAt] = useState<string | null>(null);
+  const [timeTakenSeconds, setTimeTakenSeconds] = useState<number | null>(null);
+
+  const [rankData, setRankData] = useState<{
+    global: RankItem;
+    country: RankItem;
+    state: RankItem;
+    city: RankItem;
+    university: RankItem;
+  }>({
+    global: { rank: "-" },
+    country: { rank: "-" },
+    state: { rank: "-" },
+    city: { rank: "-" },
+    university: { rank: "-" },
+  });
+
+  // ✅ GET API TO FETCH THE RESULT
+  const fetchResult = useCallback(async () => {
     const attemptId =
       location.state?.attemptId ||
       localStorage.getItem("attemptId") ||
@@ -42,27 +64,101 @@ function AssessmentResult() {
       return;
     }
 
+      const localSubmitted = sessionStorage.getItem(`submittedAt-${attemptId}`);
+  if (localSubmitted) {
+    setSubmittedAt(new Date(Number(localSubmitted)).toISOString());
+  }
+
+  const localStart = sessionStorage.getItem(`startedAt-${attemptId}`);
+  if (localStart && localSubmitted) {
+    const diff = Math.max(
+      0,
+      Math.floor((Number(localSubmitted) - Number(localStart)) / 1000)
+    );
+    setTimeTakenSeconds(diff);
+  }
+
     try {
       const res = await API("GET", `${URL_PATH.result}?attemptId=${attemptId}`);
 
       console.log("FINAL RESPONSE:", res);
+
       setResult({
-        skillIndex: res.hireabilityIndex.skillIndexScore,
-        maxSkillIndex: res.hireabilityIndex.skillIndexTotal,
+        skillIndex: res?.hireabilityIndex?.skillIndexScore ?? 0,
+        maxSkillIndex: res?.hireabilityIndex?.skillIndexTotal ?? 0,
       });
+
+      // ✅ 1) submittedAt (backend first)
+      const submitted: string | null =
+        res?.attempt?.submittedAt ||
+        res?.submittedAt ||
+        res?.attempt?.endedAt ||
+        null;
+
+      if (submitted) {
+        setSubmittedAt(submitted);
+      } else {
+        // fallback: if you stored locally
+        const localSubmitted = sessionStorage.getItem(`submittedAt-${attemptId}`);
+        if (localSubmitted) {
+          setSubmittedAt(new Date(Number(localSubmitted)).toISOString());
+        }
+      }
+
+      // ✅ 2) time taken (backend first)
+      const takenSeconds: number | null =
+        res?.attempt?.timeTakenSeconds ??
+        res?.timeTakenSeconds ??
+        res?.attempt?.durationSeconds ??
+        null;
+
+      if (typeof takenSeconds === "number") {
+        setTimeTakenSeconds(takenSeconds);
+      } else {
+        // fallback compute using stored startedAt/submittedAt
+        const start = sessionStorage.getItem(`startedAt-${attemptId}`);
+        const end = sessionStorage.getItem(`submittedAt-${attemptId}`);
+        if (start && end) {
+          const diff = Math.max(0, Math.floor((Number(end) - Number(start)) / 1000));
+          setTimeTakenSeconds(diff);
+        }
+      }
     } catch (error) {
       console.error("Failed to fetch result", error);
       setResult(null);
     } finally {
       setIsResultLoading(false);
     }
+  }, [location.state?.attemptId]);
+
+  // ✅ FETCH RANKS
+  const fetchRanks = useCallback(async () => {
+    try {
+      const res = await API("GET", URL_PATH.calculateExperienceIndex);
+
+      console.log("fetchRanks response:", res);
+      if (!res) return;
+
+      const rank = res?.rank ?? {};
+
+      setRankData({
+        global: { rank: rank?.globalRank ?? "-" },
+        country: { rank: rank?.countryRank ?? "-" },
+        state: { rank: rank?.stateRank ?? "-" },
+        city: { rank: rank?.cityRank ?? "-" },
+        university: { rank: rank?.universityRank ?? rank?.universityrank ?? "-" },
+      });
+    } catch (err) {
+      console.error("fetchRanks failed:", err);
+    }
   }, []);
 
   useEffect(() => {
     fetchResult();
-  }, [fetchResult]);
+    fetchRanks();
+  }, [fetchResult, fetchRanks]);
 
-  ////////////////////////////
+  // ✅ LOADING STATE
   if (isResultLoading) {
     return (
       <div className="w-full h-[60vh] flex items-center justify-center">
@@ -70,6 +166,27 @@ function AssessmentResult() {
       </div>
     );
   }
+
+  // ✅ HELPERS (add exactly here)
+  const formatDate = (iso?: string | null) => {
+    if (!iso) return "--";
+    return new Date(iso).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  const formatDuration = (seconds?: number | null) => {
+    if (typeof seconds !== "number" || seconds < 0) return "--";
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m} min ${s} sec`;
+  };
+
+  const formattedSubmittedDate = formatDate(submittedAt);
+  const formattedTimeTaken = formatDuration(timeTakenSeconds);
+
 
   return (
     <div className="w-full bg-neutral-50 py-12">
@@ -186,8 +303,7 @@ function AssessmentResult() {
             <FeatherCalendar className="text-sm text-green-600" />
             <div className="flex flex-col">
               <span className="text-[14px] font-medium text-default-font">
-                Dec 15, 2024
-              </span>
+{formattedSubmittedDate}              </span>
               <span className="text-xs text-subtext-color">Completed</span>
             </div>
           </div>
@@ -198,7 +314,7 @@ function AssessmentResult() {
             <FeatherClock className="text-sm text-violet-600" />
             <div className="flex flex-col">
               <span className="text-[14px] font-medium text-default-font">
-                27 minutes
+  {formattedTimeTaken}
               </span>
               <span className="text-xs text-subtext-color">Time Taken</span>
             </div>
@@ -220,58 +336,64 @@ function AssessmentResult() {
         </div>
 
         <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {/* University */}
-          <div className="flex min-w-[220px] grow flex-col items-center gap-3 rounded-3xl border border-violet-200 bg-gradient-to-b from-[#F4F2FF] to-white px-6 py-8 shadow-md">
-            <IconWithBackground
-              className="text-yellow-700 bg-yellow-100 rounded-full text-[20px]"
-              variant="warning"
-              size="large"
-              icon={<FeatherAward />}
-            />
-            <span className="text-lg font-semibold text-default-font">23</span>
-            <span className="text-sm text-subtext-color">
-              University Ranking
-            </span>
-          </div>
+  {/* University */}
+  <div className="flex min-w-[220px] grow flex-col items-center gap-3 rounded-3xl border border-violet-200 bg-gradient-to-b from-[#F4F2FF] to-white px-6 py-8 shadow-md">
+    <IconWithBackground
+      className="text-yellow-700 bg-yellow-100 rounded-full text-[20px]"
+      variant="warning"
+      size="large"
+      icon={<FeatherAward />}
+    />
+    <span className="text-lg font-semibold text-default-font">
+      {rankData.university.rank !== "-" ? `#${rankData.university.rank}` : "--"}
+    </span>
+    <span className="text-sm text-subtext-color">University Ranking</span>
+  </div>
 
-          {/* City */}
-          <div className="flex min-w-[220px] grow flex-col items-center gap-3 rounded-3xl border border-violet-200 bg-gradient-to-b from-[#F4F2FF] to-white px-6 py-8 shadow-md">
-            <IconWithBackground
-              className="text-violet-700 bg-violet-100 rounded-full text-[20px]"
-              variant="brand"
-              size="large"
-              icon={<FeatherMapPin />}
-            />
-            <span className="text-lg font-semibold text-default-font">234</span>
-            <span className="text-sm text-subtext-color">City Ranking</span>
-          </div>
+  {/* City */}
+  <div className="flex min-w-[220px] grow flex-col items-center gap-3 rounded-3xl border border-violet-200 bg-gradient-to-b from-[#F4F2FF] to-white px-6 py-8 shadow-md">
+    <IconWithBackground
+      className="text-violet-700 bg-violet-100 rounded-full text-[20px]"
+      variant="brand"
+      size="large"
+      icon={<FeatherMapPin />}
+    />
+    <span className="text-lg font-semibold text-default-font">
+      {rankData.city.rank !== "-" ? `#${rankData.city.rank}` : "--"}
+    </span>
+    <span className="text-sm text-subtext-color">City Ranking</span>
+  </div>
 
-          {/* Country */}
-          <div className="flex min-w-[220px] grow flex-col items-center gap-3 rounded-3xl border border-violet-200 bg-gradient-to-b from-[#F4F2FF] to-white px-6 py-8 shadow-md">
-            <IconWithBackground
-              className="text-violet-700 bg-violet-100 rounded-full text-[20px]"
-              variant="brand"
-              size="large"
-              icon={<FeatherMap />}
-            />
-            <span className="text-lg font-semibold text-default-font">456</span>
-            <span className="text-sm text-subtext-color">Country Ranking</span>
-          </div>
+  {/* Country */}
+  <div className="flex min-w-[220px] grow flex-col items-center gap-3 rounded-3xl border border-violet-200 bg-gradient-to-b from-[#F4F2FF] to-white px-6 py-8 shadow-md">
+    <IconWithBackground
+      className="text-violet-700 bg-violet-100 rounded-full text-[20px]"
+      variant="brand"
+      size="large"
+      icon={<FeatherMap />}
+    />
+    <span className="text-lg font-semibold text-default-font">
+      {rankData.country.rank !== "-" ? `#${rankData.country.rank}` : "--"}
+    </span>
+    <span className="text-sm text-subtext-color">Country Ranking</span>
+  </div>
 
-          {/* Global */}
-          <div className="flex min-w-[220px] grow flex-col items-center gap-3 rounded-3xl border border-violet-200 bg-gradient-to-b from-[#F4F2FF] to-white px-6 py-8 shadow-md">
-            <IconWithBackground
-              className="text-violet-700 bg-violet-100 rounded-full text-[20px]"
-              variant="brand"
-              size="large"
-              icon={<FeatherGlobe />}
-            />
-            <span className="text-lg font-semibold text-default-font">
-              4,567
-            </span>
-            <span className="text-sm text-subtext-color">Global Ranking</span>
-          </div>
-        </div>
+  {/* Global */}
+  <div className="flex min-w-[220px] grow flex-col items-center gap-3 rounded-3xl border border-violet-200 bg-gradient-to-b from-[#F4F2FF] to-white px-6 py-8 shadow-md">
+    <IconWithBackground
+      className="text-violet-700 bg-violet-100 rounded-full text-[20px]"
+      variant="brand"
+      size="large"
+      icon={<FeatherGlobe />}
+    />
+    <span className="text-lg font-semibold text-default-font">
+      {rankData.global.rank !== "-" ? `#${rankData.global.rank}` : "--"}
+    </span>
+    <span className="text-sm text-subtext-color">Global Ranking</span>
+  </div>
+</div>
+
+
 
         <div className="flex w-full flex-col items-start gap-6 rounded-3xl border border-solid border-neutral-border bg-white px-8 py-8 shadow-md">
           <div className="flex w-full items-center gap-3">
