@@ -6,8 +6,7 @@ import axios from "axios";
 /* =========================================
    🌐 BASE URL
 ========================================= */
-// export const BASE_URL = "http://localhost:5000/api";
-export const BASE_URL = "http://localhost:5001/api";
+export const BASE_URL = "http://localhost:5000/api";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -97,7 +96,7 @@ export const URL_PATH = {
   getAttemptQuestions: "/user/assessment/getAttemptQuestions",
   saveAnswer: "/user/assessment/saveAnswer",
   submitAssessment: "/user/assessment/submit",
-  getUserDomainSkils:"/user/getUserDomainSkills",
+  getUserDomainSkils: "/user/getUserDomainSkills",
 
   createSubscription: "/subscription/create",
   verifyPayment: "/subscription/verify",
