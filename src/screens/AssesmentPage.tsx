@@ -17,6 +17,7 @@ type OptionKey = 1 | 2 | 3 | 4;
 type Question = {
   id: string;
   prompt: string;
+  marks: number;
   options: {
     key: OptionKey;
     title: string;
@@ -256,15 +257,32 @@ function AssessmentPage() {
       }
       setExpiryReady(true);
 
-      const mapped: Question[] = res.questions.map((q: any) => ({
-        id: q._id,
-        prompt: q.question,
-        options: q.options.map((opt: string, i: number) => ({
-          key: (i + 1) as OptionKey,
-          title: `${["A", "B", "C", "D"][i]}. ${opt}`,
-          description: "",
-        })),
-      }));
+      // const mapped: Question[] = res.questions.map((q: any) => ({
+      //   id: q._id,
+      //   prompt: q.question,
+      //   options: q.options.map((opt: string, i: number) => ({
+      //     key: (i + 1) as OptionKey,
+      //     title: `${["A", "B", "C", "D"][i]}. ${opt}`,
+      //     description: "",
+      //   })),
+      // }));
+
+      const mapped: Question[] = res.questions.map((q: any, idx: number) => ({
+  id: q._id,
+  prompt: q.question,
+
+  // ✅ 1st priority: backend sends marks
+  // common keys: marks / points / score
+  // ✅ fallback: 5 marks default (you can change)
+  marks: Number(q.marks ?? q.points ?? q.score ?? 5),
+
+  options: q.options.map((opt: string, i: number) => ({
+    key: (i + 1) as OptionKey,
+    title: `${["A", "B", "C", "D"][i]}. ${opt}`,
+    description: "",
+  })),
+}));
+
 
       setQuestions(mapped);
       setAnswers((prev) =>
@@ -389,6 +407,14 @@ function AssessmentPage() {
   // Current question to show
   const currentQuestion = questions[currentIndex];
 
+  const currentMarks = currentQuestion?.marks ?? 0;
+
+const totalMarks = useMemo(() => {
+  return questions.reduce((sum, q) => sum + (q.marks ?? 0), 0);
+}, [questions]);
+
+
+
   if (loading) return <div>Loading assessment...</div>;
 
   return (
@@ -510,9 +536,31 @@ function AssessmentPage() {
               </span>
             </div>
 
-            <span className="w-full text-lg sm:text-xl lg:text-heading-3 font-heading-3 text-neutral-700">
+            {/* <span className="w-full text-lg sm:text-xl lg:text-heading-3 font-heading-3 text-neutral-700">
               Product Management Fundamentals Assessment
-            </span>
+            </span> */}
+
+            <div className="w-full flex flex-col gap-2">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
+                  {/* ✅ Marks badge (front of title) */}
+                  
+
+                  {/* ✅ Title */}
+                  <span className="text-lg sm:text-xl lg:text-heading-3 font-heading-3 text-neutral-700">
+                    Product Management Fundamentals Assessment
+                  </span>
+                </div>
+
+                {/* ✅ Total marks info */}
+                <span className="text-xs font-semibold text-neutral-500 whitespace-nowrap">
+                  Total: {totalMarks}
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-violet-100 text-violet-700 border border-violet-200">
+                    {currentMarks} Marks
+                  </span>
+              </div>
+            </div>
 
             {/* Bottom horizontal line */}
             <div className="w-full h-[1px] bg-gray-300 my-2 flex-shrink-0" />

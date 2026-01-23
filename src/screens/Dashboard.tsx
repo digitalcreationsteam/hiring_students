@@ -208,74 +208,46 @@ export default function Dashboard() {
 
 
   /* ==================== API CALLS ==================== */
-  const fetchDashboardData = useCallback(async () => {
+
+ const fetchDashboardData = useCallback(async () => {
+  try {
     const res = await API("GET", URL_PATH.calculateExperienceIndex);
 
-    if (!res) return;
-
-    setUser({
-      name: res?.fullName || "",
-      domain: res?.domain || "Professional",
-      location: formatLocation(res?.city, res?.state),
-    });
-    // Do not overwrite avatar here; dashboard includes documents.profileUrl
-    if (res?.profileUrl) {
-      console.log("fetchUserProfile: unexpected profileUrl:", res.profileUrl);
-    }
-
-  }, []);
-
-  const fetchDashboardData = useCallback(async () => {
-    const res = await API("GET", URL_PATH.calculateExperienceIndex);
-
-    // DEBUG: log response to inspect documents.profileUrl
-    // eslint-disable-next-line no-console
     console.log("fetchDashboardData response:", res);
     if (!res) return;
 
-    /* ==================== AVATAR ==================== */
+    /* DEMOGRAPHICS */
+    const demo = res?.data?.demographics?.[0];
+    setUser({
+      name: demo?.fullName || "",
+      domain: "Professional",
+      location: formatLocation(demo?.city, demo?.state),
+    });
+
+    /* AVATAR */
     const profileFromServer = res?.documents?.profileUrl;
-    // Normalize URL: if server returned a path, prefix with backend origin
     let normalizedProfile: string | null = null;
+
     if (profileFromServer) {
-      try {
-        const origin = BASE_URL.replace(/\/api\/?$/, "");
-        if (/^https?:\/\//.test(profileFromServer)) {
-          normalizedProfile = profileFromServer;
-        } else if (profileFromServer.startsWith("/")) {
-          normalizedProfile = origin + profileFromServer;
-        } else {
-          normalizedProfile = origin + "/" + profileFromServer;
-        }
-      } catch (e) {
-        normalizedProfile = profileFromServer;
-      }
+      const origin = BASE_URL.replace(/\/api\/?$/, "");
+      if (/^https?:\/\//.test(profileFromServer)) normalizedProfile = profileFromServer;
+      else if (profileFromServer.startsWith("/")) normalizedProfile = origin + profileFromServer;
+      else normalizedProfile = origin + "/" + profileFromServer;
     }
 
     setAvatar(normalizedProfile || DEFAULT_AVATAR);
 
-    // Persist normalized profileUrl to localStorage.user so it survives refresh
+    // save in localStorage safely
     try {
       if (normalizedProfile) {
         const u = localStorage.getItem("user");
         const parsed = u ? JSON.parse(u) : {};
         parsed.profileUrl = normalizedProfile;
         localStorage.setItem("user", JSON.stringify(parsed));
-        // eslint-disable-next-line no-console
-        console.log("persisted profileUrl to localStorage:", parsed.profileUrl);
-      } else {
-        // eslint-disable-next-line no-console
-        console.log("no profileUrl in dashboard response; using default");
       }
-    } catch (e) {
-      // ignore
-    }
+    } catch {}
 
-    // Log effective avatar state for debugging
-    // eslint-disable-next-line no-console
-    console.log("avatar state after fetchDashboardData:", normalizedProfile || DEFAULT_AVATAR);
-
-    /* ==================== RANK ==================== */
+    /* RANK */
     const rank = res?.rank;
     setRankData({
       global: {
@@ -295,11 +267,29 @@ export default function Dashboard() {
         percentile: calculatePercentile(rank?.cityRank),
       },
       university: {
-        rank: rank?.universityrank ?? "0",
-        percentile: calculatePercentile(rank?.universityrank),
+        // ✅ FIX KEY (your response is universityRank, not universityrank)
+        rank: rank?.universityRank ?? "-",
+        percentile: calculatePercentile(rank?.universityRank),
       },
     });
 
+    /* HIREABILITY */
+    const hireabilityIndex = res?.hireabilityIndex;
+    setHireability({
+      totalScore: hireabilityIndex?.hireabilityIndex ?? 0,
+      weeklyChange: 0,
+      nextRankPoints:
+        (hireabilityIndex?.experienceIndexTotal ?? 0) -
+        (hireabilityIndex?.experienceIndexScore ?? 0),
+      skill: {
+        score: hireabilityIndex?.skillIndexScore ?? 0,
+        max: hireabilityIndex?.skillIndexTotal ?? 0,
+      },
+      experience: {
+        score: hireabilityIndex?.experienceIndexScore ?? 0,
+        max: hireabilityIndex?.experienceIndexTotal ?? 0,
+      },
+    });
     /* ==================== HIREABILITY ==================== */
     const hireabilityIndex = res?.hireabilityIndex;
     setHireability({
@@ -317,82 +307,43 @@ export default function Dashboard() {
         max: hireabilityIndex?.experienceIndexTotal,
       },
     });
-    /* ==================== HIREABILITY ==================== */
-    const hireabilityIndex = res?.hireabilityIndex;
-    setHireability({
-      totalScore: hireabilityIndex?.hireabilityIndex,
-      weeklyChange: 0,
-      nextRankPoints:
-        hireabilityIndex?.experienceIndexTotal -
-        hireabilityIndex?.experienceIndexScore,
-      skill: {
-        score: hireabilityIndex?.skillIndexScore,
-        max: hireabilityIndex?.skillIndexTotal,
-      },
-      experience: {
-        score: hireabilityIndex?.experienceIndexScore,
-        max: hireabilityIndex?.experienceIndexTotal,
-      },
-    });
 
-    /* ==================== WORK EXPERIENCE ==================== */
-    setWorkExperience(
-      (res?.data?.workExperience || []).map((item: any) => ({
-        jobTitle: item.jobTitle,
-        companyName: item.companyName,
-        startYear: item.startYear ?? null,
-        endYear: item.endYear ?? null,
-        duration: item.duration ?? null,
-        description: item.description ?? "",
-        location: item.location ?? "",
-        currentlyWorking: item.currentlyWorking ?? false,
-      }))
-    );
-
-    /* ==================== PROJECTS ==================== */
+    /* LISTS */
+    setWorkExperience(res?.data?.workExperience || []);
     setProjects(
-      (res?.data?.projects || []).map((item: any) => ({
-        title: item.projectName,
-        summary: item.summary,
+      (res?.data?.projects || []).map((p: any) => ({
+        title: p.projectName,
+        summary: p.summary,
       }))
     );
-
-    /* ==================== CERTIFICATIONS ==================== */
     setCertifications(
-      (res?.data?.certifications || []).map((item: any) => ({
-        name: item.certificationName,
-        issuedBy: item.issuer,
-        issueYear: item.issueDate,
+      (res?.data?.certifications || []).map((c: any) => ({
+        name: c.certificationName,
+        issuedBy: c.issuer,
+        issueYear: c.issueDate,
       }))
     );
+    setEducation(res?.data?.education || []);
+    setSkills((res?.skills?.list || []).map((s: string) => ({ name: s })));
+  } catch (err: any) {
+    console.error("fetchDashboardData FAILED:", err);
+    console.error("message:", err?.message);
+    console.error("response:", err?.response?.data);
 
-    /* ==================== EDUCATION ==================== */
-    setEducation(
-      (res?.data?.education || []).map((item: any) => ({
-        schoolName: item.schoolName,
-        degree: item.degree,
-        startYear: item.startYear,
-        endYear: item.endYear,
-        currentlyStudying: item.currentlyStudying,
-      }))
-    );
+    // fallback - avoid crash
+    setAvatar(DEFAULT_AVATAR);
+  }
+}, []);
 
-    /* ==================== SKILLS ==================== */
-    setSkills(
-      (res?.skills?.list || []).map((skill: string) => ({
-        name: skill,
-      }))
-    );
-  }, []);
 
 
 
   /* ==================== EFFECTS ==================== */
 
   useEffect(() => {
-    fetchUserProfile(); // separate API
+   
     fetchDashboardData(); // 👈 ONLY ONE CALL
-  }, [fetchUserProfile, fetchDashboardData]);
+  }, [ fetchDashboardData]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -1223,94 +1174,167 @@ export default function Dashboard() {
             </div>
 
             {/* Recommended Actions */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-neutral-900">Recommended Actions</h3>
-                <span className="text-xs font-bold text-yellow-600 bg-yellow-50 px-3 py-1 rounded-full border border-yellow-100">4 Actions Available</span>
-              </div>
+           {/* Recommended Actions */}
+<div className="space-y-4">
+  {/* Header */}
+  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+    <h3 className="text-lg sm:text-xl font-bold text-neutral-900">
+      Recommended Actions
+    </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Assessment */}
-                <div className="bg-white border border-neutral-200 p-6 rounded-[2rem] hover:border-violet-300 transition-all group shadow-sm">
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="p-3 bg-violet-50 rounded-2xl text-violet-600 group-hover:bg-violet-600 group-hover:text-white transition-colors">
-                      <FeatherFileText />
-                    </div>
-                    <Badge className="bg-violet-50 text-violet-600 border-none font-bold text-[10px] uppercase tracking-wider">+50 Skill</Badge>
-                  </div>
-                  <h4 className="text-lg font-bold mb-2">Complete Assessment</h4>
-                  <p className="text-sm text-neutral-500 mb-6 leading-relaxed">Begin evaluation and boost your credibility with role-specific eval.</p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[10px] font-bold text-violet-600 flex items-center gap-1">
-                        <FeatherRepeat className="w-3 h-3" /> Paid retakes: 1
-                      </span>
-                      <span className="text-[10px] font-bold text-green-600 flex items-center gap-1">
-                        <FeatherGift className="w-3 h-3" /> Free retakes: 1
-                      </span>
-                    </div>
-                    <Button variant="brand-primary" className="rounded-2xl bg-violet-700 hover:bg-violet-800 px-6" onClick={() => handleNavigate("/assessment")}>
-                      Start Now
-                    </Button>
-                  </div>
-                </div>
+    <span className="w-fit text-[10px] sm:text-xs font-bold text-yellow-600 bg-yellow-50 px-3 py-1 rounded-full border border-yellow-100">
+      4 Actions Available
+    </span>
+  </div>
 
-                {/* Case Studies */}
-                <div className="bg-white border border-neutral-200 p-6 rounded-[2rem] hover:border-green-300 transition-all group shadow-sm">
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="p-3 bg-green-50 rounded-2xl text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors">
-                      <FeatherBookOpen />
-                    </div>
-                    <Badge className="bg-green-50 text-green-600 border-none font-bold text-[10px] uppercase tracking-wider">+40 Exp</Badge>
-                  </div>
-                  <h4 className="text-lg font-bold mb-2">Solve Case Studies</h4>
-                  <p className="text-sm text-neutral-500 mb-6 leading-relaxed">Solving cases shows recruiters your effort to increase your knowledge base.</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
-                      <FeatherClock className="w-3 h-3" /> 20 min
-                    </span>
-                    <Button variant="brand-primary" className="rounded-2xl bg-violet-700 hover:bg-violet-800 px-6" onClick={() => handleNavigate("/cases")}>
-                      Start Now
-                    </Button>
-                  </div>
-                </div>
-                {/* Hackathons */}
-                <div className="bg-neutral-50 border border-neutral-200 p-6 rounded-[2rem] opacity-80 group shadow-sm">
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="p-3 bg-neutral-200 rounded-2xl text-neutral-500">
-                      <FeatherUsers />
-                    </div>
-                    <Badge variant="neutral" icon={<FeatherLock />} className="bg-gray-100 text-gray-600 border-none font-bold text-[10px] uppercase">Coming Soon</Badge>
-                  </div>
-                  <h4 className="text-lg font-bold mb-2 text-neutral-700">Participate in Hackathons</h4>
-                  <p className="text-sm text-neutral-400 mb-6 leading-relaxed">Collaborate and build visibility with other PMs in upcoming events.</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
-                      <FeatherCalendar className="w-3 h-3" /> Starts in 5 days
-                    </span>
-                    <Button disabled className="rounded-2xl bg-neutral-200 text-neutral-500 cursor-not-allowed border-none px-6">Notify Me</Button>
-                  </div>
-                </div>
+  {/* Grid */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+    {/* Assessment */}
+    <div className="bg-white border border-neutral-200 p-4 sm:p-6 rounded-3xl sm:rounded-[2rem] hover:border-violet-300 transition-all group shadow-sm">
+      <div className="flex justify-between items-start mb-4 sm:mb-6">
+        <div className="p-3 bg-violet-50 rounded-2xl text-violet-600 group-hover:bg-violet-600 group-hover:text-white transition-colors">
+          <FeatherFileText />
+        </div>
 
-                {/* Courses */}
-                <div className="bg-neutral-50 border border-neutral-200 p-6 rounded-[2rem] opacity-80 group shadow-sm">
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="p-3 bg-neutral-200 rounded-2xl text-neutral-500">
-                      <FeatherBook />
-                    </div>
-                    <Badge variant="neutral" icon={<FeatherLock />} className="bg-gray-100 text-gray-600 border-none font-bold text-[10px] uppercase">Coming Soon</Badge>
-                  </div>
-                  <h4 className="text-lg font-bold mb-2 text-neutral-700">Courses</h4>
-                  <p className="text-sm text-neutral-400 mb-6 leading-relaxed">Complete structured learning path to earn verified PM badges.</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
-                      <FeatherClock className="w-3 h-3" /> 8 weeks
-                    </span>
-                    <Button disabled className="rounded-2xl bg-neutral-200 text-neutral-500 cursor-not-allowed border-none px-6">Notify Me</Button>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <Badge className="bg-violet-50 text-violet-600 border-none font-bold text-[10px] uppercase tracking-wider">
+          +50 Skill
+        </Badge>
+      </div>
+
+      <h4 className="text-base sm:text-lg font-bold mb-2">Complete Assessment</h4>
+      <p className="text-sm text-neutral-500 mb-4 sm:mb-6 leading-relaxed">
+        Begin evaluation and boost your credibility with role-specific eval.
+      </p>
+
+      {/* Footer row responsive */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-1">
+          <span className="text-[10px] font-bold text-violet-600 flex items-center gap-1">
+            <FeatherRepeat className="w-3 h-3" /> Paid retakes: 1
+          </span>
+          <span className="text-[10px] font-bold text-green-600 flex items-center gap-1">
+            <FeatherGift className="w-3 h-3" /> Free retakes: 1
+          </span>
+        </div>
+
+        <Button
+          variant="brand-primary"
+          className="w-full sm:w-auto rounded-2xl bg-violet-700 hover:bg-violet-800 px-5 sm:px-6"
+          onClick={() => handleNavigate("/assessment")}
+        >
+          Start Now
+        </Button>
+      </div>
+    </div>
+
+    {/* Case Studies */}
+    <div className="bg-white border border-neutral-200 p-4 sm:p-6 rounded-3xl sm:rounded-[2rem] hover:border-green-300 transition-all group shadow-sm">
+      <div className="flex justify-between items-start mb-4 sm:mb-6">
+        <div className="p-3 bg-green-50 rounded-2xl text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors">
+          <FeatherBookOpen />
+        </div>
+
+        <Badge className="bg-green-50 text-green-600 border-none font-bold text-[10px] uppercase tracking-wider">
+          +40 Exp
+        </Badge>
+      </div>
+
+      <h4 className="text-base sm:text-lg font-bold mb-2">Solve Case Studies</h4>
+      <p className="text-sm text-neutral-500 mb-4 sm:mb-6 leading-relaxed">
+        Solving cases shows recruiters your effort to increase your knowledge base.
+      </p>
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
+          <FeatherClock className="w-3 h-3" /> 20 min
+        </span>
+
+        <Button
+          variant="brand-primary"
+          className="w-full sm:w-auto rounded-2xl bg-violet-700 hover:bg-violet-800 px-5 sm:px-6"
+          onClick={() => handleNavigate("/cases")}
+        >
+          Start Now
+        </Button>
+      </div>
+    </div>
+
+    {/* Hackathons */}
+    <div className="bg-neutral-50 border border-neutral-200 p-4 sm:p-6 rounded-3xl sm:rounded-[2rem] opacity-80 group shadow-sm">
+      <div className="flex justify-between items-start mb-4 sm:mb-6">
+        <div className="p-3 bg-neutral-200 rounded-2xl text-neutral-500">
+          <FeatherUsers />
+        </div>
+
+        <Badge
+          variant="neutral"
+          icon={<FeatherLock />}
+          className="bg-gray-100 text-gray-600 border-none font-bold text-[10px] uppercase"
+        >
+          Coming Soon
+        </Badge>
+      </div>
+
+      <h4 className="text-base sm:text-lg font-bold mb-2 text-neutral-700">
+        Participate in Hackathons
+      </h4>
+      <p className="text-sm text-neutral-400 mb-4 sm:mb-6 leading-relaxed">
+        Collaborate and build visibility with other PMs in upcoming events.
+      </p>
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
+          <FeatherCalendar className="w-3 h-3" /> Starts in 5 days
+        </span>
+
+        <Button
+          disabled
+          className="w-full sm:w-auto rounded-2xl bg-neutral-200 text-neutral-500 cursor-not-allowed border-none px-5 sm:px-6"
+        >
+          Notify Me
+        </Button>
+      </div>
+    </div>
+
+    {/* Courses */}
+    <div className="bg-neutral-50 border border-neutral-200 p-4 sm:p-6 rounded-3xl sm:rounded-[2rem] opacity-80 group shadow-sm">
+      <div className="flex justify-between items-start mb-4 sm:mb-6">
+        <div className="p-3 bg-neutral-200 rounded-2xl text-neutral-500">
+          <FeatherBook />
+        </div>
+
+        <Badge
+          variant="neutral"
+          icon={<FeatherLock />}
+          className="bg-gray-100 text-gray-600 border-none font-bold text-[10px] uppercase"
+        >
+          Coming Soon
+        </Badge>
+      </div>
+
+      <h4 className="text-base sm:text-lg font-bold mb-2 text-neutral-700">
+        Courses
+      </h4>
+      <p className="text-sm text-neutral-400 mb-4 sm:mb-6 leading-relaxed">
+        Complete structured learning path to earn verified PM badges.
+      </p>
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
+          <FeatherClock className="w-3 h-3" /> 8 weeks
+        </span>
+
+        <Button
+          disabled
+          className="w-full sm:w-auto rounded-2xl bg-neutral-200 text-neutral-500 cursor-not-allowed border-none px-5 sm:px-6"
+        >
+          Notify Me
+        </Button>
+      </div>
+    </div>
+  </div>
+</div>
+
           </div>
 
           {/* --- RIGHT SIDEBAR --- */}
