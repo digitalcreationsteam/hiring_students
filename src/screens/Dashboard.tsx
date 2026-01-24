@@ -10,7 +10,6 @@ import React, {
 import { useNavigate } from "react-router-dom";
 
 import API, { URL_PATH, BASE_URL } from "src/common/API";
-import API, { URL_PATH, BASE_URL } from "src/common/API";
 import { Avatar } from "../ui/components/Avatar";
 import { Badge } from "../ui/components/Badge";
 import { Button } from "../ui/components/Button";
@@ -163,34 +162,7 @@ export default function Dashboard() {
     }
     return DEFAULT_AVATAR;
   });
-  const [avatar, setAvatar] = useState<string>(() => {
-    try {
-      const u = localStorage.getItem("user");
-      if (u) {
-        const parsed = JSON.parse(u);
-        // normalize stored URL if needed
-        const raw = parsed?.profileUrl;
-        if (raw) {
-          try {
-            const origin = BASE_URL.replace(/\/api\/?$/, "");
-            if (/^https?:\/\//.test(raw)) return raw;
-            if (raw.startsWith("/")) return origin + raw;
-            return origin + "/" + raw;
-          } catch (e) {
-            return raw || DEFAULT_AVATAR;
-          }
-        }
-        return DEFAULT_AVATAR;
-      }
-    } catch (e) {
-      // ignore
-    }
-    return DEFAULT_AVATAR;
-  });
   const [isSavingAvatar, setIsSavingAvatar] = useState(false);
-  const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null);
-
-
   const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null);
 
 
@@ -239,12 +211,8 @@ export default function Dashboard() {
 
  const fetchDashboardData = useCallback(async () => {
   try {
-
- const fetchDashboardData = useCallback(async () => {
-  try {
     const res = await API("GET", URL_PATH.calculateExperienceIndex);
 
-    console.log("fetchDashboardData response:", res);
     console.log("fetchDashboardData response:", res);
     if (!res) return;
 
@@ -255,38 +223,7 @@ export default function Dashboard() {
       domain: "Professional",
       location: formatLocation(demo?.city, demo?.state),
     });
-    /* DEMOGRAPHICS */
-    const demo = res?.data?.demographics?.[0];
-    setUser({
-      name: demo?.fullName || "",
-      domain: "Professional",
-      location: formatLocation(demo?.city, demo?.state),
-    });
 
-    /* AVATAR */
-    const profileFromServer = res?.documents?.profileUrl;
-    let normalizedProfile: string | null = null;
-
-    if (profileFromServer) {
-      const origin = BASE_URL.replace(/\/api\/?$/, "");
-      if (/^https?:\/\//.test(profileFromServer)) normalizedProfile = profileFromServer;
-      else if (profileFromServer.startsWith("/")) normalizedProfile = origin + profileFromServer;
-      else normalizedProfile = origin + "/" + profileFromServer;
-    }
-
-    setAvatar(normalizedProfile || DEFAULT_AVATAR);
-
-    // save in localStorage safely
-    try {
-      if (normalizedProfile) {
-        const u = localStorage.getItem("user");
-        const parsed = u ? JSON.parse(u) : {};
-        parsed.profileUrl = normalizedProfile;
-        localStorage.setItem("user", JSON.stringify(parsed));
-      }
-    } catch {}
-
-    /* RANK */
     /* AVATAR */
     const profileFromServer = res?.documents?.profileUrl;
     let normalizedProfile: string | null = null;
@@ -332,8 +269,6 @@ export default function Dashboard() {
       university: {
         // ✅ FIX KEY (your response is universityRank, not universityrank)
         rank: rank?.universityRank ?? "-",
-        // ✅ FIX KEY (your response is universityRank, not universityrank)
-        rank: rank?.universityRank ?? "-",
         percentile: calculatePercentile(rank?.universityRank),
       },
     });
@@ -358,13 +293,7 @@ export default function Dashboard() {
 
     /* LISTS */
     setWorkExperience(res?.data?.workExperience || []);
-    /* LISTS */
-    setWorkExperience(res?.data?.workExperience || []);
     setProjects(
-      (res?.data?.projects || []).map((p: any) => ({
-        title: p.projectName,
-        summary: p.summary,
-      }))
       (res?.data?.projects || []).map((p: any) => ({
         title: p.projectName,
         summary: p.summary,
@@ -376,26 +305,7 @@ export default function Dashboard() {
         issuedBy: c.issuer,
         issueYear: c.issueDate,
       }))
-      (res?.data?.certifications || []).map((c: any) => ({
-        name: c.certificationName,
-        issuedBy: c.issuer,
-        issueYear: c.issueDate,
-      }))
     );
-    setEducation(res?.data?.education || []);
-    setSkills((res?.skills?.list || []).map((s: string) => ({ name: s })));
-  } catch (err: any) {
-    console.error("fetchDashboardData FAILED:", err);
-    console.error("message:", err?.message);
-    console.error("response:", err?.response?.data);
-
-    // fallback - avoid crash
-    setAvatar(DEFAULT_AVATAR);
-  }
-}, []);
-
-
-
     setEducation(res?.data?.education || []);
     setSkills((res?.skills?.list || []).map((s: string) => ({ name: s })));
   } catch (err: any) {
@@ -414,8 +324,6 @@ export default function Dashboard() {
   /* ==================== EFFECTS ==================== */
 
   useEffect(() => {
-   
-    fetchDashboardData(); // 👈 ONLY ONE CALL
    
     fetchDashboardData(); // 👈 ONLY ONE CALL
   }, [ fetchDashboardData]);
@@ -441,29 +349,13 @@ export default function Dashboard() {
   // POST API for the profile
   const handleSaveProfile = async () => {
     if (!selectedAvatarFile) return;
-  // POST API for the profile
-  const handleSaveProfile = async () => {
-    if (!selectedAvatarFile) return;
 
-    const formData = new FormData();
-    formData.append("avatar", selectedAvatarFile);
     const formData = new FormData();
     formData.append("avatar", selectedAvatarFile);
 
     try {
       setIsSavingAvatar(true);
-    try {
-      setIsSavingAvatar(true);
 
-      await API(
-        "POST", // or "PUT" based on backend
-        URL_PATH.uploadProfile, // "user/profile"
-        formData
-        // ❌ DO NOT pass headers here
-      );
-
-      // Refresh profile image from server (dashboard includes documents.profileUrl)
-      await fetchDashboardData();
       await API(
         "POST", // or "PUT" based on backend
         URL_PATH.uploadProfile, // "user/profile"
@@ -483,30 +375,12 @@ export default function Dashboard() {
       setIsSavingAvatar(false);
     }
   };
-      // Cleanup
-      setSelectedAvatarFile(null);
-    } catch (error) {
-      console.error("Failed to save profile image", error);
-      alert("Failed to save profile image");
-    } finally {
-      setIsSavingAvatar(false);
-    }
-  };
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log("", e)
     const file = e.target.files?.[0];
     if (!file) return;
-  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("", e)
-    const file = e.target.files?.[0];
-    if (!file) return;
 
-    // Validate file size (e.g., max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      alert("File size should be less than 5MB");
-      return;
-    }
     // Validate file size (e.g., max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       alert("File size should be less than 5MB");
@@ -519,17 +393,7 @@ export default function Dashboard() {
       alert("Please select a valid image (JPEG, PNG, or WebP)");
       return;
     }
-    // Validate file type
-    const validTypes = ["image/jpeg", "image/png", "image/webp"];
-    if (!validTypes.includes(file.type)) {
-      alert("Please select a valid image (JPEG, PNG, or WebP)");
-      return;
-    }
 
-    // Cleanup old preview
-    if (avatar && avatar.startsWith("blob:")) {
-      URL.revokeObjectURL(avatar);
-    }
     // Cleanup old preview
     if (avatar && avatar.startsWith("blob:")) {
       URL.revokeObjectURL(avatar);
@@ -538,47 +402,19 @@ export default function Dashboard() {
     // Create preview
     const previewUrl = URL.createObjectURL(file);
     setAvatar(previewUrl);
-    // Create preview
-    const previewUrl = URL.createObjectURL(file);
-    setAvatar(previewUrl);
 
-    try {
-      setIsSavingAvatar(true);
     try {
       setIsSavingAvatar(true);
 
       // Upload to server
       const formData = new FormData();
       formData.append("avatar", file);
-      // Upload to server
-      const formData = new FormData();
-      formData.append("avatar", file);
 
-      await API("POST", URL_PATH.uploadProfile, formData);
       await API("POST", URL_PATH.uploadProfile, formData);
 
       // Refresh from server (dashboard includes documents.profileUrl)
       await fetchDashboardData();
-      // Refresh from server (dashboard includes documents.profileUrl)
-      await fetchDashboardData();
 
-      // Revoke preview after successful upload
-      setTimeout(() => {
-        if (previewUrl.startsWith("blob:")) {
-          URL.revokeObjectURL(previewUrl);
-        }
-      }, 1000);
-    } catch (error) {
-      console.error("Upload failed:", error);
-      alert("Failed to upload profile picture");
-      // Revert to old avatar if available
-      // if (user?.avatarUrl) {
-      //   setAvatar(user.avatarUrl);
-      // }
-    } finally {
-      setIsSavingAvatar(false);
-    }
-  };
       // Revoke preview after successful upload
       setTimeout(() => {
         if (previewUrl.startsWith("blob:")) {
@@ -635,10 +471,6 @@ export default function Dashboard() {
       style={{ backgroundColor: colors.white }}
     >
       {/* TOP WELCOME BANNER */}
-      <div
-        className="w-full "
-        style={{ borderColor: colors.aqua }}
-      >
       <div
         className="w-full "
         style={{ borderColor: colors.aqua }}
@@ -801,8 +633,6 @@ export default function Dashboard() {
                 >
                   Global Rank<br />
                   #{rankData.global.rank}
-                  Global Rank<br />
-                  #{rankData.global.rank}
                 </Badge>
 
                 {/* University Rank */}
@@ -930,29 +760,7 @@ export default function Dashboard() {
                 >
                   Projects
                 </p>
-              {/* Projects */}
-              <div className="space-y-3">
-                <p
-                  className="text-[10px] font-black uppercase tracking-widest"
-                  style={{ color: colors.primary }}
-                >
-                  Projects
-                </p>
 
-                {projects?.slice(0, 2).map((proj, i) => (
-                  <div
-                    key={i}
-                    className="relative pl-4 pr-3 py-3 rounded-xl border transition hover:shadow-md"
-                    style={{
-                      backgroundColor: colors.cream,
-                      borderColor: colors.aqua,
-                    }}
-                  >
-                    {/* Left accent bar */}
-                    <span
-                      className="absolute left-0 top-3 bottom-3 w-1 rounded-full"
-                      style={{ backgroundColor: colors.accent }}
-                    />
                 {projects?.slice(0, 2).map((proj, i) => (
                   <div
                     key={i}
@@ -975,20 +783,7 @@ export default function Dashboard() {
                     >
                       Project {i + 1}
                     </span>
-                    {/* Project index */}
-                    <span
-                      className="text-[9px] font-bold mb-1 inline-block"
-                      style={{ color: colors.accent }}
-                    >
-                      Project {i + 1}
-                    </span>
 
-                    <h4
-                      className="text-[12px] font-bold leading-tight truncate"
-                      style={{ color: colors.primary }}
-                    >
-                      {proj.title}
-                    </h4>
                     <h4
                       className="text-[12px] font-bold leading-tight truncate"
                       style={{ color: colors.primary }}
@@ -1033,22 +828,6 @@ export default function Dashboard() {
                         style={{ color: colors.accent }}
                       />
                     </div>
-                {certifications?.slice(0, 2).map((cert, i) => (
-                  <div
-                    key={i}
-                    className="flex items-start gap-3 p-3 rounded-xl border shadow-sm"
-                    style={{
-                      backgroundColor: colors.mint,
-                      borderColor: colors.aqua,
-                    }}
-                  >
-                    {/* Icon */}
-                    <div className="mt-0.5">
-                      <FeatherAward
-                        className="w-4 h-4"
-                        style={{ color: colors.accent }}
-                      />
-                    </div>
 
                     {/* Text */}
                     <div className="flex-1 min-w-0">
@@ -1058,22 +837,7 @@ export default function Dashboard() {
                       >
                         {cert.name}
                       </p>
-                    {/* Text */}
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className="text-[11px] font-bold truncate"
-                        style={{ color: colors.primary }}
-                      >
-                        {cert.name}
-                      </p>
 
-                      <p
-                        className="text-[9px] mt-0.5 truncate"
-                        style={{ color: colors.secondary }}
-                      >
-                        Issued by {cert.issuedBy}
-                      </p>
-                    </div>
                       <p
                         className="text-[9px] mt-0.5 truncate"
                         style={{ color: colors.secondary }}
@@ -1092,7 +856,6 @@ export default function Dashboard() {
                   </div>
                 ))}
               </div>
-
 
 
               {/* Education & Certs */}
@@ -1237,7 +1000,7 @@ export default function Dashboard() {
                       strokeWidth="10"
                       fill="transparent"
                     />
-                    <circle
+                     <circle
                       cx="80"
                       cy="80"
                       r="72"
@@ -1319,15 +1082,6 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Recommended Actions */}
-           {/* Recommended Actions */}
-<div className="space-y-4">
-  {/* Header */}
-  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-    <h3 className="text-lg sm:text-xl font-bold text-neutral-900">
-      Recommended Actions
-    </h3>
-            {/* Recommended Actions */}
            {/* Recommended Actions */}
 <div className="space-y-4">
   {/* Header */}
@@ -1336,10 +1090,6 @@ export default function Dashboard() {
       Recommended Actions
     </h3>
 
-    <span className="w-fit text-[10px] sm:text-xs font-bold text-yellow-600 bg-yellow-50 px-3 py-1 rounded-full border border-yellow-100">
-      4 Actions Available
-    </span>
-  </div>
     <span className="w-fit text-[10px] sm:text-xs font-bold text-yellow-600 bg-yellow-50 px-3 py-1 rounded-full border border-yellow-100">
       4 Actions Available
     </span>
@@ -1353,19 +1103,7 @@ export default function Dashboard() {
         <div className="p-3 bg-violet-50 rounded-2xl text-violet-600 group-hover:bg-violet-600 group-hover:text-white transition-colors">
           <FeatherFileText />
         </div>
-  {/* Grid */}
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-    {/* Assessment */}
-    <div className="bg-white border border-neutral-200 p-4 sm:p-6 rounded-3xl sm:rounded-[2rem] hover:border-violet-300 transition-all group shadow-sm">
-      <div className="flex justify-between items-start mb-4 sm:mb-6">
-        <div className="p-3 bg-violet-50 rounded-2xl text-violet-600 group-hover:bg-violet-600 group-hover:text-white transition-colors">
-          <FeatherFileText />
-        </div>
 
-        <Badge className="bg-violet-50 text-violet-600 border-none font-bold text-[10px] uppercase tracking-wider">
-          +50 Skill
-        </Badge>
-      </div>
         <Badge className="bg-violet-50 text-violet-600 border-none font-bold text-[10px] uppercase tracking-wider">
           +50 Skill
         </Badge>
@@ -1375,21 +1113,7 @@ export default function Dashboard() {
       <p className="text-sm text-neutral-500 mb-4 sm:mb-6 leading-relaxed">
         Begin evaluation and boost your credibility with role-specific eval.
       </p>
-      <h4 className="text-base sm:text-lg font-bold mb-2">Complete Assessment</h4>
-      <p className="text-sm text-neutral-500 mb-4 sm:mb-6 leading-relaxed">
-        Begin evaluation and boost your credibility with role-specific eval.
-      </p>
 
-      {/* Footer row responsive */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-1">
-          <span className="text-[10px] font-bold text-violet-600 flex items-center gap-1">
-            <FeatherRepeat className="w-3 h-3" /> Paid retakes: 1
-          </span>
-          <span className="text-[10px] font-bold text-green-600 flex items-center gap-1">
-            <FeatherGift className="w-3 h-3" /> Free retakes: 1
-          </span>
-        </div>
       {/* Footer row responsive */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
@@ -1410,22 +1134,7 @@ export default function Dashboard() {
         </Button>
       </div>
     </div>
-        <Button
-          variant="brand-primary"
-          className="w-full sm:w-auto rounded-2xl bg-violet-700 hover:bg-violet-800 px-5 sm:px-6"
-          onClick={() => handleNavigate("/assessment")}
-        >
-          Start Now
-        </Button>
-      </div>
-    </div>
 
-    {/* Case Studies */}
-    <div className="bg-white border border-neutral-200 p-4 sm:p-6 rounded-3xl sm:rounded-[2rem] hover:border-green-300 transition-all group shadow-sm">
-      <div className="flex justify-between items-start mb-4 sm:mb-6">
-        <div className="p-3 bg-green-50 rounded-2xl text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors">
-          <FeatherBookOpen />
-        </div>
     {/* Case Studies */}
     <div className="bg-white border border-neutral-200 p-4 sm:p-6 rounded-3xl sm:rounded-[2rem] hover:border-green-300 transition-all group shadow-sm">
       <div className="flex justify-between items-start mb-4 sm:mb-6">
@@ -1437,15 +1146,7 @@ export default function Dashboard() {
           +40 Exp
         </Badge>
       </div>
-        <Badge className="bg-green-50 text-green-600 border-none font-bold text-[10px] uppercase tracking-wider">
-          +40 Exp
-        </Badge>
-      </div>
 
-      <h4 className="text-base sm:text-lg font-bold mb-2">Solve Case Studies</h4>
-      <p className="text-sm text-neutral-500 mb-4 sm:mb-6 leading-relaxed">
-        Solving cases shows recruiters your effort to increase your knowledge base.
-      </p>
       <h4 className="text-base sm:text-lg font-bold mb-2">Solve Case Studies</h4>
       <p className="text-sm text-neutral-500 mb-4 sm:mb-6 leading-relaxed">
         Solving cases shows recruiters your effort to increase your knowledge base.
@@ -1455,20 +1156,7 @@ export default function Dashboard() {
         <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
           <FeatherClock className="w-3 h-3" /> 20 min
         </span>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
-          <FeatherClock className="w-3 h-3" /> 20 min
-        </span>
 
-        <Button
-          variant="brand-primary"
-          className="w-full sm:w-auto rounded-2xl bg-violet-700 hover:bg-violet-800 px-5 sm:px-6"
-          onClick={() => handleNavigate("/cases")}
-        >
-          Start Now
-        </Button>
-      </div>
-    </div>
         <Button
           variant="brand-primary"
           className="w-full sm:w-auto rounded-2xl bg-violet-700 hover:bg-violet-800 px-5 sm:px-6"
@@ -1485,21 +1173,7 @@ export default function Dashboard() {
         <div className="p-3 bg-neutral-200 rounded-2xl text-neutral-500">
           <FeatherUsers />
         </div>
-    {/* Hackathons */}
-    <div className="bg-neutral-50 border border-neutral-200 p-4 sm:p-6 rounded-3xl sm:rounded-[2rem] opacity-80 group shadow-sm">
-      <div className="flex justify-between items-start mb-4 sm:mb-6">
-        <div className="p-3 bg-neutral-200 rounded-2xl text-neutral-500">
-          <FeatherUsers />
-        </div>
 
-        <Badge
-          variant="neutral"
-          icon={<FeatherLock />}
-          className="bg-gray-100 text-gray-600 border-none font-bold text-[10px] uppercase"
-        >
-          Coming Soon
-        </Badge>
-      </div>
         <Badge
           variant="neutral"
           icon={<FeatherLock />}
@@ -1515,30 +1189,12 @@ export default function Dashboard() {
       <p className="text-sm text-neutral-400 mb-4 sm:mb-6 leading-relaxed">
         Collaborate and build visibility with other PMs in upcoming events.
       </p>
-      <h4 className="text-base sm:text-lg font-bold mb-2 text-neutral-700">
-        Participate in Hackathons
-      </h4>
-      <p className="text-sm text-neutral-400 mb-4 sm:mb-6 leading-relaxed">
-        Collaborate and build visibility with other PMs in upcoming events.
-      </p>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
           <FeatherCalendar className="w-3 h-3" /> Starts in 5 days
         </span>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
-          <FeatherCalendar className="w-3 h-3" /> Starts in 5 days
-        </span>
 
-        <Button
-          disabled
-          className="w-full sm:w-auto rounded-2xl bg-neutral-200 text-neutral-500 cursor-not-allowed border-none px-5 sm:px-6"
-        >
-          Notify Me
-        </Button>
-      </div>
-    </div>
         <Button
           disabled
           className="w-full sm:w-auto rounded-2xl bg-neutral-200 text-neutral-500 cursor-not-allowed border-none px-5 sm:px-6"
@@ -1554,21 +1210,7 @@ export default function Dashboard() {
         <div className="p-3 bg-neutral-200 rounded-2xl text-neutral-500">
           <FeatherBook />
         </div>
-    {/* Courses */}
-    <div className="bg-neutral-50 border border-neutral-200 p-4 sm:p-6 rounded-3xl sm:rounded-[2rem] opacity-80 group shadow-sm">
-      <div className="flex justify-between items-start mb-4 sm:mb-6">
-        <div className="p-3 bg-neutral-200 rounded-2xl text-neutral-500">
-          <FeatherBook />
-        </div>
 
-        <Badge
-          variant="neutral"
-          icon={<FeatherLock />}
-          className="bg-gray-100 text-gray-600 border-none font-bold text-[10px] uppercase"
-        >
-          Coming Soon
-        </Badge>
-      </div>
         <Badge
           variant="neutral"
           icon={<FeatherLock />}
@@ -1584,32 +1226,11 @@ export default function Dashboard() {
       <p className="text-sm text-neutral-400 mb-4 sm:mb-6 leading-relaxed">
         Complete structured learning path to earn verified PM badges.
       </p>
-      <h4 className="text-base sm:text-lg font-bold mb-2 text-neutral-700">
-        Courses
-      </h4>
-      <p className="text-sm text-neutral-400 mb-4 sm:mb-6 leading-relaxed">
-        Complete structured learning path to earn verified PM badges.
-      </p>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
           <FeatherClock className="w-3 h-3" /> 8 weeks
         </span>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
-          <FeatherClock className="w-3 h-3" /> 8 weeks
-        </span>
-
-        <Button
-          disabled
-          className="w-full sm:w-auto rounded-2xl bg-neutral-200 text-neutral-500 cursor-not-allowed border-none px-5 sm:px-6"
-        >
-          Notify Me
-        </Button>
-      </div>
-    </div>
-  </div>
-</div>
 
         <Button
           disabled
