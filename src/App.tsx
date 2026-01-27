@@ -56,13 +56,14 @@ const router = createBrowserRouter([
 
   { path: "/paywall", element: <Paywall /> },
   { path: "/talent-ranking", element: <TalentRankingPlatform /> },
-  { path: "/how-it-works", element: <HowItWorks /> },
+  // { path: "/how-it-works", element: <HowItWorks /> },
 
-  { path: "/experience-index", element: <ExperienceIndex /> },
-  { path: "/skill-index", element: <SkillIndex /> },
-  { path: "/hireability-index", element: <HireabilityIndex /> },
+  // { path: "/experience-index", element: <ExperienceIndex /> },
+  // { path: "/skill-index", element: <SkillIndex /> },
+  // { path: "/hireability-index", element: <HireabilityIndex /> },
 
   { path: "/upload-resume", element: <UploadResume /> },
+
   { path: "/demographics", element: <Demographics /> },
   { path: "/education", element: <Education /> },
   { path: "/experience", element: <Experience /> },
@@ -73,7 +74,7 @@ const router = createBrowserRouter([
   { path: "/skill-index-intro", element: <SkillIndexIntro /> },
   { path: "/job-domain", element: <JobDomain /> },
   { path: "/skills", element: <Skills /> },
-  { path: "/skills-assessment", element: <SkillAssessmentCard /> },
+  // { path: "/skills-assessment", element: <SkillAssessmentCard /> },
 
   { path: "/assessment-intro", element: <AssessmentIntro /> },
   { path: "/assessment", element: <AssessmentPage /> },
