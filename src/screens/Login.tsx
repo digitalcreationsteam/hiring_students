@@ -80,14 +80,24 @@ function Login() {
               completedSteps: response.navigation.completedSteps,
               isOnboardingComplete: response.navigation.isOnboardingComplete,
               hasPayment: response.navigation.hasPayment,
-            })
+            }),
           );
 
+          const completedSteps = response.navigation.completedSteps || [];
+          const isFirstLogin = completedSteps.length === 0;
+
+          if (isFirstLogin) {
+            navigate("/talent-ranking");
+          } else {
+            navigate(response.navigation.nextRoute);
+          }
+
           // Navigate to next step (decided by backend)
-          navigate(response.navigation.nextRoute);
+
+          // navigate(response.navigation.nextRoute);
         } else {
           // Fallback for old API (shouldn't happen)
-          navigate("/demographics");
+          navigate("/talent-ranking");
         }
       } else {
         setError("Invalid credentials. Please try again.");
@@ -99,16 +109,15 @@ function Login() {
     }
   };
 
- const handleOAuth = (provider: "google" | "linkedin") => {
-  if (provider === "google") {
-    window.location.href = "http://localhost:5000/api/auth/google";
-  }
+  const handleOAuth = (provider: "google" | "linkedin") => {
+    if (provider === "google") {
+      window.location.href = "http://localhost:5001/api/auth/google";
+    }
 
-  if (provider === "linkedin") {
-    window.location.href = "http://localhost:5000/api/auth/linkedin";
-  }
-};
-
+    if (provider === "linkedin") {
+      window.location.href = "http://localhost:5001/api/auth/linkedin";
+    }
+  };
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-neutral-50 px-4 sm:px-6">
