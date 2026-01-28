@@ -16,6 +16,9 @@ import {
   FeatherCheck,
 } from "@subframe/core";
 import API, { URL_PATH } from "src/common/API";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 type ProjectEntry = {
   id: string;
@@ -48,6 +51,8 @@ export default function Projects() {
   const userId = localStorage.getItem("userId");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const MAX_PROJECTS = 5;
+
   // form state
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
@@ -55,7 +60,7 @@ export default function Projects() {
   const [outcome, setOutcome] = useState("");
   const [link, setLink] = useState("");
   const [selectedProject, setSelectedProject] = useState<ProjectEntry | null>(
-    null
+    null,
   );
   const [experienceIndex, setExperienceIndex] = useState<number | null>(null);
   const [isExpIndexLoading, setIsExpIndexLoading] = useState(true);
@@ -125,7 +130,7 @@ export default function Projects() {
         "GET",
         URL_PATH.calculateExperienceIndex,
         undefined,
-        { "user-id": userId }
+        { "user-id": userId },
       );
 
       setExperiencePoints(res?.points ?? null);
@@ -161,47 +166,53 @@ export default function Projects() {
   };
 
   const handleAddProject = async () => {
+    const realProjectsCount = projects.filter((p) => !p.isDemo).length;
+    if (realProjectsCount >= MAX_PROJECTS) {
+      toast.error("You can add a maximum of 5 projects only.");
+      return;
+    }
     if (isSubmitting) return;
 
     if (!name.trim()) {
-      alert("Project name is required.");
+      toast.error("Project name is required.");
       return false;
     }
 
     if (!role.trim()) {
-      alert("Role is required.");
+      toast.error("Role is required.");
       return false;
     }
 
     if (!summary.trim()) {
-      alert("Project Summary is required.");
+      toast.error("Project Summary is required.");
       return false;
     }
 
-    if (!link.trim()) {
-      alert("Project Link required.");
-      return false;
-    }
+  if (!link.trim()) {
+  toast.error("Project link is required.");
+  return;
+}
+
+if (!isValidUrl(link)) {
+  toast.error("Project link must be a valid URL (https://...)");
+  return;
+}
 
 
     const normalizedName = toTitleCase(normalizeSpaces(name));
 
     const duplicate = projects.some(
-      (p) => !p.isDemo && p.name === normalizedName
+      (p) => !p.isDemo && p.name === normalizedName,
     );
 
     if (duplicate) {
-      alert("This project already exists.");
+      toast.error("This project already exists.");
       return;
     }
 
-    if (link.trim() && !isValidUrl(link)) {
-      alert("Project link must be a valid URL (https://...)");
-      return;
-    }
 
     if (!userId) {
-      alert("Session expired. Please login again.");
+      toast.error("Session expired. Please login again.");
       navigate("/login");
       return;
     }
@@ -227,7 +238,7 @@ export default function Projects() {
             },
           ],
         },
-        { "user-id": userId }
+        { "user-id": userId },
       );
 
       await fetchProjects();
@@ -235,7 +246,7 @@ export default function Projects() {
       resetForm();
       setSelectedProject(null);
     } catch (err: any) {
-      alert(err?.response?.data?.message || "Failed to add project");
+      toast.error(err?.response?.data?.message || "Failed to add project");
     } finally {
       setIsSubmitting(false);
     }
@@ -253,7 +264,7 @@ export default function Projects() {
     }
 
     if (!userId) {
-      alert("Session expired. Please login again.");
+      toast.error("Session expired. Please login again.");
       navigate("/login");
       return;
     }
@@ -262,10 +273,10 @@ export default function Projects() {
       setIsSubmitting(true);
 
       await API(
-        "DELETE",
+        "POST",
         `${URL_PATH.deleteProject}/${deleteProjectId}`,
         undefined,
-        { "user-id": userId }
+        { "user-id": userId },
       );
 
       setProjects((prev) => prev.filter((p) => p.id !== deleteProjectId));
@@ -277,7 +288,7 @@ export default function Projects() {
       await fetchExperienceIndex();
       setDeleteProjectId(null);
     } catch (err: any) {
-      alert(err?.response?.data?.message || "Failed to delete project");
+      toast.error(err?.response?.data?.message || "Failed to delete project");
     } finally {
       setIsSubmitting(false);
     }
@@ -288,13 +299,16 @@ export default function Projects() {
 
   const handleContinue = () => {
     if (!hasRealProject) {
-      alert("Please add at least one project to continue.");
+      toast.error("Please add at least one project to continue.");
       return;
     }
     navigate("/skill-index-intro");
   };
 
   return (
+    <>
+    <ToastContainer position="top-center" autoClose={3000} />
+
     <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-6 py-10">
       <div className="w-full max-w-[1100px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
         {/* Left card */}
@@ -354,9 +368,7 @@ export default function Projects() {
                   key={p.id}
                   role="button"
                   tabIndex={0}
-                  onClick={() =>
-                    setSelectedProject(isSelected ? null : p)
-                  }
+                  onClick={() => setSelectedProject(isSelected ? null : p)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
@@ -442,7 +454,6 @@ export default function Projects() {
                             <span className="font-medium">Outcome:</span>{" "}
                             {p.outcome}
                           </div>
-
                         )}
 
                         {p.link && (
@@ -466,7 +477,6 @@ export default function Projects() {
               );
             })}
           </section>
-
 
           {/* 
           {selectedProject && (
@@ -531,7 +541,7 @@ export default function Projects() {
             className="flex flex-col gap-4"
           >
             <TextField
-              label={<span className="text-[12px]">Project name * </span>}
+              label={<span className="text-[12px]">Project name <span className="text-red-500">*</span> </span>}
               helpText=""
               className={scTextFieldClass}
             >
@@ -544,7 +554,7 @@ export default function Projects() {
             </TextField>
 
             <TextField
-              label={<span className="text-[12px]">Your Role * </span>}
+              label={<span className="text-[12px]">Your Role <span className="text-red-500">*</span> </span>}
               helpText=""
               className={scTextFieldClass}
             >
@@ -557,7 +567,7 @@ export default function Projects() {
             </TextField>
 
             <TextField
-              label={<span className="text-[12px]">Summary * </span>}
+              label={<span className="text-[12px]">Summary <span className="text-red-500">*</span> </span>}
               helpText=""
               className={scTextFieldClass}
             >
@@ -583,9 +593,11 @@ export default function Projects() {
               />
             </TextField>
 
-            <TextField label={<span className="text-[12px]">Link </span>}
+            <TextField
+              label={<span className="text-[12px]">Link <span className="text-red-500">*</span></span>}
               helpText=""
-              className={scTextFieldClass}>
+              className={scTextFieldClass}
+            >
               <TextField.Input
                 placeholder="https://"
                 value={link}
@@ -624,10 +636,11 @@ export default function Projects() {
               disabled={!canContinue || isSubmitting}
               className={`
     w-full h-10 rounded-full transition-all
-    ${!canContinue || isSubmitting
-                  ? "bg-violet-300 text-white cursor-not-allowed"
-                  : "bg-violet-700 text-white shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
-                }
+    ${
+      !canContinue || isSubmitting
+        ? "bg-violet-300 text-white cursor-not-allowed"
+        : "bg-violet-700 text-white shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
+    }
   `}
             >
               {isSubmitting ? "Saving..." : "Continue"}
@@ -638,7 +651,9 @@ export default function Projects() {
         {/* Right panel */}
         <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
           <div className="lg:sticky lg:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
-            <h3 className="text-[22px] text-neutral-900">Your Experience Index</h3>
+            <h3 className="text-[22px] text-neutral-900">
+              Your Experience Index
+            </h3>
 
             <div className="flex items-center justify-center py-6">
               <span
@@ -765,5 +780,6 @@ export default function Projects() {
         </div>
       )}
     </div>
+    </>
   );
 }

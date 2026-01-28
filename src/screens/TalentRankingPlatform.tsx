@@ -699,7 +699,7 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
           <Button
             className="w-full max-w-full h-10 rounded-3xl text-[16px] bg-violet-600 hover:bg-violet-700 text-white font-semibold"
             size="large"
-            onClick={() => navigate("/upload-resume")}
+            onClick={() => navigate("/paywall")}
           >
             Finish Profile Setup
           </Button>

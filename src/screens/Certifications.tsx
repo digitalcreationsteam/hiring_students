@@ -20,6 +20,8 @@ import {
   FeatherCheck,
 } from "@subframe/core";
 import API, { URL_PATH } from "src/common/API";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 type CertEntry = {
   id: string;
@@ -69,7 +71,7 @@ const toTitleCase = (value: string) =>
     .join(" ");
 
 const notify = (msg: string) => {
-  alert(msg); // replace with toast later
+  toast.error(msg); // replace with toast later
 };
 
 // -----------------Month And Year Picker----------
@@ -353,7 +355,7 @@ export default function Certifications() {
     }
 
     if (credentialLink.trim() && !isValidUrl(credentialLink)) {
-      alert("Credential link must be a valid URL (https://...)");
+      toast.error("Credential link must be a valid URL (https://...)");
       return false;
     }
 
@@ -444,6 +446,9 @@ export default function Certifications() {
       await API("POST", URL_PATH.certification, formData, {
         "user-id": userId,
       });
+
+             toast.success("Certification added successfully");
+      
 
       // safest pattern (same as Experience)
       await fetchCertifications();
@@ -557,6 +562,8 @@ export default function Certifications() {
   };
 
   return (
+  <>
+        <ToastContainer position="top-center" autoClose={3000} />
     <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-4 sm:px-6 py-10 sm:py-22">
       <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
         {/* Left card */}
@@ -751,7 +758,7 @@ export default function Certifications() {
             </TextField>
 
             <TextField
-              label={<span className="text-[12px]">Issuer * </span>}
+              label={<span className="text-[12px]">Issuer <span className="text-red-500">*</span> </span>}
               className={scTextFieldClass}
             >
               <TextField.Input
@@ -1044,5 +1051,6 @@ export default function Certifications() {
         </div>
       )}
     </div>
+  </>
   );
 }

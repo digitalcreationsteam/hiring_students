@@ -20,6 +20,8 @@ import {
   FeatherCheck,
 } from "@subframe/core";
 import API, { URL_PATH } from "src/common/API";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import * as SubframeCore from "@subframe/core";
 import { FeatherChevronDown } from "@subframe/core";
@@ -217,54 +219,54 @@ export default function Experience() {
 
   const isAddable = () => {
     if (!roleTitle.trim()) {
-      alert("Role title is required.");
+      toast.error("Role title is required.");
       return false;
     }
 
     if (!isValidText(roleTitle)) {
-      alert("Role title must contain only letters and valid symbols.");
+      toast.error("Role title must contain only letters and valid symbols.");
       return false;
     }
 
     if (typeOfRole.trim() && !isValidText(typeOfRole)) {
-      alert("Type of role must contain only letters and valid symbols.");
+      toast.error("Type of role must contain only letters and valid symbols.");
       return false;
     }
 
     if (!company.trim()) {
-      alert("Company name is required.");
+      toast.error("Company name is required.");
       return false;
     }
 
     if (!isValidText(company)) {
-      alert("Company name must contain only letters and valid symbols.");
+      toast.error("Company name must contain only letters and valid symbols.");
       return false;
     }
 
     // Date validations (already implemented)
     if (!isValidMonthYear(startDate)) {
-      alert("Start date must be in MM/YYYY format.");
+      toast.error("Start date must be in MM/YYYY format.");
       return false;
     }
 
     if (!isValidPastOrCurrentDate(startDate)) {
-      alert("Start date cannot be in the future.");
+      toast.error("Start date cannot be in the future.");
       return false;
     }
 
     if (!currentlyWorking) {
       if (!isValidMonthYear(endDate)) {
-        alert("End date must be in MM/YYYY format.");
+        toast.error("End date must be in MM/YYYY format.");
         return false;
       }
 
       if (!isValidPastOrCurrentDate(endDate)) {
-        alert("End date cannot be in the future.");
+        toast.error("End date cannot be in the future.");
         return false;
       }
 
       if (!isEndAfterStart(startDate, endDate)) {
-        alert("End date must be after start date.");
+        toast.error("End date must be after start date.");
         return false;
       }
     }
@@ -328,7 +330,7 @@ export default function Experience() {
     if (!isAddable()) return;
 
     if (!userId) {
-      alert("Session expired. Please login again.");
+      toast.error("Session expired. Please login again.");
       navigate("/login");
       return;
     }
@@ -340,7 +342,7 @@ export default function Experience() {
     );
 
     if (isDuplicate) {
-      alert("This experience already exists.");
+      toast.error("This experience already exists.");
       return;
     }
 
@@ -367,31 +369,64 @@ export default function Experience() {
     // };
     const [startMonthNum, startYearNum] = startDate.split("/").map(Number);
 
-    const [endMonthNum, endYearNum] = currentlyWorking
-      ? [new Date().getMonth() + 1, new Date().getFullYear()]
-      : endDate.split("/").map(Number);
-    const duration = calculateDurationInMonths(
-      startMonthNum,
-      startYearNum,
-      endMonthNum,
-      endYearNum,
-    );
-    const payload = {
-      workExperiences: [
-        {
-          jobTitle: toTitleCase(roleTitle.trim()),
-          companyName: toTitleCase(company.trim()),
-          startYear: startYearNum,
-          startMonth: startMonthNum,
-          endYear: currentlyWorking ? null : endYearNum,
-          endMonth: currentlyWorking ? null : endMonthNum,
-          currentlyWorking,
-          duration, // ✅ months only
-          description: description.trim() || "",
-          typeOfRole: typeOfRole ? toTitleCase(typeOfRole.trim()) : undefined,
-        },
-      ],
-    };
+    // const [endMonthNum, endYearNum] = currentlyWorking
+    //   ? [new Date().getMonth() + 1, new Date().getFullYear()]
+    //   : endDate.split("/").map(Number);
+    // const duration = calculateDurationInMonths(
+    //   startMonthNum,
+    //   startYearNum,
+    //   endMonthNum,
+    //   endYearNum,
+    // );
+    // const payload = {
+    //   workExperiences: [
+    //     {
+    //       jobTitle: toTitleCase(roleTitle.trim()),
+    //       companyName: toTitleCase(company.trim()),
+    //       startYear: startYearNum,
+    //       startMonth: startMonthNum,
+    //       endYear: currentlyWorking ? null : endYearNum,
+    //       endMonth: currentlyWorking ? null : endMonthNum,
+    //       currentlyWorking,
+    //       duration, // ✅ months only
+    //       description: description.trim() || "",
+    //       typeOfRole: typeOfRole ? toTitleCase(typeOfRole.trim()) : undefined,
+    //     },
+    //   ],
+    // };
+    const now = new Date();
+
+const [endMonthNum, endYearNum] = currentlyWorking
+  ? [now.getMonth() + 1, now.getFullYear()]
+  : endDate.split("/").map(Number);
+
+const duration = calculateDurationInMonths(
+  startMonthNum,
+  startYearNum,
+  endMonthNum,
+  endYearNum
+);
+
+const payload = {
+  workExperiences: [
+    {
+      jobTitle: toTitleCase(roleTitle.trim()),
+      companyName: toTitleCase(company.trim()),
+      startYear: startYearNum,
+      startMonth: startMonthNum,
+
+      // ✅ ALWAYS send numbers
+      endYear: endYearNum,
+      endMonth: endMonthNum,
+
+      currentlyWorking,
+      duration,
+      description: description.trim() || "",
+      typeOfRole: typeOfRole ? toTitleCase(typeOfRole.trim()) : undefined,
+    },
+  ],
+};
+
 
     try {
       setIsSubmitting(true);
@@ -399,6 +434,8 @@ export default function Experience() {
       const res = await API("POST", URL_PATH.experience, payload, {
         "user-id": userId,
       });
+
+       toast.success("Experience added successfully");
 
       const created = res.data[0]; // backend returns array
 
@@ -435,7 +472,7 @@ export default function Experience() {
       await fetchExperienceIndex();
       resetForm();
     } catch (err: any) {
-      alert(err?.message || "Failed to add experience");
+      toast.error(err?.message || "Failed to add experience");
     } finally {
       setIsSubmitting(false);
     }
@@ -446,7 +483,7 @@ export default function Experience() {
     if (!deleteId) return;
 
     if (!userId) {
-      alert("Session expired. Please login again.");
+      toast.error("Session expired. Please login again.");
       navigate("/login");
       return;
     }
@@ -470,7 +507,7 @@ export default function Experience() {
       await fetchExperienceIndex();
       setDeleteId(null);
     } catch (err: any) {
-      alert(err?.message || "Failed to delete experience");
+      toast.error(err?.message || "Failed to delete experience");
     } finally {
       setIsSubmitting(false);
     }
@@ -546,7 +583,7 @@ export default function Experience() {
 
   const handleContinue = () => {
     if (!experiences.length) {
-      alert("Please add at least one experience.");
+      toast.error("Please add at least one experience.");
       return;
     }
 
@@ -560,7 +597,16 @@ export default function Experience() {
     fetchExperienceIndex();
   }, [userId, fetchExperiences, fetchExperienceIndex]);
 
+  useEffect(() => {
+  if (currentlyWorking) {
+    setEndDate("");
+  }
+}, [currentlyWorking]);
+
+
   return (
+    <>
+     <ToastContainer position="top-center" autoClose={3000} />
     <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-4 sm:px-6 py-10 sm:py-22">
       <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
         {/* Left card */}
@@ -840,7 +886,7 @@ export default function Experience() {
                   >
                     End Date <span className="text-red-500">*</span>
                   </label>
-                  <MonthYearPicker value={endDate} onChange={setEndDate} />
+                  <MonthYearPicker value={endDate} onChange={setEndDate} disabled={currentlyWorking} />
                 </div>
               </div>
 
@@ -1055,5 +1101,6 @@ export default function Experience() {
         </div>
       )}
     </div>
+  </>
   );
 }
