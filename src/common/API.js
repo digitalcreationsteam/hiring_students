@@ -6,9 +6,9 @@ import axios from "axios";
 /* =========================================
    🌐 BASE URL
 ========================================= */
-// export const BASE_URL = "http://localhost:5000/api";
+export const BASE_URL = "http://localhost:5000/api";
 // export const BASE_URL = "http://localhost:5001/api";
-export const BASE_URL = "https://unitalent.cloud/api";
+// export const BASE_URL = "https://unitalent.cloud/api";
 
 
 const isDev = process.env.NODE_ENV === "development";
@@ -30,6 +30,7 @@ const apiClient = axios.create({
 export const URL_PATH = {
   /* ---------- AUTH ---------- */
   signup: "/auth/signup",
+  checkEmailVerification: "/auth/verification-status",
   login: "/auth/login",
   logout: "/auth/logout",
   loginGoogle: "/auth/google",
