@@ -11,6 +11,7 @@ import { FeatherX } from "@subframe/core";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import API, { URL_PATH } from "src/common/API";
+  // import API from "@/utils/API"; // or axios/fetch wrapper
 
 type OptionKey = 1 | 2 | 3 | 4;
 
@@ -103,6 +104,32 @@ const registerViolation = (msg: string) => {
 
   //     return () => clearInterval(id);
   //   }, [location.state?.expiresAt]);
+
+
+
+
+const reportViolation = async (attemptId: string, type: string) => {
+  try {
+    const res = await API(
+      "POST",
+      `/api/test-attempts/${attemptId}/violation`,
+      { type },
+      {
+        "user-id": localStorage.getItem("userId"),
+      }
+    );
+
+    console.log("Integrity Update:", res);
+
+    // You can show warning popup if cheating alert triggered
+    if (res.cheatAlert) {
+      alert("⚠️ Suspicious activity detected. Please follow exam rules.");
+    }
+
+  } catch (err) {
+    console.error("Violation report failed", err);
+  }
+};
 
   //============ SAVE ANSWERS ON REFRESH / CRASH =================//
   useEffect(() => {
@@ -266,6 +293,13 @@ useEffect(() => {
       handleSubmit();
     }
   };
+
+  const prevQuestion = () => {
+  if (currentIndex > 0) {
+    setCurrentIndex((i) => i - 1);
+  }
+};
+
 
   //=============== POST API FOR START ASSESSMENT============//
   useEffect(() => {
@@ -738,32 +772,43 @@ const totalMarks = useMemo(() => {
 
             {/* Bottom horizontal line */}
             <div className="w-full h-[1px] bg-gray-300 my-2 flex-shrink-0" />
+<div className="flex w-full flex-col sm:flex-row gap-3 sm:gap-0 sm:justify-between">
+  <div className="flex gap-3 w-full sm:w-auto">
+    <Button
+      disabled={saving || currentIndex === 0}
+     className="h-10 px-6 rounded-full bg-gradient-to-r from-violet-600 to-violet-600
+      hover:from-violet-600 hover:to-violet-800
+      text-white shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
+      size="large"
+      onClick={prevQuestion}
+    >
+      Previous
+    </Button>
 
-            <div className="flex w-full flex-col sm:flex-row gap-3 sm:gap-0 sm:justify-between">
-              <Button
-                disabled={saving}
-                className="w-10px h-10 rounded-full text-white]"
-                variant="neutral-secondary"
-                size="large"
-                onClick={() => skipQuestion()}
-              >
-                Skip Question
-              </Button>
+    <Button
+      disabled={saving}
+      className="h-10 px-6 rounded-full"
+      variant="neutral-secondary"
+      size="large"
+      onClick={skipQuestion}
+    >
+      Skip Question
+    </Button>
+  </div>
 
-              <Button
-                disabled={saving}
-                className="h-10 px-6 rounded-full bg-gradient-to-r from-violet-600 to-violet-600
-    hovur:from-violet-600 hover:to-violet-800
-    text-white shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
-                size="large"
-                iconRight={<FeatherArrowRight />}
-                onClick={() => nextQuestion()}
-              >
-                {currentIndex < questions.length - 1
-                  ? "Next Question"
-                  : "Submit"}
-              </Button>
-            </div>
+  <Button
+    disabled={saving}
+    className="h-10 px-6 rounded-full bg-gradient-to-r from-violet-600 to-violet-600
+      hover:from-violet-600 hover:to-violet-800
+      text-white shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
+    size="large"
+    iconRight={<FeatherArrowRight />}
+    onClick={nextQuestion}
+  >
+    {currentIndex < questions.length - 1 ? "Next Question" : "Submit"}
+  </Button>
+</div>
+
           </div>
         </div>
       </div>

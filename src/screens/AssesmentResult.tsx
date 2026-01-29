@@ -36,6 +36,7 @@ type IntegrityReport = {
   integrityLevel: string;
   cheatAlertSent: boolean;
   totalViolations: number;
+  level: string;
   violationBreakdown: {
     COPY: number;
     PASTE: number;
@@ -179,38 +180,13 @@ function AssessmentResult() {
   }, []);
 
 
-  // ✅ FETCH INTEGRITY REPORT
-const fetchIntegrityReport = useCallback(async () => {
-  const attemptId =
-    location.state?.attemptId ||
-    localStorage.getItem("attemptId") ||
-    sessionStorage.getItem("attemptId");
-
-  if (!attemptId || !userId) return;
-
-  setLoading(true);
-  try {
-    const res = await API(
-      "GET",
-      `/attempts/${attemptId}/integrity-report`,
-      undefined,
-      { "user-id": userId }
-    );
-    setReport(res);
-  } catch (err) {
-    console.error("fetchIntegrityReport failed:", err);
-    setReport(null);
-  } finally {
-    setLoading(false);
-  }
-}, [location.state?.attemptId, userId]);
 
 
   useEffect(() => {
     fetchResult();
     fetchRanks();
-    fetchIntegrityReport();
-  }, [fetchResult, fetchRanks, fetchIntegrityReport]);
+
+  }, [fetchResult, fetchRanks]);
 
   // ✅ LOADING STATE
   if (isResultLoading) {
