@@ -23,23 +23,23 @@ function JobDomain() {
 
   // Domain
   const [domain, setDomain] = useState<{ id: string; name: string } | null>(
-    null
+    null,
   );
   const [domains, setDomains] = useState<{ _id: string; name: string }[]>([]);
 
-  // SubDomain
-  const [subDomain, setSubDomain] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
-  const [subDomains, setSubDomains] = useState<{ _id: string; name: string }[]>(
-    []
-  );
+  // // SubDomain
+  // const [subDomain, setSubDomain] = useState<{
+  //   id: string;
+  //   name: string;
+  // } | null>(null);
+  // const [subDomains, setSubDomains] = useState<{ _id: string; name: string }[]>(
+  //   []
+  // );
 
   // -------------------- SAVE DOMAIN + SUBDOMAIN --------------------
   const handleContinue = async () => {
-    if (!domain || !subDomain) {
-      notify("Please select both domain and sub domain.");
+    if (!domain) {
+      notify("Please select a job domain.");
       return;
     }
 
@@ -62,19 +62,16 @@ function JobDomain() {
         {
           userId,
           domainId: domain.id,
-          subDomainId: subDomain.id,
         },
         {
           Authorization: `Bearer ${token}`,
-        }
+        },
       );
 
       console.log("✅ Domain saved:", saveResponse);
 
       localStorage.setItem("domainId", domain.id);
-      localStorage.setItem("subDomainId", subDomain.id);
       localStorage.setItem("jobDomain", domain.name);
-      localStorage.setItem("subDomain", subDomain.name);
 
       // ✅ Step 2: Get updated navigation status
       console.log("🔍 Fetching updated navigation...");
@@ -96,17 +93,13 @@ function JobDomain() {
           nextRoute: statusResponse.navigation.nextRoute,
           currentStep: statusResponse.navigation.currentStep,
           completedSteps: statusResponse.navigation.completedSteps,
-          isOnboardingComplete:
-            statusResponse.navigation.isOnboardingComplete,
+          isOnboardingComplete: statusResponse.navigation.isOnboardingComplete,
           hasPayment: statusResponse.navigation.hasPayment,
-        })
+        }),
       );
 
       // ✅ Step 4: Navigate to next step
-      console.log(
-        "🚀 Navigating to:",
-        statusResponse.navigation.nextRoute
-      );
+      console.log("🚀 Navigating to:", statusResponse.navigation.nextRoute);
       navigate(statusResponse.navigation.nextRoute);
     } catch (err: any) {
       console.error("❌ Error:", err);
@@ -139,12 +132,6 @@ function JobDomain() {
             });
           }
 
-          if (item.subDomainId) {
-            setSubDomain({
-              id: item.subDomainId._id,
-              name: item.subDomainId.name,
-            });
-          }
         }
       } catch (err) {
         console.error("Failed to fetch job domain", err);
@@ -177,37 +164,37 @@ function JobDomain() {
     fetchAvailableDomains();
   }, []);
 
-  // -------------------- FETCH SUBDOMAINS BY DOMAIN --------------------
-  useEffect(() => {
-    if (!domain) {
-      setSubDomains([]);
-      setSubDomain(null);
-      return;
-    }
+  // // -------------------- FETCH SUBDOMAINS BY DOMAIN --------------------
+  // useEffect(() => {
+  //   if (!domain) {
+  //     setSubDomains([]);
+  //     setSubDomain(null);
+  //     return;
+  //   }
 
-    const fetchSubDomains = async () => {
-      try {
-        console.log("📋 Fetching subdomains for domain:", domain.id);
+  //   const fetchSubDomains = async () => {
+  //     try {
+  //       console.log("📋 Fetching subdomains for domain:", domain.id);
 
-        const res = await API(
-          "GET",
-          `${URL_PATH.getSubDomain}?domainId=${domain.id}`
-        );
+  //       const res = await API(
+  //         "GET",
+  //         `${URL_PATH.getSubDomain}?domainId=${domain.id}`,
+  //       );
 
-        setSubDomains(
-          res.data.map((item: any) => ({
-            _id: item._id,
-            name: item.name,
-          }))
-        );
-      } catch (err) {
-        console.error("Failed to fetch sub domains", err);
-        notify("Unable to load sub domains");
-      }
-    };
+  //       setSubDomains(
+  //         res.data.map((item: any) => ({
+  //           _id: item._id,
+  //           name: item.name,
+  //         })),
+  //       );
+  //     } catch (err) {
+  //       console.error("Failed to fetch sub domains", err);
+  //       notify("Unable to load sub domains");
+  //     }
+  //   };
 
-    fetchSubDomains();
-  }, [domain]);
+  //   fetchSubDomains();
+  // }, [domain]);
 
   // -------------------- UI --------------------
   return (
@@ -275,7 +262,7 @@ function JobDomain() {
                       onClick={() => {
                         console.log("🎯 Domain selected:", item.name);
                         setDomain({ id: item._id, name: item.name });
-                        setSubDomain(null); // reset subdomain when domain changes
+                        // setSubDomain(null); // reset subdomain when domain changes
                       }}
                       className={`px-4 py-2 cursor-pointer text-sm hover:bg-violet-50 ${
                         domain?.id === item._id
@@ -292,7 +279,7 @@ function JobDomain() {
           </div>
 
           {/* SubDomain Dropdown */}
-          <div className="flex flex-col gap-2">
+          {/* <div className="flex flex-col gap-2">
             <label className="text-sm font-medium text-neutral-900">
               Sub Domain <span className="text-red-500">*</span>
             </label>
@@ -344,12 +331,12 @@ function JobDomain() {
                 </SubframeCore.DropdownMenu.Content>
               )}
             </SubframeCore.DropdownMenu.Root>
-          </div>
+          </div> */}
 
           {/* Footer */}
           <Button
             onClick={handleContinue}
-            disabled={!domain || !subDomain || isSubmitting}
+            disabled={!domain || isSubmitting}
             className={`h-9 w-full rounded-2xl text-white ${
               isSubmitting
                 ? "bg-violet-300"

@@ -14,6 +14,7 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "axios": "^1.13.2",
+    "country-state-city": "^3.2.1",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "react-redux": "^9.2.0",

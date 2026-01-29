@@ -16,6 +16,11 @@ import {
   FeatherX,
 } from "@subframe/core";
 import API, { URL_PATH } from "src/common/API";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 function UploadResume() {
   const [file, setFile] = useState<File | null>(null);
@@ -34,21 +39,18 @@ function UploadResume() {
     const uploaded = e.target.files[0];
 
     // Validate file type
-    const allowed = [
-      "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    ];
-    if (!allowed.includes(uploaded.type)) {
-      alert("Only PDF, DOC, or DOCX files are allowed.");
-      // reset input so user can reselect same file if desired
+    if (
+      uploaded.type !== "application/pdf" &&
+      !uploaded.name.toLowerCase().endsWith(".pdf")
+    ) {
+      toast.error("Only PDF file is allowed.");
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
 
-    // Validate file size (10MB)
-    if (uploaded.size > 10 * 1024 * 1024) {
-      alert("File size must be less than 10MB.");
+    // Validate file size (5MB)
+    if (uploaded.size > MAX_FILE_SIZE) {
+      toast.error("File size must be 5MB or less.");
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
@@ -65,18 +67,17 @@ function UploadResume() {
     if (!e.dataTransfer.files || e.dataTransfer.files.length === 0) return;
     const uploaded = e.dataTransfer.files[0];
 
-    const allowed = [
-      "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    ];
-    if (!allowed.includes(uploaded.type)) {
-      alert("Only PDF, DOC, or DOCX files are allowed.");
+    
+    if (
+      uploaded.type !== "application/pdf" &&
+      !uploaded.name.toLowerCase().endsWith(".pdf")
+    ) {
+      toast.error("Only PDF file is allowed.");
       return;
     }
 
-    if (uploaded.size > 5 * 1024 * 1024) {
-      alert("File size must be less than 5MB.");
+    if (uploaded.size > MAX_FILE_SIZE) {
+      toast.error("File size must be 5MB or less.");
       return;
     }
 
@@ -103,7 +104,6 @@ function UploadResume() {
       e.preventDefault();
       handleBrowseFile();
     } else if (e.key === "Escape") {
-      // allow users to cancel selection quickly via keyboard
       if (file) {
         e.preventDefault();
         removeFile();
@@ -111,35 +111,9 @@ function UploadResume() {
     }
   };
 
-  // const uploadResume = async () => {
+  
 
-  //   if (!file || uploading) return;
-
-  //   try {
-  //     setUploading(true);
-  //     const userId = localStorage.getItem("userId");
-  //     const token = localStorage.getItem("token");
-
-  //     if (!token) {
-  //       alert("Session expired. Please login again.");
-  //       return;
-  //     }
-  //     const formData = new FormData();
-  //     formData.append("resume", file);
-
-  //     await API("POST", URL_PATH.uploadResume, formData, {
-  //       "user-id": userId,
-  //       Authorization: `Bearer ${token}`,
-  //     });
-  //     navigate("/demographics");
-  //   } catch (error: any) {
-  //     console.error("UPLOAD ERROR:", error);
-  //     alert(error?.response?.data?.message || "Resume upload failed");
-  //   } finally {
-  //     setUploading(false);
-  //   }
-  // };
-
+ 
   const dispatch = useAppDispatch();
 
   const uploadResume = async () => {
@@ -151,6 +125,12 @@ function UploadResume() {
       const userId = localStorage.getItem("userId");
       const token = localStorage.getItem("token");
 
+      if (!token) {
+        toast.error("Session expired. Please login again.");
+        setUploading(false);
+        return;
+      }
+
       const formData = new FormData();
       formData.append("resume", file);
 
@@ -159,6 +139,8 @@ function UploadResume() {
         "user-id": userId,
         Authorization: `Bearer ${token}`,
       });
+      toast.success("Resume uploaded successfully");
+
 
       // 2️⃣ Ask backend where to go next
       const statusRes = await API("GET", URL_PATH.getUserStatus, undefined, {
@@ -168,22 +150,27 @@ function UploadResume() {
       const navigation = statusRes?.navigation || statusRes?.data?.navigation;
 
       if (navigation?.nextRoute) {
-        dispatch(setNavigation(navigation));
-        navigate(navigation.nextRoute);
+         setTimeout(() => {
+    dispatch(setNavigation(navigation));
+    navigate(navigation.nextRoute);
+  }, 3300);
       } else {
         console.error("Navigation missing", statusRes);
       }
     } catch (error: any) {
       console.error("UPLOAD ERROR:", error);
-      alert(error?.response?.data?.message || "Resume upload failed");
+      toast.error(error?.response?.data?.message || "Resume upload failed");
     } finally {
       setUploading(false);
     }
   };
 
   return (
+    <>
+    <ToastContainer position="top-center" autoClose={2600} />
+
     <div className="flex min-h-screen w-full items-center justify-center bg-neutral-50 px-4 sm:px-6 py-6 sm:py-8">
-      <div className="w-full max-w-[576px] flex flex-col items-start gap-6 rounded-3xl border bg-white px-4 sm:px-6 md:px-8 py-6 sm:py-8 shadow-[0_12px_30px_rgba(15,15,15,0.06)]">
+      <div className="w-full max-w-[576px] flex flex-col items-start gap-6 rounded-3xl border border-gray-400 bg-white px-4 sm:px-6 md:px-8 py-6 sm:py-8 shadow-[0_12px_30px_rgba(15,15,15,0.06)]">
         {/* Back + Progress Bar */}
         <div className="flex w-full items-center gap-3 sm:gap-4">
           <IconButton
@@ -195,20 +182,6 @@ function UploadResume() {
             className="!bg-transparent !text-neutral-600"
             aria-label="Back"
           />
-
-          <div className="flex grow items-center justify-center">
-            <div className="flex w-full max-w-full sm:max-w-[460px] items-center gap-1 sm:gap-2">
-              {/* example progress UI */}
-              <div className="h-1 flex-1 rounded-full bg-violet-500" />
-              <div className="h-1 flex-1 rounded-full bg-violet-500" />
-              <div className="h-1 flex-1 rounded-full bg-violet-500" />
-              <div className="h-1 flex-1 rounded-full bg-violet-500" />
-              <div className="h-1 flex-1 rounded-full bg-violet-200" />
-              <div className="h-1 flex-1 rounded-full bg-neutral-200" />
-              <div className="h-1 flex-1 rounded-full bg-neutral-200" />
-              <div className="h-1 flex-1 rounded-full bg-neutral-200" />
-            </div>
-          </div>
         </div>
 
         {/* Title */}
@@ -217,7 +190,7 @@ function UploadResume() {
             Upload your Resume
           </span>
           <span className="text-xs sm:text-sm text-neutral-500">
-            Upload your most recent resume (PDF, DOC, or DOCX)
+            Upload your most recent resume (PDF only)
           </span>
         </div>
 
@@ -232,7 +205,7 @@ function UploadResume() {
             role="button"
             tabIndex={0}
             aria-label="Upload resume. Click or press Enter to browse files. Or drag and drop a file here. Press Escape to remove the selected file."
-            className="w-full flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-neutral-300 bg-neutral-50 px-4 sm:px-6 py-4 sm:py-6 cursor-pointer"
+            className="w-full flex flex-col items-center justify-center gap-3 rounded-3xl border-2 border-dashed border-neutral-300 bg-neutral-50 px-4 sm:px-6 py-4 sm:py-6 cursor-pointer"
             onClick={handleBrowseFile}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
@@ -250,14 +223,14 @@ function UploadResume() {
                 Click to select file or drag to upload
               </span>
               <span className="text-xs text-neutral-500 text-center">
-                PDF, DOC, or DOCX (max 10MB)
+                PDF (max 5MB)
               </span>
             </div>
 
             {/* hidden input */}
             <input
               type="file"
-              accept=".pdf,.doc,.docx"
+              accept="application/pdf,.pdf"
               className="hidden"
               ref={fileInputRef}
               onChange={handleFileChange}
@@ -308,6 +281,7 @@ function UploadResume() {
         </div>
       </div>
     </div>
+  </>
   );
 }
 
