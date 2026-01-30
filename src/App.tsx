@@ -1,8 +1,8 @@
 import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-// import Chat from "./ui/components/chat/Chat";
-// import RecruiterChats from "./screens/RecruiterChats";
+import Chat from "./ui/components/chat/Chat";
+import RecruiterChats from "./screens/RecruiterChats";
 
 
 import SignUp from "./screens/SignUp";
@@ -86,7 +86,7 @@ const router = createBrowserRouter([
   
     // ✅ CHAT ROUTE (THIS IS WHAT YOU NEEDED)
 
-  // { path: "/chat/:otherUserId", element: <Chat /> }
+  { path: "/chat/:otherUserId", element: <Chat /> }
 
 ]);
 
