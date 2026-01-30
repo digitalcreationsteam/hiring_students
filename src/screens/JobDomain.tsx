@@ -23,7 +23,7 @@ function JobDomain() {
 
   // Domain
   const [domain, setDomain] = useState<{ id: string; name: string } | null>(
-    null,
+    null
   );
   const [domains, setDomains] = useState<{ _id: string; name: string }[]>([]);
 
@@ -39,7 +39,7 @@ function JobDomain() {
   // -------------------- SAVE DOMAIN + SUBDOMAIN --------------------
   const handleContinue = async () => {
     if (!domain) {
-      notify("Please select a job domain.");
+      notify("Please select domain.");
       return;
     }
 
@@ -53,7 +53,7 @@ function JobDomain() {
     try {
       setIsSubmitting(true);
 
-      console.log("💾 Saving domain and subdomain...");
+      console.log("💾 Saving domain...");
 
       // ✅ Step 1: Save domain/subdomain
       const saveResponse = await API(
@@ -62,16 +62,19 @@ function JobDomain() {
         {
           userId,
           domainId: domain.id,
+          // subDomainId: subDomain.id,
         },
         {
           Authorization: `Bearer ${token}`,
-        },
+        }
       );
 
       console.log("✅ Domain saved:", saveResponse);
 
       localStorage.setItem("domainId", domain.id);
+      // localStorage.setItem("subDomainId", subDomain.id);
       localStorage.setItem("jobDomain", domain.name);
+      // localStorage.setItem("subDomain", subDomain.name);
 
       // ✅ Step 2: Get updated navigation status
       console.log("🔍 Fetching updated navigation...");
@@ -93,13 +96,17 @@ function JobDomain() {
           nextRoute: statusResponse.navigation.nextRoute,
           currentStep: statusResponse.navigation.currentStep,
           completedSteps: statusResponse.navigation.completedSteps,
-          isOnboardingComplete: statusResponse.navigation.isOnboardingComplete,
+          isOnboardingComplete:
+            statusResponse.navigation.isOnboardingComplete,
           hasPayment: statusResponse.navigation.hasPayment,
-        }),
+        })
       );
 
       // ✅ Step 4: Navigate to next step
-      console.log("🚀 Navigating to:", statusResponse.navigation.nextRoute);
+      console.log(
+        "🚀 Navigating to:",
+        statusResponse.navigation.nextRoute
+      );
       navigate(statusResponse.navigation.nextRoute);
     } catch (err: any) {
       console.error("❌ Error:", err);
@@ -132,6 +139,12 @@ function JobDomain() {
             });
           }
 
+          // if (item.subDomainId) {
+          //   setSubDomain({
+          //     id: item.subDomainId._id,
+          //     name: item.subDomainId.name,
+          //   });
+          // }
         }
       } catch (err) {
         console.error("Failed to fetch job domain", err);
@@ -178,14 +191,14 @@ function JobDomain() {
 
   //       const res = await API(
   //         "GET",
-  //         `${URL_PATH.getSubDomain}?domainId=${domain.id}`,
+  //         `${URL_PATH.getSubDomain}?domainId=${domain.id}`
   //       );
 
   //       setSubDomains(
   //         res.data.map((item: any) => ({
   //           _id: item._id,
   //           name: item.name,
-  //         })),
+  //         }))
   //       );
   //     } catch (err) {
   //       console.error("Failed to fetch sub domains", err);

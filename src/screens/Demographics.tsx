@@ -157,7 +157,7 @@ export default function Demographics() {
       return "Please enter your mobile number.";
     }
     if (!phoneRegex.test(phoneValue)) {
-      return "Please enter a valid phone number (10–15 digits).";
+      return "Please enter a valid phone number.";
     }
 
     if (!form.country) {
@@ -210,7 +210,6 @@ export default function Demographics() {
     try {
       // ✅ Step 1: Save demographics to backend
       const saveResponse = await API("POST", URL_PATH.demographics, payload);
-      toast.success("Demographics added successfully");
 
       if (!saveResponse?.data) {
         setError(saveResponse?.message || "Failed to save demographics");
@@ -237,9 +236,14 @@ export default function Demographics() {
           hasPayment: statusResponse.navigation.hasPayment,
         }),
       );
+            toast.success("Demographics added successfully");
+
+            setTimeout(() => {
+  navigate(statusResponse.navigation.nextRoute);
+}, 3000);
+
 
       // ✅ Step 4: Navigate to next step
-      navigate(statusResponse.navigation.nextRoute);
     } catch (err: unknown) {
       const apiError = err as ApiError;
       const message = apiError?.message || "Failed to submit demographics";
@@ -252,40 +256,6 @@ export default function Demographics() {
     }
   };
 
-  /* ============================================
-     DATA FETCHING
-  ============================================ */
-  // useEffect(() => {
-  //   const fetchData = async (): Promise<void> => {
-  //     try {
-  //       // Fetch existing demographics
-  //       const demographicsRes = await API("GET", URL_PATH.getDemographics);
-
-  //       if (demographicsRes?.fullName) {
-  //         setForm({
-  //           fullName: demographicsRes.fullName,
-  //           email: demographicsRes.email || "",
-  //           phoneNumber: demographicsRes.phoneNumber || "",
-  //           city: demographicsRes.city || "",
-  //           state: demographicsRes.state || "",
-  //           country: demographicsRes.country || "",
-  //         });
-
-  //         setPhoneVisible(!!demographicsRes.phoneVisibleToRecruiters);
-  //       }
-
-  //       // Fetch experience index
-  //       const expRes = await API("GET", URL_PATH.calculateExperienceIndex);
-  //       setExperienceIndex(expRes?.points?.demographics || 0);
-  //     } catch (err) {
-  //       console.error("❌ Error fetching data:", err);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
   useEffect(() => {
     const fetchData = async (): Promise<void> => {
       try {
@@ -376,7 +346,7 @@ export default function Demographics() {
 
   return (
     <>
-      <ToastContainer position="top-center" autoClose={3000} />
+      <ToastContainer position="top-center" autoClose={2000} />
       <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-4 sm:px-6 py-10 sm:py-22">
         <div className="w-full max-w-[1000px] mx-auto flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
           {/* LEFT CARD */}
@@ -563,7 +533,7 @@ export default function Demographics() {
                       ))}
 
                       <option value={OTHER_CITY_VALUE}>
-                        Other (Add manually)
+                        Other
                       </option>
                     </select>
                   ) : (

@@ -78,9 +78,9 @@ export default function Skills() {
       const token = localStorage.getItem("token");
       const userId = localStorage.getItem("userId");
       const domainId = localStorage.getItem("domainId");
-      const subDomainId = localStorage.getItem("subDomainId");
+      // const subDomainId = localStorage.getItem("subDomainId");
 
-      if (!domainId || !subDomainId) {
+      if (!domainId ) {
         alert("Domain selection missing. Please select domain again.");
         navigate("/job-domain");
         return;
@@ -92,7 +92,6 @@ export default function Skills() {
         {
           userId,
           domainId,
-          subDomainId,
           skills,
         },
         {
