@@ -55,6 +55,7 @@ type EducationEntry = {
   endYear?: string;
   currentlyStudying: boolean;
   gpa?: string;
+  cgpa?: string;
 };
 
 const normalize = (v: string) => v.replace(/\s+/g, " ").trim();
@@ -203,6 +204,9 @@ export default function Education() {
   const [endYear, setEndYear] = useState("");
   const [currentlyStudying, setStudying] = useState(false);
   const [gpa, setGpa] = useState("");
+  const [cgpa, setCGpa] = useState("");
+  const [gradeSystem, setGradeSystem] = useState<"gpa" | "cgpa">("gpa"); // New state for grade system
+
   const [isExpIndexLoading, setIsExpIndexLoading] = useState(true);
   const [experiencePoints, setExperiencePoints] =
     useState<ExperiencePoints | null>(null);
@@ -215,7 +219,7 @@ export default function Education() {
   const displayedIndex =
     (experiencePoints?.demographics ?? 0) + (experiencePoints?.education ?? 0);
 
-  // helpers
+  // Update the validation function
   const validateEducation = (): string | null => {
     if (!degree.trim()) return "Degree is required";
     if (!fieldOfStudy.trim()) return "Field of study is required";
@@ -230,10 +234,31 @@ export default function Education() {
       if (!isEndAfterStart(startYear, endYear))
         return "End year must be after start year";
     }
-    if (!gpa.trim()) return "GPA is required";
 
-    if (gpa && !/^(10(\.0{1,2})?|[0-9](\.\d{1,2})?)$/.test(gpa))
-      return "GPA must be between 0 and 10";
+    // Check if at least one grade is provided
+    const hasGPA = gpa.trim().length > 0;
+    const hasCGPA = cgpa.trim().length > 0;
+
+    if (!hasGPA && !hasCGPA) {
+      return "Please enter either GPA or CGPA";
+    }
+
+    // If both are entered, ask user to choose one
+    if (hasGPA && hasCGPA) {
+      return "Please enter only one: either GPA (4.0 scale) or CGPA (10.0 scale)";
+    }
+
+    // Validate GPA if provided (0-4 scale)
+    if (hasGPA) {
+      if (!/^(4(\.0{1,2})?|[0-3](\.[0-9]{1,2})?)$/.test(gpa))
+        return "GPA must be between 0 and 4.0 (e.g., 3.5, 4.0)";
+    }
+
+    // Validate CGPA if provided (0-10 scale)
+    if (hasCGPA) {
+      if (!/^(10(\.0{1,2})?|[0-9](\.\d{1,2})?)$/.test(cgpa))
+        return "CGPA must be between 0 and 10 (e.g., 7.5, 9.2)";
+    }
 
     return null;
   };
@@ -246,29 +271,30 @@ export default function Education() {
     setEndYear("");
     setStudying(false);
     setGpa("");
+    setCGpa("");
+    setGradeSystem("gpa");
   };
 
-const hasEducationOverlap = () => {
-  const newStart = Number(startYear);
-  const newEnd = currentlyStudying
-    ? new Date().getFullYear()
-    : Number(endYear);
-
-  if (!Number.isFinite(newStart) || !Number.isFinite(newEnd)) return false;
-
-  return educations.some((ed) => {
-    const oldStart = Number(ed.startYear);
-    const oldEnd = ed.currentlyStudying
+  const hasEducationOverlap = () => {
+    const newStart = Number(startYear);
+    const newEnd = currentlyStudying
       ? new Date().getFullYear()
-      : Number(ed.endYear);
+      : Number(endYear);
 
-    if (!Number.isFinite(oldStart) || !Number.isFinite(oldEnd)) return false;
+    if (!Number.isFinite(newStart) || !Number.isFinite(newEnd)) return false;
 
-    // ✅ strict overlap: allows 2003–2006 and 2006–2008
-    return newStart < oldEnd && newEnd > oldStart;
-  });
-};
+    return educations.some((ed) => {
+      const oldStart = Number(ed.startYear);
+      const oldEnd = ed.currentlyStudying
+        ? new Date().getFullYear()
+        : Number(ed.endYear);
 
+      if (!Number.isFinite(oldStart) || !Number.isFinite(oldEnd)) return false;
+
+      // ✅ strict overlap: allows 2003–2006 and 2006–2008
+      return newStart < oldEnd && newEnd > oldStart;
+    });
+  };
 
   const handleAddEducation = async () => {
     const error = validateEducation();
@@ -339,7 +365,7 @@ const hasEducationOverlap = () => {
       ? currentYear - Number(startYear)
       : Number(endYear) - Number(startYear);
 
-    // ✅ API payload
+    // ✅ API payload - include both GPA and CGPA
     const payload = {
       educations: [
         {
@@ -351,6 +377,8 @@ const hasEducationOverlap = () => {
           currentlyStudying,
           duration,
           gpa: gpa ? Number(gpa) : null,
+          cgpa: cgpa ? Number(cgpa) : null,
+          gradeSystem: gradeSystem, // Send which system was used
         },
       ],
     };
@@ -377,6 +405,7 @@ const hasEducationOverlap = () => {
             : String(created.endYear),
           currentlyStudying: created.currentlyStudying,
           gpa: created.gpa ? String(created.gpa) : undefined,
+          cgpa: created.cgpa ? String(created.cgpa) : undefined,
         },
         ...prev,
       ]);
@@ -444,6 +473,7 @@ const hasEducationOverlap = () => {
           endYear: e.currentlyStudying ? undefined : String(e.endYear),
           currentlyStudying: e.currentlyStudying,
           gpa: e.gpa ? String(e.gpa) : undefined,
+          cgpa: e.cgpa ? String(e.cgpa) : undefined,
         }),
       );
 
@@ -828,26 +858,65 @@ const hasEducationOverlap = () => {
                 </span>
               </div>
 
-              {/* GPA */}
+              {/* GPA Field - US 4-point scale */}
               <TextField
                 className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
                 label={
                   <span className="text-[12px]">
-                    GPA <span className="text-red-500">*</span>
+                    GPA (US System){" "}
+                    <span className="text-gray-500 text-xs">(Optional)</span>
                   </span>
                 }
-                helpText=""
+                helpText="Enter GPA on a 4.0 scale"
+              >
+                <TextField.Input
+                  className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0"
+                  placeholder="e.g., 3.8 (out of 4)"
+                  value={gpa}
+                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) => {
+                    const value = ev.target.value.replace(/[^0-9.]/g, "");
+                    // Prevent multiple decimal points
+                    const decimalCount = (value.match(/\./g) || []).length;
+                    if (decimalCount <= 1) {
+                      setGpa(value);
+                      // Auto-clear CGPA if user starts typing GPA
+                      if (value && cgpa) {
+                        setCGpa("");
+                      }
+                    }
+                  }}
+                />
+              </TextField>
+
+              {/* CGPA Field - Indian 10-point scale */}
+              <TextField
+                className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
+                label={
+                  <span className="text-[12px]">
+                    CGPA (Indian System){" "}
+                    <span className="text-gray-500 text-xs">(Optional)</span>
+                  </span>
+                }
+                helpText="Enter CGPA on a 10.0 scale"
               >
                 <TextField.Input
                   className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0"
                   placeholder="e.g., 7.8 (out of 10)"
-                  value={gpa}
-                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                    setGpa(ev.target.value.replace(/[^0-9.]/g, ""))
-                  }
+                  value={cgpa}
+                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) => {
+                    const value = ev.target.value.replace(/[^0-9.]/g, "");
+                    // Prevent multiple decimal points
+                    const decimalCount = (value.match(/\./g) || []).length;
+                    if (decimalCount <= 1) {
+                      setCGpa(value);
+                      // Auto-clear GPA if user starts typing CGPA
+                      if (value && gpa) {
+                        setGpa("");
+                      }
+                    }
+                  }}
                 />
               </TextField>
-
               <div className="mt-2 flex flex-col sm:flex-row gap-3 items-center">
                 <Button
                   type="button"

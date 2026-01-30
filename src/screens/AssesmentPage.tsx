@@ -108,11 +108,13 @@ const registerViolation = (msg: string) => {
 
 
 
-const reportViolation = async (attemptId: string, type: string) => {
+const reportViolation = async (type: string) => {
+  if (!attemptId) return;
+
   try {
     const res = await API(
       "POST",
-      `/api/test-attempts/${attemptId}/violation`,
+      URL_PATH.reportViolation + `/${attemptId}`,
       { type },
       {
         "user-id": localStorage.getItem("userId"),
@@ -121,16 +123,33 @@ const reportViolation = async (attemptId: string, type: string) => {
 
     console.log("Integrity Update:", res);
 
-    // You can show warning popup if cheating alert triggered
-    if (res.cheatAlert) {
-      alert("⚠️ Suspicious activity detected. Please follow exam rules.");
+    // Update violations count from backend response
+    if (res.totalViolations !== undefined) {
+      setViolations(res.totalViolations);
+      
+      // Auto-submit if violations reach 4
+      if (res.totalViolations >= 4) {
+        setWarningMsg("⚠️ Maximum violations reached! Your exam is being auto-submitted.");
+        setWarningOpen(true);
+        
+        // Auto-submit after 2 seconds
+        setTimeout(() => {
+          handleSubmit();
+        }, 2000);
+      }
     }
+
+    // If cheating alert triggered, update warning message
+    if (res.cheatAlert) {
+      setWarningMsg("⚠️ Multiple violations detected! This attempt may be flagged for review.");
+    }
+
+    return res;
 
   } catch (err) {
     console.error("Violation report failed", err);
   }
 };
-
   //============ SAVE ANSWERS ON REFRESH / CRASH =================//
   useEffect(() => {
     if (!attemptId) return;
@@ -167,43 +186,61 @@ const reportViolation = async (attemptId: string, type: string) => {
   }, []);
 
 
-useEffect(() => {
 
-    if (violations >= 4 && !submitLockRef.current) {
-    handleSubmit(); // strict: auto-submit on first leave
-  }
+
+useEffect(() => {
+  const reportTabSwitch = async () => {
+    if (attemptId) {
+      await reportViolation("TAB_SWITCH");
+    }
+  };
+
+  const reportCopy = async () => {
+    if (attemptId) {
+      await reportViolation("COPY");
+    }
+  };
+
+  const reportPaste = async () => {
+    if (attemptId) {
+      await reportViolation("PASTE");
+    }
+  };
+
   // -------- Tab switch / leaving page detection ----------
   const onVisibilityChange = () => {
     if (document.hidden) {
-      registerViolation("Warning: You switched tabs / minimized the exam window. Otherwise the exam will be auto-submitted after 3 warnings.");
+      registerViolation("Warning: You switched tabs / minimized the exam window. Otherwise the exam will be auto-submitted after 4 violations.");
+      reportTabSwitch();
     }
   };
 
   const onBlur = () => {
-    // blur fires when user clicks outside or switches apps
-    registerViolation("Warning: You moved away from the exam window. Otherwise the exam will be auto-submitted after 3 warnings.");
+    registerViolation("Warning: You moved away from the exam window. Otherwise the exam will be auto-submitted after 4 violations.");
+    reportTabSwitch();
   };
 
   // -------- Block copy/cut/paste/right click ----------
   const onCopy = (e: ClipboardEvent) => {
     e.preventDefault();
-    registerViolation("Copy is disabled during the exam. Otherwise the exam will be auto-submitted after 3 warnings.");
+    registerViolation("Copy is disabled during the exam. Otherwise the exam will be auto-submitted after 4 violations.");
+    reportCopy();
   };
 
   const onCut = (e: ClipboardEvent) => {
     e.preventDefault();
-    registerViolation("Cut is disabled during the exam. Otherwise the exam will be auto-submitted after 3 warnings.");
+    registerViolation("Cut is disabled during the exam. Otherwise the exam will be auto-submitted after 4 violations.");
+    reportCopy();
   };
 
   const onPaste = (e: ClipboardEvent) => {
     e.preventDefault();
-    registerViolation("Paste is disabled during the exam. Otherwise the exam will be auto-submitted after 3 warnings.");
+    registerViolation("Paste is disabled during the exam. Otherwise the exam will be auto-submitted after 4 violations.");
+    reportPaste();
   };
 
-  
-
-  // -------- Block common shortcuts (Ctrl+C, Ctrl+V, Ctrl+P, Ctrl+S, etc.) ----------
-  const onKeyDown = (e: KeyboardEvent) => {
+  // ... rest of your event listeners
+   const onKeyDown = (e: KeyboardEvent) => {
     const key = e.key.toLowerCase();
     const ctrlOrCmd = e.ctrlKey || e.metaKey;
 
@@ -236,9 +273,7 @@ useEffect(() => {
     document.removeEventListener("paste", onPaste);
     document.removeEventListener("keydown", onKeyDown);
   };
-}, [violations]);
-
-
+}, [violations, attemptId]); // Add attemptId to dependencies
 
   // --- COMPUTED VALUES ---
   const answeredCount = useMemo(
@@ -814,19 +849,13 @@ const totalMarks = useMemo(() => {
       </div>
 
 
-     {warningOpen && (
+{warningOpen && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
     <div className="w-[360px] rounded-2xl bg-white p-6 shadow-xl">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-semibold text-neutral-900">
           Exam Warning
         </h3>
-        <button
-          onClick={() => setWarningOpen(false)}
-          className="text-neutral-400 hover:text-neutral-600"
-        >
-          ✕
-        </button>
       </div>
 
       <p className="text-sm text-neutral-600 mb-2">
@@ -834,7 +863,7 @@ const totalMarks = useMemo(() => {
       </p>
 
       <p className="text-xs text-neutral-500 mb-6">
-        Violations: <b>{violations}</b> / 3  
+        Violations: <b>{violations}</b> / 4  
         <br />
         Switching tabs or copying may auto-submit your exam.
       </p>
@@ -843,7 +872,17 @@ const totalMarks = useMemo(() => {
         <Button
           variant="neutral-secondary"
           className="flex-1"
-          onClick={() => setWarningOpen(false)}
+          onClick={async () => {
+            // Unlock the exam
+            setIsLocked(false);
+            
+            // You could also send an acknowledgment to backend if needed
+            // await API("POST", `/api/test-attempts/${attemptId}/warning-ack`, {}, {
+            //   "user-id": localStorage.getItem("userId"),
+            // });
+            
+            setWarningOpen(false);
+          }}
         >
           Continue Exam
         </Button>
@@ -851,7 +890,6 @@ const totalMarks = useMemo(() => {
     </div>
   </div>
 )}
-
 
     </div>
   );

@@ -108,6 +108,23 @@ function AssessmentResult() {
       const res = await API("GET", `${URL_PATH.result}?attemptId=${attemptId}`);
 
       console.log("FINAL RESPONSE:", res);
+ // ✅ Integrity Data
+if (res?.integrity) {
+  setReport({
+    attemptId: res?.attempt?._id || "",
+    integrityScore: res.integrity.score,
+    integrityLevel: res.integrity.level,
+    cheatAlertSent: res.integrity.cheatAlertSent,
+    totalViolations: res.integrity.totalViolations,
+    level: res.integrity.level,
+    violationBreakdown: {
+      COPY: 0,
+      PASTE: 0,
+      TAB_SWITCH: 0,
+    },
+    violationTimeline: [],
+  });
+}
 
       setResult({
         skillIndex: res?.hireabilityIndex?.skillIndexScore ?? 0,
@@ -359,15 +376,19 @@ function AssessmentResult() {
     <div className="h-px w-full bg-neutral-200 sm:h-6 sm:w-px" />
 
     {/* Item 3 */}
+  
+
     <div className="flex items-center gap-3 sm:gap-2">
-      <FeatherShield className="text-sm text-green-600 shrink-0" />
-      <div className="flex flex-col min-w-0">
-        <span className="text-[14px] font-medium text-default-font truncate">
-          {loading ? "Loading..." : report?.integrityLevel ?? "—"}
-        </span>
-        <span className="text-xs text-subtext-color">Integrity Report</span>
-      </div>
-    </div>
+  <FeatherShield className="text-sm text-green-600 shrink-0" />
+  <div className="flex flex-col min-w-0">
+    <span className="text-[14px] font-medium text-default-font truncate">
+      {/* {report ? `${report.integrityScore}/100 • ${report.integrityLevel}` : "—"} */}
+      {report ? ` ${report.integrityLevel}` : "—"}
+    </span>
+    <span className="text-xs text-subtext-color">Integrity Score</span>
+  </div>
+</div>
+
   </div>
 </div>
 

@@ -100,6 +100,7 @@ export const URL_PATH = {
   getAttemptQuestions: "/user/assessment/getAttemptQuestions",
   saveAnswer: "/user/assessment/saveAnswer",
   submitAssessment: "/user/assessment/submit",
+  reportViolation:"/user/assessment/violation",
   getUserDomainSkils: "/user/getUserDomainSkills",
 
   createSubscription: "/subscription/create",
