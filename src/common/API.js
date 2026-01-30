@@ -30,6 +30,7 @@ const apiClient = axios.create({
 export const URL_PATH = {
   /* ---------- AUTH ---------- */
   signup: "/auth/signup",
+  checkEmailVerification: "/auth/verification-status",
   login: "/auth/login",
   logout: "/auth/logout",
   loginGoogle: "/auth/google",

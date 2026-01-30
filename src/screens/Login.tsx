@@ -110,12 +110,12 @@ function Login() {
   };
 
   const handleOAuth = (provider: "google" | "linkedin") => {
+    const baseURL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
     if (provider === "google") {
-      window.location.href = "http://localhost:5001/api/auth/google";
+      window.location.href = `${baseURL}/auth/google`;
     }
-
     if (provider === "linkedin") {
-      window.location.href = "http://localhost:5001/api/auth/linkedin";
+      window.location.href = `${baseURL}/auth/linkedin`;
     }
   };
 

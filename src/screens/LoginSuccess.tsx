@@ -12,12 +12,28 @@ export default function LoginSuccess() {
     const params = new URLSearchParams(window.location.search);
 
     const token = params.get("token");
+    const userDataBase64 = params.get("user");
     const emailRequired = params.get("email_required");
     const provider = params.get("provider");
     const sub = params.get("sub");
 
     if (token) {
       localStorage.setItem("token", token);
+      
+      // Decode and store user data if available
+      if (userDataBase64) {
+        try {
+          const userDataJson = atob(userDataBase64);
+          const userData = JSON.parse(userDataJson);
+          localStorage.setItem("user", JSON.stringify(userData));
+          localStorage.setItem("userId", userData.id);
+          localStorage.setItem("userEmail", userData.email);
+          localStorage.setItem("userName", `${userData.firstname} ${userData.lastname}`);
+        } catch (error) {
+          console.error("Failed to decode user data:", error);
+        }
+      }
+      
       navigate("/demographics", { replace: true });
       return;
     }

@@ -11,7 +11,8 @@ import API, { URL_PATH } from "src/common/API";
 function EmailVerification() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const hasVerifiedRef = useRef(false);
+  const { token } = useParams();
+  
   const INITIAL = 30;
   const timerRef = useRef<number | null>(null);
   const [countdown, setCountdown] = useState<number>(INITIAL);
@@ -19,6 +20,7 @@ function EmailVerification() {
   const [isSending, setIsSending] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<string>("");
 
+  // ----------------- Countdown Timer -----------------
   const startTimer = (startFrom = INITIAL) => {
     if (timerRef.current !== null) {
       window.clearInterval(timerRef.current);
@@ -48,7 +50,6 @@ function EmailVerification() {
     setCanResend(countdown <= 0);
   }, [countdown]);
 
-  // start on mount
   useEffect(() => {
     startTimer(INITIAL);
     return () => {
@@ -60,39 +61,69 @@ function EmailVerification() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // =============== GET API for Email verification ================
- const { token } = useParams();
+  // ----------------- Verify via token -----------------
+  useEffect(() => {
+    if (!token) return;
 
-useEffect(() => {
-  if (!token) return;
-
-  const verify = async () => {
-    try {
-      const res = await API("GET", `${URL_PATH.verifyEmail}/${token}`);
-      if (res.success) {
-        setStatusMessage("Email verified. Redirecting to login...");
-        setTimeout(() => navigate("/email-verified"), 1500);
+    const verify = async () => {
+      try {
+        const res = await API("GET", `${URL_PATH.verifyEmail}/${token}`);
+        if (res.success) {
+          setStatusMessage("Email verified. Redirecting...");
+          setTimeout(() => navigate("/talent-ranking"), 1500);
+        } else {
+          setStatusMessage("Invalid or expired link.");
+        }
+      } catch {
+        setStatusMessage("Invalid or expired link.");
       }
+    };
+
+    verify();
+  }, [token, navigate]);
+
+  // ----------------- Resend Verification Email -----------------
+  const handleResend = async () => {
+    setIsSending(true);
+    try {
+      await API("POST", URL_PATH.resendVerification, {
+        email: localStorage.getItem("signupEmail"),
+      });
+      setStatusMessage("Verification email sent again");
+      startTimer(INITIAL);
     } catch {
-      setStatusMessage("Invalid or expired link.");
+      setStatusMessage("Failed to resend email");
+    } finally {
+      setIsSending(false);
     }
   };
 
-  verify();
-}, [token]);
+  // ----------------- Polling to auto redirect when verified -----------------
+ // ----------------- Polling to auto redirect when verified -----------------
+useEffect(() => {
+  let intervalId: NodeJS.Timeout;
 
+  const pollVerification = async () => {
+    intervalId = setInterval(async () => {
+      try {
+        const res = await API("GET", URL_PATH.checkEmailVerification);
+        // ✅ Use the correct property name
+        if (res?.success && res.isVerified) {
+          clearInterval(intervalId); // stop polling
+          navigate("/talent-ranking"); // redirect
+        }
+      } catch (err) {
+        console.error("Error checking verification:", err);
+      }
+    }, 5000); // check every 5s
+  };
 
+  pollVerification();
 
- const handleResend = async () => {
-  try {
-    await API("POST", URL_PATH.resendVerification, {
-      email: localStorage.getItem("signupEmail"),
-    });
-    setStatusMessage("Verification email sent again");
-  } catch {
-    setStatusMessage("Failed to resend email");
-  }
-};
+  return () => {
+    if (intervalId) clearInterval(intervalId);
+  };
+}, [navigate]);
 
 
   return (
@@ -124,11 +155,9 @@ useEffect(() => {
 
           <Button
             className={`h-10 w-full rounded-2xl transition-all duration-150
-              ${
-                canResend
-                  ? "bg-violet-100 text-violet-700 shadow-sm"
-                  : "bg-violet-50 text-violet-600/70"
-              }
+              ${canResend
+                ? "bg-violet-100 text-violet-700 shadow-sm"
+                : "bg-violet-50 text-violet-600/70"}
             `}
             variant="brand-secondary"
             size="small"
@@ -150,10 +179,6 @@ useEffect(() => {
               You can request a new link in {countdown} second
               {countdown !== 1 ? "s" : ""}
             </span>
-          </div>
-
-          <div className="sr-only" role="status" aria-live="polite">
-            {statusMessage}
           </div>
 
           {statusMessage && (

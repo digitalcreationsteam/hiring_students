@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   FeatherBriefcase,
@@ -20,6 +20,16 @@ function SignUp() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+const checkEmailVerification = async () => {
+  try {
+    const res = await API("GET", "/auth/verification-status");
+    return res?.isVerified;
+  } catch {
+    return false;
+  }
+};
+
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const validate = () => {
@@ -36,7 +46,7 @@ function SignUp() {
     return true;
   };
 
- const handleSubmit = async (e: any) => {
+const handleSubmit = async (e: any) => {
   e.preventDefault();
   if (loading) return;
   if (!validate()) return;
@@ -44,21 +54,17 @@ function SignUp() {
   setLoading(true);
   setError("");
 
-  const formData = {
-    email,
-    firstname,
-    lastname,
-    password,
-  };
+  const formData = { email, firstname, lastname, password };
 
   try {
     const res = await API("POST", URL_PATH.signup, formData);
 
     if (res?.success) {
-      // ✅ store email ONLY for verification resend
+      // ✅ store token
+      localStorage.setItem("token", res.token);
       localStorage.setItem("signupEmail", email);
 
-      // ✅ move user to info page
+      // Redirect immediately to verify-email page
       navigate("/verify-email");
     }
   } catch (err: any) {
@@ -68,13 +74,39 @@ function SignUp() {
   }
 };
 
+
+// // ✅ Polling helper function
+// const pollEmailVerification = async (interval: number, timeout: number) => {
+//   const start = Date.now();
+
+//   return new Promise<boolean>(async (resolve) => {
+//     const check = async () => {
+//       try {
+//         const verified = await checkEmailVerification();
+//         if (verified) return resolve(true);
+//         if (Date.now() - start > timeout) return resolve(false); // stop after timeout
+//         setTimeout(check, interval); // try again after interval
+//       } catch {
+//         if (Date.now() - start > timeout) return resolve(false);
+//         setTimeout(check, interval);
+//       }
+//     };
+//     check();
+//   });
+// };
+
+
   const handleOAuth = (provider: any) => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      navigate("/verify-email");
-    }, 800);
+    const baseURL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+    if (provider === "google") {
+      window.location.href = `${baseURL}/auth/google`;
+    }
+    if (provider === "linkedin") {
+      window.location.href = `${baseURL}/auth/linkedin`;
+    }
   };
+
+
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-neutral-50 px-4">
