@@ -212,7 +212,7 @@ export default function Awards() {
   const resetForm = () => {
     setName("");
     setDescription("");
-    setYear("");
+    setEndYear("");
   };
 
   // Helper
@@ -279,7 +279,7 @@ export default function Awards() {
         { "user-id": userId },
       );
 
-       toast.success("Award added successfully");
+      toast.success("Award added successfully");
 
       await fetchAwards();
       await fetchExperienceIndex();
@@ -535,8 +535,6 @@ export default function Awards() {
                 />
               </TextField>
 
-              
-
               {/* End Year */}
               <div className="flex flex-col gap-1">
                 <label className="text-[12px] font-medium">
@@ -551,9 +549,7 @@ export default function Awards() {
               </div>
 
               <TextField
-                label={
-                  <span className="text-[12px]">Description</span>
-                }
+                label={<span className="text-[12px]">Description</span>}
                 helpText=""
                 className={scTextFieldClass}
               >

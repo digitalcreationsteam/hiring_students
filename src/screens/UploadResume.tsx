@@ -22,6 +22,31 @@ import "react-toastify/dist/ReactToastify.css";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
+const fetchStatusWithRetry = async (
+  token: string,
+  retries = 5,
+  delay = 150
+) => {
+  for (let i = 0; i < retries; i++) {
+    const res = await API("GET", URL_PATH.getUserStatus, undefined, {
+      Authorization: `Bearer ${token}`,
+    });
+
+    const navigation = res?.navigation || res?.data?.navigation;
+
+    // ✅ wait until resume is reflected in DB
+    if (navigation?.completedSteps?.includes("resume")) {
+      return navigation;
+    }
+
+    // ⏳ wait before next attempt
+    await new Promise((resolve) => setTimeout(resolve, delay));
+  }
+
+  throw new Error("User status not updated yet");
+};
+
+
 function UploadResume() {
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -116,58 +141,97 @@ function UploadResume() {
  
   const dispatch = useAppDispatch();
 
-  const uploadResume = async () => {
-    if (!file || uploading) return;
+  // const uploadResume = async () => {
+  //   if (!file || uploading) return;
 
-    try {
-      setUploading(true);
+  //   try {
+  //     setUploading(true);
 
-      const userId = localStorage.getItem("userId");
-      const token = localStorage.getItem("token");
+  //     const userId = localStorage.getItem("userId");
+  //     const token = localStorage.getItem("token");
 
-      if (!token) {
-        toast.error("Session expired. Please login again.");
-        setUploading(false);
-        return;
-      }
+  //     if (!token) {
+  //       toast.error("Session expired. Please login again.");
+  //       setUploading(false);
+  //       return;
+  //     }
 
-      const formData = new FormData();
-      formData.append("resume", file);
+  //     const formData = new FormData();
+  //     formData.append("resume", file);
 
-      // 1️⃣ Upload resume
-      await API("POST", URL_PATH.uploadResume, formData, {
-        "user-id": userId,
-        Authorization: `Bearer ${token}`,
-      });
-      toast.success("Resume uploaded successfully");
+  //     // 1️⃣ Upload resume
+  //     await API("POST", URL_PATH.uploadResume, formData, {
+  //       "user-id": userId,
+  //       Authorization: `Bearer ${token}`,
+  //     });
+  //     toast.success("Resume uploaded successfully");
 
 
-      // 2️⃣ Ask backend where to go next
-      const statusRes = await API("GET", URL_PATH.getUserStatus, undefined, {
-        Authorization: `Bearer ${token}`,
-      });
+  //     // 2️⃣ Ask backend where to go next
+  //     const statusRes = await API("GET", URL_PATH.getUserStatus, undefined, {
+  //       Authorization: `Bearer ${token}`,
+  //     });
 
-      const navigation = statusRes?.navigation || statusRes?.data?.navigation;
+  //     const navigation = statusRes?.navigation || statusRes?.data?.navigation;
 
-      if (navigation?.nextRoute) {
-         setTimeout(() => {
-    dispatch(setNavigation(navigation));
-    navigate(navigation.nextRoute);
-  }, 3300);
-      } else {
-        console.error("Navigation missing", statusRes);
-      }
-    } catch (error: any) {
-      console.error("UPLOAD ERROR:", error);
-      toast.error(error?.response?.data?.message || "Resume upload failed");
-    } finally {
-      setUploading(false);
+  //     if (navigation?.nextRoute) {
+  //        setTimeout(() => {
+  //   dispatch(setNavigation(navigation));
+  //   navigate(navigation.nextRoute);
+  // }, 2000);
+  //     } else {
+  //       console.error("Navigation missing", statusRes);
+  //     }
+  //   } catch (error: any) {
+  //     console.error("UPLOAD ERROR:", error);
+  //     toast.error(error?.response?.data?.message || "Resume upload failed");
+  //   } finally {
+  //     setUploading(false);
+  //   }
+  // };
+const uploadResume = async () => {
+  if (!file || uploading) return;
+
+  try {
+    setUploading(true);
+
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+
+    if (!token) {
+      toast.error("Session expired. Please login again.");
+      return;
     }
-  };
+
+    const formData = new FormData();
+    formData.append("resume", file);
+
+    // 1️⃣ upload resume
+    await API("POST", URL_PATH.uploadResume, formData, {
+      "user-id": userId,
+      Authorization: `Bearer ${token}`,
+    });
+
+    toast.success("Resume uploaded successfully");
+
+    // 2️⃣ WAIT until Mongo shows resume=true
+    const navigation = await fetchStatusWithRetry(token);
+
+    setTimeout(() => {
+      dispatch(setNavigation(navigation));
+      navigate(navigation.nextRoute);
+    }, 2000);
+  } catch (error) {
+    console.error(error);
+    toast.error("Something went wrong. Please try again.");
+  } finally {
+    setUploading(false);
+  }
+};
 
   return (
     <>
-    <ToastContainer position="top-center" autoClose={2600} />
+    <ToastContainer position="top-center" autoClose={2000} />
 
     <div className="flex min-h-screen w-full items-center justify-center bg-neutral-50 px-4 sm:px-6 py-6 sm:py-8">
       <div className="w-full max-w-[576px] flex flex-col items-start gap-6 rounded-3xl border border-gray-400 bg-white px-4 sm:px-6 md:px-8 py-6 sm:py-8 shadow-[0_12px_30px_rgba(15,15,15,0.06)]">
