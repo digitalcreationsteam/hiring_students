@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Button } from "../ui/components/Button";
 import { useNavigate } from "react-router-dom";
 import { IconWithBackground } from "../ui/components/IconWithBackground";
+import HeaderLogo  from "src/ui/components/HeaderLogo";
 import { FeatherArrowLeft } from "@subframe/core";
 import { FeatherBook } from "@subframe/core";
 import { FeatherCheckSquare } from "@subframe/core";
@@ -97,7 +98,9 @@ function AssessmentIntro3() {
   };
 
   return (
-    <div className="flex min-h-screen w-full justify-center bg-neutral-50 px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <>
+    <HeaderLogo />
+    <div className="flex min-h-screen w-full justify-center bg-neutral-50 px-4 sm:px-6 lg:px-8 py-0 sm:py-0">
       <div className="mx-auto flex w-full max-w-[1200px] flex-col items-start gap-6 sm:gap-8">
         <Button
           variant="neutral-tertiary"
@@ -283,6 +286,7 @@ function AssessmentIntro3() {
         </div>
       </div>
     </div>
+  </>
   );
 }
 

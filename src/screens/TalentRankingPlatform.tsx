@@ -712,12 +712,13 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
           <div className="flex w-full flex-col gap-4 items-center sm:items-start">
             <div className="flex items-center gap-3">
               <img
-                className="h-5 w-5 object-cover"
-                src="https://res.cloudinary.com/subframe/image/upload/v1711417507/shared/y2rsnhq3mex4auk54aye.png"
+                className="h-8 w-24 object-cover"
+                src="/hiringLogo.png"
+                alt="hiringLogo"
               />
-              <span className="text-[14px] font-[500] text-default-font">
+              {/* <span className="text-[14px] font-[500] text-default-font">
                 UniTalent
-              </span>
+              </span>*/}
             </div>
             <div className="flex items-center gap-3 justify-center sm:justify-start">
               <IconButton

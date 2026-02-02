@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/components/Button";
 import { Avatar } from "../ui/components/Avatar";
+import HeaderLogo from "../ui/components/HeaderLogo";
 import { IconButton } from "../ui/components/IconButton";
 import { IconWithBackground } from "../ui/components/IconWithBackground";
 import { TextField } from "../ui/components/TextField";
@@ -311,9 +312,10 @@ summary: summary
 
   return (
     <>
+      <HeaderLogo />
     <ToastContainer position="top-center" autoClose={3000} />
 
-    <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-6 py-10">
+    <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-6 py-0">
       <div className="w-full max-w-[1100px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
         {/* Left card */}
         <main

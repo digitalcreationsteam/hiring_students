@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "../ui/components/Button";
 import { IconButton } from "../ui/components/IconButton";
+import HeaderLogo from "src/ui/components/HeaderLogo";
 import { FeatherArrowLeft, FeatherChevronDown } from "@subframe/core";
 import { useNavigate } from "react-router-dom";
 import * as SubframeCore from "@subframe/core";
@@ -211,88 +212,89 @@ function JobDomain() {
 
   // -------------------- UI --------------------
   return (
-    <div className="min-h-screen bg-neutral-50 px-8 py-10 flex items-center justify-center">
-      <div className="flex max-w-[660px] w-full mx-auto">
-        <div className="flex w-full flex-col gap-8 rounded-3xl border border-neutral-300 bg-white px-10 py-8 shadow-lg">
-          {/* Header */}
-          <div className="flex items-center gap-4">
-            <IconButton
-              size="small"
-              icon={<FeatherArrowLeft />}
-              onClick={() => navigate(-1)}
-            />
+    <>
+      <HeaderLogo />
+      <div className="min-h-screen bg-neutral-50 px-8 py-0 flex items-center justify-center">
+        <div className="flex max-w-[660px] w-full mx-auto">
+          <div className="flex w-full flex-col gap-8 rounded-3xl border border-neutral-300 bg-white px-10 py-8 shadow-lg">
+            {/* Header */}
+            <div className="flex items-center gap-4">
+              <IconButton
+                size="small"
+                icon={<FeatherArrowLeft />}
+                onClick={() => navigate(-1)}
+              />
 
-            <div className="flex flex-1 gap-2">
-              {[...Array(2)].map((_, i) => (
-                <div
-                  key={i}
-                  className="h-1 flex-1 rounded-full bg-violet-700"
-                />
-              ))}
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-1 flex-1 rounded-full bg-gray-300" />
-              ))}
+              <div className="flex flex-1 gap-2">
+                {[...Array(2)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-1 flex-1 rounded-full bg-violet-700"
+                  />
+                ))}
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="h-1 flex-1 rounded-full bg-gray-300" />
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Title */}
-          <div>
-            <h2 className="text-[22px] text-neutral-900">
-              Choose your job domain
-            </h2>
-            <p className="text-xs text-neutral-500">
-              Your domain and skills will decide your assessment and rankings
-            </p>
-          </div>
+            {/* Title */}
+            <div>
+              <h2 className="text-[22px] text-neutral-900">
+                Choose your job domain
+              </h2>
+              <p className="text-xs text-neutral-500">
+                Your domain and skills will decide your assessment and rankings
+              </p>
+            </div>
 
-          {/* Domain Dropdown */}
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-neutral-900">
-              Job Domain <span className="text-red-500">*</span>
-            </label>
+            {/* Domain Dropdown */}
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-neutral-900">
+                Job Domain <span className="text-red-500">*</span>
+              </label>
 
-            <SubframeCore.DropdownMenu.Root>
-              <SubframeCore.DropdownMenu.Trigger asChild>
-                <div className="flex h-10 items-center justify-between rounded-3xl border border-neutral-300 px-4 bg-neutral-50 cursor-pointer">
-                  <span
-                    className={domain ? "text-neutral-600" : "text-neutral-400"}
-                  >
-                    {domain?.name || "Select your domain"}
-                  </span>
-                  <FeatherChevronDown />
-                </div>
-              </SubframeCore.DropdownMenu.Trigger>
+              <SubframeCore.DropdownMenu.Root>
+                <SubframeCore.DropdownMenu.Trigger asChild>
+                  <div className="flex h-10 items-center justify-between rounded-3xl border border-neutral-300 px-4 bg-neutral-50 cursor-pointer">
+                    <span
+                      className={domain ? "text-neutral-600" : "text-neutral-400"}
+                    >
+                      {domain?.name || "Select your domain"}
+                    </span>
+                    <FeatherChevronDown />
+                  </div>
+                </SubframeCore.DropdownMenu.Trigger>
 
-              <SubframeCore.DropdownMenu.Content
-                asChild
-                align="start"
-                sideOffset={4}
-              >
-                <div className="bg-white rounded-2xl shadow-lg py-2 max-h-[260px] overflow-y-auto">
-                  {domains.map((item) => (
-                    <div
-                      key={item._id}
-                      onClick={() => {
-                        console.log("🎯 Domain selected:", item.name);
-                        setDomain({ id: item._id, name: item.name });
-                        // setSubDomain(null); // reset subdomain when domain changes
-                      }}
-                      className={`px-4 py-2 cursor-pointer text-sm hover:bg-violet-50 ${
-                        domain?.id === item._id
+                <SubframeCore.DropdownMenu.Content
+                  asChild
+                  align="start"
+                  sideOffset={4}
+                >
+                  <div className="bg-white rounded-2xl shadow-lg py-2 max-h-[260px] overflow-y-auto">
+                    {domains.map((item) => (
+                      <div
+                        key={item._id}
+                        onClick={() => {
+                          console.log("🎯 Domain selected:", item.name);
+                          setDomain({ id: item._id, name: item.name });
+                          // setSubDomain(null); // reset subdomain when domain changes
+                        }}
+                        className={`px-4 py-2 cursor-pointer text-sm hover:bg-violet-50 ${domain?.id === item._id
                           ? "bg-violet-100 font-semibold"
                           : ""
-                      }`}
-                    >
-                      {item.name}
-                    </div>
-                  ))}
-                </div>
-              </SubframeCore.DropdownMenu.Content>
-            </SubframeCore.DropdownMenu.Root>
-          </div>
+                          }`}
+                      >
+                        {item.name}
+                      </div>
+                    ))}
+                  </div>
+                </SubframeCore.DropdownMenu.Content>
+              </SubframeCore.DropdownMenu.Root>
+            </div>
 
-          {/* SubDomain Dropdown */}
-          {/* <div className="flex flex-col gap-2">
+            {/* SubDomain Dropdown */}
+            {/* <div className="flex flex-col gap-2">
             <label className="text-sm font-medium text-neutral-900">
               Sub Domain <span className="text-red-500">*</span>
             </label>
@@ -346,21 +348,21 @@ function JobDomain() {
             </SubframeCore.DropdownMenu.Root>
           </div> */}
 
-          {/* Footer */}
-          <Button
-            onClick={handleContinue}
-            disabled={!domain || isSubmitting}
-            className={`h-9 w-full rounded-2xl text-white ${
-              isSubmitting
+            {/* Footer */}
+            <Button
+              onClick={handleContinue}
+              disabled={!domain || isSubmitting}
+              className={`h-9 w-full rounded-2xl text-white ${isSubmitting
                 ? "bg-violet-300"
                 : "bg-violet-600 hover:bg-violet-700"
-            }`}
-          >
-            {isSubmitting ? "Saving..." : "Continue"}
-          </Button>
+                }`}
+            >
+              {isSubmitting ? "Saving..." : "Continue"}
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

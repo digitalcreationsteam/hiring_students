@@ -116,8 +116,8 @@ const handleSubmit = async (e: any) => {
           <div className="lg:w-[64%] bg-neutral-50 px-6 py-8 flex flex-col justify-between hidden lg:flex">
             <div className="flex flex-col gap-4">
               <img
-                className="h-6 w-fit"
-                src="https://res.cloudinary.com/subframe/image/upload/v1711417507/shared/y2rsnhq3mex4auk54aye.png"
+                className="h-8 w-fit"
+                src="/hiringLogo.png"
                 alt="logo"
               />
               <h1 className="text-3xl leading-snug inter-font-family">

@@ -5,6 +5,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Avatar } from "../ui/components/Avatar";
 import { Button } from "../ui/components/Button";
+import HeaderLogo from "../ui/components/HeaderLogo";
 import { IconButton } from "../ui/components/IconButton";
 import { IconWithBackground } from "../ui/components/IconWithBackground";
 import { TextField } from "../ui/components/TextField";
@@ -357,9 +358,10 @@ export default function Awards() {
 
   return (
     <>
+      <HeaderLogo />
       <ToastContainer position="top-center" autoClose={3000} />
 
-      <div className="min-h-screen flex justify-center bg-neutral-50 px-4 sm:px-6 py-10 sm:py-22">
+      <div className="min-h-screen flex justify-center bg-neutral-50 px-4 sm:px-6 py-0 sm:py-0">
         <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
           {/* Left card */}
           <main className="w-full md:max-w-[448px] flex flex-col gap-6 rounded-[28px] border border-neutral-300 bg-white px-4 sm:px-6 md:px-8 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.06)]">

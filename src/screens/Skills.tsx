@@ -3,6 +3,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { IconButton } from "../ui/components/IconButton";
+import HeaderLogo from "src/ui/components/HeaderLogo";
 import { IconWithBackground } from "../ui/components/IconWithBackground";
 import { TextField } from "../ui/components/TextField";
 import { Button } from "../ui/components/Button";
@@ -139,7 +140,9 @@ export default function Skills() {
   }, []);
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-neutral-50 px-6 py-10">
+    <>
+    <HeaderLogo />
+    <div className="min-h-screen flex justify-center items-center bg-neutral-50 px-6 py-0">
       <main className="w-full max-w-[720px] bg-white rounded-3xl shadow-[0_10px_30px_rgba(40,0,60,0.06)] border border-gray-300 px-10 py-8">
         {/* top row - back + progress */}
         <div className="flex items-center gap-4">
@@ -261,5 +264,6 @@ export default function Skills() {
         </footer>
       </main>
     </div>
+   </>
   );
 }
