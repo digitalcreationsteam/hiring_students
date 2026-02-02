@@ -18,6 +18,8 @@ import { FeatherUsers } from "@subframe/core";
 import { FeatherArrowLeft } from "@subframe/core";
 import { useNavigate, useLocation } from "react-router-dom";
 import API, { URL_PATH } from "src/common/API";
+// At the top of AssessmentResult.tsx, add this import:
+import { markProcessComplete } from "../utils/ProtectedRoute"; // ADD THIS LINE
 
 
 
@@ -203,7 +205,14 @@ if (res?.integrity) {
     fetchResult();
     fetchRanks();
 
-  }, [fetchResult, fetchRanks]);
+     // Optional: Auto-redirect after 10 seconds
+  const timer = setTimeout(() => {
+    navigate('/dashboard', { replace: true });
+  }, 10000);
+
+  return () => clearTimeout(timer);
+
+  }, [fetchResult, fetchRanks, navigate]);
 
   // ✅ LOADING STATE
   if (isResultLoading) {

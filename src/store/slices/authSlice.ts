@@ -19,7 +19,7 @@ const authSlice = createSlice({
     setToken: (state, action: PayloadAction<string>) => {
       state.token = action.payload;
       state.isAuthenticated = true;
-      localStorage.setItem('token', action.payload);
+      localStorage.setItem('token', action.payload); // ✅ Already there
     },
     clearToken: (state) => {
       state.token = null;
@@ -27,6 +27,8 @@ const authSlice = createSlice({
       localStorage.removeItem('token');
       localStorage.removeItem('userId');
       localStorage.removeItem('user');
+      localStorage.removeItem('userEmail'); // ⭐ ADD
+      localStorage.removeItem('userName'); // ⭐ ADD
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;

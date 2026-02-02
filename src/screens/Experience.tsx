@@ -310,7 +310,7 @@ if (!isValidRole) {
 
     const [mm, yyyy] = value.split("/").map(Number);
 
-    const inputDate = new Date(yyyy, mm); // first day of that month
+    const inputDate = new Date(yyyy, mm -1); // first day of that month
     const now = new Date();
     const currentMonth = new Date(now.getFullYear(), now.getMonth());
 

@@ -112,7 +112,16 @@ export const URL_PATH = {
 
   /* ---------- RESULTS ---------- */
   result: "/user/experience_index",
+
+    /* ---------- CHAT ---------- */
+  getChatHistory: (otherUserId) => `/chat/${otherUserId}`,
+  getChatParticipants: "/chat/participants", // Get all people you've chatted with
+  markMessagesRead: "/chat/mark-read",
+  getUnreadCount: "/chat/unread-count",
+
 };
+
+
 
 /* =========================================
    🚀 API WRAPPER FUNCTION
