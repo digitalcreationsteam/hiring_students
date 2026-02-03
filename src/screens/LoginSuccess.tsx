@@ -23,8 +23,8 @@ export default function LoginSuccess() {
       // Decode and store user data if available
       if (userDataBase64) {
         try {
-          const userDataJson = atob(userDataBase64);
-          const userData = JSON.parse(userDataJson);
+          const decoded = decodeURIComponent(userDataBase64);
+          const userData = JSON.parse(atob(decoded));
           localStorage.setItem("user", JSON.stringify(userData));
           localStorage.setItem("userId", userData.id);
           localStorage.setItem("userEmail", userData.email);
@@ -46,5 +46,7 @@ export default function LoginSuccess() {
     navigate("/login", { replace: true });
   }, [navigate]);
 
-  return <p className="text-center mt-10">Completing login…</p>;
+  return (
+    <h1>Login Successful!</h1>
+  );
 }
