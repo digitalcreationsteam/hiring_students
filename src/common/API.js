@@ -6,9 +6,9 @@ import axios from "axios";
 /* =========================================
    🌐 BASE URL
 ========================================= */
-export const BASE_URL = "http://localhost:5000/api";
+// export const BASE_URL = "http://localhost:5000/api";
 // export const BASE_URL = "http://localhost:5001/api";
-// export const BASE_URL = "https://unitalent.cloud/api";
+export const BASE_URL = "https://unitalent.cloud/api";
 
 
 const isDev = process.env.NODE_ENV === "development";
@@ -100,7 +100,7 @@ export const URL_PATH = {
   getAttemptQuestions: "/user/assessment/getAttemptQuestions",
   saveAnswer: "/user/assessment/saveAnswer",
   submitAssessment: "/user/assessment/submit",
-  reportViolation:"/user/assessment/violation",
+  reportViolation: "/user/assessment/violation",
   getUserDomainSkils: "/user/getUserDomainSkills",
 
   createSubscription: "/subscription/create",
@@ -113,7 +113,7 @@ export const URL_PATH = {
   /* ---------- RESULTS ---------- */
   result: "/user/experience_index",
 
-    /* ---------- CHAT ---------- */
+  /* ---------- CHAT ---------- */
   getChatHistory: (otherUserId) => `/chat/${otherUserId}`,
   getChatParticipants: "/chat/participants", // Get all people you've chatted with
   markMessagesRead: "/chat/mark-read",
