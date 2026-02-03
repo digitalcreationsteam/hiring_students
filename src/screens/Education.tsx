@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import { Avatar } from "../ui/components/Avatar";
 import { Button } from "../ui/components/Button";
@@ -40,7 +40,6 @@ const DEGREE_OPTIONS = [
 ] as const;
 
 type DegreeOption = (typeof DEGREE_OPTIONS)[number];
-
 
 type ExperiencePoints = {
   demographics?: number;
@@ -192,6 +191,10 @@ function YearPicker({
 
 export default function Education() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const source = location.state?.source; // "dashboard" | undefined
+  console.log("EDUCATION source:", source);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -319,13 +322,12 @@ export default function Education() {
 
     // ✅ DUPLICATE CHECK (CORRECT PLACE)
     // ✅ HIERARCHICAL DUPLICATE CHECK (DEGREE → FIELD → SCHOOL)
-  const normalizedNew = {
-  degree: normalize(degree).trim(), // ✅ keep slug
-  fieldOfStudy: normalize(toTitleCase(fieldOfStudy)).trim(),
-  schoolName: normalize(toTitleCase(schoolName)).trim(),
-  startYear,
-};
-
+    const normalizedNew = {
+      degree: normalize(degree).trim(), // ✅ keep slug
+      fieldOfStudy: normalize(toTitleCase(fieldOfStudy)).trim(),
+      schoolName: normalize(toTitleCase(schoolName)).trim(),
+      startYear,
+    };
 
     // 1️⃣ Check if degree already exists
     const degreeExists = educations.some(
@@ -521,7 +523,10 @@ export default function Education() {
       return;
     }
 
-    navigate("/experience");
+   navigate("/experience", {
+  state: { source },
+});
+
   };
 
   const handleCurrentlyStudyingToggle = (checked: boolean) => {
@@ -533,10 +538,12 @@ export default function Education() {
   };
 
   // Add this helper function near your other utility functions
-const getDegreeLabel = (degreeValue: string): string => {
-  const degreeOption = DEGREE_OPTIONS.find(option => option.value === degreeValue);
-  return degreeOption?.label || degreeValue; // fallback to the value if not found
-};
+  const getDegreeLabel = (degreeValue: string): string => {
+    const degreeOption = DEGREE_OPTIONS.find(
+      (option) => option.value === degreeValue,
+    );
+    return degreeOption?.label || degreeValue; // fallback to the value if not found
+  };
 
   return (
     <>
@@ -632,7 +639,8 @@ const getDegreeLabel = (degreeValue: string): string => {
 
                         <div className="flex flex-col min-w-0">
                           <span className="text-sm font-semibold text-neutral-900 truncate">
-{getDegreeLabel(ed.degree)}                          </span>
+                            {getDegreeLabel(ed.degree)}{" "}
+                          </span>
                           <span className="text-xs text-neutral-500 truncate">
                             {ed.schoolName}
                           </span>
@@ -671,7 +679,8 @@ const getDegreeLabel = (degreeValue: string): string => {
                         <div className="flex flex-col gap-3 text-sm text-neutral-800 px-1">
                           <div>
                             <span className="font-medium">Degree:</span>{" "}
-{getDegreeLabel(ed.degree)}                          </div>
+                            {getDegreeLabel(ed.degree)}{" "}
+                          </div>
 
                           <div>
                             <span className="font-medium">Field of study:</span>{" "}
@@ -732,7 +741,8 @@ const getDegreeLabel = (degreeValue: string): string => {
                               : "text-neutral-400 text-[12px]"
                           }
                         >
-{DEGREE_OPTIONS.find((d) => d.value === degree)?.label || "Select Degree"}
+                          {DEGREE_OPTIONS.find((d) => d.value === degree)
+                            ?.label || "Select Degree"}
                         </span>
                         <FeatherChevronDown className="text-neutral-500" />
                       </div>
@@ -868,11 +878,7 @@ const getDegreeLabel = (degreeValue: string): string => {
               {/* GPA Field - US 4-point scale */}
               <TextField
                 className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-                label={
-                  <span className="text-[12px]">
-                    GPA 
-                  </span>
-                }
+                label={<span className="text-[12px]">GPA</span>}
                 // helpText="Enter GPA on a 4.0 scale"
               >
                 <TextField.Input
@@ -897,11 +903,7 @@ const getDegreeLabel = (degreeValue: string): string => {
               {/* CGPA Field - Indian 10-point scale */}
               <TextField
                 className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-                label={
-                  <span className="text-[12px]">
-                    CGPA 
-                  </span>
-                }
+                label={<span className="text-[12px]">CGPA</span>}
                 // helpText="Enter CGPA on a 10.0 scale"
               >
                 <TextField.Input

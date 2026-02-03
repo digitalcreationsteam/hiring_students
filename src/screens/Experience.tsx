@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Avatar } from "../ui/components/Avatar";
 import { Button } from "../ui/components/Button";
 import HeaderLogo from "../ui/components/HeaderLogo";
@@ -26,7 +26,6 @@ import "react-toastify/dist/ReactToastify.css";
 
 import * as SubframeCore from "@subframe/core";
 import { FeatherChevronDown } from "@subframe/core";
-
 
 const ROLE_TITLES = [
   { label: "Internship", value: "internship" },
@@ -191,7 +190,11 @@ function MonthYearPicker({
 
 export default function Experience() {
   const navigate = useNavigate();
+
   const userId = localStorage.getItem("userId");
+  const location = useLocation();
+  const source = location.state?.source; // "dashboard" | undefined
+  console.log("EXPERIENCE source:", source);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -200,9 +203,9 @@ export default function Experience() {
   // form state
   const [roleTitle, setRoleTitle] = useState("");
 
-const [typeOfRole, setTypeOfRole] = useState<RoleValue | "">("");
-const typeOfRoleLabel =
-  ROLE_TITLES.find((r) => r.value === typeOfRole)?.label || "";
+  const [typeOfRole, setTypeOfRole] = useState<RoleValue | "">("");
+  const typeOfRoleLabel =
+    ROLE_TITLES.find((r) => r.value === typeOfRole)?.label || "";
 
   const [company, setCompany] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -233,18 +236,17 @@ const typeOfRoleLabel =
       return false;
     }
 
-   // ✅ typeOfRole is a dropdown enum, so just validate it exists in ROLE_TITLES
-if (!typeOfRole) {
-  toast.error("Type of role is required.");
-  return false;
-}
+    // ✅ typeOfRole is a dropdown enum, so just validate it exists in ROLE_TITLES
+    if (!typeOfRole) {
+      toast.error("Type of role is required.");
+      return false;
+    }
 
-const isValidRole = ROLE_TITLES.some((r) => r.value === typeOfRole);
-if (!isValidRole) {
-  toast.error("Please select a valid type of role.");
-  return false;
-}
-
+    const isValidRole = ROLE_TITLES.some((r) => r.value === typeOfRole);
+    if (!isValidRole) {
+      toast.error("Please select a valid type of role.");
+      return false;
+    }
 
     if (!company.trim()) {
       toast.error("Company name is required.");
@@ -409,37 +411,36 @@ if (!isValidRole) {
     // };
     const now = new Date();
 
-const [endMonthNum, endYearNum] = currentlyWorking
-  ? [now.getMonth() + 1, now.getFullYear()]
-  : endDate.split("/").map(Number);
+    const [endMonthNum, endYearNum] = currentlyWorking
+      ? [now.getMonth() + 1, now.getFullYear()]
+      : endDate.split("/").map(Number);
 
-const duration = calculateDurationInMonths(
-  startMonthNum,
-  startYearNum,
-  endMonthNum,
-  endYearNum
-);
+    const duration = calculateDurationInMonths(
+      startMonthNum,
+      startYearNum,
+      endMonthNum,
+      endYearNum,
+    );
 
-const payload = {
-  workExperiences: [
-    {
-      jobTitle: toTitleCase(roleTitle.trim()),
-      companyName: toTitleCase(company.trim()),
-      startYear: startYearNum,
-      startMonth: startMonthNum,
+    const payload = {
+      workExperiences: [
+        {
+          jobTitle: toTitleCase(roleTitle.trim()),
+          companyName: toTitleCase(company.trim()),
+          startYear: startYearNum,
+          startMonth: startMonthNum,
 
-      // ✅ ALWAYS send numbers
-      endYear: endYearNum,
-      endMonth: endMonthNum,
+          // ✅ ALWAYS send numbers
+          endYear: endYearNum,
+          endMonth: endMonthNum,
 
-      currentlyWorking,
-      duration,
-      description: description.trim() || "",
-      typeOfRole: typeOfRole ? toTitleCase(typeOfRole.trim()) : undefined,
-    },
-  ],
-};
-
+          currentlyWorking,
+          duration,
+          description: description.trim() || "",
+          typeOfRole: typeOfRole ? toTitleCase(typeOfRole.trim()) : undefined,
+        },
+      ],
+    };
 
     try {
       setIsSubmitting(true);
@@ -448,7 +449,7 @@ const payload = {
         "user-id": userId,
       });
 
-       toast.success("Experience added successfully");
+      toast.success("Experience added successfully");
 
       const created = res.data[0]; // backend returns array
 
@@ -594,14 +595,17 @@ const payload = {
 
   const canContinue = experiences.length > 0;
 
-  const handleContinue = () => {
-    if (!experiences.length) {
-      toast.error("Please add at least one experience.");
-      return;
-    }
+ const handleContinue = () => {
+  if (!experiences.length) {
+    toast.error("Please add at least one experience.");
+    return;
+  }
 
-    navigate("/certifications");
-  };
+  navigate("/certifications", {
+    state: { source },
+  });
+};
+
 
   useEffect(() => {
     if (!userId) return;
@@ -611,11 +615,10 @@ const payload = {
   }, [userId, fetchExperiences, fetchExperienceIndex]);
 
   useEffect(() => {
-  if (currentlyWorking) {
-    setEndDate("");
-  }
-}, [currentlyWorking]);
-
+    if (currentlyWorking) {
+      setEndDate("");
+    }
+  }, [currentlyWorking]);
 
   return (
     <>
@@ -652,36 +655,38 @@ const payload = {
             </div>
           </div>
 
-          {/* header */}
-          <div className="mt-6">
-            <h2 className="text-[22px] text-neutral-900">
-              Add your experience
-            </h2>
-            <p className="mt-1 text-sm text-neutral-500">
-              Internships, roles, and other work count toward your Experience
-              Index
-            </p>
-          </div>
+            {/* header */}
+            <div className="mt-6">
+              <h2 className="text-[22px] text-neutral-900">
+                Add your experience
+              </h2>
+              <p className="mt-1 text-sm text-neutral-500">
+                Internships, roles, and other work count toward your Experience
+                Index
+              </p>
+            </div>
 
-          {/* Selected experience preview list */}
-          {/* Selected experience preview list */}
-          <section className="mt-6 flex w-full flex-col gap-3">
-            {experiences.map((exp) => {
-              const isSelected = selectedExperience?.id === exp.id;
+            {/* Selected experience preview list */}
+            {/* Selected experience preview list */}
+            <section className="mt-6 flex w-full flex-col gap-3">
+              {experiences.map((exp) => {
+                const isSelected = selectedExperience?.id === exp.id;
 
-              return (
-                <div
-                  key={exp.id}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => setSelectedExperience(isSelected ? null : exp)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      setSelectedExperience(isSelected ? null : exp);
+                return (
+                  <div
+                    key={exp.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() =>
+                      setSelectedExperience(isSelected ? null : exp)
                     }
-                  }}
-                  className="
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSelectedExperience(isSelected ? null : exp);
+                      }
+                    }}
+                    className="
           rounded-3xl
           border border-neutral-300
           bg-white
@@ -693,223 +698,229 @@ const payload = {
           focus:ring-2
           focus:ring-violet-500
         "
-                >
-                  {/* 🔹 TOP ROW */}
-                  <div className="flex items-center justify-between">
-                    {/* Left */}
-                    <div className="flex items-center gap-3 min-w-0">
-                      <Avatar
-                        size="large"
-                        square
-                        className="!rounded-3xl shadow-sm bg-violet-200 text-violet-700"
-                      >
-                        {(exp.company || "")
-                          .split(" ")
-                          .slice(0, 2)
-                          .map((w) => w[0])
-                          .join("")}
-                      </Avatar>
+                  >
+                    {/* 🔹 TOP ROW */}
+                    <div className="flex items-center justify-between">
+                      {/* Left */}
+                      <div className="flex items-center gap-3 min-w-0">
+                        <Avatar
+                          size="large"
+                          square
+                          className="!rounded-3xl shadow-sm bg-violet-200 text-violet-700"
+                        >
+                          {(exp.company || "")
+                            .split(" ")
+                            .slice(0, 2)
+                            .map((w) => w[0])
+                            .join("")}
+                        </Avatar>
 
-                      <div className="flex flex-col min-w-0">
-                        <span className="text-sm font-semibold text-neutral-900 truncate">
-                          {exp.roleTitle}
-                        </span>
-                        <span className="text-xs text-neutral-500 truncate">
-                          {exp.company}
-                        </span>
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-sm font-semibold text-neutral-900 truncate">
+                            {exp.roleTitle}
+                          </span>
+                          <span className="text-xs text-neutral-500 truncate">
+                            {exp.company}
+                          </span>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Right */}
-                    <div className="flex flex-col items-end gap-2 shrink-0">
-                      <IconButton
-                        size="small"
-                        icon={<FeatherX />}
-                        aria-label={`Delete experience ${exp.roleTitle}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setDeleteId(exp.id);
-                        }}
-                        className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
-                      />
+                      {/* Right */}
+                      <div className="flex flex-col items-end gap-2 shrink-0">
+                        <IconButton
+                          size="small"
+                          icon={<FeatherX />}
+                          aria-label={`Delete experience ${exp.roleTitle}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteId(exp.id);
+                          }}
+                          className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
+                        />
 
-                      <span className="text-xs text-neutral-500">
-                        {exp.startDate || "—"}
-                        {exp.currentlyWorking
-                          ? " - Present"
-                          : exp.endDate
-                            ? ` - ${exp.endDate}`
-                            : ""}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* 🔹 DETAILS (same card, same border) */}
-                  {isSelected && (
-                    <>
-                      <div className="my-4 border-t border-neutral-200" />
-
-                      <div className="flex flex-col gap-3 text-sm text-neutral-800 px-1">
-                        <div>
-                          <span className="font-medium">Role:</span>{" "}
-                          {exp.roleTitle}
-                        </div>
-
-                        <div>
-                          <span className="font-medium">Type Of Roll:</span>{" "}
-                          {exp.typeOfRole}
-                        </div>
-
-                        <div>
-                          <span className="font-medium">Company:</span>{" "}
-                          {exp.company}
-                        </div>
-
-                        <div>
-                          <span className="font-medium">Duration:</span>{" "}
+                        <span className="text-xs text-neutral-500">
                           {exp.startDate || "—"}
                           {exp.currentlyWorking
                             ? " - Present"
                             : exp.endDate
                               ? ` - ${exp.endDate}`
                               : ""}
-                        </div>
-
-                        {exp.description && (
-                          <div>
-                            <span className="font-medium">Description:</span>{" "}
-                            {exp.description}
-                          </div>
-                        )}
+                        </span>
                       </div>
-                    </>
-                  )}
-                </div>
-              );
-            })}
-          </section>
+                    </div>
 
-          {/* form */}
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleAddExperience();
-            }}
-            className="mt-6 flex flex-col gap-4"
-          >
-            <TextField
-              className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-              label={
-                <span className="text-[12px]">
-                  Role Title <span className="text-red-500">*</span>{" "}
-                </span>
-              }
-              helpText=""
-            >
-              <TextField.Input
-                // className="rounded-full h-10 px-4 text-[12px] bg-white !border-none focus:ring-0"
-                className="h-20 text-[12px]"
-                placeholder="Name of Role"
-                value={roleTitle}
-                onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                  setRoleTitle(ev.target.value)
-                }
-              />
-            </TextField>
+                    {/* 🔹 DETAILS (same card, same border) */}
+                    {isSelected && (
+                      <>
+                        <div className="my-4 border-t border-neutral-200" />
 
-            <div className="flex flex-col gap-1">
-              <label className="text-[12px] font-medium text-neutral-900">
-                Type of Role <span className="text-red-500">*</span>
-              </label>
+                        <div className="flex flex-col gap-3 text-sm text-neutral-800 px-1">
+                          <div>
+                            <span className="font-medium">Role:</span>{" "}
+                            {exp.roleTitle}
+                          </div>
 
-              <SubframeCore.DropdownMenu.Root>
-                <SubframeCore.DropdownMenu.Trigger asChild>
-                  <div className="flex h-9 items-center justify-between rounded-full border border-neutral-300 bg-white px-3 cursor-pointer">
-                    <span
-                      className={
-                        typeOfRole
-                          ? "text-neutral-900 text-[12px]"
-                          : "text-neutral-400 text-[12px]"
-                      }
-                    >
-                       {typeOfRole ? typeOfRoleLabel : "Select type of role"}
-                    </span>
-                    <FeatherChevronDown className="text-neutral-500" />
+                          <div>
+                            <span className="font-medium">Type Of Roll:</span>{" "}
+                            {exp.typeOfRole}
+                          </div>
+
+                          <div>
+                            <span className="font-medium">Company:</span>{" "}
+                            {exp.company}
+                          </div>
+
+                          <div>
+                            <span className="font-medium">Duration:</span>{" "}
+                            {exp.startDate || "—"}
+                            {exp.currentlyWorking
+                              ? " - Present"
+                              : exp.endDate
+                                ? ` - ${exp.endDate}`
+                                : ""}
+                          </div>
+
+                          {exp.description && (
+                            <div>
+                              <span className="font-medium">Description:</span>{" "}
+                              {exp.description}
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
                   </div>
-                </SubframeCore.DropdownMenu.Trigger>
+                );
+              })}
+            </section>
 
-                <SubframeCore.DropdownMenu.Portal>
-  <SubframeCore.DropdownMenu.Content
-    align="start"          
-    sideOffset={4}
-    className="bg-white rounded-2xl shadow-lg py-1 border border-neutral-300 min-w-[200px]"
-  >
-    {ROLE_TITLES.map((item) => (
-      <SubframeCore.DropdownMenu.Item
-        key={item.value}
-        onSelect={() => setTypeOfRole(item.value)}
-        className="px-4 py-2 text-sm cursor-pointer hover:bg-neutral-100 outline-none"
-      >
-        {item.label}
-      </SubframeCore.DropdownMenu.Item>
-    ))}
-  </SubframeCore.DropdownMenu.Content>
-</SubframeCore.DropdownMenu.Portal>
-
-              </SubframeCore.DropdownMenu.Root>
-            </div>
-
-            <TextField
-              label={
-                <span className="text-[12px]">
-                  Company <span className="text-red-500">*</span>
-                </span>
-              }
-              helpText=""
-              className={`${scTextFieldClass}`}
+            {/* form */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleAddExperience();
+              }}
+              className="mt-6 flex flex-col gap-4"
             >
-              <TextField.Input
-                placeholder="Company name"
-                value={company}
-                onChange={(e) =>
-                  setCompany(e.target.value.replace(/[^A-Za-z\s.&-]/g, ""))
+              <TextField
+                className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
+                label={
+                  <span className="text-[12px]">
+                    Role Title <span className="text-red-500">*</span>{" "}
+                  </span>
                 }
-                onBlur={() => setCompany(toTitleCase(company))}
-                className={scInputClass}
-              />
-            </TextField>
+                helpText=""
+              >
+                <TextField.Input
+                  // className="rounded-full h-10 px-4 text-[12px] bg-white !border-none focus:ring-0"
+                  className="h-20 text-[12px]"
+                  placeholder="Name of Role"
+                  value={roleTitle}
+                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                    setRoleTitle(ev.target.value)
+                  }
+                />
+              </TextField>
 
-            {/* // date------------------------- */}
-            <div className="flex flex-col gap-6 max-w-lg">
-              {/* Dates */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label
-                    htmlFor="startdate"
-                    className="text-[12px] font-medium text-neutral-700"
-                  >
-                    Start Date <span className="text-red-500">*</span>
-                  </label>
-                  <MonthYearPicker value={startDate} onChange={setStartDate} />
-                </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-[12px] font-medium text-neutral-900">
+                  Type of Role <span className="text-red-500">*</span>
+                </label>
 
-                <div>
-                  <label
-                    htmlFor="startdate"
-                    className="text-[12px] font-medium text-neutral-700"
-                  >
-                    End Date <span className="text-red-500">*</span>
-                  </label>
-                  <MonthYearPicker value={endDate} onChange={setEndDate} disabled={currentlyWorking} />
-                </div>
+                <SubframeCore.DropdownMenu.Root>
+                  <SubframeCore.DropdownMenu.Trigger asChild>
+                    <div className="flex h-9 items-center justify-between rounded-full border border-neutral-300 bg-white px-3 cursor-pointer">
+                      <span
+                        className={
+                          typeOfRole
+                            ? "text-neutral-900 text-[12px]"
+                            : "text-neutral-400 text-[12px]"
+                        }
+                      >
+                        {typeOfRole ? typeOfRoleLabel : "Select type of role"}
+                      </span>
+                      <FeatherChevronDown className="text-neutral-500" />
+                    </div>
+                  </SubframeCore.DropdownMenu.Trigger>
+
+                  <SubframeCore.DropdownMenu.Portal>
+                    <SubframeCore.DropdownMenu.Content
+                      align="start"
+                      sideOffset={4}
+                      className="bg-white rounded-2xl shadow-lg py-1 border border-neutral-300 min-w-[200px]"
+                    >
+                      {ROLE_TITLES.map((item) => (
+                        <SubframeCore.DropdownMenu.Item
+                          key={item.value}
+                          onSelect={() => setTypeOfRole(item.value)}
+                          className="px-4 py-2 text-sm cursor-pointer hover:bg-neutral-100 outline-none"
+                        >
+                          {item.label}
+                        </SubframeCore.DropdownMenu.Item>
+                      ))}
+                    </SubframeCore.DropdownMenu.Content>
+                  </SubframeCore.DropdownMenu.Portal>
+                </SubframeCore.DropdownMenu.Root>
               </div>
 
-              {/* Switch */}
-              <div className="flex items-center gap-3">
-                <Switch
-                  checked={currentlyWorking}
-                  onCheckedChange={setCurrentlyWorking}
-                  className="
+              <TextField
+                label={
+                  <span className="text-[12px]">
+                    Company <span className="text-red-500">*</span>
+                  </span>
+                }
+                helpText=""
+                className={`${scTextFieldClass}`}
+              >
+                <TextField.Input
+                  placeholder="Company name"
+                  value={company}
+                  onChange={(e) =>
+                    setCompany(e.target.value.replace(/[^A-Za-z\s.&-]/g, ""))
+                  }
+                  onBlur={() => setCompany(toTitleCase(company))}
+                  className={scInputClass}
+                />
+              </TextField>
+
+              {/* // date------------------------- */}
+              <div className="flex flex-col gap-6 max-w-lg">
+                {/* Dates */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      htmlFor="startdate"
+                      className="text-[12px] font-medium text-neutral-700"
+                    >
+                      Start Date <span className="text-red-500">*</span>
+                    </label>
+                    <MonthYearPicker
+                      value={startDate}
+                      onChange={setStartDate}
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="startdate"
+                      className="text-[12px] font-medium text-neutral-700"
+                    >
+                      End Date <span className="text-red-500">*</span>
+                    </label>
+                    <MonthYearPicker
+                      value={endDate}
+                      onChange={setEndDate}
+                      disabled={currentlyWorking}
+                    />
+                  </div>
+                </div>
+
+                {/* Switch */}
+                <div className="flex items-center gap-3">
+                  <Switch
+                    checked={currentlyWorking}
+                    onCheckedChange={setCurrentlyWorking}
+                    className="
             h-5 w-9
             data-[state=checked]:bg-violet-700
             data-[state=unchecked]:bg-neutral-300
@@ -917,53 +928,53 @@ const payload = {
             [&>span]:data-[state=checked]:translate-x-4
             [&>span]:data-[state=unchecked]:translate-x-0
           "
-                />
-                <span className="text-sm text-neutral-700">
-                  I currently work here
-                </span>
+                  />
+                  <span className="text-sm text-neutral-700">
+                    I currently work here
+                  </span>
+                </div>
               </div>
-            </div>
 
-            <TextField
-              label={<span className="text-[12px]">Description </span>}
-              helpText=""
-              className={`${scTextFieldClass}`}
-            >
-              <TextField.Input
-                placeholder="Describe your key responsibilities and achievements"
-                value={description}
-                onChange={(e) => {
-                  if (e.target.value.length <= 500) {
-                    setDescription(e.target.value);
-                  }
-                }}
-                onBlur={() => setDescription(toSentenceCase(description))}
-                className={scInputClass}
-              />
-            </TextField>
-
-            <div className="mt-2 flex flex-col sm:flex-row gap-3">
-              <Button
-                type="button"
-                disabled={isSubmitting}
-                variant="neutral-secondary"
-                icon={<FeatherPlus />}
-                className="w-full rounded-full h-10 px-4 border-neutral-300"
-                onClick={handleAddExperience}
+              <TextField
+                label={<span className="text-[12px]">Description </span>}
+                helpText=""
+                className={`${scTextFieldClass}`}
               >
-                {isSubmitting ? "Adding..." : "Add another experience"}
-              </Button>
+                <TextField.Input
+                  placeholder="Describe your key responsibilities and achievements"
+                  value={description}
+                  onChange={(e) => {
+                    if (e.target.value.length <= 500) {
+                      setDescription(e.target.value);
+                    }
+                  }}
+                  onBlur={() => setDescription(toSentenceCase(description))}
+                  className={scInputClass}
+                />
+              </TextField>
 
-              <div className="flex-1" />
-            </div>
-          </form>
-          {/* Top form horizontal line */}
-          <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
-          <footer>
-            <Button
-              onClick={handleContinue}
-              disabled={!canContinue || isSubmitting}
-              className={`
+              <div className="mt-2 flex flex-col sm:flex-row gap-3">
+                <Button
+                  type="button"
+                  disabled={isSubmitting}
+                  variant="neutral-secondary"
+                  icon={<FeatherPlus />}
+                  className="w-full rounded-full h-10 px-4 border-neutral-300"
+                  onClick={handleAddExperience}
+                >
+                  {isSubmitting ? "Adding..." : "Add another experience"}
+                </Button>
+
+                <div className="flex-1" />
+              </div>
+            </form>
+            {/* Top form horizontal line */}
+            <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
+            <footer>
+              <Button
+                onClick={handleContinue}
+                disabled={!canContinue || isSubmitting}
+                className={`
     w-full h-10 rounded-full transition-all
     ${
       !canContinue || isSubmitting
@@ -971,150 +982,152 @@ const payload = {
         : "bg-violet-700 text-white shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
     }
   `}
-            >
-              {isSubmitting ? "Saving..." : "Continue"}
-            </Button>
-          </footer>
-        </main>
-
-        {/* Right panel - SC2 style with Experience active */}
-        {/* Right panel */}
-        <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
-          <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
-            <h3 className="text-[22px] text-neutral-900">
-              Your Experience Index
-            </h3>
-
-            <div className="flex items-center justify-center py-6">
-              <span
-                aria-live="polite"
-                className="font-['Afacad_Flux'] text-[32px] sm:text-[40px] md:text-[48px] font-[500] leading-[56px] text-neutral-300"
               >
-                {displayedIndex ?? 0}
-              </span>
-            </div>
+                {isSubmitting ? "Saving..." : "Continue"}
+              </Button>
+            </footer>
+          </main>
 
-            <div className="h-px bg-neutral-300" />
+          {/* Right panel - SC2 style with Experience active */}
+          {/* Right panel */}
+          <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
+            <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
+              <h3 className="text-[22px] text-neutral-900">
+                Your Experience Index
+              </h3>
 
-            <div className="mt-4">
-              <div className="text-[16px] text-neutral-800 mb-3">
-                Progress Steps
-              </div>
-
-              {/* ⚪ Completed — Demographics */}
-              <button
-                type="button"
-                className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3"
-              >
-                <IconWithBackground
-                  size="small"
-                  icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                  className="!bg-green-100 !rounded-full !p-3"
-                />
-                <span className="text-sm text-neutral-700">Demographics</span>
-              </button>
-
-              {/* ✔ Education — Completed */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                <IconWithBackground
-                  size="small"
-                  icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                  className="!bg-green-100 !rounded-full !p-3"
-                />
-                <span className="text-sm text-neutral-700">Education</span>
-              </div>
-
-              {/* 🟣 Experience — Active */}
-              <div className="flex items-center gap-3 rounded-2xl border border-violet-300 bg-violet-50 px-4 py-2 mb-3">
-                <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white shadow-sm">
-                  <IconWithBackground
-                    size="small"
-                    variant="neutral"
-                    className="!bg-white !text-neutral-700"
-                    icon={<FeatherBriefcase className="!text-neutral-700" />}
-                  />
-                </div>
-                <span className="text-sm font-semibold text-neutral-900">
-                  Experience
+              <div className="flex items-center justify-center py-6">
+                <span
+                  aria-live="polite"
+                  className="font-['Afacad_Flux'] text-[32px] sm:text-[40px] md:text-[48px] font-[500] leading-[56px] text-neutral-300"
+                >
+                  {displayedIndex ?? 0}
                 </span>
               </div>
 
-              {/* Certifications — Inactive */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                <IconWithBackground
-                  size="small"
-                  variant="neutral"
-                  className="!bg-grey !text-neutral-600"
-                  icon={<FeatherFileCheck />}
-                />
-                <span className="text-sm text-neutral-500">Certifications</span>
-              </div>
+              <div className="h-px bg-neutral-300" />
 
-              {/* Awards — Inactive */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                <IconWithBackground
-                  size="small"
-                  variant="neutral"
-                  className="!bg-grey !text-neutral-600"
-                  icon={<FeatherAward />}
-                />
-                <span className="text-sm text-neutral-500">Awards</span>
-              </div>
+              <div className="mt-4">
+                <div className="text-[16px] text-neutral-800 mb-3">
+                  Progress Steps
+                </div>
 
-              {/* Projects — Inactive */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2">
-                <IconWithBackground
-                  size="small"
-                  variant="neutral"
-                  className="!bg-grey !text-neutral-600"
-                  icon={<FeatherPackage />}
-                />
-                <span className="text-sm text-neutral-500">Projects</span>
+                {/* ⚪ Completed — Demographics */}
+                <button
+                  type="button"
+                  className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3"
+                >
+                  <IconWithBackground
+                    size="small"
+                    icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
+                    className="!bg-green-100 !rounded-full !p-3"
+                  />
+                  <span className="text-sm text-neutral-700">Demographics</span>
+                </button>
+
+                {/* ✔ Education — Completed */}
+                <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
+                  <IconWithBackground
+                    size="small"
+                    icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
+                    className="!bg-green-100 !rounded-full !p-3"
+                  />
+                  <span className="text-sm text-neutral-700">Education</span>
+                </div>
+
+                {/* 🟣 Experience — Active */}
+                <div className="flex items-center gap-3 rounded-2xl border border-violet-300 bg-violet-50 px-4 py-2 mb-3">
+                  <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white shadow-sm">
+                    <IconWithBackground
+                      size="small"
+                      variant="neutral"
+                      className="!bg-white !text-neutral-700"
+                      icon={<FeatherBriefcase className="!text-neutral-700" />}
+                    />
+                  </div>
+                  <span className="text-sm font-semibold text-neutral-900">
+                    Experience
+                  </span>
+                </div>
+
+                {/* Certifications — Inactive */}
+                <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
+                  <IconWithBackground
+                    size="small"
+                    variant="neutral"
+                    className="!bg-grey !text-neutral-600"
+                    icon={<FeatherFileCheck />}
+                  />
+                  <span className="text-sm text-neutral-500">
+                    Certifications
+                  </span>
+                </div>
+
+                {/* Awards — Inactive */}
+                <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
+                  <IconWithBackground
+                    size="small"
+                    variant="neutral"
+                    className="!bg-grey !text-neutral-600"
+                    icon={<FeatherAward />}
+                  />
+                  <span className="text-sm text-neutral-500">Awards</span>
+                </div>
+
+                {/* Projects — Inactive */}
+                <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2">
+                  <IconWithBackground
+                    size="small"
+                    variant="neutral"
+                    className="!bg-grey !text-neutral-600"
+                    icon={<FeatherPackage />}
+                  />
+                  <span className="text-sm text-neutral-500">Projects</span>
+                </div>
               </div>
             </div>
-          </div>
-        </aside>
-      </div>
-      {deleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-[360px] rounded-2xl bg-white p-6 shadow-xl">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-neutral-900">
-                Are you sure?
-              </h3>
-              <button
-                onClick={() => setDeleteId(null)}
-                className="text-neutral-400 hover:text-neutral-600"
-              >
-                ✕
-              </button>
-            </div>
-
-            <p className="text-sm text-neutral-600 mb-6">
-              Do you really want to delete this experience?
-            </p>
-
-            <div className="flex gap-3">
-              <Button
-                variant="neutral-secondary"
-                className="flex-1"
-                onClick={() => setDeleteId(null)}
-              >
-                Cancel
-              </Button>
-
-              <Button
-                className="flex-1 rounded-3xl bg-violet-600 text-white hover:bg-violet-700"
-                onClick={handleRemove}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Deleting..." : "Yes"}
-              </Button>
-            </div>
-          </div>
+          </aside>
         </div>
-      )}
-    </div>
-  </>
+        {deleteId && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="w-[360px] rounded-2xl bg-white p-6 shadow-xl">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-neutral-900">
+                  Are you sure?
+                </h3>
+                <button
+                  onClick={() => setDeleteId(null)}
+                  className="text-neutral-400 hover:text-neutral-600"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <p className="text-sm text-neutral-600 mb-6">
+                Do you really want to delete this experience?
+              </p>
+
+              <div className="flex gap-3">
+                <Button
+                  variant="neutral-secondary"
+                  className="flex-1"
+                  onClick={() => setDeleteId(null)}
+                >
+                  Cancel
+                </Button>
+
+                <Button
+                  className="flex-1 rounded-3xl bg-violet-600 text-white hover:bg-violet-700"
+                  onClick={handleRemove}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Deleting..." : "Yes"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }

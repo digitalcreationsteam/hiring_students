@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "../ui/components/Button";
 import { Avatar } from "../ui/components/Avatar";
 import HeaderLogo from "../ui/components/HeaderLogo";
@@ -19,7 +19,6 @@ import {
 import API, { URL_PATH } from "src/common/API";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
 
 type ProjectEntry = {
   id: string;
@@ -49,6 +48,11 @@ const isValidUrl = (value: string) => {
 
 export default function Projects() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const source = location.state?.source; // "dashboard" | undefined
+
+  console.log("PROJECT source:", source);
+
   const userId = localStorage.getItem("userId");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -189,16 +193,15 @@ export default function Projects() {
     //   return false;
     // }
 
-  if (!link.trim()) {
-  toast.error("Project link is required.");
-  return;
-}
+    if (!link.trim()) {
+      toast.error("Project link is required.");
+      return;
+    }
 
-if (!isValidUrl(link)) {
-  toast.error("Project link must be a valid URL (https://...)");
-  return;
-}
-
+    if (!isValidUrl(link)) {
+      toast.error("Project link must be a valid URL (https://...)");
+      return;
+    }
 
     const normalizedName = toTitleCase(normalizeSpaces(name));
 
@@ -210,7 +213,6 @@ if (!isValidUrl(link)) {
       toast.error("This project already exists.");
       return;
     }
-
 
     if (!userId) {
       toast.error("Session expired. Please login again.");
@@ -230,9 +232,9 @@ if (!isValidUrl(link)) {
               projectName: toTitleCase(normalizeSpaces(name)),
               role: role ? toTitleCase(normalizeSpaces(role)) : null,
 
-summary: summary
-  ? toSentenceCase(normalizeSpaces(summary.trim()))
-  : null,
+              summary: summary
+                ? toSentenceCase(normalizeSpaces(summary.trim()))
+                : null,
 
               outcome: outcome
                 ? toSentenceCase(normalizeSpaces(outcome.trim()))
@@ -307,7 +309,11 @@ summary: summary
       toast.error("Please add at least one project to continue.");
       return;
     }
-    navigate("/skill-index-intro");
+    if (source === "dashboard") {
+      navigate("/dashboard");
+    } else {
+      navigate("/skill-index-intro");
+    }
   };
 
   return (
@@ -330,58 +336,60 @@ summary: summary
     py-6
     shadow-[0_10px_30px_rgba(40,0,60,0.06)]
   "
-        >
-          {/* top row - back + progress */}
-          <div className="flex items-center gap-4">
-            <IconButton
-              size="small"
-              icon={<FeatherArrowLeft />}
-              onClick={() => navigate(-1)}
-            />
-            <div className="flex-1 w-full max-w-full md:max-w-[420px]">
-              <div className="flex items-center gap-3">
-                {[...Array(6)].map((_, i) => (
-                  <div
-                    key={`p-${i}`}
-                    style={{ height: 6 }}
-                    className="flex-1 rounded-full bg-violet-700"
-                  />
-                ))}
-                {[...Array()].map((_, i) => (
-                  <div
-                    key={`n-${i}`}
-                    style={{ height: 6 }}
-                    className="flex-1 rounded-full bg-neutral-200"
-                  />
-                ))}
+          >
+            {/* top row - back + progress */}
+            <div className="flex items-center gap-4">
+              <IconButton
+                size="small"
+                icon={<FeatherArrowLeft />}
+                onClick={() => navigate(-1)}
+              />
+              <div className="flex-1 w-full max-w-full md:max-w-[420px]">
+                <div className="flex items-center gap-3">
+                  {[...Array(6)].map((_, i) => (
+                    <div
+                      key={`p-${i}`}
+                      style={{ height: 6 }}
+                      className="flex-1 rounded-full bg-violet-700"
+                    />
+                  ))}
+                  {[...Array()].map((_, i) => (
+                    <div
+                      key={`n-${i}`}
+                      style={{ height: 6 }}
+                      className="flex-1 rounded-full bg-neutral-200"
+                    />
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Header */}
-          <header className="w-full">
-            <h2 className="text-[22px] text-neutral-900">Add your projects</h2>
-            <p className="text-xs text-neutral-500">Share your best work</p>
-          </header>
+            {/* Header */}
+            <header className="w-full">
+              <h2 className="text-[22px] text-neutral-900">
+                Add your projects
+              </h2>
+              <p className="text-xs text-neutral-500">Share your best work</p>
+            </header>
 
-          {/* Selected projects preview list */}
-          <section className="flex w-full flex-col gap-3">
-            {projects.map((p) => {
-              const isSelected = selectedProject?.id === p.id;
+            {/* Selected projects preview list */}
+            <section className="flex w-full flex-col gap-3">
+              {projects.map((p) => {
+                const isSelected = selectedProject?.id === p.id;
 
-              return (
-                <div
-                  key={p.id}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => setSelectedProject(isSelected ? null : p)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      setSelectedProject(isSelected ? null : p);
-                    }
-                  }}
-                  className="
+                return (
+                  <div
+                    key={p.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setSelectedProject(isSelected ? null : p)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSelectedProject(isSelected ? null : p);
+                      }
+                    }}
+                    className="
           rounded-3xl
           border border-neutral-300
           bg-white
@@ -393,98 +401,98 @@ summary: summary
           focus:ring-2
           focus:ring-violet-500
         "
-                >
-                  {/* 🔹 TOP ROW */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <Avatar
-                        size="large"
-                        square
-                        className="!rounded-2xl bg-violet-200 text-violet-700 font-semibold"
-                      >
-                        {p.name
-                          .split(" ")
-                          .slice(0, 2)
-                          .map((s) => s[0])
-                          .join("")}
-                      </Avatar>
+                  >
+                    {/* 🔹 TOP ROW */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <Avatar
+                          size="large"
+                          square
+                          className="!rounded-2xl bg-violet-200 text-violet-700 font-semibold"
+                        >
+                          {p.name
+                            .split(" ")
+                            .slice(0, 2)
+                            .map((s) => s[0])
+                            .join("")}
+                        </Avatar>
 
-                      <div className="flex flex-col min-w-0">
-                        <span className="text-sm font-semibold text-neutral-900 truncate">
-                          {p.name}
-                        </span>
-
-                        {p.role && (
-                          <span className="text-xs text-neutral-500 truncate">
-                            {p.role}
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-sm font-semibold text-neutral-900 truncate">
+                            {p.name}
                           </span>
-                        )}
+
+                          {p.role && (
+                            <span className="text-xs text-neutral-500 truncate">
+                              {p.role}
+                            </span>
+                          )}
+                        </div>
                       </div>
+
+                      <IconButton
+                        size="small"
+                        icon={<FeatherX />}
+                        aria-label={`Delete project ${p.name}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteProjectId(p.id);
+                        }}
+                        className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
+                      />
                     </div>
 
-                    <IconButton
-                      size="small"
-                      icon={<FeatherX />}
-                      aria-label={`Delete project ${p.name}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setDeleteProjectId(p.id);
-                      }}
-                      className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
-                    />
+                    {/* 🔹 EXPANDED DETAILS */}
+                    {isSelected && (
+                      <>
+                        <div className="my-4 border-t border-neutral-200" />
+
+                        <div className="flex flex-col gap-3 text-sm text-neutral-800 px-1">
+                          <div>
+                            <span className="font-medium">Project name:</span>{" "}
+                            {p.name}
+                          </div>
+                          <div>
+                            <span className="font-medium">Your Role:</span>{" "}
+                            {p.role}
+                          </div>
+                          {p.summary && (
+                            <div>
+                              <span className="font-medium">Summary:</span>{" "}
+                              {p.summary}
+                            </div>
+                          )}
+
+                          {p.outcome && (
+                            <div>
+                              <span className="font-medium">Outcome:</span>{" "}
+                              {p.outcome}
+                            </div>
+                          )}
+
+                          {p.link && (
+                            <div>
+                              <span className="font-medium">Project link:</span>{" "}
+                              <a
+                                href={p.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-violet-700 underline break-all"
+                                onClick={(e) => e.stopPropagation()} // 🚫 don’t collapse card
+                              >
+                                {p.link}
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
                   </div>
+                );
+              })}
+            </section>
 
-                  {/* 🔹 EXPANDED DETAILS */}
-                  {isSelected && (
-                    <>
-                      <div className="my-4 border-t border-neutral-200" />
-
-                      <div className="flex flex-col gap-3 text-sm text-neutral-800 px-1">
-                        <div>
-                          <span className="font-medium">Project name:</span>{" "}
-                          {p.name}
-                        </div>
-                        <div>
-                          <span className="font-medium">Your Role:</span>{" "}
-                          {p.role}
-                        </div>
-                        {p.summary && (
-                          <div>
-                            <span className="font-medium">Summary:</span>{" "}
-                            {p.summary}
-                          </div>
-                        )}
-
-                        {p.outcome && (
-                          <div>
-                            <span className="font-medium">Outcome:</span>{" "}
-                            {p.outcome}
-                          </div>
-                        )}
-
-                        {p.link && (
-                          <div>
-                            <span className="font-medium">Project link:</span>{" "}
-                            <a
-                              href={p.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-violet-700 underline break-all"
-                              onClick={(e) => e.stopPropagation()} // 🚫 don’t collapse card
-                            >
-                              {p.link}
-                            </a>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  )}
-                </div>
-              );
-            })}
-          </section>
-
-          {/* 
+            {/* 
           {selectedProject && (
             <div className="rounded-3xl border border-neutral-300 bg-white px-6 py-5">
               <div className="flex items-center justify-between mb-4">
@@ -538,113 +546,121 @@ summary: summary
             </div>
           )} */}
 
-          {/* Form */}
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleAddProject();
-            }}
-            className="flex flex-col gap-4"
-          >
-            <TextField
-              label={<span className="text-[12px]">Project name <span className="text-red-500">*</span> </span>}
-              helpText=""
-              className={scTextFieldClass}
+            {/* Form */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleAddProject();
+              }}
+              className="flex flex-col gap-4"
             >
-              <TextField.Input
-                placeholder="e.g., Mobile app redesign"
-                value={name}
-                onChange={(ev) => setName(toTitleCase(ev.target.value))}
-                className={scInputClass}
-              />
-            </TextField>
-
-            <TextField
-              label={<span className="text-[12px]">Your Role <span className="text-red-500">*</span> </span>}
-              helpText=""
-              className={scTextFieldClass}
-            >
-              <TextField.Input
-                placeholder="e.g., Product Manager"
-                value={role}
-                onChange={(ev) => setRole(toTitleCase(ev.target.value))}
-                className={scInputClass}
-              />
-            </TextField>
+              <TextField
+                label={
+                  <span className="text-[12px]">
+                    Project name <span className="text-red-500">*</span>{" "}
+                  </span>
+                }
+                helpText=""
+                className={scTextFieldClass}
+              >
+                <TextField.Input
+                  placeholder="e.g., Mobile app redesign"
+                  value={name}
+                  onChange={(ev) => setName(toTitleCase(ev.target.value))}
+                  className={scInputClass}
+                />
+              </TextField>
 
               <TextField
-              label={<span className="text-[12px]">Link <span className="text-red-500">*</span></span>}
-              helpText=""
-              className={scTextFieldClass}
-            >
-              <TextField.Input
-                placeholder="https://"
-                value={link}
-                onChange={(e) => setLink(e.target.value.replace(/\s/g, ""))}
-                onBlur={() => {
-                  if (!link) return;
-                  if (!link.startsWith("http")) {
-                    setLink("https://" + link);
-                  }
-                }}
-                className={scInputClass}
-              />
-            </TextField>
-
-            <TextField
-              label={<span className="text-[12px]">Summary </span>}
-              helpText=""
-              className={scTextFieldClass}
-            >
-              <TextField.Input
-                placeholder="What was the project about?"
-                value={summary}
-                onChange={(e) => setSummary(e.target.value)}
-                onBlur={() => setSummary(toSentenceCase(summary))}
-                className={scInputClass}
-              />
-            </TextField>
-
-             
-
-            <TextField
-              label={<span className="text-[12px]">Outcome </span>}
-              helpText=""
-              className={scTextFieldClass}
-            >
-              <TextField.Input
-                placeholder="What was the result or impact?"
-                value={outcome}
-                onChange={(ev) => setOutcome(toSentenceCase(ev.target.value))}
-                className={scInputClass}
-              />
-            </TextField>
-
-         
-
-            <div className="flex gap-3 mt-2">
-              <Button
-                type="button"
-                variant="neutral-secondary"
-                icon={<FeatherPlus />}
-                className="w-full rounded-full border border-neutral-300 h-10 px-4 flex items-center gap-2"
-                onClick={handleAddProject}
-                disabled={isSubmitting}
+                label={
+                  <span className="text-[12px]">
+                    Your Role <span className="text-red-500">*</span>{" "}
+                  </span>
+                }
+                helpText=""
+                className={scTextFieldClass}
               >
-                {isSubmitting ? "Adding..." : "Add another project"}
-              </Button>
+                <TextField.Input
+                  placeholder="e.g., Product Manager"
+                  value={role}
+                  onChange={(ev) => setRole(toTitleCase(ev.target.value))}
+                  className={scInputClass}
+                />
+              </TextField>
 
-              <div className="flex-1" />
-            </div>
-          </form>
+              <TextField
+                label={
+                  <span className="text-[12px]">
+                    Link <span className="text-red-500">*</span>
+                  </span>
+                }
+                helpText=""
+                className={scTextFieldClass}
+              >
+                <TextField.Input
+                  placeholder="https://"
+                  value={link}
+                  onChange={(e) => setLink(e.target.value.replace(/\s/g, ""))}
+                  onBlur={() => {
+                    if (!link) return;
+                    if (!link.startsWith("http")) {
+                      setLink("https://" + link);
+                    }
+                  }}
+                  className={scInputClass}
+                />
+              </TextField>
 
-          <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
+              <TextField
+                label={<span className="text-[12px]">Summary </span>}
+                helpText=""
+                className={scTextFieldClass}
+              >
+                <TextField.Input
+                  placeholder="What was the project about?"
+                  value={summary}
+                  onChange={(e) => setSummary(e.target.value)}
+                  onBlur={() => setSummary(toSentenceCase(summary))}
+                  className={scInputClass}
+                />
+              </TextField>
 
-          <footer>
-            <Button
-              onClick={handleContinue}
-              disabled={!canContinue || isSubmitting}
-              className={`
+              <TextField
+                label={<span className="text-[12px]">Outcome </span>}
+                helpText=""
+                className={scTextFieldClass}
+              >
+                <TextField.Input
+                  placeholder="What was the result or impact?"
+                  value={outcome}
+                  onChange={(ev) => setOutcome(toSentenceCase(ev.target.value))}
+                  className={scInputClass}
+                />
+              </TextField>
+
+              <div className="flex gap-3 mt-2">
+                <Button
+                  type="button"
+                  variant="neutral-secondary"
+                  icon={<FeatherPlus />}
+                  className="w-full rounded-full border border-neutral-300 h-10 px-4 flex items-center gap-2"
+                  onClick={handleAddProject}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Adding..." : "Add another project"}
+                </Button>
+
+                <div className="flex-1" />
+              </div>
+            </form>
+
+            <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
+
+            <footer>
+              <Button
+                onClick={handleContinue}
+                disabled={!canContinue || isSubmitting}
+                className={`
     w-full h-10 rounded-full transition-all
     ${
       !canContinue || isSubmitting
@@ -652,144 +668,146 @@ summary: summary
         : "bg-violet-700 text-white shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
     }
   `}
-            >
-              {isSubmitting ? "Saving..." : "Continue"}
-            </Button>
-          </footer>
-        </main>
-
-        {/* Right panel */}
-        <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
-          <div className="lg:sticky lg:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
-            <h3 className="text-[22px] text-neutral-900">
-              Your Experience Index
-            </h3>
-
-            <div className="flex items-center justify-center py-6">
-              <span
-                aria-live="polite"
-                className="font-['Afacad_Flux'] text-[32px] sm:text-[40px] md:text-[48px] font-[500] leading-[56px] text-neutral-300"
               >
-                {displayedIndex ?? 0}
-              </span>
-            </div>
+                {isSubmitting ? "Saving..." : "Continue"}
+              </Button>
+            </footer>
+          </main>
 
-            {/* Top form horizontal line */}
-            <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
+          {/* Right panel */}
+          <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
+            <div className="lg:sticky lg:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
+              <h3 className="text-[22px] text-neutral-900">
+                Your Experience Index
+              </h3>
 
-            <div className="mt-4">
-              <div className="text-[16px] text-neutral-800 mb-3">
-                Progress Steps
-              </div>
-
-              {/* Demographics — completed (green) */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                <IconWithBackground
-                  size="small"
-                  icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                  className="!bg-green-100 !rounded-full !p-3"
-                />
-                <span className="text-sm text-neutral-700">Demographics</span>
-              </div>
-
-              {/* Education — completed (green) */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                <IconWithBackground
-                  size="small"
-                  icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                  className="!bg-green-100 !rounded-full !p-3"
-                />
-                <span className="text-sm text-neutral-700">Education</span>
-              </div>
-
-              {/* Experience — completed (green) */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                <IconWithBackground
-                  size="small"
-                  icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                  className="!bg-green-100 !rounded-full !p-3"
-                />
-                <span className="text-sm text-neutral-700">Experience</span>
-              </div>
-
-              {/* Certifications — completed (green) */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                <IconWithBackground
-                  size="small"
-                  icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                  className="!bg-green-100 !rounded-full !p-3"
-                />
-                <span className="text-sm text-neutral-700">Certifications</span>
-              </div>
-
-              {/* Awards — completed (green) */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                <IconWithBackground
-                  size="small"
-                  icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                  className="!bg-green-100 !rounded-full !p-3"
-                />
-                <span className="text-sm text-neutral-700">Awards</span>
-              </div>
-
-              {/* Certifications — active (purple) */}
-              <div className="flex items-center gap-3 rounded-2xl border border-violet-300 bg-violet-50 px-4 py-2 mb-3">
-                <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white shadow-sm">
-                  <IconWithBackground
-                    size="small"
-                    variant="neutral"
-                    className="!bg-white !text-violet-600"
-                    icon={<FeatherPackage className="!text-violet-800" />}
-                  />
-                </div>
-                <span className="text-sm font-semibold text-neutral-900">
-                  Projects
+              <div className="flex items-center justify-center py-6">
+                <span
+                  aria-live="polite"
+                  className="font-['Afacad_Flux'] text-[32px] sm:text-[40px] md:text-[48px] font-[500] leading-[56px] text-neutral-300"
+                >
+                  {displayedIndex ?? 0}
                 </span>
               </div>
-            </div>
-          </div>
-        </aside>
-      </div>
-      {deleteProjectId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-[360px] rounded-2xl bg-white p-6 shadow-xl">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-neutral-900">
-                Are you sure?
-              </h3>
-              <button
-                onClick={() => setDeleteProjectId(null)}
-                className="text-neutral-400 hover:text-neutral-600"
-              >
-                ✕
-              </button>
-            </div>
 
-            <p className="text-sm text-neutral-600 mb-6">
-              Do you really want to delete this project?
-            </p>
+              {/* Top form horizontal line */}
+              <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
 
-            <div className="flex gap-3">
-              <Button
-                variant="neutral-secondary"
-                className="flex-1"
-                onClick={() => setDeleteProjectId(null)}
-              >
-                Cancel
-              </Button>
+              <div className="mt-4">
+                <div className="text-[16px] text-neutral-800 mb-3">
+                  Progress Steps
+                </div>
 
-              <Button
-                className="flex-1 rounded-3xl bg-violet-600 text-white hover:bg-violet-700"
-                onClick={handleRemove}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Deleting..." : "Yes"}
-              </Button>
+                {/* Demographics — completed (green) */}
+                <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
+                  <IconWithBackground
+                    size="small"
+                    icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
+                    className="!bg-green-100 !rounded-full !p-3"
+                  />
+                  <span className="text-sm text-neutral-700">Demographics</span>
+                </div>
+
+                {/* Education — completed (green) */}
+                <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
+                  <IconWithBackground
+                    size="small"
+                    icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
+                    className="!bg-green-100 !rounded-full !p-3"
+                  />
+                  <span className="text-sm text-neutral-700">Education</span>
+                </div>
+
+                {/* Experience — completed (green) */}
+                <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
+                  <IconWithBackground
+                    size="small"
+                    icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
+                    className="!bg-green-100 !rounded-full !p-3"
+                  />
+                  <span className="text-sm text-neutral-700">Experience</span>
+                </div>
+
+                {/* Certifications — completed (green) */}
+                <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
+                  <IconWithBackground
+                    size="small"
+                    icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
+                    className="!bg-green-100 !rounded-full !p-3"
+                  />
+                  <span className="text-sm text-neutral-700">
+                    Certifications
+                  </span>
+                </div>
+
+                {/* Awards — completed (green) */}
+                <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
+                  <IconWithBackground
+                    size="small"
+                    icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
+                    className="!bg-green-100 !rounded-full !p-3"
+                  />
+                  <span className="text-sm text-neutral-700">Awards</span>
+                </div>
+
+                {/* Certifications — active (purple) */}
+                <div className="flex items-center gap-3 rounded-2xl border border-violet-300 bg-violet-50 px-4 py-2 mb-3">
+                  <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white shadow-sm">
+                    <IconWithBackground
+                      size="small"
+                      variant="neutral"
+                      className="!bg-white !text-violet-600"
+                      icon={<FeatherPackage className="!text-violet-800" />}
+                    />
+                  </div>
+                  <span className="text-sm font-semibold text-neutral-900">
+                    Projects
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
+          </aside>
         </div>
-      )}
-    </div>
+        {deleteProjectId && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="w-[360px] rounded-2xl bg-white p-6 shadow-xl">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-neutral-900">
+                  Are you sure?
+                </h3>
+                <button
+                  onClick={() => setDeleteProjectId(null)}
+                  className="text-neutral-400 hover:text-neutral-600"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <p className="text-sm text-neutral-600 mb-6">
+                Do you really want to delete this project?
+              </p>
+
+              <div className="flex gap-3">
+                <Button
+                  variant="neutral-secondary"
+                  className="flex-1"
+                  onClick={() => setDeleteProjectId(null)}
+                >
+                  Cancel
+                </Button>
+
+                <Button
+                  className="flex-1 rounded-3xl bg-violet-600 text-white hover:bg-violet-700"
+                  onClick={handleRemove}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Deleting..." : "Yes"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </>
   );
 }

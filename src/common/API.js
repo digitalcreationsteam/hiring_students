@@ -53,6 +53,7 @@ export const URL_PATH = {
   getUser: "/user",
   updateUser: "/user",
   uploadResume: "/user/resume",
+  getResume:"/user/resume",
   uploadProfile: "/user/profile",
 
   /* ---------- EXPERIENCE INDEX ---------- */
@@ -100,7 +101,7 @@ export const URL_PATH = {
   getAttemptQuestions: "/user/assessment/getAttemptQuestions",
   saveAnswer: "/user/assessment/saveAnswer",
   submitAssessment: "/user/assessment/submit",
-  reportViolation:"/user/assessment/violation",
+  reportViolation: "/user/assessment/violation",
   getUserDomainSkils: "/user/getUserDomainSkills",
 
   createSubscription: "/subscription/create",
@@ -113,7 +114,7 @@ export const URL_PATH = {
   /* ---------- RESULTS ---------- */
   result: "/user/experience_index",
 
-    /* ---------- CHAT ---------- */
+  /* ---------- CHAT ---------- */
   getChatHistory: (otherUserId) => `/chat/${otherUserId}`,
   getChatParticipants: "/chat/participants", // Get all people you've chatted with
   markMessagesRead: "/chat/mark-read",

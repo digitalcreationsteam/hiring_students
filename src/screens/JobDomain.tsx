@@ -18,13 +18,15 @@ const notify = (msg: string) => {
 function JobDomain() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const [isDomainOpen, setIsDomainOpen] = useState(false);
+
   const userId = React.useMemo(() => localStorage.getItem("userId"), []);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Domain
   const [domain, setDomain] = useState<{ id: string; name: string } | null>(
-    null
+    null,
   );
   const [domains, setDomains] = useState<{ _id: string; name: string }[]>([]);
 
@@ -67,7 +69,7 @@ function JobDomain() {
         },
         {
           Authorization: `Bearer ${token}`,
-        }
+        },
       );
 
       console.log("✅ Domain saved:", saveResponse);
@@ -97,17 +99,13 @@ function JobDomain() {
           nextRoute: statusResponse.navigation.nextRoute,
           currentStep: statusResponse.navigation.currentStep,
           completedSteps: statusResponse.navigation.completedSteps,
-          isOnboardingComplete:
-            statusResponse.navigation.isOnboardingComplete,
+          isOnboardingComplete: statusResponse.navigation.isOnboardingComplete,
           hasPayment: statusResponse.navigation.hasPayment,
-        })
+        }),
       );
 
       // ✅ Step 4: Navigate to next step
-      console.log(
-        "🚀 Navigating to:",
-        statusResponse.navigation.nextRoute
-      );
+      console.log("🚀 Navigating to:", statusResponse.navigation.nextRoute);
       navigate(statusResponse.navigation.nextRoute);
     } catch (err: any) {
       console.error("❌ Error:", err);
@@ -254,33 +252,38 @@ function JobDomain() {
                 Job Domain <span className="text-red-500">*</span>
               </label>
 
-              <SubframeCore.DropdownMenu.Root>
-                <SubframeCore.DropdownMenu.Trigger asChild>
-                  <div className="flex h-10 items-center justify-between rounded-3xl border border-neutral-300 px-4 bg-neutral-50 cursor-pointer">
-                    <span
-                      className={domain ? "text-neutral-600" : "text-neutral-400"}
-                    >
-                      {domain?.name || "Select your domain"}
-                    </span>
-                    <FeatherChevronDown />
-                  </div>
-                </SubframeCore.DropdownMenu.Trigger>
+            <SubframeCore.DropdownMenu.Root
+              open={isDomainOpen}
+              onOpenChange={setIsDomainOpen}
+            >
+              <SubframeCore.DropdownMenu.Trigger asChild>
+                <div className="flex h-10 items-center justify-between rounded-3xl border border-neutral-300 px-4 bg-neutral-50 cursor-pointer">
+                  <span
+                    className={domain ? "text-neutral-600" : "text-neutral-400"}
+                  >
+                    {domain?.name || "Select your domain"}
+                  </span>
+                  <FeatherChevronDown />
+                </div>
+              </SubframeCore.DropdownMenu.Trigger>
 
-                <SubframeCore.DropdownMenu.Content
-                  asChild
-                  align="start"
-                  sideOffset={4}
-                >
-                  <div className="bg-white rounded-2xl shadow-lg py-2 max-h-[260px] overflow-y-auto">
-                    {domains.map((item) => (
-                      <div
-                        key={item._id}
-                        onClick={() => {
-                          console.log("🎯 Domain selected:", item.name);
-                          setDomain({ id: item._id, name: item.name });
-                          // setSubDomain(null); // reset subdomain when domain changes
-                        }}
-                        className={`px-4 py-2 cursor-pointer text-sm hover:bg-violet-50 ${domain?.id === item._id
+              <SubframeCore.DropdownMenu.Content
+                asChild
+                align="start"
+                sideOffset={4}
+              >
+                <div className="bg-white rounded-2xl shadow-lg py-2 max-h-[260px] overflow-y-auto">
+                  {domains.map((item) => (
+                    <div
+                      key={item._id}
+                      onClick={() => {
+                        console.log("🎯 Domain selected:", item.name);
+                        setDomain({ id: item._id, name: item.name });
+                        setIsDomainOpen(false);
+                        // setSubDomain(null); // reset subdomain when domain changes
+                      }}
+                      className={`px-4 py-2 cursor-pointer text-sm hover:bg-violet-50 ${
+                        domain?.id === item._id
                           ? "bg-violet-100 font-semibold"
                           : ""
                           }`}

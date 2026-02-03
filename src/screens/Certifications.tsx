@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useRef, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Avatar } from "../ui/components/Avatar";
 import { Button } from "../ui/components/Button";
 import HeaderLogo from "../ui/components/HeaderLogo";
@@ -212,6 +212,10 @@ function MonthYearPicker({
 
 export default function Certifications() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const source = location.state?.source;
+
+  console.log("CERTIFICATIONS source:", source);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const userId = localStorage.getItem("userId");
 
@@ -448,8 +452,7 @@ export default function Certifications() {
         "user-id": userId,
       });
 
-             toast.success("Certification added successfully");
-      
+      toast.success("Certification added successfully");
 
       // safest pattern (same as Experience)
       await fetchCertifications();
@@ -547,7 +550,9 @@ export default function Certifications() {
       return;
     }
 
-    navigate("/awards");
+    navigate("/awards", {
+      state: { source },
+    });
   };
 
   const handleUploadKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -597,35 +602,35 @@ export default function Certifications() {
             </div>
           </div>
 
-          {/* Header */}
-          <header className="mt-1 w-full">
-            <h2 className="text-[22px] text-neutral-900">
-              Add your certifications
-            </h2>
-            <p className="mt-1 text-xs text-neutral-500">
-              Professional certifications help boost your Experience Index
-            </p>
-          </header>
+            {/* Header */}
+            <header className="mt-1 w-full">
+              <h2 className="text-[22px] text-neutral-900">
+                Add your certifications
+              </h2>
+              <p className="mt-1 text-xs text-neutral-500">
+                Professional certifications help boost your Experience Index
+              </p>
+            </header>
 
-          {/* selected cert preview list */}
+            {/* selected cert preview list */}
 
-          <section className="flex w-full flex-col gap-3">
-            {certs.map((c) => {
-              const isSelected = selectedCert?.id === c.id;
+            <section className="flex w-full flex-col gap-3">
+              {certs.map((c) => {
+                const isSelected = selectedCert?.id === c.id;
 
-              return (
-                <div
-                  key={c.id}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => setSelectedCert(isSelected ? null : c)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      setSelectedCert(isSelected ? null : c);
-                    }
-                  }}
-                  className="
+                return (
+                  <div
+                    key={c.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setSelectedCert(isSelected ? null : c)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSelectedCert(isSelected ? null : c);
+                      }
+                    }}
+                    className="
           rounded-3xl
           border border-neutral-300
           bg-white
@@ -637,431 +642,435 @@ export default function Certifications() {
           focus:ring-2
           focus:ring-violet-500
         "
-                >
-                  {/* 🔹 TOP ROW */}
-                  <div className="flex items-center justify-between">
-                    {/* Left */}
-                    <div className="flex items-center gap-3 min-w-0">
-                      <Avatar
-                        size="large"
-                        square
-                        className="!rounded-3xl bg-violet-200 text-violet-700"
-                      >
-                        {c.issuer
-                          ? c.issuer
-                              .split(" ")
-                              .slice(0, 2)
-                              .map((s) => s[0])
-                              .join("")
-                          : "C"}
-                      </Avatar>
+                  >
+                    {/* 🔹 TOP ROW */}
+                    <div className="flex items-center justify-between">
+                      {/* Left */}
+                      <div className="flex items-center gap-3 min-w-0">
+                        <Avatar
+                          size="large"
+                          square
+                          className="!rounded-3xl bg-violet-200 text-violet-700"
+                        >
+                          {c.issuer
+                            ? c.issuer
+                                .split(" ")
+                                .slice(0, 2)
+                                .map((s) => s[0])
+                                .join("")
+                            : "C"}
+                        </Avatar>
 
-                      <div className="flex flex-col min-w-0">
-                        <span className="text-sm font-semibold text-neutral-900 truncate">
-                          {c.name}
-                        </span>
-                        <span className="text-xs text-neutral-500 truncate">
-                          {c.issuer}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Right */}
-                    <div className="flex flex-col items-end gap-2 shrink-0">
-                      <IconButton
-                        size="small"
-                        icon={<FeatherX />}
-                        aria-label={`Delete certificate ${c.name}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setDeleteId(c.id);
-                        }}
-                        className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
-                      />
-
-                      <span className="text-xs text-neutral-500">
-                        {c.issueDate}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* 🔹 DETAILS (INSIDE SAME BORDER) */}
-                  {isSelected && (
-                    <>
-                      <div className="my-4 border-t border-neutral-200" />
-
-                      <div className="flex flex-col gap-3 text-sm text-neutral-800 px-1">
-                        <div>
-                          <span className="font-medium">Name:</span> {c.name}
-                        </div>
-
-                        {c.issuer && (
-                          <div>
-                            <span className="font-medium">Issuer:</span>{" "}
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-sm font-semibold text-neutral-900 truncate">
+                            {c.name}
+                          </span>
+                          <span className="text-xs text-neutral-500 truncate">
                             {c.issuer}
-                          </div>
-                        )}
-
-                        {c.issueDate && (
-                          <div>
-                            <span className="font-medium">Issue date:</span>{" "}
-                            {c.issueDate}
-                          </div>
-                        )}
-
-                        {c.credentialLink && (
-                          <div>
-                            <span className="font-medium">Credential:</span>{" "}
-                            <a
-                              href={c.credentialLink}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-violet-700 underline"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              View
-                            </a>
-                          </div>
-                        )}
+                          </span>
+                        </div>
                       </div>
-                    </>
-                  )}
-                </div>
-              );
-            })}
-          </section>
 
-          {/* form */}
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleAdd();
-            }}
-            className="flex w-full flex-col gap-4"
-          >
-            <TextField
-              label={
-                <span className="text-[12px]">
-                  Certification Name <span className="text-red-500">*</span>
-                </span>
-              }
-              helpText=""
-              className={scTextFieldClass}
-            >
-              <TextField.Input
-                placeholder="e.g., Certified Product Manager"
-                value={name}
-                onChange={(e) =>
-                  setName(e.target.value.replace(/[^A-Za-z\s.&-]/g, ""))
-                }
-                onBlur={() => setName(toTitleCase(name))}
-                className={scInputClass}
-              />
-            </TextField>
+                      {/* Right */}
+                      <div className="flex flex-col items-end gap-2 shrink-0">
+                        <IconButton
+                          size="small"
+                          icon={<FeatherX />}
+                          aria-label={`Delete certificate ${c.name}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteId(c.id);
+                          }}
+                          className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
+                        />
 
-            <TextField
-              label={<span className="text-[12px]">Issuer <span className="text-red-500">*</span> </span>}
-              className={scTextFieldClass}
-            >
-              <TextField.Input
-                placeholder="Issuing organization"
-                value={issuer}
-                onChange={(e) =>
-                  setIssuer(e.target.value.replace(/[^A-Za-z\s.&-]/g, ""))
-                }
-                onBlur={() => setIssuer(toTitleCase(issuer))}
-                className={scInputClass}
-              />
-            </TextField>
-            {/* ------------Date------------------ */}
-
-            {/* // date------------------------- */}
-            <div className="flex flex-col gap-6 max-w-lg">
-              {/* Issue Month & Year */}
-              <div className="flex flex-col gap-1">
-                <label
-                  htmlFor="issueDate"
-                  className="text-[12px] font-medium text-neutral-700"
-                >
-                  Issue Month & Year <span className="text-red-500">*</span>
-                </label>
-
-                <MonthYearPicker value={issueDate} onChange={setIssueDate} />
-              </div>
-            </div>
-
-            {/* ---------------End Date-------------- */}
-
-            <TextField
-              label={
-                <span className="text-[12px]">Credential Link </span>
-              }
-              helpText=""
-              className={scTextFieldClass}
-            >
-              <TextField.Input
-                placeholder="https://"
-                value={credentialLink}
-                onChange={(e) =>
-                  setCredentialLink(e.target.value.replace(/\s/g, ""))
-                }
-                onBlur={() => {
-                  if (!credentialLink) return;
-                  if (!credentialLink.startsWith("http")) {
-                    setCredentialLink("https://" + credentialLink);
-                  }
-                }}
-                className={scInputClass}
-              />
-            </TextField>
-
-            {/* ✅ OR Divider (ADD THIS) */}
-            <div className="flex items-center gap-3 my-1">
-              <div className="flex-1 h-px bg-neutral-300" />
-              <span className="text-[11px] text-neutral-500 font-medium tracking-wide">
-                OR
-              </span>
-              <div className="flex-1 h-px bg-neutral-300" />
-            </div>
-
-            {/* Upload */}
-            <div className="w-full">
-              <div className="text-[12px] text-neutral-800 mb-2">
-                Upload Certificate
-              </div>
-
-              <div
-                role="button"
-                tabIndex={0}
-                aria-label="Upload certificate PDF. Click or press Enter to browse files. Drag and drop is supported. Press Escape to remove the selected file."
-                onClick={handleBrowseFile}
-                onKeyDown={handleUploadKeyDown}
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                className="w-full rounded-2xl border-2 border-dashed border-neutral-300 bg-gray-50 px-6 py-4 flex flex-col items-center justify-center cursor-pointer"
-              >
-                <IconWithBackground
-                  size="large"
-                  icon={<FeatherUpload className="w-5 h-5 text-neutral-600" />}
-                  className="!bg-neutral-200 !rounded-full !p-3 shadow-s"
-                />
-
-                <div className="mt-3 text-xm text-neutral-600 text-center">
-                  Click to select file or drag to upload
-                </div>
-                <div className="text-xs text-neutral-400 mt-1 text-center">
-                  PDF format only, max file size 5MB
-                </div>
-                <input
-                  type="file"
-                  accept=".pdf"
-                  className="hidden"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                />
-              </div>
-
-              {/* file preview */}
-              {file && (
-                <div className="mt-4 rounded-2xl border border-neutral-300 bg-gray-50 px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:justify-between">
-                  <div className="flex items-center gap-3">
-                    <IconWithBackground
-                      size="medium"
-                      icon={
-                        <FeatherFileText className="w-4 h-4 text-red-800" />
-                      }
-                      className="!bg-red-100 !rounded-full !p-3"
-                    />
-                    <div className="flex flex-col">
-                      <span className="text-sm text-neutral-900">
-                        {file.name}
-                      </span>
-                      <span className="text-xs text-neutral-500">
-                        {(file.size / (1024 * 1024)).toFixed(1)} MB
-                      </span>
+                        <span className="text-xs text-neutral-500">
+                          {c.issueDate}
+                        </span>
+                      </div>
                     </div>
+
+                    {/* 🔹 DETAILS (INSIDE SAME BORDER) */}
+                    {isSelected && (
+                      <>
+                        <div className="my-4 border-t border-neutral-200" />
+
+                        <div className="flex flex-col gap-3 text-sm text-neutral-800 px-1">
+                          <div>
+                            <span className="font-medium">Name:</span> {c.name}
+                          </div>
+
+                          {c.issuer && (
+                            <div>
+                              <span className="font-medium">Issuer:</span>{" "}
+                              {c.issuer}
+                            </div>
+                          )}
+
+                          {c.issueDate && (
+                            <div>
+                              <span className="font-medium">Issue date:</span>{" "}
+                              {c.issueDate}
+                            </div>
+                          )}
+
+                          {c.credentialLink && (
+                            <div>
+                              <span className="font-medium">Credential:</span>{" "}
+                              <a
+                                href={c.credentialLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-violet-700 underline"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                View
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
                   </div>
-                  <IconButton
-                    size="small"
-                    icon={<FeatherX />}
-                    onClick={removeFile}
-                    className="!bg-transparent !text-neutral-500"
+                );
+              })}
+            </section>
+
+            {/* form */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleAdd();
+              }}
+              className="flex w-full flex-col gap-4"
+            >
+              <TextField
+                label={
+                  <span className="text-[12px]">
+                    Certification Name <span className="text-red-500">*</span>
+                  </span>
+                }
+                helpText=""
+                className={scTextFieldClass}
+              >
+                <TextField.Input
+                  placeholder="e.g., Certified Product Manager"
+                  value={name}
+                  onChange={(e) =>
+                    setName(e.target.value.replace(/[^A-Za-z\s.&-]/g, ""))
+                  }
+                  onBlur={() => setName(toTitleCase(name))}
+                  className={scInputClass}
+                />
+              </TextField>
+
+              <TextField
+                label={
+                  <span className="text-[12px]">
+                    Issuer <span className="text-red-500">*</span>{" "}
+                  </span>
+                }
+                className={scTextFieldClass}
+              >
+                <TextField.Input
+                  placeholder="Issuing organization"
+                  value={issuer}
+                  onChange={(e) =>
+                    setIssuer(e.target.value.replace(/[^A-Za-z\s.&-]/g, ""))
+                  }
+                  onBlur={() => setIssuer(toTitleCase(issuer))}
+                  className={scInputClass}
+                />
+              </TextField>
+              {/* ------------Date------------------ */}
+
+              {/* // date------------------------- */}
+              <div className="flex flex-col gap-6 max-w-lg">
+                {/* Issue Month & Year */}
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="issueDate"
+                    className="text-[12px] font-medium text-neutral-700"
+                  >
+                    Issue Month & Year <span className="text-red-500">*</span>
+                  </label>
+
+                  <MonthYearPicker value={issueDate} onChange={setIssueDate} />
+                </div>
+              </div>
+
+              {/* ---------------End Date-------------- */}
+
+              <TextField
+                label={<span className="text-[12px]">Credential Link </span>}
+                helpText=""
+                className={scTextFieldClass}
+              >
+                <TextField.Input
+                  placeholder="https://"
+                  value={credentialLink}
+                  onChange={(e) =>
+                    setCredentialLink(e.target.value.replace(/\s/g, ""))
+                  }
+                  onBlur={() => {
+                    if (!credentialLink) return;
+                    if (!credentialLink.startsWith("http")) {
+                      setCredentialLink("https://" + credentialLink);
+                    }
+                  }}
+                  className={scInputClass}
+                />
+              </TextField>
+
+              {/* ✅ OR Divider (ADD THIS) */}
+              <div className="flex items-center gap-3 my-1">
+                <div className="flex-1 h-px bg-neutral-300" />
+                <span className="text-[11px] text-neutral-500 font-medium tracking-wide">
+                  OR
+                </span>
+                <div className="flex-1 h-px bg-neutral-300" />
+              </div>
+
+              {/* Upload */}
+              <div className="w-full">
+                <div className="text-[12px] text-neutral-800 mb-2">
+                  Upload Certificate
+                </div>
+
+                <div
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Upload certificate PDF. Click or press Enter to browse files. Drag and drop is supported. Press Escape to remove the selected file."
+                  onClick={handleBrowseFile}
+                  onKeyDown={handleUploadKeyDown}
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                  className="w-full rounded-2xl border-2 border-dashed border-neutral-300 bg-gray-50 px-6 py-4 flex flex-col items-center justify-center cursor-pointer"
+                >
+                  <IconWithBackground
+                    size="large"
+                    icon={
+                      <FeatherUpload className="w-5 h-5 text-neutral-600" />
+                    }
+                    className="!bg-neutral-200 !rounded-full !p-3 shadow-s"
+                  />
+
+                  <div className="mt-3 text-xm text-neutral-600 text-center">
+                    Click to select file or drag to upload
+                  </div>
+                  <div className="text-xs text-neutral-400 mt-1 text-center">
+                    PDF format only, max file size 5MB
+                  </div>
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    className="hidden"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
                   />
                 </div>
-              )}
-            </div>
 
-            <div className="flex flex-col sm:flex-row w-full gap-3 mt-2">
-              <Button
-                type="button"
-                variant="neutral-secondary"
-                icon={<FeatherPlus />}
-                className="w-full rounded-full border-neutral-300 h-10 px-4 flex items-center gap-2"
-                onClick={handleAdd}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Adding..." : "Add another certification"}
-              </Button>
+                {/* file preview */}
+                {file && (
+                  <div className="mt-4 rounded-2xl border border-neutral-300 bg-gray-50 px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:justify-between">
+                    <div className="flex items-center gap-3">
+                      <IconWithBackground
+                        size="medium"
+                        icon={
+                          <FeatherFileText className="w-4 h-4 text-red-800" />
+                        }
+                        className="!bg-red-100 !rounded-full !p-3"
+                      />
+                      <div className="flex flex-col">
+                        <span className="text-sm text-neutral-900">
+                          {file.name}
+                        </span>
+                        <span className="text-xs text-neutral-500">
+                          {(file.size / (1024 * 1024)).toFixed(1)} MB
+                        </span>
+                      </div>
+                    </div>
+                    <IconButton
+                      size="small"
+                      icon={<FeatherX />}
+                      onClick={removeFile}
+                      className="!bg-transparent !text-neutral-500"
+                    />
+                  </div>
+                )}
+              </div>
 
-              <div className="flex-1" />
-            </div>
-          </form>
+              <div className="flex flex-col sm:flex-row w-full gap-3 mt-2">
+                <Button
+                  type="button"
+                  variant="neutral-secondary"
+                  icon={<FeatherPlus />}
+                  className="w-full rounded-full border-neutral-300 h-10 px-4 flex items-center gap-2"
+                  onClick={handleAdd}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Adding..." : "Add another certification"}
+                </Button>
 
-          {/* divider */}
-          <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
+                <div className="flex-1" />
+              </div>
+            </form>
 
-          <footer>
-            <Button
-              onClick={handleContinue}
-              disabled={!canContinue || isSubmitting}
-              className={`w-full h-10 rounded-full ${
-                !canContinue || isSubmitting
-                  ? "bg-violet-300 cursor-not-allowed"
-                  : "bg-violet-700 shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
-              }`}
-            >
-              {isSubmitting ? "Saving..." : "Continue"}
-            </Button>
-          </footer>
-        </main>
-
-        {/* Right panel */}
-        <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
-          <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
-            <h3 className="text-[22px] text-neutral-900">
-              Your Experience Index
-            </h3>
-
-            <div className="flex items-center justify-center py-6">
-              <span
-                aria-live="polite"
-                className="font-['Afacad_Flux'] text-[32px] sm:text-[40px] md:text-[48px] font-[500] leading-[56px] text-neutral-300"
-              >
-                {displayedIndex ?? 0}
-              </span>
-            </div>
-
-            {/* Top form horizontal line */}
+            {/* divider */}
             <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
 
-            <div className="mt-4">
-              <div className="text-[16px] text-neutral-800 mb-3">
-                Progress Steps
-              </div>
-
-              {/* ⚪ Completed — Demographics */}
-              <button
-                type="button"
-                className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3 hover:bg-neutral-50"
+            <footer>
+              <Button
+                onClick={handleContinue}
+                disabled={!canContinue || isSubmitting}
+                className={`w-full h-10 rounded-full ${
+                  !canContinue || isSubmitting
+                    ? "bg-violet-300 cursor-not-allowed"
+                    : "bg-violet-700 shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
+                }`}
               >
-                <IconWithBackground
-                  size="small"
-                  icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                  className="!bg-green-100 !rounded-full !p-3"
-                />
-                <span className="text-sm text-neutral-700">Demographics</span>
-              </button>
+                {isSubmitting ? "Saving..." : "Continue"}
+              </Button>
+            </footer>
+          </main>
 
-              {/* ⚪ Completed — Education */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                <IconWithBackground
-                  size="small"
-                  icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                  className="!bg-green-100 !rounded-full !p-3"
-                />
-                <span className="text-sm text-neutral-700">Education</span>
+          {/* Right panel */}
+          <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
+            <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
+              <h3 className="text-[22px] text-neutral-900">
+                Your Experience Index
+              </h3>
+
+              <div className="flex items-center justify-center py-6">
+                <span
+                  aria-live="polite"
+                  className="font-['Afacad_Flux'] text-[32px] sm:text-[40px] md:text-[48px] font-[500] leading-[56px] text-neutral-300"
+                >
+                  {displayedIndex ?? 0}
+                </span>
               </div>
 
-              {/* Experience — completed (green) */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                <IconWithBackground
-                  size="small"
-                  icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                  className="!bg-green-100 !rounded-full !p-3"
-                />
-                <span className="text-sm text-neutral-700">Experience</span>
-              </div>
+              {/* Top form horizontal line */}
+              <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
 
-              {/* Certifications — active (purple) */}
-              <div className="flex items-center gap-3 rounded-2xl border border-violet-300 bg-violet-50 px-4 py-2 mb-3">
-                <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white shadow-sm">
+              <div className="mt-4">
+                <div className="text-[16px] text-neutral-800 mb-3">
+                  Progress Steps
+                </div>
+
+                {/* ⚪ Completed — Demographics */}
+                <button
+                  type="button"
+                  className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3 hover:bg-neutral-50"
+                >
+                  <IconWithBackground
+                    size="small"
+                    icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
+                    className="!bg-green-100 !rounded-full !p-3"
+                  />
+                  <span className="text-sm text-neutral-700">Demographics</span>
+                </button>
+
+                {/* ⚪ Completed — Education */}
+                <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
+                  <IconWithBackground
+                    size="small"
+                    icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
+                    className="!bg-green-100 !rounded-full !p-3"
+                  />
+                  <span className="text-sm text-neutral-700">Education</span>
+                </div>
+
+                {/* Experience — completed (green) */}
+                <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
+                  <IconWithBackground
+                    size="small"
+                    icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
+                    className="!bg-green-100 !rounded-full !p-3"
+                  />
+                  <span className="text-sm text-neutral-700">Experience</span>
+                </div>
+
+                {/* Certifications — active (purple) */}
+                <div className="flex items-center gap-3 rounded-2xl border border-violet-300 bg-violet-50 px-4 py-2 mb-3">
+                  <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white shadow-sm">
+                    <IconWithBackground
+                      size="small"
+                      variant="neutral"
+                      className="!bg-white !text-violet-600"
+                      icon={<FeatherFileCheck className="!text-violet-800" />}
+                    />
+                  </div>
+                  <span className="text-sm font-semibold text-neutral-900">
+                    Certifications
+                  </span>
+                </div>
+
+                {/* Awards — Inactive */}
+                <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
                   <IconWithBackground
                     size="small"
                     variant="neutral"
-                    className="!bg-white !text-violet-600"
-                    icon={<FeatherFileCheck className="!text-violet-800" />}
+                    className="!bg-grey !text-neutral-600"
+                    icon={<FeatherAward />}
                   />
+                  <span className="text-sm text-neutral-500">Awards</span>
                 </div>
-                <span className="text-sm font-semibold text-neutral-900">
-                  Certifications
-                </span>
-              </div>
 
-              {/* Awards — Inactive */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                <IconWithBackground
-                  size="small"
-                  variant="neutral"
-                  className="!bg-grey !text-neutral-600"
-                  icon={<FeatherAward />}
-                />
-                <span className="text-sm text-neutral-500">Awards</span>
-              </div>
-
-              {/* Projects — Inactive */}
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2">
-                <IconWithBackground
-                  size="small"
-                  variant="neutral"
-                  className="!bg-grey !text-neutral-600"
-                  icon={<FeatherPackage />}
-                />
-                <span className="text-sm text-neutral-500">Projects</span>
+                {/* Projects — Inactive */}
+                <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2">
+                  <IconWithBackground
+                    size="small"
+                    variant="neutral"
+                    className="!bg-grey !text-neutral-600"
+                    icon={<FeatherPackage />}
+                  />
+                  <span className="text-sm text-neutral-500">Projects</span>
+                </div>
               </div>
             </div>
-          </div>
-        </aside>
-      </div>
-      {deleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-[360px] rounded-2xl bg-white p-6 shadow-xl">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-neutral-900">
-                Are you sure?
-              </h3>
-              <button
-                onClick={() => setDeleteId(null)}
-                className="text-neutral-400 hover:text-neutral-600"
-              >
-                ✕
-              </button>
-            </div>
-
-            <p className="text-sm text-neutral-600 mb-6">
-              Do you really want to delete this certification?{" "}
-            </p>
-
-            <div className="flex gap-3">
-              <Button
-                variant="neutral-secondary"
-                className="flex-1"
-                onClick={() => setDeleteId(null)}
-              >
-                Cancel
-              </Button>
-
-              <Button
-                className="flex-1 rounded-3xl bg-violet-600 text-white hover:bg-violet-700"
-                onClick={handleRemove}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Deleting..." : "Yes"}
-              </Button>
-            </div>
-          </div>
+          </aside>
         </div>
-      )}
-    </div>
-  </>
+        {deleteId && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="w-[360px] rounded-2xl bg-white p-6 shadow-xl">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-neutral-900">
+                  Are you sure?
+                </h3>
+                <button
+                  onClick={() => setDeleteId(null)}
+                  className="text-neutral-400 hover:text-neutral-600"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <p className="text-sm text-neutral-600 mb-6">
+                Do you really want to delete this certification?{" "}
+              </p>
+
+              <div className="flex gap-3">
+                <Button
+                  variant="neutral-secondary"
+                  className="flex-1"
+                  onClick={() => setDeleteId(null)}
+                >
+                  Cancel
+                </Button>
+
+                <Button
+                  className="flex-1 rounded-3xl bg-violet-600 text-white hover:bg-violet-700"
+                  onClick={handleRemove}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Deleting..." : "Yes"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }

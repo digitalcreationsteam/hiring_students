@@ -362,7 +362,13 @@ setDomain(res?.jobdomain || "");
     navigate(`/chat/${studentId}`);
   };
 
-  const handleNavigate = (path: string) => navigate(path);
+  // const handleNavigate = (path: string) => navigate(path);
+  const handleNavigate = (path: string) => {
+  navigate(path, {
+    state: { source: "dashboard" },
+  });
+};
+
 
   // POST API for the profile
   const handleSaveProfile = async () => {
@@ -539,7 +545,7 @@ setDomain(res?.jobdomain || "");
                   style={{ borderColor: colors.aqua }}
                 >
                   <button
-                    onClick={() => handleNavigate("/dashboard")}
+                    onClick={() => navigate("/dashboard")}
                     className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium hover:bg-neutral-100 rounded-t-xl"
                   >
                     <FeatherUser2 className="w-4 h-4" />
@@ -547,7 +553,7 @@ setDomain(res?.jobdomain || "");
                   </button>
 
                   <button
-                    onClick={() => handleNavigate("/settings")}
+                    onClick={() => navigate("/settings")}
                     className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium hover:bg-neutral-100"
                   >
                     <FeatherSettings className="w-4 h-4" />

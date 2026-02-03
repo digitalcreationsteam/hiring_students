@@ -12,11 +12,16 @@ import {
   FeatherAlertTriangle,
   FeatherX,
 } from "@subframe/core";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import API, { URL_PATH } from "src/common/API";
 
 export default function Skills() {
   const navigate = useNavigate();
+  const location = useLocation();
+const source = location.state?.source; // "dashboard" | undefined
+
+console.log("SKILLS source: ", source);
+// console.log("EDUCATION source:", source);
   const [input, setInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -100,7 +105,12 @@ export default function Skills() {
         }
       );
 
-      navigate("/assessment-intro");
+      if (source === "dashboard") {
+  navigate("/dashboard");
+} else {
+  navigate("/assessment-intro");
+}
+
     } catch (error: any) {
       console.error("Skill save failed:", error);
       alert(

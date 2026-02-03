@@ -1,7 +1,7 @@
 // src/components/UploadResume.tsx
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "src/store/hooks";
 import { setNavigation } from "src/store/slices/onboardingSlice";
@@ -24,7 +24,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 const fetchStatusWithRetry = async (
   token: string,
-  retries = 5,
+  retries = 10,
   delay = 150
 ) => {
   for (let i = 0; i < retries; i++) {
@@ -51,6 +51,11 @@ function UploadResume() {
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [existingResume, setExistingResume] = useState<{
+  name: string;
+  url: string;
+} | null>(null);
+
 
   // Trigger hidden file input
   const handleBrowseFile = () => fileInputRef.current?.click();
@@ -189,45 +194,131 @@ function UploadResume() {
   //     setUploading(false);
   //   }
   // };
-const uploadResume = async () => {
-  if (!file || uploading) return;
+// const uploadResume = async () => {
+//   if (!file || uploading) return;
 
+//   try {
+//     setUploading(true);
+
+//     const token = localStorage.getItem("token");
+//     const userId = localStorage.getItem("userId");
+
+//     if (!token) {
+//       toast.error("Session expired. Please login again.");
+//       return;
+//     }
+
+//     const formData = new FormData();
+//     formData.append("resume", file);
+
+//     // 1️⃣ upload resume
+//     await API("POST", URL_PATH.uploadResume, formData, {
+//       "user-id": userId,
+//       Authorization: `Bearer ${token}`,
+//     });
+
+//     toast.success("Resume uploaded successfully");
+
+//     // 2️⃣ WAIT until Mongo shows resume=true
+//     const navigation = await fetchStatusWithRetry(token);
+
+//     setTimeout(() => {
+//       dispatch(setNavigation(navigation));
+//       navigate(navigation.nextRoute);
+//     }, 2000);
+//   } catch (error) {
+//     console.error(error);
+//     toast.error("Something went wrong. Please try again.");
+//   } finally {
+//     setUploading(false);
+//   }
+// };
+const uploadResume = async () => {
+  if (uploading) return;
+
+  // ✅ CASE 1: resume already exists → just continue
+if (!file && existingResume) {
+  toast.success("Resume already uploaded");
+
+  const token = localStorage.getItem("token");
+  if (!token) return;
+
+  const navigation = await fetchStatusWithRetry(token);
+
+  setTimeout(() => {
+    dispatch(setNavigation(navigation));
+    navigate(navigation.nextRoute);
+  }, 1500);
+
+  return;
+}
+
+
+  // ❌ no file & no existing resume
+  if (!file) return;
+
+  // ✅ CASE 2: new upload
   try {
     setUploading(true);
 
     const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
 
-    if (!token) {
-      toast.error("Session expired. Please login again.");
-      return;
-    }
+    if (!token) return;
 
     const formData = new FormData();
     formData.append("resume", file);
 
-    // 1️⃣ upload resume
     await API("POST", URL_PATH.uploadResume, formData, {
       "user-id": userId,
       Authorization: `Bearer ${token}`,
     });
-
     toast.success("Resume uploaded successfully");
 
-    // 2️⃣ WAIT until Mongo shows resume=true
     const navigation = await fetchStatusWithRetry(token);
-
     setTimeout(() => {
-      dispatch(setNavigation(navigation));
-      navigate(navigation.nextRoute);
-    }, 2000);
+  dispatch(setNavigation(navigation));
+  navigate(navigation.nextRoute);
+}, 1500);
+
   } catch (error) {
-    console.error(error);
     toast.error("Something went wrong. Please try again.");
   } finally {
     setUploading(false);
   }
 };
+
+
+useEffect(() => {
+  const fetchResume = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
+
+      if (!token || !userId) return;
+
+      const res = await API("GET", URL_PATH.getResume, undefined, {
+        "user-id": userId,
+        Authorization: `Bearer ${token}`,
+      });
+
+      const resumeUrl = res?.data?.resumeUrl;
+      const resumeName = res?.data?.resumeOriginalName;
+
+      if (resumeUrl) {
+        setExistingResume({
+          name: resumeName || "resume.pdf", 
+          url: resumeUrl,
+        });
+      }
+    } catch (err) {
+      console.error("Resume fetch failed", err);
+    }
+  };
+
+  fetchResume();
+}, []);
+
 
   return (
     <>
@@ -302,33 +393,45 @@ const uploadResume = async () => {
           </div>
 
           {/* Uploaded File Preview */}
-          {file && (
-            <div className="w-full flex items-center gap-3 sm:gap-4 rounded-2xl border border-neutral-border bg-neutral-50 px-3 sm:px-4 py-3">
-              <IconWithBackground
-                variant="neutral"
-                size="medium"
-                icon={<FeatherFileText className="w-4 h-4 text-neutral-700" />}
-                className="!p-2 !bg-neutral-100"
-              />
+          {(file || existingResume) && (
+  <div className="w-full flex items-center gap-3 sm:gap-4 rounded-2xl border border-neutral-border bg-neutral-50 px-3 sm:px-4 py-3">
+    <IconWithBackground
+      variant="neutral"
+      size="medium"
+      icon={<FeatherFileText className="w-4 h-4 text-neutral-700" />}
+      className="!p-2 !bg-neutral-100"
+    />
 
-              <div className="flex grow flex-col">
-                <span className="text-sm text-neutral-900 truncate">
-                  {file.name}
-                </span>
+    <div className="flex grow flex-col">
+      <span className="text-sm text-neutral-900 truncate">
+        {file?.name || existingResume?.name}
+      </span>
 
-                <span className="text-xs text-neutral-500">
-                  {(file.size / (1024 * 1024)).toFixed(1)} MB
-                </span>
-              </div>
+      {!file && existingResume && (
+        <a
+          href={existingResume.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-violet-600 underline"
+        >
+          View 
+        </a>
+      )}
+    </div>
 
-              <IconButton
-                size="small"
-                icon={<FeatherX />}
-                onClick={removeFile}
-                className="!bg-transparent !text-neutral-500"
-              />
-            </div>
-          )}
+    <IconButton
+      size="small"
+      icon={<FeatherX />}
+      onClick={() => {
+        setFile(null);
+        setExistingResume(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+      }}
+      className="!bg-transparent !text-neutral-500"
+    />
+  </div>
+)}
+
         </div>
 
         {/* Continue Button */}
@@ -338,7 +441,7 @@ const uploadResume = async () => {
               uploading ? "pointer-events-none opacity-70" : ""
             }`}
             onClick={uploadResume}
-            disabled={!file || uploading}
+            disabled={(!file && !existingResume) || uploading}
           >
             {uploading ? "Uploading..." : "Continue"}
           </Button>
