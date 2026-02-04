@@ -603,7 +603,7 @@ export default function Experience() {
     if(source==="dashboard"){
       navigate("/dashboard");
     }else{
-      navigate("/ceritifications", { state: { source } });
+      navigate("/certifications", { state: { source } });
     }
   };
 
