@@ -544,16 +544,30 @@ export default function Certifications() {
 
   const canContinue = certs.length > 0;
 
-  const handleContinue = () => {
-    if (!canContinue) {
-      notify("Please add at least one certification.");
-      return;
-    }
+  // const handleContinue = () => {
+  //   if (!canContinue) {
+  //     notify("Please add at least one certification.");
+  //     return;
+  //   }
 
-    navigate("/awards", {
-      state: { source },
-    });
-  };
+  //   navigate("/awards", {
+  //     state: { source },
+  //   });
+  // };
+
+const handleContinue = () => {
+  if (!certs.length) {
+    toast.error("Please add at least one certification to continue.");
+    return;
+  }
+
+  if (source === "dashboard") {
+    navigate("/dashboard");
+  } else {
+    navigate("/awards", { state: { source } });
+  }
+};
+
 
   const handleUploadKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Enter" || e.key === " ") {
@@ -577,11 +591,37 @@ export default function Certifications() {
         <main className="w-full md:max-w-[448px] flex flex-col gap-6 rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6 sm:py-8">
           {/* top - back + progress */}
           <div className="flex w-full items-center justify-center gap-4">
-            <IconButton
+            {/* <IconButton
               size="small"
               icon={<FeatherArrowLeft />}
               onClick={() => navigate(-1)}
-            />
+            /> */}
+
+             <IconButton
+                            size="small"
+                            icon={<FeatherArrowLeft />}
+                            onClick={async () => {
+                              try {
+                                // 1️⃣ If came from dashboard → always go back to dashboard
+                                if (source === "dashboard") {
+                                  navigate("/dashboard");
+                                  return;
+                                }
+            
+                                // 2️⃣ Otherwise → ask backend if education is allowed
+                                const res = await API("POST", "/auth/verify-route", {
+                                  route: "/experience",
+                                });
+            
+                                if (res.allowed) {
+                                  navigate("/education", { state: { source } });
+                                }
+                                // ❌ else do nothing (education already completed)
+                              } catch {
+                                // silent fail
+                              }
+                            }}
+                          />
             <div className="flex-1 w-full max-w-full md:max-w-[420px]">
               <div className="flex items-center gap-3">
                 {[...Array(4)].map((_, i) => (

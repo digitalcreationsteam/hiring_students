@@ -312,20 +312,20 @@ export default function Projects() {
     if (source === "dashboard") {
       navigate("/dashboard");
     } else {
-      navigate("/skill-index-intro");
+      navigate("/skill-index-intro", { state: { source } });
     }
   };
 
   return (
     <>
       <HeaderLogo />
-    <ToastContainer position="top-center" autoClose={3000} />
+      <ToastContainer position="top-center" autoClose={3000} />
 
-    <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-6 py-0">
-      <div className="w-full max-w-[1100px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
-        {/* Left card */}
-        <main
-          className="
+      <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-6 py-0">
+        <div className="w-full max-w-[1100px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
+          {/* Left card */}
+          <main
+            className="
     w-full
     md:max-w-[480px]
     flex flex-col gap-6
@@ -339,10 +339,36 @@ export default function Projects() {
           >
             {/* top row - back + progress */}
             <div className="flex items-center gap-4">
-              <IconButton
+              {/* <IconButton
                 size="small"
                 icon={<FeatherArrowLeft />}
                 onClick={() => navigate(-1)}
+              /> */}
+
+              <IconButton
+                size="small"
+                icon={<FeatherArrowLeft />}
+                onClick={async () => {
+                  try {
+                    // 1️⃣ If came from dashboard → always go back to dashboard
+                    if (source === "dashboard") {
+                      navigate("/dashboard");
+                      return;
+                    }
+
+                    // 2️⃣ Otherwise → ask backend if education is allowed
+                    const res = await API("POST", "/auth/verify-route", {
+                      route: "/certifications",
+                    });
+
+                    if (res.allowed) {
+                      navigate("/certifications", { state: { source } });
+                    }
+                    // ❌ else do nothing (education already completed)
+                  } catch {
+                    // silent fail
+                  }
+                }}
               />
               <div className="flex-1 w-full max-w-full md:max-w-[420px]">
                 <div className="flex items-center gap-3">

@@ -352,16 +352,18 @@ console.log("AWARDS source:", source);
   const hasRealAward = awards.some((a) => !a.isDemo);
   const canContinue = hasRealAward;
 
-  const handleContinue = () => {
-    if (!hasRealAward) {
-      toast.error("Please add at least one award to continue.");
-      return;
-    }
-    navigate("/projects", {
-  state: { source },
-});
+const handleContinue = () => {
+  if (!hasRealAward) {
+    toast.error("Please add at least one award to continue.");
+    return;
+  }
 
-  };
+  if (source === "dashboard") {
+    navigate("/dashboard");
+  } else {
+    navigate("/projects", { state: { source } });
+  }
+};
 
   return (
     <>
@@ -374,11 +376,36 @@ console.log("AWARDS source:", source);
           <main className="w-full md:max-w-[448px] flex flex-col gap-6 rounded-[28px] border border-neutral-300 bg-white px-4 sm:px-6 md:px-8 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.06)]">
             {/* top row - back + progress */}
             <div className="flex items-center gap-4">
-              <IconButton
+              {/* <IconButton
                 size="small"
                 icon={<FeatherArrowLeft />}
                 onClick={() => navigate(-1)}
-              />
+              /> */}
+               <IconButton
+                              size="small"
+                              icon={<FeatherArrowLeft />}
+                              onClick={async () => {
+                                try {
+                                  // 1️⃣ If came from dashboard → always go back to dashboard
+                                  if (source === "dashboard") {
+                                    navigate("/dashboard");
+                                    return;
+                                  }
+              
+                                  // 2️⃣ Otherwise → ask backend if education is allowed
+                                  const res = await API("POST", "/auth/verify-route", {
+                                    route: "/certifications",
+                                  });
+              
+                                  if (res.allowed) {
+                                    navigate("/certifications", { state: { source } });
+                                  }
+                                  // ❌ else do nothing (education already completed)
+                                } catch {
+                                  // silent fail
+                                }
+                              }}
+                            />
               <div className="flex-1 w-full max-w-full md:max-w-[420px]">
                 <div className="flex items-center gap-3">
                   {[...Array(5)].map((_, i) => (

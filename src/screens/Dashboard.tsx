@@ -16,6 +16,8 @@ import { Button } from "../ui/components/Button";
 import { DefaultPageLayout } from "../ui/layouts/DefaultPageLayout";
 import { Progress } from "../ui/components/Progress";
 import { colors } from "../common/Colors";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 // import Chat from "../ui/components/chat/Chat";
 
 import {
@@ -209,6 +211,7 @@ export default function Dashboard() {
   const [chatUserId, setChatUserId] = useState("");
   const [testOtherUserId, setTestOtherUserId] = useState("");
   const [domain, setDomain] = useState("");
+  const [isAssessmentCompleted, setIsAssessmentCompleted] = useState(false);
 
   const openChat = () => {
     if (!chatUserId.trim()) return;
@@ -255,7 +258,7 @@ export default function Dashboard() {
           parsed.profileUrl = normalizedProfile;
           localStorage.setItem("user", JSON.stringify(parsed));
         }
-      } catch { }
+      } catch {}
 
       /* RANK */
       const rank = res?.rank;
@@ -320,8 +323,7 @@ export default function Dashboard() {
       setSkills((res?.skills?.list || []).map((s: string) => ({ name: s })));
 
       /* JOB DOMAIN */
-setDomain(res?.jobdomain || "");
-
+      setDomain(res?.jobdomain || "");
     } catch (err: any) {
       console.error("fetchDashboardData FAILED:", err);
       console.error("message:", err?.message);
@@ -333,6 +335,10 @@ setDomain(res?.jobdomain || "");
   }, []);
 
   /* ==================== EFFECTS ==================== */
+  useEffect(() => {
+    const completed = localStorage.getItem("assessmentCompleted") === "true";
+    setIsAssessmentCompleted(completed);
+  }, []);
 
   useEffect(() => {
     fetchDashboardData(); // 👈 ONLY ONE CALL
@@ -356,7 +362,7 @@ setDomain(res?.jobdomain || "");
   const openMyChat = () => {
     const studentId = localStorage.getItem("userId");
     if (!studentId) {
-      alert("User ID not found. Please login again.");
+       toast.error("User ID not found. Please login again.");
       return;
     }
     navigate(`/chat/${studentId}`);
@@ -364,11 +370,21 @@ setDomain(res?.jobdomain || "");
 
   // const handleNavigate = (path: string) => navigate(path);
   const handleNavigate = (path: string) => {
-  navigate(path, {
-    state: { source: "dashboard" },
-  });
-};
+    navigate(path, {
+      state: { source: "dashboard" },
+    });
+  };
 
+  const handleAssessmentClick = () => {
+    if (isAssessmentCompleted) {
+       toast.success("Assessment already completed");
+      return;
+    }
+
+    navigate("/assessment", {
+      state: { source: "dashboard" },
+    });
+  };
 
   // POST API for the profile
   const handleSaveProfile = async () => {
@@ -394,7 +410,7 @@ setDomain(res?.jobdomain || "");
       setSelectedAvatarFile(null);
     } catch (error) {
       console.error("Failed to save profile image", error);
-      alert("Failed to save profile image");
+       toast.error("Failed to save profile image");
     } finally {
       setIsSavingAvatar(false);
     }
@@ -407,14 +423,14 @@ setDomain(res?.jobdomain || "");
 
     // Validate file size (e.g., max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert("File size should be less than 5MB");
+       toast.error("File size should be less than 5MB");
       return;
     }
 
     // Validate file type
     const validTypes = ["image/jpeg", "image/png", "image/webp"];
     if (!validTypes.includes(file.type)) {
-      alert("Please select a valid image (JPEG, PNG, or WebP)");
+       toast.error("Please select a valid image (JPEG, PNG, or WebP)");
       return;
     }
 
@@ -447,7 +463,7 @@ setDomain(res?.jobdomain || "");
       }, 1000);
     } catch (error) {
       console.error("Upload failed:", error);
-      alert("Failed to upload profile picture");
+       toast.error("Failed to upload profile picture");
       // Revert to old avatar if available
       // if (user?.avatarUrl) {
       //   setAvatar(user.avatarUrl);
@@ -487,6 +503,8 @@ setDomain(res?.jobdomain || "");
 
   return (
     // <DefaultPageLayout>
+    <>
+     <ToastContainer position="top-center" autoClose={3000} />
     <div
       className="min-h-screen w-full overflow-y-auto pb-12"
       style={{ backgroundColor: colors.white }}
@@ -496,15 +514,15 @@ setDomain(res?.jobdomain || "");
         <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-end gap-4 px-4 sm:px-8 py-8 mb-8">
           <div className="space-y-1">
             <img
-                className="h-8 w-24 object-cover"
-                src="/hiringLogo.png"
-                alt="hiringLogo"
-              />
+              className="h-8 w-24 object-cover"
+              src="/hiringLogo.png"
+              alt="hiringLogo"
+            />
             <h1
               className="text-3xl md:text-4xl font-bold tracking-tight"
               style={{ color: colors.primary }}
             >
-                Welcome back, {user.name} 👋
+              Welcome back, {user.name} 👋
             </h1>
             <p className="text-lg" style={{ color: colors.secondary }}>
               Track progress, discover opportunities, and level up your
@@ -512,7 +530,6 @@ setDomain(res?.jobdomain || "");
             </p>
           </div>
           <div className="flex gap-3 items-center">
-
             <Button
               size="small"
               className="rounded-full px-4 py-2 font-semibold shadow-sm"
@@ -524,7 +541,6 @@ setDomain(res?.jobdomain || "");
             >
               Message
             </Button>
-
 
             {/* PROFILE DROPDOWN */}
             <div className="relative" ref={profileMenuRef}>
@@ -640,43 +656,43 @@ setDomain(res?.jobdomain || "");
                 </div>
               </div>
 
-     <div className="mt-4 flex w-full justify-center">
-  <div
-    className="
+              <div className="mt-4 flex w-full justify-center">
+                <div
+                  className="
       inline-flex items-center gap-3
       rounded-2xl
       px-5 py-3
       border
       shadow-sm
     "
-    style={{
-      backgroundColor: colors.cream,
-      borderColor: colors.aqua,
-      color: colors.accent,
-    }}
-  >
-    {/* Icon bubble */}
-    <div
-      className="h-9 w-9 rounded-xl flex items-center justify-center"
-      style={{
-        backgroundColor: "rgba(255,255,255,0.7)",
-        border: `1px solid ${colors.aqua}`,
-      }}
-    >
-      <FeatherTrophy className="w-5 h-5" />
-    </div>
+                  style={{
+                    backgroundColor: colors.cream,
+                    borderColor: colors.aqua,
+                    color: colors.accent,
+                  }}
+                >
+                  {/* Icon bubble */}
+                  <div
+                    className="h-9 w-9 rounded-xl flex items-center justify-center"
+                    style={{
+                      backgroundColor: "rgba(255,255,255,0.7)",
+                      border: `1px solid ${colors.aqua}`,
+                    }}
+                  >
+                    <FeatherTrophy className="w-5 h-5" />
+                  </div>
 
-    {/* Text */}
-    <div className="flex flex-col leading-none">
-      <span className="text-[13px] font-semibold opacity-90">Global Rank</span>
-      <span className="text-[22px] font-extrabold mt-1">
-        #{rankData?.global?.rank ?? 0}
-      </span>
-    </div>
-  </div>
-</div>
-
-
+                  {/* Text */}
+                  <div className="flex flex-col leading-none">
+                    <span className="text-[13px] font-semibold opacity-90">
+                      Global Rank
+                    </span>
+                    <span className="text-[22px] font-extrabold mt-1">
+                      #{rankData?.global?.rank ?? 0}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* ACTIVITY INTENSITY (Placed here as requested) */}
@@ -707,7 +723,6 @@ setDomain(res?.jobdomain || "");
                     color: colors.secondary,
                     val: "1/2",
                   },
-
                 ].map((item, idx) => (
                   <div key={idx} className="space-y-1">
                     <div className="flex justify-between text-[11px] font-bold">
@@ -1185,13 +1200,39 @@ setDomain(res?.jobdomain || "");
                       </span>
                     </div>
 
-                    <Button
+                    {/* <Button
                       variant="brand-primary"
-                      className="w-full sm:w-auto rounded-2xl bg-violet-700 hover:bg-violet-800 px-5 sm:px-6"
-                      onClick={() => handleNavigate("/assessment")}
+                      className="w-full sm:w-auto rounded-2xl px-5 sm:px-6"
+                      style={{
+                        backgroundColor: "#6D28D9",
+                        cursor: "pointer",
+                      }}
+                      onClick={handleAssessmentClick}
                     >
                       Start Now
-                    </Button>
+                    </Button> */}
+                    {isAssessmentCompleted ? (
+  // ❌ DISABLED STATE (like Notify Me)
+  <Button
+    disabled
+    className="w-full sm:w-auto rounded-2xl bg-neutral-200 text-neutral-500 cursor-not-allowed border-none px-5 sm:px-6"
+  >
+    Completed
+  </Button>
+) : (
+  // ✅ ENABLED STATE
+  <Button
+    variant="brand-primary"
+    className="w-full sm:w-auto rounded-2xl px-5 sm:px-6"
+    style={{
+      backgroundColor: "#6D28D9",
+    }}
+    onClick={handleAssessmentClick}
+  >
+    Start Now
+  </Button>
+)}
+
                   </div>
                 </div>
 
@@ -1601,6 +1642,7 @@ setDomain(res?.jobdomain || "");
         </div>
       </div>
     </div>
+    </>
     // </DefaultPageLayout>
   );
 }

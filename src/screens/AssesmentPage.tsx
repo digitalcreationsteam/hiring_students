@@ -521,15 +521,12 @@ const handleSubmit = async () => {
       { attemptId },
       { "user-id": userId }
     );
-
+    localStorage.setItem("assessmentCompleted", "true");
     localStorage.setItem("attemptId", attemptId);
     sessionStorage.setItem("attemptId", attemptId);
 
     sessionStorage.setItem(`submittedAt-${attemptId}`, Date.now().toString());
-
-
-    
-
+  
     navigate("/assessment-results", { state: { attemptId } });
   } catch (err) {
     submitLockRef.current = false;

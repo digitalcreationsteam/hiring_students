@@ -313,7 +313,7 @@ export default function Experience() {
 
     const [mm, yyyy] = value.split("/").map(Number);
 
-    const inputDate = new Date(yyyy, mm -1); // first day of that month
+    const inputDate = new Date(yyyy, mm - 1); // first day of that month
     const now = new Date();
     const currentMonth = new Date(now.getFullYear(), now.getMonth());
 
@@ -595,17 +595,17 @@ export default function Experience() {
 
   const canContinue = experiences.length > 0;
 
- const handleContinue = () => {
-  if (!experiences.length) {
-    toast.error("Please add at least one experience.");
-    return;
-  }
-
-  navigate("/certifications", {
-    state: { source },
-  });
-};
-
+  const handleContinue = () => {
+    if (!experiences.length) {
+      toast.error("Please add at least one experience to continue.");
+      return;
+    }
+    if(source==="dashboard"){
+      navigate("/dashboard");
+    }else{
+      navigate("/ceritifications", { state: { source } });
+    }
+  };
 
   useEffect(() => {
     if (!userId) return;
@@ -622,38 +622,65 @@ export default function Experience() {
 
   return (
     <>
-     <HeaderLogo />
-     <ToastContainer position="top-center" autoClose={3000} />
-    <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-4 sm:px-6 py-0 sm:py-0">
-      <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
-        {/* Left card */}
-        <main className="w-full md:max-w-[480px] bg-white rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6 ...">
-          {/* top row - back + progress */}
-          <div className="flex items-center gap-4">
-            <IconButton
+      <HeaderLogo />
+      <ToastContainer position="top-center" autoClose={3000} />
+      <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-4 sm:px-6 py-0 sm:py-0">
+        <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
+          {/* Left card */}
+          <main className="w-full md:max-w-[480px] bg-white rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6 ...">
+            {/* top row - back + progress */}
+            <div className="flex items-center gap-4">
+              {/* <IconButton
               size="small"
               icon={<FeatherArrowLeft />}
               onClick={() => navigate(-1)}
-            />
-            <div className="flex-1 w-full max-w-full md:max-w-[420px]">
-              <div className="flex items-center gap-3">
-                {[...Array(3)].map((_, i) => (
-                  <div
-                    key={`p-${i}`}
-                    style={{ height: 6 }}
-                    className="flex-1 rounded-full bg-violet-700"
-                  />
-                ))}
-                {[...Array(3)].map((_, i) => (
-                  <div
-                    key={`n-${i}`}
-                    style={{ height: 6 }}
-                    className="flex-1 rounded-full bg-neutral-300"
-                  />
-                ))}
+            /> */}
+
+              <IconButton
+                size="small"
+                icon={<FeatherArrowLeft />}
+                onClick={async () => {
+                  try {
+                    // 1️⃣ If came from dashboard → always go back to dashboard
+                    if (source === "dashboard") {
+                      navigate("/dashboard");
+                      return;
+                    }
+
+                    // 2️⃣ Otherwise → ask backend if education is allowed
+                    const res = await API("POST", "/auth/verify-route", {
+                      route: "/education",
+                    });
+
+                    if (res.allowed) {
+                      navigate("/education", { state: { source } });
+                    }
+                    // ❌ else do nothing (education already completed)
+                  } catch {
+                    // silent fail
+                  }
+                }}
+              />
+
+              <div className="flex-1 w-full max-w-full md:max-w-[420px]">
+                <div className="flex items-center gap-3">
+                  {[...Array(3)].map((_, i) => (
+                    <div
+                      key={`p-${i}`}
+                      style={{ height: 6 }}
+                      className="flex-1 rounded-full bg-violet-700"
+                    />
+                  ))}
+                  {[...Array(3)].map((_, i) => (
+                    <div
+                      key={`n-${i}`}
+                      style={{ height: 6 }}
+                      className="flex-1 rounded-full bg-neutral-300"
+                    />
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
 
             {/* header */}
             <div className="mt-6">
