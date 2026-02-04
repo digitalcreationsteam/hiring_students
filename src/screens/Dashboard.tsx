@@ -381,7 +381,7 @@ export default function Dashboard() {
       return;
     }
 
-    navigate("/assessment", {
+    navigate("/assessment-intro", {
       state: { source: "dashboard" },
     });
   };
@@ -1535,7 +1535,7 @@ export default function Dashboard() {
                   {[
                     {
                       label: "Experience",
-                      sub: "Showcase your impactful projects and product outcomes",
+                      sub: "Highlight your roles, responsibilities, and measurable impact",
                       icon: <FeatherPlus />,
                       path: "/experience",
                     },
@@ -1556,6 +1556,12 @@ export default function Dashboard() {
                       sub: "Add relevant certifications to validate your expertise",
                       icon: <FeatherTool />,
                       path: "/certifications",
+                    },
+                      {
+                      label: "Awards",
+                      sub: "Highlight awards, recognitions, or notable activities",
+                      icon: <FeatherTool />,
+                      path: "/awards",
                     },
                     {
                       label: "Skills",
