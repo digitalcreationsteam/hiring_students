@@ -63,14 +63,20 @@ function Login() {
         password,
       });
 
+      if (!response?.success) {
+      setError("Invalid credentials. Please try again.");
+      return;
+    }
+
+       // 🔐 ROLE CHECK (CRITICAL)
+    if (response.user.role !== "student") {
+      setError("You are not authorized as student");
+      return;
+    }
+
       if (response?.success) {
-        // ✅ Save token
         dispatch(setToken(response.token));
-
-        // ✅ Save user profile
         dispatch(setUserProfile(response.user));
-
-        // ✅ NEW: Get navigation from login response
         // Backend login now includes navigation object
         if (response.navigation) {
           dispatch(
@@ -91,16 +97,9 @@ function Login() {
           } else {
             navigate(response.navigation.nextRoute);
           }
-
-          // Navigate to next step (decided by backend)
-
-          // navigate(response.navigation.nextRoute);
         } else {
-          // Fallback for old API (shouldn't happen)
           navigate("/talent-ranking");
         }
-      } else {
-        setError("Invalid credentials. Please try again.");
       }
     } catch (err: any) {
       setError(err?.message || "Invalid credentials. Please try again.");
