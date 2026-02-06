@@ -19,6 +19,7 @@ function SignUp() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [role, setRole] = useState<"student" | "recruiter" | "admin">("student");
 
 const checkEmailVerification = async () => {
   try {
@@ -54,7 +55,7 @@ const handleSubmit = async (e: any) => {
   setLoading(true);
   setError("");
 
-  const formData = { email, firstname, lastname, password };
+  const formData = { email, firstname, lastname, password,  role  };
 
   try {
     const res = await API("POST", URL_PATH.signup, formData);
@@ -65,7 +66,21 @@ const handleSubmit = async (e: any) => {
       localStorage.setItem("signupEmail", email);
 
       // Redirect immediately to verify-email page
-      navigate("/verify-email");
+     if (res?.success) {
+  localStorage.setItem("token", res.token);
+  localStorage.setItem("signupEmail", email);
+
+  // ✅ store role too (optional but useful)
+  localStorage.setItem("role", role);
+
+  // ✅ redirect based on role
+  if (role === "admin") return navigate("/admin/dashboard");
+  if (role === "recruiter") return navigate("/recruiter/dashboard");
+
+  // student default flow
+  return navigate("/verify-email");
+}
+
     }
   } catch (err: any) {
     setError(err?.message || "Unable to create account. Please try again.");
@@ -301,6 +316,8 @@ const handleSubmit = async (e: any) => {
                 </p>
               </div>
 
+
+
               {/* Error */}
               <div
                 aria-live="polite"
@@ -308,6 +325,9 @@ const handleSubmit = async (e: any) => {
               >
                 {error}
               </div>
+
+              
+
 
               {/* Submit */}
               <button

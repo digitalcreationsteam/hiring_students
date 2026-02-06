@@ -517,17 +517,19 @@ export default function Education() {
 
   /* -------------------- BUILD PAYLOAD -------------------- */
 
-  const handleContinue = () => {
-    if (!educations.length) {
-      toast.error("Please add at least one education to continue.");
-      return;
-    }
+const handleContinue = () => {
+  if (!educations.length) {
+    toast.error("Please add at least one education to continue.");
+    return;
+  }
 
-   navigate("/experience", {
-  state: { source },
-});
+  if (source === "dashboard") {
+    navigate("/dashboard");
+  } else {
+    navigate("/experience", { state: { source } });
+  }
+};
 
-  };
 
   const handleCurrentlyStudyingToggle = (checked: boolean) => {
     setStudying(checked);
@@ -555,10 +557,30 @@ export default function Education() {
           <main className="w-full md:max-w-[480px] bg-white rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6 ...">
             {/* Top: back + progress */}
             <div className="flex items-center gap-4">
-              <IconButton
+              {/* <IconButton
                 size="small"
                 icon={<FeatherArrowLeft />}
                 onClick={() => navigate(-1)}
+              /> */}
+              <IconButton
+                size="small"
+                icon={<FeatherArrowLeft />}
+                onClick={async () => {
+                  try {
+                    const res = await API(
+                      "POST",
+                      "/auth/verify-route",
+                      { route: "/demographics" }, // ⬅️ previous step
+                    );
+
+                    if (res.allowed) {
+                      navigate("/demographics");
+                    }
+                    // ❌ if not allowed → do nothing
+                  } catch {
+                    // fail silently
+                  }
+                }}
               />
 
               <div className="flex-1 w-full max-w-full md:max-w-[420px]">

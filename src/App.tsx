@@ -1,5 +1,7 @@
 import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { Navigate } from "react-router-dom";
+import { isAuthenticated } from "./utils/authUtils";
 import Chat from "./ui/components/chat/Chat";
 import RecruiterChats from "./screens/RecruiterChats";
 import SignUp from "./screens/SignUp";
@@ -33,16 +35,24 @@ import ForgotPassword2 from "./screens/ForgotPassword2";
 import ForgotPassword3 from "./screens/ForgotPassword3";
 import ForgotPassword4 from "./screens/ForgotPassword4";
 import EmailVerifiedSuccess from "./screens/EmailVerifiedSuccess";
-import PaymentSuccess from "./screens/PaymentSuccess";
+//import PaymentSuccess from "./screens/PaymentSuccess";
 import ProtectedRoute from "./utils/ProtectedRoute"; // ✅ Import ProtectedRoute
 import CaseAssessmentsPage from "./screens/CaseAssessments";
 
 import "./App.css";
+import CaseAssessmentOpening from "./screens/CaseAssessmentOpening";
+import CaseAssessmentQuestions from "./screens/CaseAssessmentQuestions";
+import CaseAssessmentScore from "./screens/CaseAssessmentScore";
+import CaseAssessmentRevel from "./screens/CaseAssessmentRevel";
 
 const router = createBrowserRouter([
-
-  // ✅ PUBLIC ROUTES (No authentication needed)
-  { index: true, element: <LogIn /> }, // Use "index: true" instead of "path: "/""
+  {
+  index: true,
+  element: isAuthenticated()
+    ? <Navigate to="/dashboard" replace />
+    : <LogIn />,
+},
+ // Use "index: true" instead of "path: "/""
   { path: "/signup", element: <SignUp /> },
   { path: "/login", element: <LogIn /> },
   { path: "/login-success", element: <LoginSuccess /> },
@@ -54,112 +64,215 @@ const router = createBrowserRouter([
   { path: "/verify-email", element: <EmailVerification /> },
   { path: "/verify-email/:token", element: <EmailVerification /> },
   { path: "/email-verified", element: <EmailVerifiedSuccess /> },
-  { path: "/payment-success", element: <PaymentSuccess /> },
 
   // ✅ PROTECTED ROUTES (Authentication required)
   {
     path: "/recruiter-chats",
-    element: <ProtectedRoute><RecruiterChats /></ProtectedRoute>
+    element: (
+      <ProtectedRoute>
+        <RecruiterChats />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/chat",
-    element: <ProtectedRoute><Chat /></ProtectedRoute>
+    element: (
+      <ProtectedRoute>
+        <Chat />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/chat/:otherUserId",
-    element: <ProtectedRoute><Chat /></ProtectedRoute>
+    element: (
+      <ProtectedRoute>
+        <Chat />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/complete-profile",
-    element: <ProtectedRoute requireIncomplete={true}><CompleteProfile /></ProtectedRoute>
+    element: (
+      <ProtectedRoute requireIncomplete={true}>
+        <CompleteProfile />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/paywall",
-    element: <ProtectedRoute><Paywall /></ProtectedRoute>
+    element: (
+      <ProtectedRoute>
+        <Paywall />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/talent-ranking",
-    element: <ProtectedRoute><TalentRankingPlatform /></ProtectedRoute>
+    element: (
+      <ProtectedRoute>
+        <TalentRankingPlatform />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/experience-index",
-    element: <ProtectedRoute><ExperienceIndex /></ProtectedRoute>
+    element: (
+      <ProtectedRoute>
+        <ExperienceIndex />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/skill-index",
-    element: <ProtectedRoute><SkillIndex /></ProtectedRoute>
+    element: (
+      <ProtectedRoute>
+        <SkillIndex />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/hireability-index",
-    element: <ProtectedRoute><HireabilityIndex /></ProtectedRoute>
+    element: (
+      <ProtectedRoute>
+        <HireabilityIndex />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/upload-resume",
-    element: <ProtectedRoute requireIncomplete={true}><UploadResume /></ProtectedRoute>
+    element: (
+      <ProtectedRoute requireIncomplete={true}>
+        <UploadResume />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/demographics",
-    element: <ProtectedRoute requireIncomplete={true}><Demographics /></ProtectedRoute>
+    element: (
+      <ProtectedRoute requireIncomplete={true}>
+        <Demographics />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/education",
-    element: <ProtectedRoute requireIncomplete={true}><Education /></ProtectedRoute>
+    element: (
+      <ProtectedRoute requireIncomplete={true}>
+        <Education />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/experience",
-    element: <ProtectedRoute requireIncomplete={true}><Experience /></ProtectedRoute>
+    element: (
+      <ProtectedRoute requireIncomplete={true}>
+        <Experience />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/certifications",
-    element: <ProtectedRoute requireIncomplete={true}><Certifications /></ProtectedRoute>
+    element: (
+      <ProtectedRoute requireIncomplete={true}>
+        <Certifications />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/awards",
-    element: <ProtectedRoute requireIncomplete={true}><Awards /></ProtectedRoute>
+    element: (
+      <ProtectedRoute requireIncomplete={true}>
+        <Awards />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/projects",
-    element: <ProtectedRoute requireIncomplete={true}><Projects /></ProtectedRoute>
+    element: (
+      <ProtectedRoute requireIncomplete={true}>
+        <Projects />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/skill-index-intro",
-    element: <ProtectedRoute requireIncomplete={true}><SkillIndexIntro /></ProtectedRoute>
+    element: (
+      <ProtectedRoute requireIncomplete={true}>
+        <SkillIndexIntro />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/job-domain",
-    element: <ProtectedRoute requireIncomplete={true}><JobDomain /></ProtectedRoute>
+    element: (
+      <ProtectedRoute requireIncomplete={true}>
+        <JobDomain />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/skills",
-    element: <ProtectedRoute requireIncomplete={true}><Skills /></ProtectedRoute>
+    element: (
+      <ProtectedRoute requireIncomplete={true}>
+        <Skills />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/assessment-intro",
-    element: <ProtectedRoute requireIncomplete={true}><AssessmentIntro /></ProtectedRoute>
+    element: (
+      <ProtectedRoute requireIncomplete={true}>
+        <AssessmentIntro />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/assessment",
-    element: <ProtectedRoute requireIncomplete={true}><AssessmentPage /></ProtectedRoute>
+    element: (
+      <ProtectedRoute requireIncomplete={true}>
+        <AssessmentPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/assessment-results",
-    element: <ProtectedRoute requireIncomplete={true}><AssessmentResult /></ProtectedRoute>
+    element: (
+      <ProtectedRoute requireIncomplete={true}>
+        <AssessmentResult />
+      </ProtectedRoute>
+    ),
   },
-  {
-    path: "/assessment",
-    element: <ProtectedRoute><AssessmentPage /></ProtectedRoute>
-  },
+  // {
+  //   path: "/assessment",
+  //   element: (
+  //     <ProtectedRoute>
+  //       <AssessmentPage />
+  //     </ProtectedRoute>
+  //   ),
+  // },
   {
     path: "/assessment-results",
-    element: <ProtectedRoute><AssessmentResult /></ProtectedRoute>
+    element: (
+      <ProtectedRoute>
+        <AssessmentResult />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/skill-assessment",
-    element: <ProtectedRoute><SkillAssessmentCard /></ProtectedRoute>
+    element: (
+      <ProtectedRoute>
+        <SkillAssessmentCard />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/dashboard",
-    element: <ProtectedRoute><Dashboard /></ProtectedRoute>
+    element: (
+      <ProtectedRoute>
+        <Dashboard />
+      </ProtectedRoute>
+    ),
   },
 
   {
@@ -171,22 +284,56 @@ const router = createBrowserRouter([
     ),
   },
 
+  {
+    path: "/case-assessment-opening",
+    element: (
+      <ProtectedRoute requireIncomplete={true}>
+        <CaseAssessmentOpening />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/case-assessment-questions",
+    element: (
+      <ProtectedRoute requireIncomplete={true}>
+        <CaseAssessmentQuestions />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/case-assessment-score",
+    element: (
+      <ProtectedRoute requireIncomplete={true}>
+        <CaseAssessmentScore />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/case-assessment-revel/:caseId",
+    element: (
+      <ProtectedRoute requireIncomplete={true}>
+        <CaseAssessmentRevel />
+      </ProtectedRoute>
+    ),
+  },
 
   // ⭐ KEEP THIS as the catch-all 404
   {
     path: "*",
     element: (
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
+      <div style={{ padding: "2rem", textAlign: "center" }}>
         <h1>404 - Page Not Found</h1>
         <p>The page you're looking for doesn't exist.</p>
-        <a href="/dashboard" style={{ color: 'blue', textDecoration: 'underline' }}>
+        <a
+          href="/dashboard"
+          style={{ color: "blue", textDecoration: "underline" }}
+        >
           Go to Dashboard
         </a>
       </div>
     ),
   },
-],
-);
+]);
 
 export default function App() {
   return <RouterProvider router={router} />;

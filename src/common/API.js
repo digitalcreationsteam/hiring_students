@@ -6,9 +6,9 @@ import axios from "axios";
 /* =========================================
    🌐 BASE URL
 ========================================= */
-//export const BASE_URL = "http://localhost:5000/api";
+export const BASE_URL = "http://localhost:5000/api";
 // export const BASE_URL = "http://localhost:5001/api";
- export const BASE_URL = "https://unitalent.cloud/api";
+// export const BASE_URL = "https://unitalent.cloud/api";
 
 
 const isDev = process.env.NODE_ENV === "development";
@@ -123,6 +123,13 @@ export const URL_PATH = {
   markMessagesRead: "/chat/mark-read",
   getUnreadCount: "/chat/unread-count",
 
+  // Case Study
+  getAllCases: "/cases/",
+  startCase: (caseId) => `/cases/${caseId}/start`,
+  getCurrentQuestion: (attemptId) => `/cases/attempt/${attemptId}/question`,
+  submitAnswer: (attemptId) => `/cases/attempt/${attemptId}/answer`,
+  submitAttempt: (attemptId) => `cases/attempt/${attemptId}/submit`,
+  getCaseReveal: (caseId) => `/cases/${caseId}/reveal`
 };
 
 

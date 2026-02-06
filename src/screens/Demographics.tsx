@@ -1,6 +1,4 @@
 // components/Demographics.tsx
-// ✅ TYPESCRIPT VERSION (All errors fixed)
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/components/Button";
@@ -47,6 +45,8 @@ interface StepItem {
 
 export default function Demographics() {
   const navigate = useNavigate();
+  const [navReady, setNavReady] = useState(false);
+
   const dispatch = useAppDispatch();
   const [isManualCity, setIsManualCity] = useState<boolean>(false);
   const OTHER_CITY_VALUE = "__OTHER__";
@@ -70,16 +70,20 @@ export default function Demographics() {
   //     navigate(nextRoute || "/demographics");
   //   }
   // }, [currentStep, nextRoute, navigate]);
-  useEffect(() => {
-    // ⛔ Do nothing until onboarding state is ready
-    if (!currentStep) return;
 
-    // ⛔ Allow demographics
+  // useEffect(() => {
+  //   if (!currentStep) return;
+  //   if (currentStep === "demographics") return;
+  //   navigate(nextRoute || "/");
+  // }, [currentStep, nextRoute, navigate]);
+
+  useEffect(() => {
+    if (!navReady) return;
+
     if (currentStep === "demographics") return;
 
-    // ✅ Redirect only if user is NOT supposed to be here
     navigate(nextRoute || "/");
-  }, [currentStep, nextRoute, navigate]);
+  }, [navReady, currentStep, nextRoute, navigate]);
 
   /* ============================================
      LOCAL STATE
@@ -89,6 +93,36 @@ export default function Demographics() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [experienceIndex, setExperienceIndex] = useState<number | null>(null);
+  useEffect(() => {
+    const hydrateNavigation = async () => {
+      if (currentStep) {
+        setNavReady(true);
+        return;
+      }
+
+      try {
+        const res = await API("GET", URL_PATH.getUserStatus);
+
+        if (res?.navigation) {
+          dispatch(
+            setNavigation({
+              nextRoute: res.navigation.nextRoute,
+              currentStep: res.navigation.currentStep,
+              completedSteps: res.navigation.completedSteps,
+              isOnboardingComplete: res.navigation.isOnboardingComplete,
+              hasPayment: res.navigation.hasPayment,
+            }),
+          );
+        }
+      } catch (e) {
+        console.error("Failed to hydrate onboarding", e);
+      } finally {
+        setNavReady(true);
+      }
+    };
+
+    hydrateNavigation();
+  }, [currentStep, dispatch]);
 
   const [form, setForm] = useState<DemographicsData>({
     fullName: "",
@@ -243,7 +277,6 @@ export default function Demographics() {
         navigate(statusResponse.navigation.nextRoute);
       }, 3000);
 
-
       // ✅ Step 4: Navigate to next step
     } catch (err: unknown) {
       const apiError = err as ApiError;
@@ -272,16 +305,18 @@ export default function Demographics() {
         }
 
         // Populate form ONLY if data exists
-        if (demographicsRes?.fullName) {
+        const data = demographicsRes?.data;
+
+        if (data?.fullName) {
           setForm({
-            fullName: demographicsRes.fullName,
-            email: demographicsRes.email || "",
-            phoneNumber: demographicsRes.phoneNumber || "",
-            city: demographicsRes.city || "",
-            state: demographicsRes.state || "",
-            country: demographicsRes.country || "",
+            fullName: data.fullName,
+            email: data.email || "",
+            phoneNumber: data.phoneNumber || "",
+            city: data.city || "",
+            state: data.state || "",
+            country: data.country || "",
           });
-          setPhoneVisible(!!demographicsRes.phoneVisibleToRecruiters);
+          setPhoneVisible(!!data.phoneVisibleToRecruiters);
         }
 
         // Experience index is safe
@@ -318,13 +353,20 @@ export default function Demographics() {
   }, [selectedCountry, form.state]);
 
   useEffect(() => {
-    if (selectedCountry && selectedState && form.city && !selectedCity) {
-      const city = City.getCitiesOfState(
-        selectedCountry.isoCode,
-        selectedState.isoCode,
-      ).find((c) => c.name === form.city);
+    if (!selectedCountry || !selectedState || !form.city) return;
 
-      setSelectedCity(city || null);
+    const city = City.getCitiesOfState(
+      selectedCountry.isoCode,
+      selectedState.isoCode,
+    ).find((c) => c.name === form.city);
+
+    if (city) {
+      setSelectedCity(city);
+      setIsManualCity(false);
+    } else {
+      // 👇 THIS IS THE FIX
+      setSelectedCity(null);
+      setIsManualCity(true);
     }
   }, [selectedCountry, selectedState, form.city]);
 
@@ -355,10 +397,30 @@ export default function Demographics() {
           <main className="w-full md:max-w-[480px] bg-white rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.06)]">
             {/* Header */}
             <div className="flex items-center gap-4 mb-6">
-              <IconButton
+              {/* <IconButton
                 size="small"
                 icon={<FeatherArrowLeft />}
                 onClick={() => navigate(-1)}
+              /> */}
+              <IconButton
+                size="small"
+                icon={<FeatherArrowLeft />}
+                onClick={async () => {
+                  try {
+                    const res = await API(
+                      "POST",
+                      "/auth/verify-route",
+                      { route: "/upload-resume" }, // ⬅️ previous step
+                    );
+
+                    if (res.allowed) {
+                      navigate("/upload-resume");
+                    }
+                    // ❌ if not allowed → do nothing
+                  } catch {
+                    // fail silently
+                  }
+                }}
               />
               <div className="flex-1">
                 <div className="flex items-center gap-3">
@@ -534,9 +596,7 @@ export default function Demographics() {
                         </option>
                       ))}
 
-                      <option value={OTHER_CITY_VALUE}>
-                        Other
-                      </option>
+                      <option value={OTHER_CITY_VALUE}>Other</option>
                     </select>
                   ) : (
                     <TextField.Input
@@ -573,10 +633,11 @@ export default function Demographics() {
             <Button
               onClick={handleContinue}
               disabled={isSubmitting || isLoading}
-              className={`w-full h-10 rounded-full font-semibold text-white transition ${isSubmitting || isLoading
+              className={`w-full h-10 rounded-full font-semibold text-white transition ${
+                isSubmitting || isLoading
                   ? "bg-violet-400 cursor-not-allowed"
                   : "bg-violet-700 hover:bg-violet-800 shadow-lg"
-                }`}
+              }`}
             >
               {isLoading
                 ? "Loading..."

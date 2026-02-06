@@ -1,135 +1,181 @@
+
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import API, { URL_PATH, BASE_URL } from "src/common/API";
 import { colors } from "../common/Colors";
 import { Button } from "../ui/components/Button";
-import { Badge } from "../ui/components/Badge";
 import { Avatar } from "../ui/components/Avatar";
 import {
   FeatherArrowLeft,
   FeatherArrowRight,
-  FeatherBookOpen,
   FeatherClock,
   FeatherFileText,
-  FeatherGift,
   FeatherGlobe,
   FeatherMapPin,
-  FeatherRepeat,
   FeatherTarget,
-  FeatherUsers,
 } from "@subframe/core";
+
+/* ==================== TYPES ==================== */
 
 type Difficulty = "Easy" | "Medium" | "Hard";
 
-type CaseItem = {
-  id: string;
+// type CaseItem = {
+//   id: string;
+//   title: string;
+//   desc: string;
+//   difficulty: Difficulty;
+//   points: number;
+//   minutes: number;
+//   icon: React.ReactNode;
+// };
+
+type BackendCase = {
+  _id: string;
   title: string;
-  desc: string;
+  description?: string;
+  totalQuestions: number;
+  maxAttempts: number;
+  isActive: boolean;
+  createdAt: string;
+};
+
+type CaseItem = {
+  _id: string;
+  title: string;
+  description: string;
   difficulty: Difficulty;
   points: number;
   minutes: number;
   icon: React.ReactNode;
 };
 
-const cases: CaseItem[] = [
-  {
-    id: "1",
-    title: "Product Metrics Analysis",
-    desc: "Analyze user engagement metrics for a mobile app and recommend improvements.",
-    difficulty: "Easy",
-    points: 15,
-    minutes: 45,
-    icon: (
-      <div
-        className="h-10 w-10 rounded-2xl grid place-items-center"
-        style={{ backgroundColor: colors.cream, color: colors.accent }}
-      >
-        ⌁
-      </div>
-    ),
-  },
-  {
-    id: "2",
-    title: "Feature Prioritization",
-    desc: "Prioritize a backlog of features with limited engineering resources.",
-    difficulty: "Medium",
-    points: 25,
-    minutes: 60,
-    icon: (
-      <div
-        className="h-10 w-10 rounded-2xl grid place-items-center"
-        style={{ backgroundColor: colors.mint, color: colors.secondary }}
-      >
-        ✦
-      </div>
-    ),
-  },
-  {
-    id: "3",
-    title: "Product Strategy & Vision",
-    desc: "Develop a 3-year product strategy for a declining B2B SaaS platform.",
-    difficulty: "Hard",
-    points: 40,
-    minutes: 90,
-    icon: (
-      <div
-        className="h-10 w-10 rounded-2xl grid place-items-center"
-        style={{ backgroundColor: "#FEE2E2", color: "#B91C1C" }}
-      >
-        ◈
-      </div>
-    ),
-  },
-  {
-    id: "4",
-    title: "User Research Synthesis",
-    desc: "Review interview transcripts and synthesize insights into actionable recommendations.",
-    difficulty: "Easy",
-    points: 18,
-    minutes: 50,
-    icon: (
-      <div
-        className="h-10 w-10 rounded-2xl grid place-items-center"
-        style={{ backgroundColor: colors.cream, color: colors.accent }}
-      >
-        ⟡
-      </div>
-    ),
-  },
-  {
-    id: "5",
-    title: "Go-to-Market Planning",
-    desc: "Create a GTM plan for a new feature, including positioning and launch tactics.",
-    difficulty: "Medium",
-    points: 28,
-    minutes: 75,
-    icon: (
-      <div
-        className="h-10 w-10 rounded-2xl grid place-items-center"
-        style={{ backgroundColor: colors.mint, color: colors.secondary }}
-      >
-        ⬣
-      </div>
-    ),
-  },
-  {
-    id: "6",
-    title: "Crisis Management",
-    desc: "Handle a critical incident affecting thousands of users. Coordinate comms and recovery.",
-    difficulty: "Hard",
-    points: 45,
-    minutes: 120,
-    icon: (
-      <div
-        className="h-10 w-10 rounded-2xl grid place-items-center"
-        style={{ backgroundColor: "#FEE2E2", color: "#B91C1C" }}
-      >
-        ⚑
-      </div>
-    ),
-  },
-];
+
+type StudentProfile = {
+  name: string;
+  email: string;
+  location: string;
+  avatar: string;
+};
+
+/* ==================== CONSTANTS ==================== */
+
+const DEFAULT_AVATAR =
+  "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400";
+
+// const cases: CaseItem[] = [
+//   {
+//     id: "1",
+//     title: "Product Metrics Analysis",
+//     desc: "Analyze user engagement metrics for a mobile app and recommend improvements.",
+//     difficulty: "Easy",
+//     points: 15,
+//     minutes: 45,
+//     icon: (
+//       <div
+//         className="h-10 w-10 rounded-2xl grid place-items-center"
+//         style={{ backgroundColor: colors.cream, color: colors.accent }}
+//       >
+//         ⌁
+//       </div>
+//     ),
+//   },
+//   {
+//     id: "2",
+//     title: "Feature Prioritization",
+//     desc: "Prioritize a backlog of features with limited engineering resources.",
+//     difficulty: "Medium",
+//     points: 25,
+//     minutes: 60,
+//     icon: (
+//       <div
+//         className="h-10 w-10 rounded-2xl grid place-items-center"
+//         style={{ backgroundColor: colors.mint, color: colors.secondary }}
+//       >
+//         ✦
+//       </div>
+//     ),
+//   },
+//   {
+//     id: "3",
+//     title: "Product Strategy & Vision",
+//     desc: "Develop a 3-year product strategy for a declining B2B SaaS platform.",
+//     difficulty: "Hard",
+//     points: 40,
+//     minutes: 90,
+//     icon: (
+//       <div
+//         className="h-10 w-10 rounded-2xl grid place-items-center"
+//         style={{ backgroundColor: "#FEE2E2", color: "#B91C1C" }}
+//       >
+//         ◈
+//       </div>
+//     ),
+//   },
+//   {
+//     id: "4",
+//     title: "User Research Synthesis",
+//     desc: "Review interview transcripts and synthesize insights into actionable recommendations.",
+//     difficulty: "Easy",
+//     points: 18,
+//     minutes: 50,
+//     icon: (
+//       <div
+//         className="h-10 w-10 rounded-2xl grid place-items-center"
+//         style={{ backgroundColor: colors.cream, color: colors.accent }}
+//       >
+//         ⟡
+//       </div>
+//     ),
+//   },
+//   {
+//     id: "5",
+//     title: "Go-to-Market Planning",
+//     desc: "Create a GTM plan for a new feature, including positioning and launch tactics.",
+//     difficulty: "Medium",
+//     points: 28,
+//     minutes: 75,
+//     icon: (
+//       <div
+//         className="h-10 w-10 rounded-2xl grid place-items-center"
+//         style={{ backgroundColor: colors.mint, color: colors.secondary }}
+//       >
+//         ⬣
+//       </div>
+//     ),
+//   },
+//   {
+//     id: "6",
+//     title: "Crisis Management",
+//     desc: "Handle a critical incident affecting thousands of users. Coordinate comms and recovery.",
+//     difficulty: "Hard",
+//     points: 45,
+//     minutes: 120,
+//     icon: (
+//       <div
+//         className="h-10 w-10 rounded-2xl grid place-items-center"
+//         style={{ backgroundColor: "#FEE2E2", color: "#B91C1C" }}
+//       >
+//         ⚑
+//       </div>
+//     ),
+//   },
+// ];
+
+
+/* ==================== HELPERS ==================== */
+
+const formatLocation = (city?: string, state?: string): string =>
+  `${city || ""}, ${state || ""}`.trim().replace(/^,\s*|,\s*$/g, "");
+
+const normalizeAvatarUrl = (raw?: string): string => {
+  if (!raw) return DEFAULT_AVATAR;
+  const origin = BASE_URL.replace(/\/api\/?$/, "");
+  if (/^https?:\/\//.test(raw)) return raw;
+  if (raw.startsWith("/")) return origin + raw;
+  return origin + "/" + raw;
+};
 
 const difficultyBadge = (d: Difficulty) => {
   if (d === "Easy") return { bg: colors.mint, text: colors.secondary };
@@ -173,7 +219,10 @@ function StepCard({
         <p className="text-sm font-extrabold" style={{ color: colors.primary }}>
           {title}
         </p>
-        <p className="mt-1 text-xs leading-relaxed" style={{ color: colors.secondary }}>
+        <p
+          className="mt-1 text-xs leading-relaxed"
+          style={{ color: colors.secondary }}
+        >
           {desc}
         </p>
       </div>
@@ -207,7 +256,7 @@ function CaseCard({
               className="mt-1 text-xs leading-relaxed line-clamp-2"
               style={{ color: colors.secondary }}
             >
-              {item.desc}
+              {item.description}
             </p>
           </div>
         </div>
@@ -250,12 +299,12 @@ function CaseCard({
       <Button
         variant="brand-primary"
         className="mt-5 w-full rounded-2xl px-6 bg-violet-700 hover:bg-violet-800"
-        onClick={() => onStart(item.id)}
+        // onClick={() => onStart(item._id)}
+        onClick={() => onStart(item._id)}
       >
         Start Case Study <FeatherArrowRight className="ml-2 w-4 h-4" />
       </Button>
 
-      {/* accent strip */}
       <div
         className="mt-5 h-1.5 rounded-full"
         style={{ backgroundColor: difficultyBadge(item.difficulty).bg }}
@@ -264,27 +313,227 @@ function CaseCard({
   );
 }
 
+/* ==================== MAIN COMPONENT ==================== */
+
 export default function CaseAssessmentsPage() {
   const navigate = useNavigate();
+
+  /* ==================== STATE ==================== */
+
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"All" | Difficulty>("All");
+  const [cases, setCases] = useState<BackendCase[]>([]);
+  const [loadingCases, setLoadingCases] = useState(true);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return cases.filter((c) => {
-      const okFilter = filter === "All" ? true : c.difficulty === filter;
-      const okQuery =
-        !q ||
-        c.title.toLowerCase().includes(q) ||
-        c.desc.toLowerCase().includes(q);
-      return okFilter && okQuery;
+
+  const [student, setStudent] = useState<StudentProfile>({
+    name: "",
+    email: "",
+    location: "",
+    avatar: DEFAULT_AVATAR,
+  });
+
+  const [loadingProfile, setLoadingProfile] = useState(true);
+
+  /* ==================== API CALLS ==================== */
+
+  const fetchStudentProfile = useCallback(async () => {
+    try {
+      setLoadingProfile(true);
+
+      // ✅ SAME endpoint you already use in dashboard
+      const res = await API("GET", URL_PATH.calculateExperienceIndex);
+
+      const demo = res?.data?.demographics?.[0];
+
+      const avatarFromServer = res?.documents?.profileUrl;
+
+      setStudent({
+        name: demo?.fullName || "",
+        email: demo?.email || "",
+        location: formatLocation(demo?.city, demo?.state),
+        avatar: normalizeAvatarUrl(avatarFromServer),
+      });
+    } catch (err) {
+      console.log("fetchStudentProfile failed:", err);
+      setStudent((p) => ({ ...p, avatar: DEFAULT_AVATAR }));
+    } finally {
+      setLoadingProfile(false);
+    }
+  }, []);
+
+  const fetchCases = useCallback(async () => {
+  try {
+    setLoadingCases(true);
+
+    const res = await API("GET", URL_PATH.getAllCases, {
+      page: 1,
+      limit: 20
     });
-  }, [query, filter]);
+    setCases(res?.data || []);
+  } catch (err) {
+    console.error("fetchCases failed:", err);
+  } finally {
+    setLoadingCases(false);
+  }
+}, []);
 
-  const onStart = (caseId: string) => {
-    // later: navigate(`/case-assessments/${caseId}`)
-    console.log("Start case:", caseId);
+
+  const handleAssessmentClick = (caseId: string) => {
+    navigate("/case-assessment-opening", {
+      state: {
+        source: "dashboard",
+        caseId,
+      },
+    });
   };
+
+
+
+  /* ==================== EFFECTS ==================== */
+
+  // useEffect(() => {
+  //   fetchStudentProfile();
+  // }, [fetchStudentProfile]);
+
+  useEffect(() => {
+  fetchStudentProfile();
+  fetchCases();
+}, [fetchStudentProfile, fetchCases]);
+
+
+const mappedCases: CaseItem[] = useMemo(() => {
+  return cases.map((c) => {
+    let difficulty: Difficulty = "Easy";
+
+    if (c.totalQuestions > 10 && c.totalQuestions <= 20) difficulty = "Medium";
+    if (c.totalQuestions > 20) difficulty = "Hard";
+
+    return {
+      _id: c._id,
+      title: c.title,
+      description: c.description || "No description provided",
+      difficulty,
+      points: c.totalQuestions * 2,
+      minutes: c.totalQuestions * 5,
+      icon: (
+        <div
+          className="h-10 w-10 rounded-2xl grid place-items-center"
+          style={{ backgroundColor: colors.cream, color: colors.accent }}
+        >
+          ⌁
+        </div>
+      ),
+    };
+  });
+}, [cases]);
+
+
+  /* ==================== MEMOS ==================== */
+
+  // const filteredCases = useMemo(() => {
+  //   const q = query.trim().toLowerCase();
+  //   return cases.filter((c) => {
+  //     const okFilter = filter === "All" ? true : c.difficulty === filter;
+  //     const okQuery = !q || c.title.toLowerCase().includes(q) || c.description.toLowerCase().includes(q);
+  //     return okFilter && okQuery;
+  //   });
+  // }, [query, filter]);
+  const filteredCases = useMemo(() => {
+  const q = query.trim().toLowerCase();
+
+  return mappedCases.filter((c) => {
+    const okFilter = filter === "All" ? true : c.difficulty === filter;
+    const okQuery =
+      !q ||
+      c.title.toLowerCase().includes(q) ||
+      (c.description || "").toLowerCase().includes(q);
+
+    return okFilter && okQuery;
+  });
+}, [mappedCases, query, filter]);
+
+  /* ==================== HANDLERS ==================== */
+
+//   const onStart = (caseId: string) => {
+//   navigate("/case-assessment-opening", {
+//     state: {
+//       source: "dashboard",
+//       caseId,
+//     },
+//   });
+// };
+
+//   const onStart = async (caseId: string) => {
+//   try {
+//     const res = await API(
+//       "POST",
+//       URL_PATH.startCase(caseId), {}
+//     );
+
+//     const { attemptId } = res.data;
+
+//     navigate("/case-assessment-opening", {
+//       state: {
+//         caseId,
+//         attemptId,
+//       },
+//     });
+//   } catch (err) {
+//     console.error("Start case failed:", err);
+//   }
+// };
+
+// const onStart = async (caseId: string) => {
+//   try {
+//     const res = await API(
+//       "POST",
+//       URL_PATH.startCase(caseId),
+//       {}
+//     );
+
+//     const { attemptId, opening } = res.data;
+//     console.log(attemptId, opening);
+
+//     navigate("/case-assessment-opening", {
+//       state: {
+//         caseId,
+//         attemptId,
+//         opening,
+//       },
+//     });
+//   } catch (err) {
+//     console.error("Start case failed:", err);
+//   }
+// };
+
+const onStart = async (caseId: string) => {
+  try {
+    const res = await API(
+      "POST",
+      URL_PATH.startCase(caseId),
+      {}
+    );
+
+    // ✅ res IS the payload
+    const { attemptId, opening } = res;
+
+    navigate("/case-assessment-opening", {
+      state: {
+        caseId,
+        attemptId,
+        opening,
+      },
+    });
+  } catch (err) {
+    console.error("Start case failed:", err);
+  }
+};
+
+
+  const avatarLetter = (student.name?.trim()?.[0] || "S").toUpperCase();
+
+  /* ==================== UI ==================== */
 
   return (
     <div className="min-h-screen w-full pb-12" style={{ backgroundColor: colors.white }}>
@@ -302,10 +551,7 @@ export default function CaseAssessmentsPage() {
             </button>
 
             <div className="min-w-0">
-              <p
-                className="text-[10px] font-black uppercase tracking-widest opacity-60"
-                style={{ color: colors.primary }}
-              >
+              <p className="text-[10px] font-black uppercase tracking-widest opacity-60" style={{ color: colors.primary }}>
                 Case Studies
               </p>
               <h1 className="text-base sm:text-lg font-extrabold truncate" style={{ color: colors.primary }}>
@@ -315,59 +561,38 @@ export default function CaseAssessmentsPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <div
-              className="hidden sm:flex items-center gap-2 rounded-full border px-4 py-2"
-              style={{ borderColor: colors.aqua, backgroundColor: colors.cream }}
-            >
-              <span className="text-xs font-bold" style={{ color: colors.secondary }}>
-                Search:
+            <div className="hidden sm:flex flex-col items-end leading-tight">
+              <span className="text-xs font-extrabold" style={{ color: colors.primary }}>
+                {loadingProfile ? "Loading..." : student.name || "Student"}
               </span>
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                className="w-56 bg-transparent text-sm outline-none placeholder:opacity-70"
-                style={{ color: colors.primary }}
-                placeholder="Try: strategy, metrics..."
-              />
+              <span className="text-[11px] font-bold opacity-70" style={{ color: colors.secondary }}>
+                {student.location || ""}
+              </span>
             </div>
 
-            <Button
-              size="small"
-              className="rounded-full px-4 py-2 font-semibold shadow-sm"
-              style={{ backgroundColor: colors.primary, color: "white" }}
-              onClick={() => navigate("/chat")}
-            >
-              Messages
-            </Button>
-
-            <Avatar size="large" image="" style={{ boxShadow: `0 0 0 2px ${colors.aqua}` }}>
-              A
+            <Avatar size="large" image={student.avatar} style={{ boxShadow: `0 0 0 2px ${colors.aqua}` }}>
+              {avatarLetter}
             </Avatar>
           </div>
         </div>
       </div>
 
+      {/* Body */}
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 py-8">
         {/* Hero */}
-        <div
-          className="rounded-[2.5rem] border shadow-sm p-6 sm:p-8"
-          style={{ backgroundColor: colors.white, borderColor: colors.aqua }}
-        >
-         
-
-          <div className="mt-2 flex  justify-center">
-            <div className="max-w-3xl text-center ">
-              <h2 className="text-xl sm:text-2xl font-extrabold " style={{ color: colors.primary }}>
+        <div className="rounded-[2.5rem] border shadow-sm p-6 sm:p-8" style={{ backgroundColor: colors.white, borderColor: colors.aqua }}>
+          <div className="mt-2 flex justify-center">
+            <div className="max-w-3xl text-center">
+              <h2 className="text-xl sm:text-2xl font-extrabold" style={{ color: colors.primary }}>
                 Product Management Case Assessments
               </h2>
               <p className="mt-2 text-sm leading-relaxed" style={{ color: colors.secondary }}>
-                Complete real-world product case studies to showcase your skills and boost your Hireability Index. 
-                Each case you complete adds points to your profile, making you more visible to recruiters and helping them understand your capabilities beyond your resume.
+                Complete real-world product case studies to showcase your skills and boost your Hireability Index.
+                Each case you complete adds points to your profile, making you more visible to recruiters.
               </p>
             </div>
           </div>
 
-          {/* How it works */}
           <div className="mt-7 grid grid-cols-1 md:grid-cols-3 gap-4">
             <StepCard
               title="Complete the Case"
@@ -386,7 +611,6 @@ export default function CaseAssessmentsPage() {
             />
           </div>
 
-          {/* Filters */}
           <div className="mt-6 flex flex-wrap gap-2">
             {(["All", "Easy", "Medium", "Hard"] as const).map((t) => {
               const active = filter === t;
@@ -425,36 +649,13 @@ export default function CaseAssessmentsPage() {
           </div>
 
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map((c) => (
-              <CaseCard key={c.id} item={c} onStart={onStart} />
+            {filteredCases.map((c) => (
+              <CaseCard key={c._id} item={c} onStart={onStart} />
             ))}
           </div>
-
-          {filtered.length === 0 && (
-            <div
-              className="mt-6 rounded-[2rem] border p-6 text-center"
-              style={{ backgroundColor: colors.white, borderColor: colors.aqua, color: colors.secondary }}
-            >
-              <p className="text-sm font-extrabold" style={{ color: colors.primary }}>
-                No cases found
-              </p>
-              <p className="mt-1 text-xs">
-                Try a different search or clear the difficulty filter.
-              </p>
-              <button
-                className="mt-4 px-4 py-2 rounded-full text-[11px] font-extrabold border"
-                style={{ borderColor: colors.aqua, color: colors.primary }}
-                onClick={() => {
-                  setQuery("");
-                  setFilter("All");
-                }}
-              >
-                Reset filters
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </div>
   );
 }
+
