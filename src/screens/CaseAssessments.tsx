@@ -178,8 +178,8 @@ const normalizeAvatarUrl = (raw?: string): string => {
 };
 
 const difficultyBadge = (d: Difficulty) => {
-  if (d === "Easy") return { bg: colors.mint, text: colors.secondary };
-  if (d === "Medium") return { bg: colors.cream, text: colors.accent };
+  if (d === "Easy") return { bg: colors.primary, text: colors.secondary };
+  if (d === "Medium") return { bg: colors.primary, text: colors.accent };
   return { bg: "#FEE2E2", text: "#B91C1C" };
 };
 
@@ -207,11 +207,11 @@ function StepCard({
   return (
     <div
       className="flex gap-3 rounded-[1.75rem] border shadow-sm px-5 py-4"
-      style={{ backgroundColor: colors.white, borderColor: colors.aqua }}
+      style={{ backgroundColor: colors.white, borderColor: colors.primary }}
     >
       <div
         className="h-10 w-10 rounded-2xl flex items-center justify-center shrink-0"
-        style={{ backgroundColor: colors.cream, color: colors.accent }}
+        style={{ backgroundColor: colors.primary, color: colors.accent }}
       >
         {icon}
       </div>
@@ -240,7 +240,7 @@ function CaseCard({
   return (
     <div
       className="bg-white border p-5 sm:p-6 rounded-3xl sm:rounded-[2rem] shadow-sm hover:shadow-md transition-all"
-      style={{ borderColor: colors.aqua }}
+      style={{ borderColor: colors.primary }}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
@@ -267,7 +267,7 @@ function CaseCard({
       <div className="mt-5 grid grid-cols-2 gap-3">
         <div
           className="rounded-2xl border px-4 py-3"
-          style={{ backgroundColor: colors.cream, borderColor: colors.aqua }}
+          style={{ backgroundColor: colors.primary, borderColor: colors.primary }}
         >
           <p
             className="text-[10px] font-black uppercase tracking-widest opacity-60"
@@ -282,7 +282,7 @@ function CaseCard({
 
         <div
           className="rounded-2xl border px-4 py-3"
-          style={{ backgroundColor: colors.cream, borderColor: colors.aqua }}
+          style={{ backgroundColor: colors.primary, borderColor: colors.primary }}
         >
           <p
             className="text-[10px] font-black uppercase tracking-widest opacity-60"
@@ -419,7 +419,7 @@ const mappedCases: CaseItem[] = useMemo(() => {
       icon: (
         <div
           className="h-10 w-10 rounded-2xl grid place-items-center"
-          style={{ backgroundColor: colors.cream, color: colors.accent }}
+          style={{ backgroundColor: colors.primary, color: colors.accent }}
         >
           ⌁
         </div>
@@ -538,13 +538,13 @@ const onStart = async (caseId: string) => {
   return (
     <div className="min-h-screen w-full pb-12" style={{ backgroundColor: colors.white }}>
       {/* Top bar */}
-      <div className="sticky top-0 z-20 border-b backdrop-blur bg-white/70" style={{ borderColor: colors.aqua }}>
+      <div className="sticky top-0 z-20 border-b backdrop-blur bg-white/70" style={{ borderColor: colors.primary }}>
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => navigate("/dashboard")}
               className="h-10 w-10 rounded-2xl border flex items-center justify-center hover:shadow-sm transition"
-              style={{ backgroundColor: colors.white, borderColor: colors.aqua, color: colors.primary }}
+              style={{ backgroundColor: colors.white, borderColor: colors.primary, color: colors.primary }}
               title="Back"
             >
               <FeatherArrowLeft className="w-4 h-4" />
@@ -570,7 +570,7 @@ const onStart = async (caseId: string) => {
               </span>
             </div>
 
-            <Avatar size="large" image={student.avatar} style={{ boxShadow: `0 0 0 2px ${colors.aqua}` }}>
+            <Avatar size="large" image={student.avatar} style={{ boxShadow: `0 0 0 2px ${colors.primary}` }}>
               {avatarLetter}
             </Avatar>
           </div>
@@ -580,7 +580,7 @@ const onStart = async (caseId: string) => {
       {/* Body */}
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 py-8">
         {/* Hero */}
-        <div className="rounded-[2.5rem] border shadow-sm p-6 sm:p-8" style={{ backgroundColor: colors.white, borderColor: colors.aqua }}>
+        <div className="rounded-[2.5rem] border shadow-sm p-6 sm:p-8" style={{ backgroundColor: colors.white, borderColor: colors.primary }}>
           <div className="mt-2 flex justify-center">
             <div className="max-w-3xl text-center">
               <h2 className="text-xl sm:text-2xl font-extrabold" style={{ color: colors.primary }}>
@@ -620,7 +620,7 @@ const onStart = async (caseId: string) => {
                   onClick={() => setFilter(t)}
                   className="px-4 py-2 rounded-full text-[11px] font-extrabold border transition"
                   style={{
-                    borderColor: colors.aqua,
+                    borderColor: colors.primary,
                     backgroundColor: active ? colors.primary : colors.white,
                     color: active ? colors.white : colors.primary,
                   }}

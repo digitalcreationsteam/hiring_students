@@ -26,6 +26,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import * as SubframeCore from "@subframe/core";
 import { FeatherChevronDown } from "@subframe/core";
+import { colors } from "src/common/Colors";
 
 const ROLE_TITLES = [
   { label: "Internship", value: "internship" },
@@ -621,21 +622,46 @@ export default function Experience() {
   }, [currentlyWorking]);
 
   return (
-    <>
+  <div className="min-h-screen bg-neutral-50 relative overflow-hidden">
+    {/* Blended background - Covers entire page */}
+    <div className="pointer-events-none absolute inset-0">
+      <div
+        className="absolute inset-0"
+        style={{ backgroundColor: colors.background }}
+      />
+
+      <div
+        className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
+        style={{
+          background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
+        }}
+      />
+
+      <div
+        className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
+        style={{
+          background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
+        }}
+      />
+
+      <div
+        className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
+        style={{
+          background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
+        }}
+      />
+    </div>
+
+    {/* Header and content with z-index to stay above background */}
+    <div className="relative z-10">
       <HeaderLogo />
       <ToastContainer position="top-center" autoClose={3000} />
-      <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-4 sm:px-6 py-0 sm:py-0">
-        <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
+      <div className="flex justify-center px-4 sm:px-6 py-0 sm:py-0">
+        <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center py-8">
           {/* Left card */}
-          <main className="w-full md:max-w-[480px] bg-white rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6 ...">
+          <main className="w-full md:max-w-[480px] bg-white rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6">
             {/* top row - back + progress */}
             <div className="flex items-center gap-4">
-              {/* <IconButton
-              size="small"
-              icon={<FeatherArrowLeft />}
-              onClick={() => navigate(-1)}
-            /> */}
-
               <IconButton
                 size="small"
                 icon={<FeatherArrowLeft />}
@@ -667,8 +693,8 @@ export default function Experience() {
                   {[...Array(3)].map((_, i) => (
                     <div
                       key={`p-${i}`}
-                      style={{ height: 6 }}
-                      className="flex-1 rounded-full bg-violet-700"
+                      style={{ height: 6, backgroundColor: colors.primary }}
+                      className="flex-1 rounded-full"
                     />
                   ))}
                   {[...Array(3)].map((_, i) => (
@@ -693,7 +719,6 @@ export default function Experience() {
               </p>
             </div>
 
-            {/* Selected experience preview list */}
             {/* Selected experience preview list */}
             <section className="mt-6 flex w-full flex-col gap-3">
               {experiences.map((exp) => {
@@ -839,7 +864,6 @@ export default function Experience() {
                 helpText=""
               >
                 <TextField.Input
-                  // className="rounded-full h-10 px-4 text-[12px] bg-white !border-none focus:ring-0"
                   className="h-20 text-[12px]"
                   placeholder="Name of Role"
                   value={roleTitle}
@@ -1001,12 +1025,13 @@ export default function Experience() {
               <Button
                 onClick={handleContinue}
                 disabled={!canContinue || isSubmitting}
+                style={{ backgroundColor: colors.accent }}
                 className={`
     w-full h-10 rounded-full transition-all
     ${
       !canContinue || isSubmitting
-        ? "bg-violet-300 text-white cursor-not-allowed"
-        : "bg-violet-700 text-white shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
+        ? "bg-violet-300 cursor-not-allowed"
+        : "shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
     }
   `}
               >
@@ -1015,7 +1040,6 @@ export default function Experience() {
             </footer>
           </main>
 
-          {/* Right panel - SC2 style with Experience active */}
           {/* Right panel */}
           <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
             <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
@@ -1063,7 +1087,7 @@ export default function Experience() {
                 </div>
 
                 {/* 🟣 Experience — Active */}
-                <div className="flex items-center gap-3 rounded-2xl border border-violet-300 bg-violet-50 px-4 py-2 mb-3">
+                <div style={{backgroundColor: colors.background}} className="flex items-center gap-3 rounded-2xl px-4 py-2 mb-3">
                   <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white shadow-sm">
                     <IconWithBackground
                       size="small"
@@ -1144,7 +1168,8 @@ export default function Experience() {
                 </Button>
 
                 <Button
-                  className="flex-1 rounded-3xl bg-violet-600 text-white hover:bg-violet-700"
+                  style={{ backgroundColor: colors.primary, color: "white" }}
+                  className="flex-1 rounded-3xl hover:bg-violet-700"
                   onClick={handleRemove}
                   disabled={isSubmitting}
                 >
@@ -1155,6 +1180,7 @@ export default function Experience() {
           </div>
         )}
       </div>
-    </>
-  );
+    </div>
+  </div>
+);
 }
