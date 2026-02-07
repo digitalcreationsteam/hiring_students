@@ -1,4 +1,3 @@
-// src/components/Skills.tsx
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
@@ -14,14 +13,15 @@ import {
 } from "@subframe/core";
 import { useNavigate, useLocation } from "react-router-dom";
 import API, { URL_PATH } from "src/common/API";
+import { colors } from "../common/Colors";
 
 export default function Skills() {
   const navigate = useNavigate();
   const location = useLocation();
-const source = location.state?.source; // "dashboard" | undefined
+  const source = location.state?.source; // "dashboard" | undefined
 
-console.log("SKILLS source: ", source);
-// console.log("EDUCATION source:", source);
+  console.log("SKILLS source: ", source);
+
   const [input, setInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -84,9 +84,8 @@ console.log("SKILLS source: ", source);
       const token = localStorage.getItem("token");
       const userId = localStorage.getItem("userId");
       const domainId = localStorage.getItem("domainId");
-      // const subDomainId = localStorage.getItem("subDomainId");
 
-      if (!domainId ) {
+      if (!domainId) {
         alert("Domain selection missing. Please select domain again.");
         navigate("/job-domain");
         return;
@@ -106,11 +105,10 @@ console.log("SKILLS source: ", source);
       );
 
       if (source === "dashboard") {
-  navigate("/dashboard");
-} else {
-  navigate("/assessment-intro");
-}
-
+        navigate("/dashboard");
+      } else {
+        navigate("/assessment-intro");
+      }
     } catch (error: any) {
       console.error("Skill save failed:", error);
       alert(
@@ -150,130 +148,165 @@ console.log("SKILLS source: ", source);
   }, []);
 
   return (
-    <>
-    <HeaderLogo />
-    <div className="min-h-screen flex justify-center items-center bg-neutral-50 px-6 py-0">
-      <main className="w-full max-w-[720px] bg-white rounded-3xl shadow-[0_10px_30px_rgba(40,0,60,0.06)] border border-gray-300 px-10 py-8">
-        {/* top row - back + progress */}
-        <div className="flex items-center gap-4">
-          <IconButton
-            size="small"
-            icon={<FeatherArrowLeft />}
-            onClick={() => navigate(-1)}
-          />
+    <div className="min-h-screen bg-neutral-50 relative overflow-hidden">
+      {/* Blended background - Covers entire page */}
+      <div className="pointer-events-none absolute inset-0">
+        <div
+          className="absolute inset-0"
+          style={{ backgroundColor: colors.background }}
+        />
 
-          <div className="flex-1">
-            <div className="flex items-center gap-3">
-              {[...Array(3)].map((_, i) => (
-                <div
-                  key={`p-${i}`}
-                  style={{ height: 6 }}
-                  className="flex-1 rounded-full bg-violet-700"
-                />
-              ))}
-              {[...Array(2)].map((_, i) => (
-                <div
-                  key={`n-${i}`}
-                  style={{ height: 6 }}
-                  className="flex-1 rounded-full bg-gray-300"
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-        {/* Header */}
-        <h2 className="mt-8 text-[22px]">Add your skills</h2>
-        <p className="text-xs text-neutral-500">
-          Add your key skills to help recruiters discover your profile and match
-          you with relevant opportunities
-        </p>
+        <div
+          className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
+          style={{
+            background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
+          }}
+        />
 
-        {/* Your Skills */}
-        <div className="mt-8 flex flex-col gap-2">
-          <span className="text-[16px]  text-neutral-800">Your Skills *</span>
+        <div
+          className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
+          style={{
+            background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
+          }}
+        />
 
-          <TextField className={scTextFieldClass} label="">
-            <TextField.Input
-              placeholder="Type a skill and press Enter"
-              value={input}
-              ref={inputRef}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className={scInputClass}
+        <div
+          className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
+          style={{
+            background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
+          }}
+        />
+      </div>
+
+      {/* Header Logo with relative positioning */}
+      <div className="relative z-10">
+        <HeaderLogo />
+      </div>
+
+      {/* Main content */}
+      <div className="flex justify-center items-center px-6 py-0 relative z-10">
+        <main className="w-full max-w-[720px] bg-white rounded-3xl shadow-[0_10px_30px_rgba(40,0,60,0.06)] border border-gray-300 px-10 py-8">
+          {/* top row - back + progress */}
+          <div className="flex items-center gap-4">
+            <IconButton
+              size="small"
+              icon={<FeatherArrowLeft />}
+              onClick={() => navigate(-1)}
             />
-          </TextField>
 
-          {/* Added skills */}
-          <div className="flex flex-wrap items-center gap-3 mt-1">
-            {skills.map((s) => (
-              <div
-                key={s}
-                className="inline-flex items-center gap-2 rounded-full bg-neutral-100 px-3"
-              >
-                <span className="text-[16px] text-neutral-700">{s}</span>
-
-                <IconButton
-                  size="small"
-                  icon={<FeatherX />}
-                  onClick={() => removeSkill(s)}
-                  className="!bg-transparent !text-neutral-500 !w-6 !h-6 [&>svg]:w-3 [&>svg]:h-3"
-                  aria-label={`Remove ${s}`}
-                />
+            <div className="flex-1">
+              <div className="flex items-center gap-3">
+                {[...Array(3)].map((_, i) => (
+                  <div
+                    key={`p-${i}`}
+                    style={{ height: 6, backgroundColor: colors.primary }}
+                    className="flex-1 rounded-full"
+                  />
+                ))}
+                {[...Array(2)].map((_, i) => (
+                  <div
+                    key={`n-${i}`}
+                    style={{ height: 6 }}
+                    className="flex-1 rounded-full bg-gray-300"
+                  />
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Suggested Skills */}
-        <div className="mt-8">
-          <div className="rounded-3xl bg-gray-200  px-4 py-4 flex flex-col gap-3">
-            {/* Header INSIDE container */}
-            <span className="text-[18px] text-neutral-800 mt-1">
-              Suggested Skills for Product Managers
-            </span>
-
-            {/* Pills */}
-            <div className="flex flex-wrap rounded-3xl gap-3 mt-2">
-              {suggested.map((s) => {
-                const isAdded = skills.some(
-                  (k) => k.toLowerCase() === s.toLowerCase()
-                );
-
-                return (
-                  <button
-                    key={s}
-                    type="button"
-                    disabled={isAdded}
-                    onClick={() => addSkill(s)}
-                    className={`px-3 rounded-full text-sm transition-all ${
-                      isAdded
-                        ? "bg-neutral-100 border-neutral-200 text-neutral-400 cursor-default"
-                        : "bg-neutral-150 border-neutral-200 text-neutral-700 hover:bg-white hover:shadow-xl"
-                    }`}
-                  >
-                    {s}
-                  </button>
-                );
-              })}
             </div>
           </div>
-        </div>
+          {/* Header */}
+          <h2 className="mt-8 text-[22px]">Add your skills</h2>
+          <p className="text-xs text-neutral-500">
+            Add your key skills to help recruiters discover your profile and
+            match you with relevant opportunities
+          </p>
 
-        {/* Divider */}
-        <div className="w-full h-px bg-neutral-200 my-8" />
+          {/* Your Skills */}
+          <div className="mt-8 flex flex-col gap-2">
+            <span className="text-[16px]  text-neutral-800">Your Skills *</span>
 
-        <footer>
-          <Button
-            className="w-full h-10 rounded-full bg-gradient-to-r from-violet-600 to-violet-600 
-    text-white shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
-            onClick={handleContinue}
-            disabled={skills.length === 0 || isSubmitting}
-          >
-            {isSubmitting ? "Saving..." : "Continue"}
-          </Button>
-        </footer>
-      </main>
+            <TextField className={scTextFieldClass} label="">
+              <TextField.Input
+                placeholder="Type a skill and press Enter"
+                value={input}
+                ref={inputRef}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className={scInputClass}
+              />
+            </TextField>
+
+            {/* Added skills */}
+            <div className="flex flex-wrap items-center gap-3 mt-1">
+              {skills.map((s) => (
+                <div
+                  key={s}
+                  className="inline-flex items-center gap-2 rounded-full bg-neutral-100 px-3"
+                >
+                  <span className="text-[16px] text-neutral-700">{s}</span>
+
+                  <IconButton
+                    size="small"
+                    icon={<FeatherX />}
+                    onClick={() => removeSkill(s)}
+                    className="!bg-transparent !text-neutral-500 !w-6 !h-6 [&>svg]:w-3 [&>svg]:h-3"
+                    aria-label={`Remove ${s}`}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Suggested Skills */}
+          <div className="mt-8">
+            <div className="rounded-3xl bg-gray-200  px-4 py-4 flex flex-col gap-3">
+              {/* Header INSIDE container */}
+              <span className="text-[18px] text-neutral-800 mt-1">
+                Suggested Skills for Product Managers
+              </span>
+
+              {/* Pills */}
+              <div className="flex flex-wrap rounded-3xl gap-3 mt-2">
+                {suggested.map((s) => {
+                  const isAdded = skills.some(
+                    (k) => k.toLowerCase() === s.toLowerCase()
+                  );
+
+                  return (
+                    <button
+                      key={s}
+                      type="button"
+                      disabled={isAdded}
+                      onClick={() => addSkill(s)}
+                      className={`px-3 rounded-full text-sm transition-all ${
+                        isAdded
+                          ? "bg-neutral-100 border-neutral-200 text-neutral-400 cursor-default"
+                          : "bg-neutral-150 border-neutral-200 text-neutral-700 hover:bg-white hover:shadow-xl"
+                      }`}
+                    >
+                      {s}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="w-full h-px bg-neutral-200 my-8" />
+
+          <footer>
+            <Button
+              style={{ backgroundColor: colors.primary, color: "black" }}
+              className="w-full h-10 rounded-full from-violet-600 to-violet-600  shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
+              onClick={handleContinue}
+              disabled={skills.length === 0 || isSubmitting}
+            >
+              {isSubmitting ? "Saving..." : "Continue"}
+            </Button>
+          </footer>
+        </main>
+      </div>
     </div>
-   </>
   );
 }
+

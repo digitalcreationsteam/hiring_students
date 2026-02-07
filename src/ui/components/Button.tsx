@@ -157,11 +157,11 @@ const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonRootProps>(
         {iconRight ? (
           <SubframeCore.IconWrapper
             className={SubframeUtils.twClassNames(
-              "text-body font-body text-white group-disabled/3b777358:text-neutral-400",
+              "text-body font-body text-black group-disabled/3b777358:text-neutral-400",
               {
                 "text-body font-body": size === "small",
                 "text-heading-3 font-heading-3": size === "large",
-                "text-white": variant === "inverse",
+                "text-black": variant === "inverse",
                 "text-error-700":
                   variant === "destructive-tertiary" ||
                   variant === "destructive-secondary",
