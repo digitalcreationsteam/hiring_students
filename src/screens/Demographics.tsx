@@ -22,6 +22,8 @@ import API, { URL_PATH } from "src/common/API";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Country, State, City } from "country-state-city";
+import { colors } from "src/common/Colors";
+
 
 interface DemographicsData {
   fullName: string;
@@ -667,7 +669,9 @@ export default function Demographics() {
               </div>
 
               {/* Current Step */}
-              <button className="w-full flex items-center gap-3 rounded-2xl border border-violet-300 bg-violet-100 px-4 py-2 mb-3">
+              <button className="w-full flex items-center gap-3 rounded-2xl  px-4 py-2 mb-3"
+              style={{backgroundColor: colors.primary}}
+              >
                 <IconWithBackground size="small" icon={<FeatherUser />} />
                 <span className="text-sm font-medium text-neutral-900">
                   Demographics

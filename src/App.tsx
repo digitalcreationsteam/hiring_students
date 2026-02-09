@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import { isAuthenticated } from "./utils/authUtils";
 import Chat from "./ui/components/chat/Chat";
+import LandingPage from './screens/LandingPage'
 import RecruiterChats from "./screens/RecruiterChats";
 import SignUp from "./screens/SignUp";
 import LogIn from "./screens/Login";
@@ -53,6 +54,7 @@ const router = createBrowserRouter([
     : <LogIn />,
 },
  // Use "index: true" instead of "path: "/""
+  { path: "/LandingPage", element: <LandingPage /> },
   { path: "/signup", element: <SignUp /> },
   { path: "/login", element: <LogIn /> },
   { path: "/login-success", element: <LoginSuccess /> },

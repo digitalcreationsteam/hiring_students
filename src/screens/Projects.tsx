@@ -1269,7 +1269,7 @@ export default function Projects() {
                 </div>
 
                 {/* Certifications — active (purple) */}
-                <div className="flex items-center gap-3 rounded-2xl border border-gray-300 px-4 py-2 mb-3" style={{background: colors.white}}>
+                <div className="flex items-center gap-3 rounded-2xl border border-gray-300 px-4 py-2 mb-3" style={{background: colors.primary}}>
                   <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white shadow-sm">
                     <IconWithBackground
                       size="small"

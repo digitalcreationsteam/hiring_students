@@ -68,3 +68,29 @@ export const colors = {
   cream: "#FFFAE6",      // Main Background
   mint: "#E4F2EA",
 };
+
+// NEW UNITALENT COLOR PALETTE - Added separately without modifying existing colors
+export const uniTalentColors = {
+  // Client's specific color palette for UniTalent landing page
+  primary: "#FFD85F",      // Yellow accent
+  lightGray: "#D9D9D9",    // Borders and dividers
+  background: "#F8F8F8",   // Main background
+  text: "#060606",         // All text content
+  
+  // Extended palette
+  primaryLight: "#FFEDB2", // Light yellow for gradients
+  
+  // Status colors for UniTalent
+  status: {
+    success: "#FFD85F",    // Using primary for success
+    successText: "#060606",
+    inactive: "#F3F4F6",
+    inactiveText: "#4B5563",
+  },
+  
+  // Utility colors
+  white: "#FFFFFF",
+  black: "#060606",
+  gray: "#D9D9D9",
+  lightGray: "#F8F8F8",
+};

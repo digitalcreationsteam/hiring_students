@@ -178,7 +178,7 @@ const normalizeAvatarUrl = (raw?: string): string => {
 };
 
 const difficultyBadge = (d: Difficulty) => {
-  if (d === "Easy") return { bg: colors.primary, text: colors.secondary };
+  if (d === "Easy") return { bg: colors.primary, text: colors.accent };
   if (d === "Medium") return { bg: colors.primary, text: colors.accent };
   return { bg: "#FEE2E2", text: "#B91C1C" };
 };
@@ -207,21 +207,21 @@ function StepCard({
   return (
     <div
       className="flex gap-3 rounded-[1.75rem] border shadow-sm px-5 py-4"
-      style={{ backgroundColor: colors.white, borderColor: colors.primary }}
+      style={{ backgroundColor: colors.primary, borderColor: colors.accent }}
     >
       <div
         className="h-10 w-10 rounded-2xl flex items-center justify-center shrink-0"
-        style={{ backgroundColor: colors.primary, color: colors.accent }}
+        style={{ backgroundColor: colors.accent, color: colors.primary }}
       >
         {icon}
       </div>
       <div className="min-w-0">
-        <p className="text-sm font-extrabold" style={{ color: colors.primary }}>
+        <p className="text-sm font-extrabold" style={{ color: colors.accent }}>
           {title}
         </p>
         <p
           className="mt-1 text-xs leading-relaxed"
-          style={{ color: colors.secondary }}
+          style={{ color: colors.accent }}
         >
           {desc}
         </p>
@@ -267,11 +267,11 @@ function CaseCard({
       <div className="mt-5 grid grid-cols-2 gap-3">
         <div
           className="rounded-2xl border px-4 py-3"
-          style={{ backgroundColor: colors.primary, borderColor: colors.primary }}
+          style={{ backgroundColor: colors.primary, borderColor: colors.accent }}
         >
           <p
-            className="text-[10px] font-black uppercase tracking-widest opacity-60"
-            style={{ color: colors.primary }}
+            className="text-[10px] font-black uppercase tracking-widest "
+            style={{ color: colors.accent }}
           >
             Points Awarded
           </p>
@@ -282,15 +282,15 @@ function CaseCard({
 
         <div
           className="rounded-2xl border px-4 py-3"
-          style={{ backgroundColor: colors.primary, borderColor: colors.primary }}
+          style={{ backgroundColor: colors.primary, borderColor: colors.accent }}
         >
           <p
-            className="text-[10px] font-black uppercase tracking-widest opacity-60"
-            style={{ color: colors.primary }}
+            className="text-[10px] font-black uppercase tracking-widest "
+            style={{ color: colors.accent }}
           >
             Time Required
           </p>
-          <p className="mt-1 text-sm font-extrabold" style={{ color: colors.primary }}>
+          <p className="mt-1 text-sm font-extrabold" style={{ color: colors.accent }}>
             {item.minutes} min
           </p>
         </div>
@@ -298,7 +298,8 @@ function CaseCard({
 
       <Button
         variant="brand-primary"
-        className="mt-5 w-full rounded-2xl px-6 bg-violet-700 hover:bg-violet-800"
+        className="mt-5 w-full rounded-2xl px-6 "
+        style={{background: colors.accent}}
         // onClick={() => onStart(item._id)}
         onClick={() => onStart(item._id)}
       >
@@ -419,7 +420,7 @@ const mappedCases: CaseItem[] = useMemo(() => {
       icon: (
         <div
           className="h-10 w-10 rounded-2xl grid place-items-center"
-          style={{ backgroundColor: colors.primary, color: colors.accent }}
+          style={{ backgroundColor: colors.primary, color: colors.accent, borderColor: colors.accent }}
         >
           ⌁
         </div>
@@ -537,24 +538,52 @@ const onStart = async (caseId: string) => {
 
   return (
     <div className="min-h-screen w-full pb-12" style={{ backgroundColor: colors.white }}>
+       {/* Blended background - Covers entire page */}
+          {/* <div className="pointer-events-none absolute inset-0">
+            <div
+              className="absolute inset-0"
+              style={{ backgroundColor: colors.background }}
+            />
+      
+            <div
+              className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
+              style={{
+                background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
+              }}
+            />
+      
+            <div
+              className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
+              style={{
+                background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
+              }}
+            />
+      
+            <div
+              className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
+              style={{
+                background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
+              }}
+            />
+          </div> */}
       {/* Top bar */}
-      <div className="sticky top-0 z-20 border-b backdrop-blur bg-white/70" style={{ borderColor: colors.primary }}>
+      <div className="sticky top-0 z-20 border-b backdrop-blur bg-white/70" style={{ borderColor: colors.accent }}>
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => navigate("/dashboard")}
               className="h-10 w-10 rounded-2xl border flex items-center justify-center hover:shadow-sm transition"
-              style={{ backgroundColor: colors.white, borderColor: colors.primary, color: colors.primary }}
+              style={{ backgroundColor: colors.white, borderColor: colors.accent, color: colors.accent }}
               title="Back"
             >
               <FeatherArrowLeft className="w-4 h-4" />
             </button>
 
             <div className="min-w-0">
-              <p className="text-[10px] font-black uppercase tracking-widest opacity-60" style={{ color: colors.primary }}>
+              <p className="text-[10px] font-black uppercase tracking-widest opacity-60" style={{ color: colors.accent }}>
                 Case Studies
               </p>
-              <h1 className="text-base sm:text-lg font-extrabold truncate" style={{ color: colors.primary }}>
+              <h1 className="text-base sm:text-lg font-extrabold truncate" style={{ color: colors.accent }}>
                 Product Management Case Assessments
               </h1>
             </div>
@@ -562,15 +591,15 @@ const onStart = async (caseId: string) => {
 
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex flex-col items-end leading-tight">
-              <span className="text-xs font-extrabold" style={{ color: colors.primary }}>
+              <span className="text-xs font-mid" style={{ color: colors.accent }}>
                 {loadingProfile ? "Loading..." : student.name || "Student"}
               </span>
-              <span className="text-[11px] font-bold opacity-70" style={{ color: colors.secondary }}>
+              <span className="text-[11px] font-bold opacity-70" style={{ color: colors.accent }}>
                 {student.location || ""}
               </span>
             </div>
 
-            <Avatar size="large" image={student.avatar} style={{ boxShadow: `0 0 0 2px ${colors.primary}` }}>
+            <Avatar size="large" image={student.avatar} style={{ boxShadow: `0 0 0 2px ${colors.secondary}` }}>
               {avatarLetter}
             </Avatar>
           </div>
@@ -580,13 +609,13 @@ const onStart = async (caseId: string) => {
       {/* Body */}
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 py-8">
         {/* Hero */}
-        <div className="rounded-[2.5rem] border shadow-sm p-6 sm:p-8" style={{ backgroundColor: colors.white, borderColor: colors.primary }}>
+        <div className="rounded-[2.5rem] border shadow-sm p-6 sm:p-8" style={{ backgroundColor: colors.white, borderColor: colors.accent }}>
           <div className="mt-2 flex justify-center">
             <div className="max-w-3xl text-center">
-              <h2 className="text-xl sm:text-2xl font-extrabold" style={{ color: colors.primary }}>
+              <h2 className="text-xl sm:text-2xl font-extrabold" style={{ color: colors.accent }}>
                 Product Management Case Assessments
               </h2>
-              <p className="mt-2 text-sm leading-relaxed" style={{ color: colors.secondary }}>
+              <p className="mt-2 text-sm leading-relaxed" style={{ color: colors.accent }}>
                 Complete real-world product case studies to showcase your skills and boost your Hireability Index.
                 Each case you complete adds points to your profile, making you more visible to recruiters.
               </p>
@@ -620,8 +649,8 @@ const onStart = async (caseId: string) => {
                   onClick={() => setFilter(t)}
                   className="px-4 py-2 rounded-full text-[11px] font-extrabold border transition"
                   style={{
-                    borderColor: colors.primary,
-                    backgroundColor: active ? colors.primary : colors.white,
+                    borderColor: colors.accent,
+                    backgroundColor: active ? colors.primary : colors.accent,
                     color: active ? colors.white : colors.primary,
                   }}
                 >
@@ -639,7 +668,7 @@ const onStart = async (caseId: string) => {
         {/* List */}
         <div className="mt-8">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg sm:text-xl font-bold" style={{ color: colors.primary }}>
+            <h3 className="text-lg sm:text-xl font-bold" style={{ color: colors.accent }}>
               Available Case Assessments
             </h3>
 

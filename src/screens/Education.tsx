@@ -1633,7 +1633,7 @@ const handleContinue = () => {
 
                 {/* 🟣 Active — Education */}
                 <button
-                  style={{ backgroundColor: colors.background}}
+                  style={{ backgroundColor: colors.primary}}
                   type="button"
                   className="w-full flex items-center gap-3 rounded-2xl px-4 py-2 mb-3 hover:shadow-sm"
                 >

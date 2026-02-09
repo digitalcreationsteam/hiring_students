@@ -106,6 +106,7 @@ export const URL_PATH = {
 
   createSubscription: "/subscription/create",
   initiateDodoPayment: "/subscription/payments/dodo/initiate",
+  checkSubsciptionStatus:"/subscription",
   verifyPayment: "/subscription/verify",
   getSubscriptions: "/subscription",
   getCurrentSubscription: "/subscription/current",
