@@ -4,6 +4,7 @@ import FeaturesSection from 'src/ui/components/FeaturesSection';
 import StatsSection from 'src/ui/components/StatsSection';
 import Navbar from "src/ui/components/Navbar";
 import TrustSection from 'src/ui/components/TrustSection';
+import CTASection from 'src/ui/components/CTASection';
 import Footer from 'src/ui/components/Footer';
 
 const LandingPage = () => {
@@ -14,6 +15,7 @@ const LandingPage = () => {
       <StatsSection />
       <TrustSection />
       <FeaturesSection />
+      <CTASection/>
       <Footer />
     </div>
   );

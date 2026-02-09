@@ -1,44 +1,72 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import { uniTalentColors } from "src/common/Colors";
 
 const Navbar = () => {
     return (
-        <header className="bg-[#F8F8F8] border-b border-[#D9D9D9]">
-            <div className="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
-
+        <header style={{ 
+            backgroundColor: uniTalentColors.background, 
+            borderColor: uniTalentColors.lightGray 
+        }} className="border-b sticky top-0 z-50">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
                 {/* Logo */}
                 <div className="flex items-center gap-3">
                     <img
-                        src="/rename.png"  // 🔴 replace with your logo path
+                        src="/rename.png"
                         alt="Company Logo"
                         className="h-9 w-50 object-contain"
                     />
                 </div>
 
                 {/* Menu */}
-                <nav className="hidden md:flex items-center gap-12 text-[#060606] font-bold">
+                <nav className="hidden md:flex items-center gap-12">
                     {["Home", "Features", "Pricing", "Contact"].map((item) => (
-                        <a
+                        <Link
                             key={item}
-                            href="#"
-                            className="relative transition hover:text-[#FFD85F]"
+                            to="#"
+                            style={{ color: uniTalentColors.text }}
+                            className="relative group font-bold transition-all duration-300"
                         >
-                            {item}
-
-                            {/* Hover underline */}
-                            <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-[#FFD85F] transition-all duration-300 group-hover:w-full" />
-                        </a>
+                            <span className="relative z-10">{item}</span>
+                            
+                            {/* Hover underline animation */}
+                            <span 
+                                style={{ backgroundColor: uniTalentColors.primary }}
+                                className="absolute left-0 -bottom-1 h-[2px] w-0 group-hover:w-full transition-all duration-300 ease-out"
+                            />
+                            
+                            {/* Background highlight on hover */}
+                            <span 
+                                style={{ 
+                                    backgroundColor: uniTalentColors.primary,
+                                    opacity: 0
+                                }}
+                                className="absolute inset-0 -z-10 rounded-lg group-hover:opacity-10 transition-opacity duration-300"
+                            />
+                        </Link>
                     ))}
                 </nav>
 
                 {/* Auth Buttons */}
-                <div className="flex items-center gap-5">
-                    <button className="text-[#060606] font-bold transition hover:opacity-70">
+                <div className="flex items-center gap-4">
+                    <Link 
+                        to="/login" 
+                        style={{ color: uniTalentColors.text }}
+                        className="font-bold hover:opacity-80 transition-all duration-300 hover:scale-105"
+                    >
                         Login
-                    </button>
+                    </Link>
 
-                    <button className="bg-[#FFD85F] text-[#060606] px-6 py-2 rounded-lg font-semibold transition hover:scale-[1.03]">
+                    <Link 
+                        to="/signup" 
+                        style={{ 
+                            backgroundColor: uniTalentColors.primary,
+                            color: uniTalentColors.text
+                        }}
+                        className="px-6 py-2 rounded-lg font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                    >
                         Sign Up
-                    </button>
+                    </Link>
                 </div>
             </div>
         </header>

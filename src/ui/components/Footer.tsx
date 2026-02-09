@@ -1,5 +1,6 @@
-// src/components/Footer.tsx
+// src/components/Footer.tsx - Updated to use uniTalentColors
 import { Facebook, Twitter, Instagram, Linkedin, Youtube, Github } from 'lucide-react';
+import { uniTalentColors } from 'src/common/Colors';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -8,7 +9,7 @@ const Footer = () => {
     <footer className="relative">
       {/* Background */}
       <div 
-        style={{ backgroundColor: '#F8F8F8' }}
+        style={{ backgroundColor: uniTalentColors.background }}
         className="relative overflow-hidden"
       >
         {/* Top Section */}
@@ -18,13 +19,13 @@ const Footer = () => {
             <div className="md:col-span-1">
               <div className="mb-6">
                 <h2 
-                  style={{ color: '#060606' }}
+                  style={{ color: uniTalentColors.text }}
                   className="text-2xl font-bold mb-2"
                 >
                   UniTalent
                 </h2>
                 <p 
-                  style={{ color: '#060606' }}
+                  style={{ color: uniTalentColors.text }}
                   className="opacity-70 text-sm"
                 >
                   A Talent Ranking & Discovery Platform for Product Managers
@@ -36,9 +37,7 @@ const Footer = () => {
                 {[
                   { icon: Twitter, label: 'Twitter', href: '#' },
                   { icon: Linkedin, label: 'LinkedIn', href: '#' },
-                  { icon: Facebook, label: 'Facebook', href: '#' },
                   { icon: Instagram, label: 'Instagram', href: '#' },
-                  { icon: Youtube, label: 'YouTube', href: '#' },
                   { icon: Github, label: 'GitHub', href: '#' }
                 ].map((social) => {
                   const Icon = social.icon;
@@ -51,13 +50,13 @@ const Footer = () => {
                     >
                       <div 
                         style={{ 
-                          backgroundColor: '#F8F8F8',
-                          borderColor: '#D9D9D9'
+                          backgroundColor: uniTalentColors.background,
+                          borderColor: uniTalentColors.lightGray
                         }}
                         className="w-10 h-10 rounded-full border flex items-center justify-center group-hover:border-#FFD85F transition-all duration-300"
                       >
                         <Icon 
-                          style={{ color: '#060606' }}
+                          style={{ color: uniTalentColors.text }}
                           className="w-5 h-5 group-hover:scale-110 transition-transform duration-300"
                         />
                       </div>
@@ -70,7 +69,7 @@ const Footer = () => {
             {/* Quick Links */}
             <div>
               <h3 
-                style={{ color: '#060606' }}
+                style={{ color: uniTalentColors.text }}
                 className="text-lg font-semibold mb-4"
               >
                 Quick Links
@@ -80,7 +79,7 @@ const Footer = () => {
                   <li key={item}>
                     <a
                       href="#"
-                      style={{ color: '#060606' }}
+                      style={{ color: uniTalentColors.text }}
                       className="opacity-70 hover:opacity-100 hover:text-#FFD85F transition-all duration-300"
                     >
                       {item}
@@ -93,7 +92,7 @@ const Footer = () => {
             {/* Resources */}
             <div>
               <h3 
-                style={{ color: '#060606' }}
+                style={{ color: uniTalentColors.text }}
                 className="text-lg font-semibold mb-4"
               >
                 Resources
@@ -103,7 +102,7 @@ const Footer = () => {
                   <li key={item}>
                     <a
                       href="#"
-                      style={{ color: '#060606' }}
+                      style={{ color: uniTalentColors.text }}
                       className="opacity-70 hover:opacity-100 hover:text-#FFD85F transition-all duration-300"
                     >
                       {item}
@@ -116,7 +115,7 @@ const Footer = () => {
             {/* Company */}
             <div>
               <h3 
-                style={{ color: '#060606' }}
+                style={{ color: uniTalentColors.text }}
                 className="text-lg font-semibold mb-4"
               >
                 Company
@@ -126,7 +125,7 @@ const Footer = () => {
                   <li key={item}>
                     <a
                       href="#"
-                      style={{ color: '#060606' }}
+                      style={{ color: uniTalentColors.text }}
                       className="opacity-70 hover:opacity-100 hover:text-#FFD85F transition-all duration-300"
                     >
                       {item}
@@ -139,7 +138,7 @@ const Footer = () => {
 
           {/* Divider */}
           <div 
-            style={{ backgroundColor: '#D9D9D9' }}
+            style={{ backgroundColor: uniTalentColors.lightGray }}
             className="h-px my-8 md:my-12"
           ></div>
 
@@ -148,7 +147,7 @@ const Footer = () => {
             {/* Copyright */}
             <div>
               <p 
-                style={{ color: '#060606' }}
+                style={{ color: uniTalentColors.text }}
                 className="text-sm opacity-70"
               >
                 © {currentYear} UniTalent. All rights reserved.
@@ -161,7 +160,7 @@ const Footer = () => {
                 <a
                   key={item}
                   href="#"
-                  style={{ color: '#060606' }}
+                  style={{ color: uniTalentColors.text }}
                   className="text-sm opacity-70 hover:opacity-100 hover:text-#FFD85F transition-all duration-300"
                 >
                   {item}
@@ -176,16 +175,16 @@ const Footer = () => {
                   type="email"
                   placeholder="Enter your email"
                   style={{ 
-                    backgroundColor: '#F8F8F8',
-                    borderColor: '#D9D9D9',
-                    color: '#060606'
+                    backgroundColor: uniTalentColors.background,
+                    borderColor: uniTalentColors.lightGray,
+                    color: uniTalentColors.text
                   }}
                   className="px-4 py-2 rounded-lg border focus:outline-none focus:border-#FFD85F flex-grow md:w-48"
                 />
                 <button
                   style={{ 
-                    backgroundColor: '#FFD85F',
-                    color: '#060606'
+                    backgroundColor: uniTalentColors.primary,
+                    color: uniTalentColors.text
                   }}
                   className="px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-all duration-300"
                 >
@@ -193,7 +192,7 @@ const Footer = () => {
                 </button>
               </div>
               <p 
-                style={{ color: '#060606' }}
+                style={{ color: uniTalentColors.text }}
                 className="text-xs opacity-60 mt-2"
               >
                 Stay updated with our latest news
@@ -203,40 +202,7 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Bottom Bar 
-      <div 
-        style={{ backgroundColor: '#060606' }}
-        className="py-4"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-2">
-            <p 
-              style={{ color: '#F8F8F8' }}
-              className="text-sm opacity-70"
-            >
-              Designed with ❤️ for Product Managers worldwide
-            </p>
-            <div className="flex items-center gap-2">
-              <span 
-                style={{ color: '#F8F8F8' }}
-                className="text-sm opacity-70"
-              >
-                Made in
-              </span>
-              <div 
-                style={{ 
-                  backgroundColor: '#FFD85F',
-                  color: '#060606'
-                }}
-                className="px-2 py-1 rounded text-xs font-bold"
-              >
-                INDIA
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      */}
+
     </footer>
   );
 };

@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { uniTalentColors } from 'src/common/Colors';
 
 const StatsSection = () => {
   const [recruiters, setRecruiters] = useState(0);
@@ -48,24 +49,24 @@ const StatsSection = () => {
           <div className="space-y-8">
             <div 
               style={{ 
-                backgroundColor: '#F8F8F8',
-                borderColor: '#D9D9D9'
+                backgroundColor: uniTalentColors.background,
+                borderColor: uniTalentColors.lightGray
               }}
               className="rounded-2xl border p-8"
             >
               <div className="flex items-center mb-6">
                 <div 
-                  style={{ backgroundColor: '#FFD85F' }}
+                  style={{ backgroundColor: uniTalentColors.primary }}
                   className="p-3 rounded-xl"
                 >
-                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="#060606">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke={uniTalentColors.text}>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
                 </div>
                 <div className="ml-4">
-                  <h3 style={{ color: '#060606' }} className="text-2xl font-bold">Profile Visibility</h3>
-                  <p style={{ color: '#060606' }} className="text-lg opacity-80">{recruiters} recruiters viewed your profile this week</p>
+                  <h3 style={{ color: uniTalentColors.text }} className="text-2xl font-bold">Profile Visibility</h3>
+                  <p style={{ color: uniTalentColors.text }} className="text-lg opacity-80">{recruiters} recruiters viewed your profile this week</p>
                 </div>
               </div>
               
@@ -73,35 +74,35 @@ const StatsSection = () => {
               <div className="grid grid-cols-3 gap-4">
                 <div 
                   style={{ 
-                    backgroundColor: '#F8F8F8',
-                    borderColor: '#D9D9D9'
+                    backgroundColor: uniTalentColors.background,
+                    borderColor: uniTalentColors.lightGray
                   }}
-                  className="text-center p-4 rounded-xl border"
+                  className="text-center p-4 rounded-xl border hover:scale-105 transition-all duration-300"
                 >
-                  <div style={{ color: '#060606' }} className="text-3xl font-bold">{atsFiltered}%</div>
-                  <div style={{ color: '#060606' }} className="text-sm opacity-80 mt-2">Resumes filtered by ATS</div>
+                  <div style={{ color: uniTalentColors.text }} className="text-3xl font-bold">{atsFiltered}%</div>
+                  <div style={{ color: uniTalentColors.text }} className="text-sm opacity-80 mt-2">Resumes filtered by ATS</div>
                 </div>
                 
                 <div 
                   style={{ 
-                    backgroundColor: '#F8F8F8',
-                    borderColor: '#D9D9D9'
+                    backgroundColor: uniTalentColors.background,
+                    borderColor: uniTalentColors.lightGray
                   }}
-                  className="text-center p-4 rounded-xl border"
+                  className="text-center p-4 rounded-xl border hover:scale-105 transition-all duration-300"
                 >
-                  <div style={{ color: '#060606' }} className="text-3xl font-bold">{referralJobs}%</div>
-                  <div style={{ color: '#060606' }} className="text-sm opacity-80 mt-2">Jobs filled via referrals</div>
+                  <div style={{ color: uniTalentColors.text }} className="text-3xl font-bold">{referralJobs}%</div>
+                  <div style={{ color: uniTalentColors.text }} className="text-sm opacity-80 mt-2">Jobs filled via referrals</div>
                 </div>
                 
                 <div 
                   style={{ 
-                    backgroundColor: '#F8F8F8',
-                    borderColor: '#D9D9D9'
+                    backgroundColor: uniTalentColors.background,
+                    borderColor: uniTalentColors.lightGray
                   }}
-                  className="text-center p-4 rounded-xl border"
+                  className="text-center p-4 rounded-xl border hover:scale-105 transition-all duration-300"
                 >
-                  <div style={{ color: '#060606' }} className="text-3xl font-bold">{interviewRate}x</div>
-                  <div style={{ color: '#060606' }} className="text-sm opacity-80 mt-2">Better interview rate</div>
+                  <div style={{ color: uniTalentColors.text }} className="text-3xl font-bold">{interviewRate}x</div>
+                  <div style={{ color: uniTalentColors.text }} className="text-sm opacity-80 mt-2">Better interview rate</div>
                 </div>
               </div>
             </div>
@@ -110,21 +111,21 @@ const StatsSection = () => {
             <div className="flex flex-col sm:flex-row gap-4">
               <button 
                 style={{ 
-                  backgroundColor: '#FFD85F',
-                  color: '#060606'
+                  backgroundColor: uniTalentColors.primary,
+                  color: uniTalentColors.text
                 }}
-                className="flex-1 font-semibold py-4 px-8 rounded-xl hover:opacity-90 transition-all duration-300 border border-transparent hover:border-#D9D9D9"
+                className="flex-1 font-semibold py-4 px-8 rounded-xl hover:opacity-90 transition-all duration-300 border border-transparent hover:border-#D9D9D9 hover:shadow-lg hover:scale-105"
               >
                 Get Ranked Today →
               </button>
               
               <button 
                 style={{ 
-                  backgroundColor: '#F8F8F8',
-                  color: '#060606',
-                  borderColor: '#D9D9D9'
+                  backgroundColor: uniTalentColors.background,
+                  color: uniTalentColors.text,
+                  borderColor: uniTalentColors.lightGray
                 }}
-                className="flex-1 font-semibold py-4 px-8 rounded-xl border-2 hover:opacity-80 transition-all duration-300"
+                className="flex-1 font-semibold py-4 px-8 rounded-xl border-2 hover:opacity-80 hover:border-#FFD85F hover:shadow-lg transition-all duration-300"
               >
                 See How It Works
               </button>
@@ -133,44 +134,44 @@ const StatsSection = () => {
           
           {/* Right Column - Introducing UniTalent */}
           <div>
-            <h2 style={{ color: '#060606' }} className="text-3xl md:text-4xl font-bold mb-6">
+            <h2 style={{ color: uniTalentColors.text }} className="text-3xl md:text-4xl font-bold mb-6">
               Introducing UniTalent: A Talent Ranking &<br />
-              <span style={{ color: '#060606' }}>Discovery Platform for Product Managers</span>
+              <span style={{ color: uniTalentColors.text }}>Discovery Platform for Product Managers</span>
             </h2>
             
-            <p style={{ color: '#060606' }} className="text-lg opacity-80 mb-8">
+            <p style={{ color: uniTalentColors.text }} className="text-lg opacity-80 mb-8">
               We built UniTalent because we believe hiring should work differently. Not based on who you know or how well you can game an ATS system, but on what you can actually do.
             </p>
             
             <div 
               style={{ 
-                backgroundColor: '#F8F8F8',
-                borderColor: '#D9D9D9'
+                backgroundColor: uniTalentColors.background,
+                borderColor: uniTalentColors.lightGray
               }}
-              className="rounded-xl p-6 border"
+              className="rounded-xl p-6 border hover:border-#FFD85F transition-all duration-300"
             >
-              <h3 style={{ color: '#060606' }} className="text-xl font-semibold mb-4">How It Works:</h3>
+              <h3 style={{ color: uniTalentColors.text }} className="text-xl font-semibold mb-4">How It Works:</h3>
               <ul className="space-y-3">
-                <li className="flex items-center">
+                <li className="flex items-center hover:translate-x-2 transition-all duration-300">
                   <div 
-                    style={{ backgroundColor: '#FFD85F' }}
+                    style={{ backgroundColor: uniTalentColors.primary }}
                     className="w-2 h-2 rounded-full mr-3"
                   ></div>
-                  <span style={{ color: '#060606' }}>Demonstrate skills through real-world assessments</span>
+                  <span style={{ color: uniTalentColors.text }}>Demonstrate skills through real-world assessments</span>
                 </li>
-                <li className="flex items-center">
+                <li className="flex items-center hover:translate-x-2 transition-all duration-300">
                   <div 
-                    style={{ backgroundColor: '#FFD85F' }}
+                    style={{ backgroundColor: uniTalentColors.primary }}
                     className="w-2 h-2 rounded-full mr-3"
                   ></div>
-                  <span style={{ color: '#060606' }}>Showcase verified projects that prove execution</span>
+                  <span style={{ color: uniTalentColors.text }}>Showcase verified projects that prove execution</span>
                 </li>
-                <li className="flex items-center">
+                <li className="flex items-center hover:translate-x-2 transition-all duration-300">
                   <div 
-                    style={{ backgroundColor: '#FFD85F' }}
+                    style={{ backgroundColor: uniTalentColors.primary }}
                     className="w-2 h-2 rounded-full mr-3"
                   ></div>
-                  <span style={{ color: '#060606' }}>Get ranked transparently against other PMs</span>
+                  <span style={{ color: uniTalentColors.text }}>Get ranked transparently against other PMs</span>
                 </li>
               </ul>
             </div>

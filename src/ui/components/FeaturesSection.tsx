@@ -1,4 +1,6 @@
-// src/components/FeaturesSection.tsx
+// src/components/FeaturesSection.tsx - Updated with color variables
+import { uniTalentColors } from 'src/common/Colors';
+
 const FeaturesSection = () => {
   const features = [
     {
@@ -60,26 +62,26 @@ const FeaturesSection = () => {
   ];
 
   return (
-    <section className="py-20">
+    <section className="py-20 pb-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 style={{ color: '#060606' }} className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 style={{ color: uniTalentColors.text }} className="text-3xl md:text-4xl font-bold mb-4">
             Here's how it works:
           </h2>
-          <p style={{ color: '#060606' }} className="text-xl opacity-80 max-w-3xl mx-auto">
+          <p style={{ color: uniTalentColors.text }} className="text-xl opacity-80 max-w-3xl mx-auto">
             Instead of sending another resume into the void, you demonstrate real PM skills through verified assessments.
           </p>
         </div>
 
         {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-0">
           {features.map((feature, index) => (
             <div 
               key={index} 
               style={{ 
-                backgroundColor: '#F8F8F8',
-                borderColor: '#D9D9D9'
+                backgroundColor: uniTalentColors.background,
+                borderColor: uniTalentColors.lightGray
               }}
               className="group p-8 rounded-2xl border hover:border-#060606 transition-all duration-300 hover:shadow-lg relative overflow-hidden"
             >
@@ -87,12 +89,12 @@ const FeaturesSection = () => {
               <div className="mb-6 relative z-10">
                 <div 
                   style={{ 
-                    backgroundColor: '#FFD85F',
-                    borderColor: '#D9D9D9'
+                    backgroundColor: uniTalentColors.primary,
+                    borderColor: uniTalentColors.lightGray
                   }}
                   className="inline-flex p-3 rounded-xl border group-hover:scale-110 transition-transform duration-300"
                 >
-                  <div style={{ color: '#060606' }}>
+                  <div style={{ color: uniTalentColors.text }}>
                     {feature.icon}
                   </div>
                 </div>
@@ -100,11 +102,11 @@ const FeaturesSection = () => {
               
               {/* Feature Content */}
               <div className="relative z-10">
-                <h3 style={{ color: '#060606' }} className="text-xl font-bold mb-4 group-hover:opacity-100 transition-opacity duration-300">
+                <h3 style={{ color: uniTalentColors.text }} className="text-xl font-bold mb-4 group-hover:opacity-100 transition-opacity duration-300">
                   {feature.title}
                 </h3>
                 
-                <p style={{ color: '#060606' }} className="opacity-80 leading-relaxed mb-6">
+                <p style={{ color: uniTalentColors.text }} className="opacity-80 leading-relaxed mb-6">
                   {feature.description}
                 </p>
               </div>
@@ -112,11 +114,11 @@ const FeaturesSection = () => {
               {/* Animated Bottom Border */}
               <div className="relative z-10">
                 <div 
-                  style={{ borderColor: '#D9D9D9' }}
+                  style={{ borderColor: uniTalentColors.lightGray }}
                   className="mt-6 pt-6 border-t"
                 >
                   <div 
-                    style={{ backgroundColor: '#FFD85F' }}
+                    style={{ backgroundColor: uniTalentColors.primary }}
                     className="h-1 w-0 group-hover:w-full transition-all duration-500 ease-out"
                   ></div>
                 </div>
@@ -124,65 +126,66 @@ const FeaturesSection = () => {
 
               {/* Subtle Background Pattern on Hover */}
               <div 
-                style={{ backgroundColor: '#FFD85F' }}
+                style={{ backgroundColor: uniTalentColors.primary }}
                 className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300"
               ></div>
             </div>
           ))}
         </div>
 
-        {/* Closing Statement */}
+        {/* Closing Statement 
         <div className="text-center">
           <div 
             style={{ 
-              backgroundColor: '#FFD85F',
-              borderColor: '#D9D9D9'
+              backgroundColor: uniTalentColors.primary,
+              borderColor: uniTalentColors.lightGray
             }}
             className="inline-block px-8 py-8 rounded-2xl border max-w-4xl mx-auto relative overflow-hidden"
           >
-            {/* Background Pattern */}
+            {/* Background Pattern }
             <div 
-              style={{ backgroundColor: '#060606' }}
+              style={{ backgroundColor: uniTalentColors.text }}
               className="absolute top-0 right-0 w-32 h-32 rounded-full -translate-y-16 translate-x-16 opacity-5"
             ></div>
             <div 
-              style={{ backgroundColor: '#060606' }}
+              style={{ backgroundColor: uniTalentColors.text }}
               className="absolute bottom-0 left-0 w-24 h-24 rounded-full translate-y-12 -translate-x-12 opacity-5"
             ></div>
 
             <div className="relative z-10">
-              <p style={{ color: '#060606' }} className="text-2xl md:text-3xl font-bold mb-4">
+              <p style={{ color: uniTalentColors.text }} className="text-2xl md:text-3xl font-bold mb-4">
                 This is what merit-based hiring looks like.
               </p>
-              <p style={{ color: '#060606' }} className="text-lg opacity-80 mb-8 max-w-2xl mx-auto">
+              <p style={{ color: uniTalentColors.text }} className="text-lg opacity-80 mb-8 max-w-2xl mx-auto">
                 And it starts with you taking the first assessment. Join thousands of Product Managers who've found their dream roles through UniTalent.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button 
                   style={{ 
-                    backgroundColor: '#060606',
-                    color: '#F8F8F8'
+                    backgroundColor: uniTalentColors.text,
+                    color: uniTalentColors.background
                   }}
-                  className="font-semibold py-3 px-8 rounded-xl hover:opacity-90 transition-all duration-300 transform hover:-translate-y-0.5"
+                  className="font-semibold py-3 px-8 rounded-xl hover:opacity-90 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg"
                 >
                   Start Free Assessment
                 </button>
                 
                 <button 
                   style={{ 
-                    backgroundColor: '#F8F8F8',
-                    color: '#060606',
-                    borderColor: '#060606'
+                    backgroundColor: uniTalentColors.background,
+                    color: uniTalentColors.text,
+                    borderColor: uniTalentColors.text
                   }}
-                  className="font-semibold py-3 px-8 rounded-xl border hover:opacity-80 transition-all duration-300"
+                  className="font-semibold py-3 px-8 rounded-xl border hover:opacity-80 hover:border-#FFD85F hover:shadow-lg transition-all duration-300"
                 >
                   View Success Stories →
                 </button>
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
+
       </div>
     </section>
   );
