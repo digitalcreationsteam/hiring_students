@@ -43,21 +43,8 @@ export default function PaymentSuccess({ }: PaymentSuccessProps) {
                     if (subPaymentStatus === "pending") {
                         console.log("⏳ Payment pending - marking as paid in test mode...");
 
-                        const markPaidResponse = await API(
-                            "POST",
-                            URL_PATH.subscriptionMarkPaid,
-                            { subscriptionId }
-                        );
 
-                        console.log("✅ Mark paid response:", markPaidResponse);
-
-                        if (markPaidResponse?.success) {
-                            setPaymentStatus("success");
-                            // Clear localStorage after successful payment
-                            localStorage.removeItem("pendingSubscriptionId");
-                        } else {
-                            setPaymentStatus("partial");
-                        }
+                        
                     } else if (subPaymentStatus === "success") {
                         console.log("✅ Payment already marked as success");
                         setPaymentStatus("success");

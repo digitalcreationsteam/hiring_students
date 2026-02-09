@@ -39,9 +39,12 @@
 
 
 @keyframes softBlink {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.4;
   }
@@ -56,6 +59,101 @@
 }
 
 
-.inter-font-family{
+.inter-font-family {
   font-family: 'Inter', sans-serif;
+}
+
+
+/* Add to your global CSS file */
+@keyframes textShimmer {
+  0% {
+    background-position: 0% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes slideRight {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gridShine {
+  0% {
+    background-position: -300px 0;
+  }
+
+  100% {
+    background-position: 300px 0;
+  }
+}
+
+@keyframes gridMove {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  25% {
+    transform: translate(10px, 5px);
+  }
+
+  50% {
+    transform: translate(0, 10px);
+  }
+
+  75% {
+    transform: translate(-5px, 5px);
+  }
+
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+.animate-slide-right {
+  animation: slideRight 2s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 1s ease-out;
+}
+
+/* Enhanced grid visibility */
+.grid-container {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, #FFD85F22 1px, transparent 1px),
+    linear-gradient(#FFD85F22 1px, transparent 1px);
+  background-size: 50px 50px;
+  opacity: 0.8;
+}
+
+/* Hover effect on grid */
+.grid-container:hover {
+  opacity: 1;
+  transition: opacity 0.3s ease;
 }
