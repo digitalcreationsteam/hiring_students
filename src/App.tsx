@@ -51,7 +51,7 @@ const router = createBrowserRouter([
   index: true,
   element: isAuthenticated()
     ? <Navigate to="/dashboard" replace />
-    : <LogIn />,
+    : <LandingPage />,
 },
  // Use "index: true" instead of "path: "/""
   { path: "/LandingPage", element: <LandingPage /> },

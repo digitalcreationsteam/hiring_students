@@ -186,7 +186,7 @@ const CTASection = () => {
             </div>
           </div>
 
-          {/* Right Column - Form */}
+          {/* Right Column - Form 
           <div>
             <div 
               style={{ 
@@ -248,7 +248,7 @@ const CTASection = () => {
                     )}
 
                     <div className="space-y-4">
-                      {/* Name Field */}
+                      {/* Name Field }
                       <div>
                         <label 
                           style={{ color: uniTalentColors.text }}
@@ -272,7 +272,7 @@ const CTASection = () => {
                         />
                       </div>
 
-                      {/* Email Field */}
+                      {/* Email Field }
                       <div>
                         <label 
                           style={{ color: uniTalentColors.text }}
@@ -296,7 +296,7 @@ const CTASection = () => {
                         />
                       </div>
 
-                      {/* Current Role */}
+                      {/* Current Role }
                       <div>
                         <label 
                           style={{ color: uniTalentColors.text }}
@@ -319,7 +319,7 @@ const CTASection = () => {
                         />
                       </div>
 
-                      {/* Years of Experience */}
+                      {/* Years of Experience }
                       <div>
                         <label 
                           style={{ color: uniTalentColors.text }}
@@ -347,7 +347,7 @@ const CTASection = () => {
                       </div>
                     </div>
 
-                    {/* Submit Button */}
+                    {/* Submit Button }
                     <button
                       type="submit"
                       disabled={isSubmitting}
@@ -370,7 +370,7 @@ const CTASection = () => {
                       )}
                     </button>
 
-                    {/* Privacy Notice */}
+                    {/* Privacy Notice }
                     <p 
                       style={{ color: uniTalentColors.text }}
                       className="text-xs opacity-60 text-center"
@@ -385,7 +385,7 @@ const CTASection = () => {
               )}
             </div>
 
-            {/* Trust Indicators */}
+            {/* Trust Indicators }
             <div className="mt-8 grid grid-cols-3 gap-4">
               <div className="text-center">
                 <div style={{ color: uniTalentColors.text }} className="text-xl font-bold">100%</div>
@@ -401,6 +401,8 @@ const CTASection = () => {
               </div>
             </div>
           </div>
+          */}
+
         </div>
       </div>
     </section>
