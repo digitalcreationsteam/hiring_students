@@ -76,7 +76,7 @@ export const uniTalentColors = {
   lightGray: "#D9D9D9",    // Borders and dividers
   background: "#F8F8F8",   // Main background
   text: "#060606",         // All text content
-  
+  secondary:"#7C3AED",
   // Extended palette
   primaryLight: "#FFEDB2", // Light yellow for gradients
   
