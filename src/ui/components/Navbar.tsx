@@ -8,7 +8,7 @@ const Navbar = () => {
                 {/* Logo */}
                 <div className="flex items-center gap-3">
                     <img
-                        src="/rename.png"  // 🔴 replace with your logo path
+                        src="/BlackHiringLogo.png"  // 🔴 replace with your logo path
                         alt="Company Logo"
                         className="h-9 w-50 object-contain"
                     />

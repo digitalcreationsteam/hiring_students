@@ -189,8 +189,9 @@ const HeroSection = () => {
           </div>
 
           {/* Problem Points - Light Theme Design */}
-          <div className="max-w-4xl mx-auto mb-16">
-            <div className="grid md:grid-cols-2 gap-8 md:gap-12 mb-12">
+          <div className="max-w-full mx-auto mb-16">
+
+            <div className="grid md:grid-cols-2 gap-12 md:gap-12 mb-12">
               {/* Point 1 */}
               <div className="relative group">
                 <div 
