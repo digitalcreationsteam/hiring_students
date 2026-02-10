@@ -1181,26 +1181,19 @@ const handleContinue = () => {
           <main className="w-full md:max-w-[480px] bg-white rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6">
             {/* Top: back + progress */}
             <div className="flex items-center gap-4">
-              <IconButton
-                size="small"
-                icon={<FeatherArrowLeft />}
-                onClick={async () => {
-                  try {
-                    const res = await API(
-                      "POST",
-                      "/auth/verify-route",
-                      { route: "/demographics" }, // ⬅️ previous step
-                    );
+           <IconButton
+  size="small"
+  icon={<FeatherArrowLeft />}
+  onClick={() => {
+    if (source === "dashboard") {
+      navigate("/dashboard");
+    } else {
+      navigate("/demographics");
+    }
+  }}
+/>
 
-                    if (res.allowed) {
-                      navigate("/demographics");
-                    }
-                    // ❌ if not allowed → do nothing
-                  } catch {
-                    // fail silently
-                  }
-                }}
-              />
+
 
               <div className="flex-1 w-full max-w-full md:max-w-[420px]">
                 <div className="flex items-center gap-3">

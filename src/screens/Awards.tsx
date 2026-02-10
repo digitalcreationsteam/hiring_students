@@ -20,7 +20,6 @@ import {
 import API, { URL_PATH } from "src/common/API";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { colors } from "src/common/Colors";
 
 type AwardEntry = {
   id: string;
