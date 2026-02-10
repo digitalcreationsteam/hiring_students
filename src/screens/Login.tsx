@@ -14,6 +14,7 @@ import { useAppDispatch } from "src/store/hooks";
 import { setToken } from "src/store/slices/authSlice";
 import { setUserProfile } from "src/store/slices/userSlice";
 import { setNavigation } from "src/store/slices/onboardingSlice"; // ✅ NEW
+import { colors } from "src/common/Colors";
 
 function Login() {
   const navigate = useNavigate();
@@ -119,7 +120,36 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-neutral-50 px-4 sm:px-6">
+  <div className="min-h-screen w-full flex items-center justify-center px-4 sm:px-6 relative">
+
+    {/* 🌈 Blended background - fixed behind everything */}
+    <div className="pointer-events-none fixed inset-0 -z-10">
+      <div
+        className="absolute inset-0"
+        style={{ backgroundColor: colors.background }}
+      />
+
+      <div
+        className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
+        style={{
+          background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
+        }}
+      />
+
+      <div
+        className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
+        style={{
+          background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
+        }}
+      />
+
+      <div
+        className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
+        style={{
+          background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
+        }}
+      />
+    </div>
       <div className="w-full max-w-[870px] rounded-none sm:rounded-xl border border-neutral-border bg-white shadow-sm sm:shadow-md overflow-hidden">
         <div className="flex flex-col lg:flex-row w-full relative">
           {/* LEFT */}
@@ -135,47 +165,64 @@ function Login() {
               </h1>
             </div>
 
-            <div className="flex flex-col gap-4">
-              <div className="w-full h-[1px] bg-gray-400 my-4 flex-shrink-0" />
-              <div className="flex flex-col gap-4">
-                <div className="flex items-start gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-violet-100">
-                    <FeatherCheckCircle className="text-violet-600" />
-                  </div>
-                  <div>
-                    <p className="text-gray-900 text-sm">Access your profile</p>
-                    <p className="text-xs text-gray-500">
-                      View and update your professional profile, skills, and
-                      experience
-                    </p>
-                  </div>
-                </div>
+<div className="flex flex-col gap-4">
+  <div
+    className="w-full h-[1px] my-4 flex-shrink-0"
+    style={{ backgroundColor: colors.neutral[400] }}
+  />
 
-                <div className="flex items-start gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-violet-100">
-                    <FeatherBriefcase className="text-violet-600" />
-                  </div>
-                  <div>
-                    <p className="text-gray-900 text-sm">Manage applications</p>
-                    <p className="text-xs text-gray-500">
-                      Track your job applications and see real-time status
-                      updates
-                    </p>
-                  </div>
-                </div>
+  <div className="flex flex-col gap-4">
+    <div className="flex items-start gap-3">
+      <div
+        className="flex items-center justify-center w-8 h-8 rounded-full"
+        style={{ backgroundColor: colors.primary + "22" }}
+      >
+        <FeatherCheckCircle style={{ color: colors.primary }} />
+      </div>
+      <div>
+        <p className="text-sm" style={{ color: colors.neutral[800] }}>
+          Access your profile
+        </p>
+        <p className="text-xs" style={{ color: colors.neutral[600] }}>
+          View and update your professional profile, skills, and experience
+        </p>
+      </div>
+    </div>
 
-                <div className="flex items-start gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-violet-100">
-                    <FeatherMessageSquare className="text-violet-600" />
-                  </div>
-                  <div>
-                    <p className="text-gray-900 text-sm">Check messages</p>
-                    <p className="text-xs text-gray-500">
-                      Stay connected with employers and respond to opportunities
-                    </p>
-                  </div>
-                </div>
-              </div>
+    <div className="flex items-start gap-3">
+      <div
+        className="flex items-center justify-center w-8 h-8 rounded-full"
+        style={{ backgroundColor: colors.primary + "22" }}
+      >
+        <FeatherBriefcase style={{ color: colors.primary }} />
+      </div>
+      <div>
+        <p className="text-sm" style={{ color: colors.neutral[800] }}>
+          Manage applications
+        </p>
+        <p className="text-xs" style={{ color: colors.neutral[600] }}>
+          Track your job applications and see real-time status updates
+        </p>
+      </div>
+    </div>
+
+    <div className="flex items-start gap-3">
+      <div
+        className="flex items-center justify-center w-8 h-8 rounded-full"
+        style={{ backgroundColor: colors.primary + "22" }}
+      >
+        <FeatherMessageSquare style={{ color: colors.primary }} />
+      </div>
+      <div>
+        <p className="text-sm" style={{ color: colors.neutral[800] }}>
+          Check messages
+        </p>
+        <p className="text-xs" style={{ color: colors.neutral[600] }}>
+          Stay connected with employers and respond to opportunities
+        </p>
+      </div>
+    </div>
+  </div>
             </div>
           </div>
 
@@ -262,7 +309,8 @@ function Login() {
                 <div />
                 <Link
                   to="/forgot-password"
-                  className="text-xs text-violet-600 hover:underline"
+                  className="text-xs  hover:underline"
+                  style={{color: colors.accent}}
                 >
                   Forgot password?
                 </Link>
@@ -279,12 +327,18 @@ function Login() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full h-9 text-white font-semibold rounded-full transition ${
-                  loading
-                    ? "bg-violet-400 cursor-wait"
-                    : "bg-violet-600 hover:bg-violet-700"
-                }`}
-              >
+   className="w-full h-9 text-white font-semibold rounded-full transition"
+  style={{
+    backgroundColor: loading ? colors.neutral[400] : colors.primary,
+    cursor: loading ? "wait" : "pointer",
+  }}
+  onMouseEnter={(e) => {
+    if (!loading) e.currentTarget.style.backgroundColor = colors.secondary;
+  }}
+  onMouseLeave={(e) => {
+    if (!loading) e.currentTarget.style.backgroundColor = colors.primary;
+  }}
+>
                 {loading ? "Signing in..." : "Log in"}
               </button>
             </form>
@@ -292,14 +346,19 @@ function Login() {
             <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
 
             <div className="flex flex-wrap justify-center gap-1 text-xs text-center">
-              <span className="text-subtext-color">Don't have an account?</span>
-              <Link
-                to="/signup"
-                className="text-violet-600 font-semibold hover:underline"
-              >
-                Sign up
-              </Link>
-            </div>
+  <span style={{ color: colors.neutral[600] }}>
+    Don't have an account?
+  </span>
+
+  <Link
+    to="/signup"
+    className="font-semibold hover:underline transition"
+    style={{ color: colors.accent }}
+  >
+    Sign up
+  </Link>
+</div>
+
           </div>
         </div>
       </div>

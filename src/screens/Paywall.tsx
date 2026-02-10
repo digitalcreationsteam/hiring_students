@@ -5,6 +5,7 @@ import { setNavigation } from "src/store/slices/onboardingSlice";
 import { Button } from "../ui/components/Button";
 import { FeatherCheck, FeatherStar } from "@subframe/core";
 import API, { URL_PATH } from "src/common/API";
+import { colors } from "src/common/Colors";
 
 // Type definitions
 interface SubscriptionPlan {
@@ -220,20 +221,60 @@ function Paywall() {
     });
   };
 
-  if (isLoadingPlans) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading plans...</p>
-        </div>
+ if (isLoadingPlans) {
+  return (
+    <div
+      className="min-h-screen flex items-center justify-center"
+      style={{ backgroundColor: colors.background }}
+    >
+      <div className="text-center">
+        <div
+          className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto"
+          style={{ borderColor: colors.primary }}
+        ></div>
+
+        <p className="mt-4 text-sm" style={{ color: colors.neutral[600] }}>
+          Loading plans...
+        </p>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-neutral-50 px-4 sm:px-6 md:px-8 py-10">
-      <div className="w-full max-w-[760px] flex flex-col items-center gap-8 sm:gap-10">
+  <div className="min-h-screen w-full flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 py-10 relative">
+    
+    {/* Blended background - fixed behind everything */}
+    <div className="pointer-events-none fixed inset-0 -z-10">
+      <div
+        className="absolute inset-0"
+        style={{ backgroundColor: colors.background }}
+      />
+
+      <div
+        className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
+        style={{
+          background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
+        }}
+      />
+
+      <div
+        className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
+        style={{
+          background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
+        }}
+      />
+
+      <div
+        className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
+        style={{
+          background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
+        }}
+      />
+    </div>
+    
+          <div className="w-full max-w-[760px] flex flex-col items-center gap-8 sm:gap-10">
         {/* Heading */}
         <div className="flex flex-col items-center gap-2 text-center">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
@@ -245,133 +286,167 @@ function Paywall() {
         </div>
 
         {/* Plans Grid */}
-        <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 justify-items-center">
-          {plans.length > 0 ? (
-            plans.map((plan: SubscriptionPlan) => (
-              <div
-                key={plan._id}
-                onClick={() => {
-                  console.log("📌 Selected plan:", plan.name, plan._id);
-                  setSelectedPlanId(plan._id);
-                }}
-                className={`cursor-pointer w-full max-w-[320px] rounded-3xl p-6 flex flex-col gap-6 shadow-sm border-2 transition-all duration-200 ${selectedPlanId === plan._id
-                  ? "border-violet-600 ring-2 ring-violet-200 bg-white transform scale-[1.02]"
-                  : "border-gray-200 bg-white hover:border-violet-300 hover:shadow-md"
-                  }`}
-              >
-                {/* Plan Header */}
-                <div>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h2 className="text-xl font-bold text-gray-900">
-                        {plan.name}
-                      </h2>
-                      <p className="text-sm text-gray-500 mt-1">
-                        {plan.description}
-                      </p>
-                    </div>
-                    {isPopularPlan(plan) && (
-                      <div className="flex items-center gap-1 bg-violet-100 text-violet-700 text-xs font-medium px-3 py-1 rounded-full">
-                        <FeatherStar className="w-3 h-3" />
-                        <span>Popular</span>
-                      </div>
-                    )}
-                  </div>
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
 
-                  {/* Price */}
-                  <p className="text-2xl font-bold text-gray-900 mt-4">
-                    {formatPrice(plan)}
-                  </p>
+      {plans.map((plan: SubscriptionPlan) => {
+  const isSelected = selectedPlanId === plan._id;
 
-                  {/* Trial period */}
-                  {plan.trialPeriod > 0 && (
-                    <p className="text-sm text-green-600 mt-1">
-                      {plan.trialPeriod}-day free trial
-                    </p>
-                  )}
-                </div>
+  return (
+    <div
+      key={plan._id}
+      onClick={() => setSelectedPlanId(plan._id)}
+      className={`cursor-pointer w-full  rounded-3xl p-6 flex flex-col gap-6 shadow-sm border-2 transition-all duration-200 ${
+        isSelected ? "scale-[1.02]" : "hover:shadow-md"
+      }`}
+      style={{
+        backgroundColor: colors.white,
+        borderColor: isSelected ? colors.primary : colors.neutral[200],
+        boxShadow: isSelected
+          ? `0 0 0 4px ${colors.primary}22`
+          : undefined,
+      }}
+    >
+      {/* Plan Header */}
+      <div>
+        <div className="flex items-start justify-between">
+          <div>
+            <h2 className="text-xl font-bold" style={{ color: colors.accent }}>
+              {plan.name}
+            </h2>
+            <p className="text-sm mt-1" style={{ color: colors.neutral[600] }}>
+              {plan.description}
+            </p>
+          </div>
 
-                {/* Features */}
-                <div className="flex flex-col gap-3">
-                  {getPlanFeatures(plan).map(
-                    (feature: string, index: number) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <div
-                          className={`w-5 h-5 rounded-full flex items-center justify-center mt-0.5 ${selectedPlanId === plan._id
-                            ? "bg-violet-100"
-                            : "bg-gray-100"
-                            }`}
-                        >
-                          <FeatherCheck
-                            className={`w-3 h-3 ${selectedPlanId === plan._id
-                              ? "text-violet-600"
-                              : "text-gray-500"
-                              }`}
-                          />
-                        </div>
-                        <span className="text-sm text-gray-800">{feature}</span>
-                      </div>
-                    ),
-                  )}
-                </div>
-
-                {/* Limits */}
-                <div className="pt-4 border-t border-gray-100">
-                  {plan.maxAssessments > 0 && (
-                    <p className="text-xs text-gray-600">
-                      <span className="font-medium">{plan.maxAssessments}</span>{" "}
-                      assessments/month
-                    </p>
-                  )}
-                  {plan.maxCandidates > 0 && (
-                    <p className="text-xs text-gray-600 mt-1">
-                      <span className="font-medium">{plan.maxCandidates}</span>{" "}
-                      candidates
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="col-span-full text-center py-10">
-              <p className="text-gray-500">No plans available</p>
+          {isPopularPlan(plan) && (
+            <div
+              className="flex items-center gap-1 text-xs font-medium px-3 py-1 rounded-full"
+              style={{
+                backgroundColor: `${colors.primary}1A`,
+                color: colors.primary,
+              }}
+            >
+              <FeatherStar className="w-3 h-3" />
+              <span>Popular</span>
             </div>
           )}
         </div>
 
-        {/* Error Message */}
-        {error && (
-          <div className="w-full max-w-[820px] p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
-            {error}
-          </div>
-        )}
+        {/* Price */}
+        <p className="text-2xl font-bold mt-4" style={{ color: colors.accent }}>
+          {formatPrice(plan)}
+        </p>
 
-        {/* Continue Button */}
-        <Button
-          disabled={isLoading || !selectedPlanId}
-          onClick={handleContinue}
-          className={`w-full max-w-[820px] h-12 rounded-full font-semibold text-base transition ${isLoading
-            ? "bg-violet-400 cursor-not-allowed text-white"
-            : selectedPlanId
-              ? "bg-violet-600 hover:bg-violet-700 text-white"
-              : "bg-gray-300 cursor-not-allowed text-gray-500"
-            }`}
-        >
-          {isLoading ? (
-            <div className="flex items-center justify-center gap-2">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-              Processing...
+        {/* Trial period */}
+        {plan.trialPeriod > 0 && (
+<p className="text-sm mt-1" style={{ color: colors.accent }}>
+            {plan.trialPeriod}-day free trial
+          </p>
+        )}
+      </div>
+
+      {/* Features */}
+      <div className="flex flex-col gap-3">
+        {getPlanFeatures(plan).map((feature: string, index: number) => (
+          <div key={index} className="flex items-start gap-3">
+            <div
+              className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5"
+              style={{
+                backgroundColor: isSelected
+                  ? `${colors.primary}1A`
+                  : colors.neutral[100],
+              }}
+            >
+              <FeatherCheck
+                className="w-3 h-3"
+                style={{ color: isSelected ? colors.primary : colors.neutral[600] }}
+              />
             </div>
-          ) : selectedPlanId ? (
-            getSelectedPlan()?.price === 0 ? (
-              "Continue with Free Plan"
-            ) : (
-              `Subscribe to ${getSelectedPlan()?.name}`
-            )
-          ) : (
-            "Select a Plan to Continue"
-          )}
-        </Button>
+
+            <span className="text-sm" style={{ color: colors.neutral[800] }}>
+              {feature}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Limits */}
+      <div
+        className="pt-4 border-t"
+        style={{ borderColor: colors.neutral[200] }}
+      >
+        {plan.maxAssessments > 0 && (
+          <p className="text-xs" style={{ color: colors.neutral[600] }}>
+            <span className="font-medium" style={{ color: colors.accent }}>
+              {plan.maxAssessments}
+            </span>{" "}
+            assessments/month
+          </p>
+        )}
+        {plan.maxCandidates > 0 && (
+          <p className="text-xs mt-1" style={{ color: colors.neutral[600] }}>
+            <span className="font-medium" style={{ color: colors.accent }}>
+              {plan.maxCandidates}
+            </span>{" "}
+            candidates
+          </p>
+        )}
+      </div>
+    </div>
+  );
+})}
+</div>
+
+
+{/* Error Message */}
+{error && (
+  <div
+    className="w-full max-w-[820px] p-4 rounded-lg text-sm border"
+    style={{
+      backgroundColor: `${colors.status.absent}15`,
+      borderColor: `${colors.status.absent}40`,
+      color: colors.status.absent,
+    }}
+  >
+    {error}
+  </div>
+)}
+
+
+      {/* Continue Button */}
+<Button
+  disabled={isLoading || !selectedPlanId}
+  onClick={handleContinue}
+  className="w-full max-w-[820px] h-14 rounded-2xl font-semibold text-base transition-all duration-300 flex items-center justify-center gap-2"
+  style={{
+    backgroundColor: isLoading || !selectedPlanId
+      ? colors.neutral[200]
+      : colors.primary,
+    color: isLoading || !selectedPlanId
+      ? colors.neutral[600]
+      : colors.white,
+    boxShadow: isLoading || !selectedPlanId
+      ? "none"
+      : `0 10px 25px ${colors.primary}30`,
+    transform: isLoading || !selectedPlanId ? "none" : "translateY(0)",
+  }}
+>
+  {isLoading ? (
+    <>
+      <div
+        className="animate-spin rounded-full h-5 w-5 border-b-2"
+        style={{ borderColor: colors.white }}
+      />
+      Processing...
+    </>
+  ) : selectedPlanId ? (
+    getSelectedPlan()?.price === 0
+      ? "Continue with Free Plan"
+      : `Subscribe to ${getSelectedPlan()?.name}`
+  ) : (
+    "Select a Plan to Continue"
+  )}
+</Button>
 
         {/* Back Button */}
         <button

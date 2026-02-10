@@ -7,6 +7,8 @@ import { IconWithBackground } from "../ui/components/IconWithBackground";
 import { FeatherClock, FeatherMailCheck } from "@subframe/core";
 
 import API, { URL_PATH } from "src/common/API";
+import { colors } from "src/common/Colors";
+
 
 function EmailVerification() {
   const navigate = useNavigate();
@@ -126,19 +128,51 @@ useEffect(() => {
 }, [navigate]);
 
 
-  return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-neutral-50 py-12 px-4">
+return (
+  <div className="flex min-h-screen w-full items-center justify-center py-12 px-4 relative">
+
+    {/* 🌈 Blended background */}
+    <div className="pointer-events-none fixed inset-0 -z-10">
+      <div
+        className="absolute inset-0"
+        style={{ backgroundColor: colors.background }}
+      />
+
+      <div
+        className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
+        style={{
+          background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
+        }}
+      />
+
+      <div
+        className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
+        style={{
+          background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
+        }}
+      />
+
+      <div
+        className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
+        style={{
+          background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
+        }}
+      />
+    </div>
       <div className="w-full max-w-md flex flex-col items-center gap-4 rounded-3xl border border-neutral-border bg-white px-7 py-12 shadow-[0_6px_20px_rgba(15,15,15,0.05)]">
-        <IconWithBackground
-          size="large"
-          icon={<FeatherMailCheck className="w-4 h-4 text-violet-800" />}
-          className="!rounded-full !p-2 !bg-violet-100"
-        />
+<IconWithBackground
+  size="large"
+  icon={<FeatherMailCheck className="w-4 h-4" style={{ color: colors.primary }} />}
+  className="!rounded-full !p-2"
+  style={{ backgroundColor: `${colors.primary}1A` }} // light tint (10% approx)
+ />
+
 
         <div className="flex flex-col items-center gap-1 text-center px-2">
-          <span className="text-lg font-semibold text-neutral-700">
-            Check your email
-          </span>
+          <span className="text-lg font-semibold" style={{ color: colors.accent }}>
+  Check your email
+</span>
+
           <span className="text-[14px] text-neutral-500">
             We sent a verification link to your email address. Click the link to
             activate your recruiter account.
@@ -153,25 +187,22 @@ useEffect(() => {
             link.
           </span>
 
-          <Button
-            className={`h-10 w-full rounded-2xl transition-all duration-150
-              ${canResend
-                ? "bg-violet-100 text-violet-700 shadow-sm"
-                : "bg-violet-50 text-violet-600/70"}
-            `}
-            variant="brand-secondary"
-            size="small"
-            onClick={handleResend}
-            disabled={!canResend || isSending}
-            aria-disabled={!canResend || isSending}
-            aria-label={
-              isSending
-                ? "Sending verification link"
-                : "Resend verification link"
-            }
-          >
-            {isSending ? "Sending..." : "Resend verification link"}
-          </Button>
+<Button
+  className="h-10 w-full rounded-2xl transition-all duration-150"
+  style={{
+    backgroundColor: canResend ? `${colors.primary}1A` : `${colors.primary}0D`,
+    color: canResend ? colors.accent : `${colors.accent}B3`,
+    boxShadow: canResend ? "0 1px 2px rgba(0,0,0,0.06)" : "none",
+  }}
+  variant="brand-secondary"
+  size="small"
+  onClick={handleResend}
+  disabled={!canResend || isSending}
+  aria-disabled={!canResend || isSending}
+>
+  {isSending ? "Sending..." : "Resend verification link"}
+</Button>
+
 
           <div className="flex items-center gap-2 mt-2 text-xs text-neutral-500">
             <FeatherClock className="w-4 h-4" />

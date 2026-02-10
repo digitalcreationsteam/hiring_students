@@ -873,46 +873,50 @@ export default function Experience() {
                 />
               </TextField>
 
-              <div className="flex flex-col gap-1">
-                <label className="text-[12px] font-medium text-neutral-900">
-                  Type of Role <span className="text-red-500">*</span>
-                </label>
+<div className="flex flex-col gap-1">
+  <label className="text-[12px] font-medium text-neutral-900">
+    Type of Role <span className="text-red-500">*</span>
+  </label>
 
-                <SubframeCore.DropdownMenu.Root>
-                  <SubframeCore.DropdownMenu.Trigger asChild>
-                    <div className="flex h-9 items-center justify-between rounded-full border border-neutral-300 bg-white px-3 cursor-pointer">
-                      <span
-                        className={
-                          typeOfRole
-                            ? "text-neutral-900 text-[12px]"
-                            : "text-neutral-400 text-[12px]"
-                        }
-                      >
-                        {typeOfRole ? typeOfRoleLabel : "Select type of role"}
-                      </span>
-                      <FeatherChevronDown className="text-neutral-500" />
-                    </div>
-                  </SubframeCore.DropdownMenu.Trigger>
+  <SubframeCore.DropdownMenu.Root>
+    <SubframeCore.DropdownMenu.Trigger asChild>
+      <button
+        type="button"
+        className="flex h-9 w-full items-center justify-between rounded-full border border-neutral-300 bg-white px-3 cursor-pointer"
+      >
+        <span
+          className={
+            typeOfRole
+              ? "text-neutral-900 text-[12px]"
+              : "text-neutral-400 text-[12px]"
+          }
+        >
+          {typeOfRole ? typeOfRoleLabel : "Select type of role"}
+        </span>
+        <FeatherChevronDown className="text-neutral-500" />
+      </button>
+    </SubframeCore.DropdownMenu.Trigger>
 
-                  <SubframeCore.DropdownMenu.Portal>
-                    <SubframeCore.DropdownMenu.Content
-                      align="start"
-                      sideOffset={4}
-                      className="bg-white rounded-2xl shadow-lg py-1 border border-neutral-300 min-w-[200px]"
-                    >
-                      {ROLE_TITLES.map((item) => (
-                        <SubframeCore.DropdownMenu.Item
-                          key={item.value}
-                          onSelect={() => setTypeOfRole(item.value)}
-                          className="px-4 py-2 text-sm cursor-pointer hover:bg-neutral-100 outline-none"
-                        >
-                          {item.label}
-                        </SubframeCore.DropdownMenu.Item>
-                      ))}
-                    </SubframeCore.DropdownMenu.Content>
-                  </SubframeCore.DropdownMenu.Portal>
-                </SubframeCore.DropdownMenu.Root>
-              </div>
+    <SubframeCore.DropdownMenu.Portal>
+      <SubframeCore.DropdownMenu.Content
+        align="start"
+        sideOffset={6}
+        className="z-[9999] bg-white rounded-2xl shadow-lg py-1 border border-neutral-300 min-w-[220px]"
+      >
+        {ROLE_TITLES.map((item) => (
+          <SubframeCore.DropdownMenu.Item
+            key={item.value}
+            onSelect={() => setTypeOfRole(item.value)}
+            className="px-4 py-2 text-sm cursor-pointer hover:bg-neutral-100 outline-none"
+          >
+            {item.label}
+          </SubframeCore.DropdownMenu.Item>
+        ))}
+      </SubframeCore.DropdownMenu.Content>
+    </SubframeCore.DropdownMenu.Portal>
+  </SubframeCore.DropdownMenu.Root>
+</div>
+
 
               <TextField
                 label={
@@ -966,25 +970,27 @@ export default function Experience() {
                   </div>
                 </div>
 
-                {/* Switch */}
-                <div className="flex items-center gap-3">
-                  <Switch
-                    checked={currentlyWorking}
-                    onCheckedChange={setCurrentlyWorking}
-                    className="
-            h-5 w-9
-            data-[state=checked]:bg-violet-700
-            data-[state=unchecked]:bg-neutral-300
-            [&>span]:h-4 [&>span]:w-3
-            [&>span]:data-[state=checked]:translate-x-4
-            [&>span]:data-[state=unchecked]:translate-x-0
-          "
-                  />
-                  <span className="text-sm text-neutral-700">
-                    I currently work here
-                  </span>
-                </div>
-              </div>
+              {/* Switch */}
+<div className="flex items-center gap-3">
+  <Switch
+    checked={currentlyWorking}
+    onCheckedChange={setCurrentlyWorking}
+    className="
+      h-5 w-9
+      [&>span]:h-4 [&>span]:w-3
+      [&>span]:data-[state=checked]:translate-x-4
+      [&>span]:data-[state=unchecked]:translate-x-0
+    "
+    style={{
+      backgroundColor: currentlyWorking ? colors.primary : colors.neutral[400],
+    }}
+  />
+  <span className="text-sm" style={{ color: colors.neutral[600] ?? "#374151" }}>
+    I currently work here
+  </span>
+</div>
+</div>
+
 
               <TextField
                 label={<span className="text-[12px]">Description </span>}

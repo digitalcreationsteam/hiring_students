@@ -9,6 +9,7 @@ import {
 } from "@subframe/core";
 import { IconWithBackground, OAuthSocialButton, TextField } from "../ui";
 import API, { URL_PATH } from "src/common/API";
+import { colors } from "src/common/Colors";
 
 function SignUp() {
   const navigate = useNavigate();
@@ -123,8 +124,37 @@ const handleSubmit = async (e: any) => {
 
 
 
-  return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-neutral-50 px-4">
+return (
+  <div className="min-h-screen w-full flex items-center justify-center px-4 relative">
+
+    {/* 🌈 Blended background - fixed behind everything */}
+    <div className="pointer-events-none fixed inset-0 -z-10">
+      <div
+        className="absolute inset-0"
+        style={{ backgroundColor: colors.background }}
+      />
+
+      <div
+        className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
+        style={{
+          background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
+        }}
+      />
+
+      <div
+        className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
+        style={{
+          background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
+        }}
+      />
+
+      <div
+        className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
+        style={{
+          background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
+        }}
+      />
+    </div>
       <div className="w-full max-w-[870px] rounded-xl border border-neutral-border bg-white shadow-md overflow-hidden">
         <div className="flex flex-col lg:flex-row w-full relative">
           {/* LEFT */}
@@ -143,50 +173,58 @@ const handleSubmit = async (e: any) => {
             <div className="flex flex-col gap-4">
               <div className="w-full h-[1px] bg-gray-400 my-4 flex-shrink-0" />
 
-              <div className="flex flex-col gap-4">
-                <div className="flex items-start gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-violet-100">
-                    <FeatherCheckCircle className="text-violet-600" />
-                  </div>
-                  <div>
-                    <p className="text-gray-900 text-sm">Verify your skills</p>
-                    <p className="text-xs text-gray-500">
-                      Complete assessments to earn capability scores that
-                      employers trust
-                    </p>
-                  </div>
-                </div>
+<div className="flex flex-col gap-4">
+  <div className="flex items-start gap-3">
+    <div
+      className="flex items-center justify-center w-8 h-8 rounded-full"
+      style={{ backgroundColor: colors.primary + "22" }} // soft tint
+    >
+      <FeatherCheckCircle style={{ color: colors.primary }} />
+    </div>
+    <div>
+      <p className="text-sm" style={{ color: colors.neutral[800] }}>
+        Verify your skills
+      </p>
+      <p className="text-xs" style={{ color: colors.neutral[600] }}>
+        Complete assessments to earn capability scores that employers trust
+      </p>
+    </div>
+  </div>
 
-                <div className="flex items-start gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-violet-100">
-                    <FeatherBriefcase className="text-violet-600" />
-                  </div>
-                  <div>
-                    <p className="text-gray-900 text-sm">
-                      Discover matched roles
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      Get personalized job recommendations based on your
-                      verified abilities
-                    </p>
-                  </div>
-                </div>
+  <div className="flex items-start gap-3">
+    <div
+      className="flex items-center justify-center w-8 h-8 rounded-full"
+      style={{ backgroundColor: colors.primary + "22" }}
+    >
+      <FeatherBriefcase style={{ color: colors.primary }} />
+    </div>
+    <div>
+      <p className="text-sm" style={{ color: colors.neutral[800] }}>
+        Discover matched roles
+      </p>
+      <p className="text-xs" style={{ color: colors.neutral[600] }}>
+        Get personalized job recommendations based on your verified abilities
+      </p>
+    </div>
+  </div>
 
-                <div className="flex items-start gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-violet-100">
-                    <FeatherMessageSquare className="text-violet-600" />
-                  </div>
-                  <div>
-                    <p className="text-gray-900 text-sm">
-                      Connect with employers
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      Receive direct messages from companies looking for your
-                      expertise
-                    </p>
-                  </div>
-                </div>
-              </div>
+  <div className="flex items-start gap-3">
+    <div
+      className="flex items-center justify-center w-8 h-8 rounded-full"
+      style={{ backgroundColor: colors.primary + "22" }}
+    >
+      <FeatherMessageSquare style={{ color: colors.primary }} />
+    </div>
+    <div>
+      <p className="text-sm" style={{ color: colors.neutral[800] }}>
+        Connect with employers
+      </p>
+      <p className="text-xs" style={{ color: colors.neutral[600] }}>
+        Receive direct messages from companies looking for your expertise
+      </p>
+    </div>
+  </div>
+</div>
             </div>
           </div>
 
@@ -329,18 +367,24 @@ const handleSubmit = async (e: any) => {
               
 
 
-              {/* Submit */}
               <button
-                type="submit"
-                disabled={loading}
-                className={`w-full h-9 text-white font-semibold rounded-full transition ${
-                  loading
-                    ? "bg-violet-900 cursor-wait"
-                    : "bg-violet-700 hover:bg-violet-800"
-                }`}
-              >
-                {loading ? "Creating..." : "Create account"}
-              </button>
+  type="submit"
+  disabled={loading}
+  className="w-full h-9 text-white font-semibold rounded-full transition"
+  style={{
+    backgroundColor: loading ? colors.neutral[400] : colors.primary,
+    cursor: loading ? "wait" : "pointer",
+  }}
+  onMouseEnter={(e) => {
+    if (!loading) e.currentTarget.style.backgroundColor = colors.secondary;
+  }}
+  onMouseLeave={(e) => {
+    if (!loading) e.currentTarget.style.backgroundColor = colors.primary;
+  }}
+>
+  {loading ? "Creating..." : "Create account"}
+</button>
+
             </form>
 
             <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
@@ -350,11 +394,13 @@ const handleSubmit = async (e: any) => {
                 Already have an account?
               </span>
               <Link
-                to="/login"
-                className="text-violet-600 font-semibold hover:underline"
-              >
-                Sign in
-              </Link>
+  to="/login"
+  className="font-semibold hover:underline transition"
+  style={{ color: colors.accent }}
+>
+  Sign in
+</Link>
+
             </div>
           </div>
         </div>

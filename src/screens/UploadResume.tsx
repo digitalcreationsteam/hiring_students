@@ -18,6 +18,7 @@ import {
 import API, { URL_PATH } from "src/common/API";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { colors } from "src/common/Colors";
 
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
@@ -324,7 +325,37 @@ useEffect(() => {
     <>
     <ToastContainer position="top-center" autoClose={2000} />
 
-    <div className="flex min-h-screen w-full items-center justify-center bg-neutral-50 px-4 sm:px-6 py-6 sm:py-8">
+<div className="min-h-screen w-full flex items-center justify-center px-4 sm:px-6 py-6 sm:py-8 relative overflow-hidden">
+  
+  {/* Blended Background Layer */}
+  <div className="pointer-events-none absolute inset-0 -z-10">
+    <div
+      className="absolute inset-0"
+      style={{ backgroundColor: colors.background }}
+    />
+
+    <div
+      className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
+      style={{
+        background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
+      }}
+    />
+
+    <div
+      className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
+      style={{
+        background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
+      }}
+    />
+
+    <div
+      className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
+      style={{
+        background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
+      }}
+    />
+  </div>
+
       <div className="w-full max-w-[576px] flex flex-col items-start gap-6 rounded-3xl border border-gray-400 bg-white px-4 sm:px-6 md:px-8 py-6 sm:py-8 shadow-[0_12px_30px_rgba(15,15,15,0.06)]">
         {/* Back + Progress Bar */}
         <div className="flex w-full items-center gap-3 sm:gap-4">
@@ -340,14 +371,22 @@ useEffect(() => {
         </div>
 
         {/* Title */}
-        <div className="flex w-full flex-col items-start gap-2">
-          <span className="text-base sm:text-lg font-medium text-neutral-900">
-            Upload your Resume
-          </span>
-          <span className="text-xs sm:text-sm text-neutral-500">
-            Upload your most recent resume (PDF only)
-          </span>
-        </div>
+<div className="flex w-full flex-col items-start gap-2">
+  <span
+    className="text-base sm:text-lg font-medium"
+    style={{ color: colors.accent }}
+  >
+    Upload your Resume
+  </span>
+
+  <span
+    className="text-xs sm:text-sm"
+    style={{ color: colors.neutral[600] }}
+  >
+    Upload your most recent resume (PDF only)
+  </span>
+</div>
+
 
         {/* Resume Upload Section */}
         <div className="flex w-full flex-col items-start gap-4">
@@ -434,18 +473,31 @@ useEffect(() => {
 
         </div>
 
-        {/* Continue Button */}
-        <div className="flex w-full justify-center sm:justify-end border-t border-neutral-border pt-4">
-          <Button
-            className={`h-10 w-full sm:max-w-[520px] rounded-full bg-violet-600 font-semibold shadow-md ${
-              uploading ? "pointer-events-none opacity-70" : ""
-            }`}
-            onClick={uploadResume}
-            disabled={(!file && !existingResume) || uploading}
-          >
-            {uploading ? "Uploading..." : "Continue"}
-          </Button>
-        </div>
+      {/* Continue Button */}
+<div className="flex w-full justify-center sm:justify-end border-t border-neutral-border pt-4">
+  <Button
+    className={`h-10 w-full sm:max-w-[520px] rounded-full font-semibold shadow-md transition ${
+      uploading ? "pointer-events-none opacity-70" : ""
+    }`}
+    style={{
+      backgroundColor: colors.primary,
+      color: colors.accent, // ✅ text color accent
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.backgroundColor = colors.secondary;
+      e.currentTarget.style.color = colors.accent; // keep accent on hover
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.backgroundColor = colors.primary;
+      e.currentTarget.style.color = colors.accent; // keep accent after hover
+    }}
+    onClick={uploadResume}
+    disabled={(!file && !existingResume) || uploading}
+  >
+    {uploading ? "Uploading..." : "Continue"}
+  </Button>
+</div>
+
       </div>
     </div>
   </>

@@ -4,6 +4,8 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import API, { URL_PATH } from "../common/API";
+import { colors } from "src/common/Colors";
+
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -41,8 +43,39 @@ export default function ForgotPassword() {
     <>
       <ToastContainer position="top-center" autoClose={3000} />
 
-      <div className="min-h-screen bg-[#EEF4FF] flex items-center justify-center px-4">
-        <div className="bg-white w-full border border-neutral-300  max-w-md rounded-3xl p-6">
+<div className="min-h-screen flex items-center justify-center px-4 relative">
+  {/* Blended background - fixed behind everything */}
+  <div className="pointer-events-none fixed inset-0 -z-10">
+    <div className="absolute inset-0" style={{ backgroundColor: colors.background }} />
+
+    <div
+      className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
+      style={{
+        background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
+      }}
+    />
+
+    <div
+      className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
+      style={{
+        background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
+      }}
+    />
+
+    <div
+      className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
+      style={{
+        background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
+      }}
+    />
+  </div>
+<div
+  className="w-full max-w-md rounded-3xl p-6 shadow-[0_6px_20px_rgba(15,15,15,0.06)]"
+  style={{
+    backgroundColor: colors.white,
+    border: `1px solid ${colors.neutral[200]}`,
+  }}
+>
           <button onClick={() => navigate(-1)} className="mb-6">
             ←
           </button>
@@ -61,17 +94,19 @@ export default function ForgotPassword() {
             onChange={(e) => setEmail(e.target.value)}
           />
 
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className={`w-full h-10 rounded-3xl ${
-              loading
-                ? "bg-violet-300 cursor-not-allowed"
-                : "bg-violet-600 text-white"
-            }`}
-          >
-            {loading ? "Sending..." : "Reset Password"}
-          </button>
+<button
+  onClick={handleSubmit}
+  disabled={loading}
+  className="w-full h-10 rounded-3xl font-semibold transition"
+  style={{
+    backgroundColor: loading ? colors.neutral[400] : colors.primary,
+    color: colors.white,
+    cursor: loading ? "not-allowed" : "pointer",
+  }}
+>
+  {loading ? "Sending..." : "Reset Password"}
+</button>
+
         </div>
       </div>
     </>
