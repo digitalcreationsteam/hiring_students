@@ -11,7 +11,7 @@ import { colors } from "src/common/Colors";
 interface SubscriptionPlan {
   _id: string;
   id?: string;
-  name: string;
+  planName: string;
   description: string;
   price: number;
   currency: string;
@@ -101,7 +101,7 @@ function Paywall() {
     }
 
     try {
-      console.log("🚀 Creating subscription for plan:", selectedPlan.name);
+      console.log("🚀 Creating subscription for plan:", selectedPlan.planName);
 
       // Step 1: Create subscription
       const subscriptionResponse = await API(
@@ -204,7 +204,7 @@ function Paywall() {
 
   // Check if plan is popular
   const isPopularPlan = (plan: SubscriptionPlan): boolean => {
-    return plan?.name?.toLowerCase() === "premium";
+    return plan?.planName?.toLowerCase() === "premium";
   };
 
   // Get plan features (handle array format)
@@ -309,7 +309,7 @@ function Paywall() {
         <div className="flex items-start justify-between">
           <div>
             <h2 className="text-xl font-bold" style={{ color: colors.accent }}>
-              {plan.name}
+              {plan.planName}
             </h2>
             <p className="text-sm mt-1" style={{ color: colors.neutral[600] }}>
               {plan.description}
@@ -421,8 +421,8 @@ function Paywall() {
       ? colors.neutral[200]
       : colors.primary,
     color: isLoading || !selectedPlanId
-      ? colors.neutral[600]
-      : colors.white,
+      ? colors.accent
+      : colors.accent,
     boxShadow: isLoading || !selectedPlanId
       ? "none"
       : `0 10px 25px ${colors.primary}30`,
@@ -433,26 +433,30 @@ function Paywall() {
     <>
       <div
         className="animate-spin rounded-full h-5 w-5 border-b-2"
-        style={{ borderColor: colors.white }}
+        style={{ borderColor: colors.accent }}
       />
       Processing...
     </>
   ) : selectedPlanId ? (
     getSelectedPlan()?.price === 0
       ? "Continue with Free Plan"
-      : `Subscribe to ${getSelectedPlan()?.name}`
+      : `Subscribe to ${getSelectedPlan()?.planName}`
   ) : (
     "Select a Plan to Continue"
   )}
 </Button>
 
-        {/* Back Button */}
-        <button
-          onClick={() => navigate(-1)}
-          className="text-sm text-gray-600 hover:text-gray-800 transition"
-        >
-          ← Go back
-        </button>
+       {/* Back Button */}
+<button
+  onClick={() => navigate(-1)}
+  className="text-sm transition"
+  style={{ color: colors.accent }}
+  onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.8")}
+  onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+>
+  ← Go back
+</button>
+
       </div>
     </div>
   );

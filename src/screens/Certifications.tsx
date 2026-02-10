@@ -1228,18 +1228,16 @@ const handleContinue = () => {
                         setSelectedCert(isSelected ? null : c);
                       }
                     }}
-                    className="
-          rounded-3xl
-          border border-neutral-300
-          bg-white
-          px-4 py-3
-          cursor-pointer
-          transition
-          hover:bg-neutral-50
-          focus:outline-none
-          focus:ring-2
-          focus:ring-violet-500
-        "
+                  className="rounded-3xl px-4 py-3 cursor-pointer transition-all duration-200 focus:outline-none"
+style={{
+  backgroundColor: isSelected ? `${colors.primary}10` : colors.white,
+  border: `1px solid ${
+    isSelected ? colors.primary : colors.neutral[400]
+  }`,
+  boxShadow: isSelected
+    ? `0 4px 14px ${colors.primary}22`
+    : "0 1px 3px rgba(0,0,0,0.04)",
+}}
                   >
                     {/* 🔹 TOP ROW */}
                     <div className="flex items-center justify-between">
@@ -1514,23 +1512,33 @@ const handleContinue = () => {
               </div>
             </form>
 
-            {/* divider */}
-            <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
+           {/* divider */}
+<div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
 
-            <footer>
-              <Button
-                onClick={handleContinue}
-                disabled={!canContinue || isSubmitting}
-                style={{ backgroundColor: colors.primary, color: "white" }}
-                className={`w-full h-10 rounded-full ${
-                  !canContinue || isSubmitting
-                    ? "bg-violet-300 cursor-not-allowed"
-                    : "shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
-                }`}
-              >
-                {isSubmitting ? "Saving..." : "Continue"}
-              </Button>
-            </footer>
+<footer>
+  <Button
+    onClick={handleContinue}
+    disabled={!canContinue || isSubmitting}
+    className="w-full h-10 rounded-full transition-all duration-200"
+    style={{
+      backgroundColor:
+        !canContinue || isSubmitting
+          ? `${colors.accent}55`   // faded primary when disabled
+          : colors.accent,
+      color: !canContinue || isSubmitting
+        ? `${colors.background}AA`      // soft white text
+        : colors.background,
+      boxShadow:
+        !canContinue || isSubmitting
+          ? "none"
+          : "0 6px 18px rgba(99,52,237,0.18)",
+      cursor: !canContinue || isSubmitting ? "not-allowed" : "pointer",
+    }}
+  >
+    {isSubmitting ? "Saving..." : "Continue"}
+  </Button>
+</footer>
+
           </main>
 
           {/* Right panel */}
@@ -1630,46 +1638,78 @@ const handleContinue = () => {
             </div>
           </aside>
         </div>
-        {deleteId && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="w-[360px] rounded-2xl bg-white p-6 shadow-xl">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-neutral-900">
-                  Are you sure?
-                </h3>
-                <button
-                  onClick={() => setDeleteId(null)}
-                  className="text-neutral-400 hover:text-neutral-600"
-                >
-                  ✕
-                </button>
-              </div>
+      {deleteId && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div
+      className="w-[360px] rounded-2xl p-6 shadow-xl"
+      style={{ backgroundColor: colors.white }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold" style={{ color: colors.accent }}>
+          Are you sure?
+        </h3>
 
-              <p className="text-sm text-neutral-600 mb-6">
-                Do you really want to delete this certification?{" "}
-              </p>
+        <button
+          onClick={() => setDeleteId(null)}
+          className="transition"
+          style={{ color: colors.neutral[600] }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = colors.accent)}
+          onMouseLeave={(e) => (e.currentTarget.style.color = colors.neutral[600])}
+        >
+          ✕
+        </button>
+      </div>
 
-              <div className="flex gap-3">
-                <Button
-                  variant="neutral-secondary"
-                  className="flex-1"
-                  onClick={() => setDeleteId(null)}
-                >
-                  Cancel
-                </Button>
+      <p className="text-sm mb-6" style={{ color: colors.neutral[600] }}>
+        Do you really want to delete this certification?
+      </p>
 
-                <Button
-                  style={{ backgroundColor: colors.primary, color: "white" }}
-                  className="flex-1 rounded-3xl hover:bg-violet-700"
-                  onClick={handleRemove}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Deleting..." : "Yes"}
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+     <div className="flex gap-3">
+  {/* Cancel */}
+  <Button
+    className="flex-1 rounded-3xl transition"
+    onClick={() => setDeleteId(null)}
+    style={{
+      backgroundColor: colors.primary,
+      color: colors.accent,
+    }}
+    onMouseEnter={(e) =>
+      (e.currentTarget.style.backgroundColor = colors.secondary)
+    }
+    onMouseLeave={(e) =>
+      (e.currentTarget.style.backgroundColor = colors.primary)
+    }
+  >
+    Cancel
+  </Button>
+
+  {/* Yes */}
+  <Button
+    className="flex-1 rounded-3xl transition"
+    onClick={handleRemove}
+    disabled={isSubmitting}
+    style={{
+      backgroundColor: isSubmitting ? `${colors.primary}55` : colors.primary,
+      color: colors.accent,
+      cursor: isSubmitting ? "not-allowed" : "pointer",
+    }}
+    onMouseEnter={(e) => {
+      if (!isSubmitting)
+        e.currentTarget.style.backgroundColor = colors.secondary;
+    }}
+    onMouseLeave={(e) => {
+      if (!isSubmitting)
+        e.currentTarget.style.backgroundColor = colors.primary;
+    }}
+  >
+    {isSubmitting ? "Deleting..." : "Yes"}
+  </Button>
+</div>
+
+    </div>
+  </div>
+)}
+
       </div>
     </div>
   </div>

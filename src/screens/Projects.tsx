@@ -960,18 +960,16 @@ export default function Projects() {
                         setSelectedProject(isSelected ? null : p);
                       }
                     }}
-                    className="
-          rounded-3xl
-          border border-neutral-300
-          bg-white
-          px-4 py-3
-          cursor-pointer
-          transition
-          hover:bg-neutral-50
-          focus:outline-none
-          focus:ring-2
-          focus:ring-violet-500
-        "
+                    className="rounded-3xl px-4 py-3 cursor-pointer transition-all duration-200 focus:outline-none"
+                   style={{
+                     backgroundColor: isSelected ? `${colors.primary}10` : colors.white,
+                     border: `1px solid ${
+                       isSelected ? colors.primary : colors.neutral[400]
+                     }`,
+                     boxShadow: isSelected
+                       ? `0 4px 14px ${colors.primary}22`
+                       : "0 1px 3px rgba(0,0,0,0.04)",
+                   }}
                   >
                     {/* 🔹 TOP ROW */}
                     <div className="flex items-center justify-between">
@@ -1174,21 +1172,26 @@ export default function Projects() {
             <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
 
             <footer>
-              <Button
+<Button
   onClick={handleContinue}
   disabled={!canContinue || isSubmitting}
-  style={{backgroundColor: colors.primary}}
-  className={`
-    w-full h-10 rounded-full transition-all !text-black
-    ${
+  className="w-full h-10 rounded-full transition-all font-semibold"
+  style={{
+    backgroundColor:
       !canContinue || isSubmitting
-        ? "bg-violet-300 cursor-not-allowed"
-        : "bg-violet-700 shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
-    }
-  `}
+        ? `${colors.accent}66`   // faded when disabled
+        : colors.accent,
+    color: colors.accent,               // black text
+    cursor: !canContinue || isSubmitting ? "not-allowed" : "pointer",
+    boxShadow:
+      !canContinue || isSubmitting
+        ? "none"
+        : "0 6px 18px rgba(99,52,237,0.18)",
+  }}
 >
   {isSubmitting ? "Saving..." : "Continue"}
 </Button>
+
             </footer>
           </main>
 
@@ -1286,45 +1289,76 @@ export default function Projects() {
             </div>
           </aside>
         </div>
-        {deleteProjectId && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="w-[360px] rounded-2xl bg-white p-6 shadow-xl">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-neutral-900">
-                  Are you sure?
-                </h3>
-                <button
-                  onClick={() => setDeleteProjectId(null)}
-                  className="text-neutral-400 hover:text-neutral-600"
-                >
-                  ✕
-                </button>
-              </div>
+       {deleteProjectId && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div
+      className="w-[360px] rounded-2xl p-6 shadow-xl"
+      style={{ backgroundColor: colors.white }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold" style={{ color: colors.accent }}>
+          Are you sure?
+        </h3>
+        <button
+          onClick={() => setDeleteProjectId(null)}
+          className="transition"
+          style={{ color: colors.neutral[600] }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = colors.accent)}
+          onMouseLeave={(e) => (e.currentTarget.style.color = colors.neutral[600])}
+        >
+          ✕
+        </button>
+      </div>
 
-              <p className="text-sm text-neutral-600 mb-6">
-                Do you really want to delete this project?
-              </p>
+      <p className="text-sm mb-6" style={{ color: colors.neutral[600] }}>
+        Do you really want to delete this project?
+      </p>
 
-              <div className="flex gap-3">
-                <Button
-                  variant="neutral-secondary"
-                  className="flex-1"
-                  onClick={() => setDeleteProjectId(null)}
-                >
-                  Cancel
-                </Button>
+      <div className="flex gap-3">
+        {/* Cancel */}
+        <Button
+          className="flex-1 rounded-3xl transition"
+          onClick={() => setDeleteProjectId(null)}
+          style={{
+            backgroundColor: colors.primary,
+            color: colors.accent,
+          }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.backgroundColor = colors.secondary)
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.backgroundColor = colors.primary)
+          }
+        >
+          Cancel
+        </Button>
 
-                <Button
-                  className="flex-1 rounded-3xl bg-violet-600 text-white hover:bg-violet-700"
-                  onClick={handleRemove}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Deleting..." : "Yes"}
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Yes */}
+        <Button
+          className="flex-1 rounded-3xl transition"
+          onClick={handleRemove}
+          disabled={isSubmitting}
+          style={{
+            backgroundColor: isSubmitting ? `${colors.primary}66` : colors.primary,
+            color: colors.accent,
+            cursor: isSubmitting ? "not-allowed" : "pointer",
+          }}
+          onMouseEnter={(e) => {
+            if (!isSubmitting)
+              e.currentTarget.style.backgroundColor = colors.secondary;
+          }}
+          onMouseLeave={(e) => {
+            if (!isSubmitting)
+              e.currentTarget.style.backgroundColor = colors.primary;
+          }}
+        >
+          {isSubmitting ? "Deleting..." : "Yes"}
+        </Button>
+      </div>
+    </div>
+  </div>
+)}
+
       </div>
     </>
   );

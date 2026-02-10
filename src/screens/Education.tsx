@@ -1714,47 +1714,70 @@ const handleContinue = () => {
             </div>
           </aside>
         </div>
-        {/* ✅ DELETE CONFIRMATION MODAL — ADD HERE */}
         {deleteId && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="w-[360px] rounded-2xl bg-white p-6 shadow-xl">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-neutral-900">
-                  Are you sure?
-                </h3>
-                <button
-                  onClick={() => setDeleteId(null)}
-                  className="text-neutral-400 hover:text-neutral-600"
-                >
-                  ✕
-                </button>
-              </div>
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div
+      className="w-[360px] rounded-2xl p-6 shadow-xl"
+      style={{ backgroundColor: colors.white }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold" style={{ color: colors.accent }}>
+          Are you sure?
+        </h3>
 
-              <p className="text-sm text-neutral-600 mb-6">
-                Do you really want to delete this education?
-              </p>
+        <button
+          onClick={() => setDeleteId(null)}
+          className="transition"
+          style={{ color: colors.neutral[400] }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = colors.accent)}
+          onMouseLeave={(e) => (e.currentTarget.style.color = colors.neutral[400])}
+        >
+          ✕
+        </button>
+      </div>
 
-              <div className="flex gap-3">
-                <Button
-                  variant="neutral-secondary"
-                  className="flex-1"
-                  onClick={() => setDeleteId(null)}
-                >
-                  Cancel
-                </Button>
+      <p className="text-sm mb-6" style={{ color: colors.neutral[600] }}>
+        Do you really want to delete this education?
+      </p>
 
-                <Button
-                  style={{ backgroundColor: colors.primary, color: "white" }}
-                  className="flex-1 rounded-3xl hover:bg-violet-700"
-                  onClick={handleRemove}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Deleting..." : "Yes"}
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+      <div className="flex gap-3">
+        {/* Cancel */}
+        <Button
+          variant="neutral-secondary"
+          className="flex-1 rounded-3xl"
+          onClick={() => setDeleteId(null)}
+        >
+          Cancel
+        </Button>
+
+        {/* Confirm */}
+        <Button
+          className="flex-1 rounded-3xl transition"
+          onClick={handleRemove}
+          disabled={isSubmitting}
+          style={{
+            backgroundColor: isSubmitting
+              ? `${colors.primary}66`
+              : colors.primary,
+            color: colors.accent,
+            cursor: isSubmitting ? "not-allowed" : "pointer",
+          }}
+          onMouseEnter={(e) => {
+            if (!isSubmitting)
+              e.currentTarget.style.backgroundColor = colors.secondary;
+          }}
+          onMouseLeave={(e) => {
+            if (!isSubmitting)
+              e.currentTarget.style.backgroundColor = colors.primary;
+          }}
+        >
+          {isSubmitting ? "Deleting..." : "Yes"}
+        </Button>
+      </div>
+    </div>
+  </div>
+)}
+
       </div>
     </div>
   </div>

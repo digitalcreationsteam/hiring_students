@@ -738,18 +738,16 @@ export default function Experience() {
                         setSelectedExperience(isSelected ? null : exp);
                       }
                     }}
-                    className="
-          rounded-3xl
-          border border-neutral-300
-          bg-white
-          px-4 py-3
-          cursor-pointer
-          transition
-          hover:bg-neutral-50
-          focus:outline-none
-          focus:ring-2
-          focus:ring-violet-500
-        "
+              className="rounded-3xl px-4 py-3 cursor-pointer transition-all duration-200 focus:outline-none"
+style={{
+  backgroundColor: isSelected ? `${colors.primary}10` : colors.white,
+  border: `1px solid ${
+    isSelected ? colors.primary : colors.neutral[400]
+  }`,
+  boxShadow: isSelected
+    ? `0 4px 14px ${colors.primary}22`
+    : "0 1px 3px rgba(0,0,0,0.04)",
+}}
                   >
                     {/* 🔹 TOP ROW */}
                     <div className="flex items-center justify-between">
@@ -1146,45 +1144,54 @@ export default function Experience() {
           </aside>
         </div>
         {deleteId && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="w-[360px] rounded-2xl bg-white p-6 shadow-xl">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-neutral-900">
-                  Are you sure?
-                </h3>
-                <button
-                  onClick={() => setDeleteId(null)}
-                  className="text-neutral-400 hover:text-neutral-600"
-                >
-                  ✕
-                </button>
-              </div>
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="w-[360px] rounded-2xl bg-white p-6 shadow-xl">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold text-neutral-900">
+          Are you sure?
+        </h3>
+        <button
+          onClick={() => setDeleteId(null)}
+          className="text-neutral-400 hover:text-neutral-600"
+        >
+          ✕
+        </button>
+      </div>
 
-              <p className="text-sm text-neutral-600 mb-6">
-                Do you really want to delete this experience?
-              </p>
+      <p className="text-sm text-neutral-600 mb-6">
+        Do you really want to delete this experience?
+      </p>
 
-              <div className="flex gap-3">
-                <Button
-                  variant="neutral-secondary"
-                  className="flex-1"
-                  onClick={() => setDeleteId(null)}
-                >
-                  Cancel
-                </Button>
+      <div className="flex gap-3">
+        {/* ✅ Cancel - same shape */}
+        <Button
+          variant="neutral-secondary"
+          className="flex-1 rounded-3xl"
+          onClick={() => setDeleteId(null)}
+        >
+          Cancel
+        </Button>
 
-                <Button
-                  style={{ backgroundColor: colors.primary, color: "white" }}
-                  className="flex-1 rounded-3xl hover:bg-violet-700"
-                  onClick={handleRemove}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Deleting..." : "Yes"}
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* ✅ Yes - same shape */}
+        <Button
+          style={{ backgroundColor: colors.primary, color: colors.white }}
+          className="flex-1 rounded-3xl transition"
+          onMouseEnter={(e) => {
+            if (!isSubmitting) e.currentTarget.style.backgroundColor = colors.secondary;
+          }}
+          onMouseLeave={(e) => {
+            if (!isSubmitting) e.currentTarget.style.backgroundColor = colors.primary;
+          }}
+          onClick={handleRemove}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Deleting..." : "Yes"}
+        </Button>
+      </div>
+    </div>
+  </div>
+)}
+
       </div>
     </div>
   </div>
