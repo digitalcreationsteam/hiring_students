@@ -113,7 +113,7 @@ export const URL_PATH = {
   cancelSubscription: "/subscription",
   getPlans: "/subscription/plans",
   subscriptionStatus: "/subscription/status/",
-  checkSubscriptionStatus: (id) => `/subscriptions/${id}/status`,
+  checkSubscriptionStatus: (id) => `/subscription/${id}/status`,
   subscriptionMarkPaid: "/subscription/mark-paid",
 
   /* ---------- RESULTS ---------- */
