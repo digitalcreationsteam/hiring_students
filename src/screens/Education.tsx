@@ -31,10 +31,10 @@ import { colors } from "src/common/Colors";
 
 const DEGREE_OPTIONS = [
   { label: "Diploma", value: "diploma" },
-  { label: "Bachelor's Degree", value: "bachelors_degree" },
-  { label: "B.Tech", value: "btech" },
-  { label: "Master's Degree", value: "masters_degree" },
-  { label: "M.Tech", value: "mtech" },
+  { label: "Bachelor's Degree", value: "bachelor" },
+  { label: "B.Tech", value: "b.tech" },
+  { label: "Master's Degree", value: "master" },
+  { label: "M.Tech", value: "m.tech" },
   { label: "Doctorate (PhD)", value: "phd" },
   { label: "Professional Degree", value: "professional_degree" },
   { label: "Other", value: "other" },
@@ -1222,46 +1222,43 @@ const handleContinue = () => {
               </div>
             </div>
 
-            {/* Header */}
-            <header className="mt-6">
-              <h2 className="text-[22px] text-neutral-900">
-                Add your education
-              </h2>
-              <p className="mt-1 text-xs text-neutral-500">
-                Your academic background helps shape your Experience Index
-              </p>
-            </header>
+         {/* Header */}
+<header className="mt-6">
+  <h2 className="text-[22px] text-neutral-900">
+    Add your education
+  </h2>
+  <p className="mt-1 text-xs text-neutral-500">
+    Your academic background helps shape your Experience Index
+  </p>
+</header>
 
-            {/* Selected education preview list */}
-            <section className="mt-6 flex w-full flex-col gap-3">
-              {educations.map((ed) => {
-                const isSelected = selectedEducation?.id === ed.id;
+{/* Education List */}
+<section className="mt-6 flex w-full flex-col gap-3">
+  {educations.map((ed) => {
+    const isSelected = selectedEducation?.id === ed.id;
 
-                return (
-                  <div
-                    key={ed.id}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => setSelectedEducation(isSelected ? null : ed)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        setSelectedEducation(isSelected ? null : ed);
-                      }
-                    }}
-                    className="
-          rounded-3xl
-          border border-neutral-300
-          bg-white
-          px-4 py-3
-          cursor-pointer
-          transition
-          hover:bg-neutral-50
-          focus:outline-none
-          focus:ring-2
-          focus:ring-violet-500
-        "
-                  >
+    return (
+      <div
+        key={ed.id}
+        role="button"
+        tabIndex={0}
+        onClick={() => setSelectedEducation(isSelected ? null : ed)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setSelectedEducation(isSelected ? null : ed);
+          }
+        }}
+        className="rounded-3xl px-4 py-3 cursor-pointer transition-all duration-200 focus:outline-none"
+        style={{
+          backgroundColor: isSelected ? `${colors.primary}14` : colors.white,
+          border: `1px solid ${
+            isSelected ? colors.primary : colors.neutral[200]
+          }`,
+          boxShadow: isSelected ? `0 0 0 3px ${colors.primary}22` : "none",
+        }}
+      >
+
                     {/* 🔹 TOP ROW */}
                     <div className="flex items-center justify-between">
                       {/* Left */}
@@ -1364,51 +1361,60 @@ const handleContinue = () => {
               }}
               className="mt-6 flex flex-col gap-4"
             >
-              {/* Degree */}
-              <div className="flex flex-col gap-1">
-                {/* Degree Dropdown - Fixed */}
-                <div className="flex flex-col gap-1">
-                  <label className="text-[12px] font-medium text-neutral-900">
-                    Degree <span className="text-red-500">*</span>
-                  </label>
+             {/* Degree */}
+<div className="flex flex-col gap-1">
+  <label className="text-[12px] font-medium text-neutral-900">
+    Degree <span className="text-red-500">*</span>
+  </label>
 
-                  <SubframeCore.DropdownMenu.Root>
-                    <SubframeCore.DropdownMenu.Trigger asChild>
-                      <div className="flex h-9 items-center justify-between rounded-full border border-neutral-300 bg-white px-3 cursor-pointer hover:bg-neutral-50">
-                        <span
-                          className={
-                            degree
-                              ? "text-neutral-900 text-[12px]"
-                              : "text-neutral-400 text-[12px]"
-                          }
-                        >
-                          {DEGREE_OPTIONS.find((d) => d.value === degree)
-                            ?.label || "Select Degree"}
-                        </span>
-                        <FeatherChevronDown className="text-neutral-500" />
-                      </div>
-                    </SubframeCore.DropdownMenu.Trigger>
+  <SubframeCore.DropdownMenu.Root>
+    <SubframeCore.DropdownMenu.Trigger asChild>
+      {/* ✅ Trigger must have EXACTLY ONE child element */}
+      <div
+  className="flex h-9 items-center justify-between rounded-full border border-neutral-300 px-3 cursor-pointer hover:bg-neutral-50"
+  style={{ backgroundColor: colors.white }}
+>
+  <span
+    className="text-[12px]"
+    style={{ color: degree ? colors.accent : "#9CA3AF" }}
+  >
+    {DEGREE_OPTIONS.find((d) => d.value === degree)?.label || "Select Degree"}
+  </span>
 
-                    <SubframeCore.DropdownMenu.Portal>
-                      <SubframeCore.DropdownMenu.Content
-                        className="bg-white rounded-2xl shadow-lg py-1 max-h-[220px] overflow-y-auto border border-neutral-300 min-w-[200px]"
-                        sideOffset={4}
-                        align="start"
-                      >
-                        {DEGREE_OPTIONS.map((item) => (
-                          <SubframeCore.DropdownMenu.Item
-                            key={item.value}
-                            className="px-4 py-2 text-sm cursor-pointer hover:bg-neutral-100 outline-none"
-                            onSelect={() => setDegree(item.value)}
-                          >
-                            {item.label}
-                          </SubframeCore.DropdownMenu.Item>
-                        ))}
-                      </SubframeCore.DropdownMenu.Content>
-                    </SubframeCore.DropdownMenu.Portal>
-                  </SubframeCore.DropdownMenu.Root>
-                </div>
-              </div>
+  <FeatherChevronDown style={{ color: "#6B7280" }} />
+</div>
+
+    </SubframeCore.DropdownMenu.Trigger>
+
+<SubframeCore.DropdownMenu.Portal>
+  <SubframeCore.DropdownMenu.Content
+  sideOffset={4}
+    align="start"
+
+    className="bg-white text-neutral-900 rounded-2xl shadow-lg py-1 max-h-[220px] overflow-y-auto border border-neutral-300 min-w-[200px]"
+    style={{ zIndex: 999999 }}
+    
+  >
+    {DEGREE_OPTIONS.map((item) => (
+      <SubframeCore.DropdownMenu.Item
+        key={item.value}
+        className="
+          px-4 py-2 text-sm
+          text-neutral-900
+          cursor-pointer
+          hover:bg-neutral-100
+          outline-none
+        "
+        onSelect={() => setDegree(item.value)}
+      >
+        {item.label}
+      </SubframeCore.DropdownMenu.Item>
+    ))}
+  </SubframeCore.DropdownMenu.Content>
+</SubframeCore.DropdownMenu.Portal>
+  </SubframeCore.DropdownMenu.Root>
+</div>
+
 
               {/* Field of Study */}
               <TextField
@@ -1501,14 +1507,12 @@ const handleContinue = () => {
                       handleCurrentlyStudyingToggle(!currentlyStudying);
                     }
                   }}
-                  className="
-    h-5 w-9
-    data-[state=checked]:bg-violet-700
-    data-[state=unchecked]:bg-neutral-300
-    [&>span]:h-4 [&>span]:w-3
-    [&>span]:data-[state=checked]:translate-x-2
-    [&>span]:data-[state=unchecked]:translate-x-0
-  "
+                 className="h-5 w-9 transition-colors"
+    style={{
+      backgroundColor: currentlyStudying
+        ? colors.primary        // ON color
+        : colors.neutral?.[200] || "#D1D5DB", // OFF color fallback
+    }}
                 />
 
                 <span className="text-sm text-neutral-700">
@@ -1579,7 +1583,7 @@ const handleContinue = () => {
               <Button
                 onClick={handleContinue}
                 disabled={!canContinue || isSubmitting}
-                style={{ backgroundColor: colors.primary, color: "white" }}
+                style={{ backgroundColor: colors.accent, color: "Background" }}
                 className={`
     w-full h-10 rounded-full transition-all
     ${
