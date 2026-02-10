@@ -34,7 +34,7 @@ function PaymentProcessing() {
       try {
         const response = await API(
           "GET",
-          `/subscriptions/${subscriptionId}/status`
+          `/subscription/${subscriptionId}/status`
         );
 
         console.log("📊 Status check response:", response);
