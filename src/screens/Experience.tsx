@@ -663,30 +663,17 @@ export default function Experience() {
             {/* top row - back + progress */}
             <div className="flex items-center gap-4">
               <IconButton
-                size="small"
-                icon={<FeatherArrowLeft />}
-                onClick={async () => {
-                  try {
-                    // 1️⃣ If came from dashboard → always go back to dashboard
-                    if (source === "dashboard") {
-                      navigate("/dashboard");
-                      return;
-                    }
+  size="small"
+  icon={<FeatherArrowLeft />}
+  onClick={() => {
+    if (source === "dashboard") {
+      navigate("/dashboard");
+    } else {
+      navigate(-1);
+    }
+  }}
+/>
 
-                    // 2️⃣ Otherwise → ask backend if education is allowed
-                    const res = await API("POST", "/auth/verify-route", {
-                      route: "/education",
-                    });
-
-                    if (res.allowed) {
-                      navigate("/education", { state: { source } });
-                    }
-                    // ❌ else do nothing (education already completed)
-                  } catch {
-                    // silent fail
-                  }
-                }}
-              />
 
               <div className="flex-1 w-full max-w-full md:max-w-[420px]">
                 <div className="flex items-center gap-3">

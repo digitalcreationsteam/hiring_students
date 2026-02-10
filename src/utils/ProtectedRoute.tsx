@@ -51,11 +51,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // 2. NEW: Check if process is already complete
-  if (requireIncomplete && isProcessComplete()) {
-    console.log('🚫 Blocked access - process already complete');
+  // 2. Check if process is already complete
+if (requireIncomplete && isProcessComplete()) {
+  // allow navigation history (like Education → Demographics)
+  if (PROCESS_STEPS.includes(location.pathname)) {
     return <Navigate to="/dashboard" replace />;
   }
+}
+
 
   return children;
 };
