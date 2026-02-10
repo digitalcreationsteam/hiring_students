@@ -24,7 +24,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { Country, State, City } from "country-state-city";
 import { colors } from "src/common/Colors";
 
-
 interface DemographicsData {
   fullName: string;
   email: string;
@@ -390,20 +389,46 @@ export default function Demographics() {
   ];
 
   return (
-    <>
+  <div className="min-h-screen bg-neutral-50 relative overflow-hidden">
+    {/* Blended background - Covers entire page */}
+    <div className="pointer-events-none absolute inset-0">
+      <div
+        className="absolute inset-0"
+        style={{ backgroundColor: colors.background }}
+      />
+
+      <div
+        className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
+        style={{
+          background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
+        }}
+      />
+
+      <div
+        className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
+        style={{
+          background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
+        }}
+      />
+
+      <div
+        className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
+        style={{
+          background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
+        }}
+      />
+    </div>
+
+    {/* Header and content with z-index to stay above background */}
+    <div className="relative z-10">
       <ToastContainer position="top-center" autoClose={2000} />
       <HeaderLogo />
-      <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-4 sm:px-6 py-0 sm:py-0">
-        <div className="w-full max-w-[1000px] mx-auto flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
+      <div className="flex justify-center px-4 sm:px-6 py-0 sm:py-0">
+        <div className="w-full max-w-[1000px] mx-auto flex flex-col md:flex-row gap-6 md:gap-8 justify-center py-8">
           {/* LEFT CARD */}
           <main className="w-full md:max-w-[480px] bg-white rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.06)]">
             {/* Header */}
             <div className="flex items-center gap-4 mb-6">
-              {/* <IconButton
-                size="small"
-                icon={<FeatherArrowLeft />}
-                onClick={() => navigate(-1)}
-              /> */}
               <IconButton
                 size="small"
                 icon={<FeatherArrowLeft />}
@@ -426,7 +451,10 @@ export default function Demographics() {
               />
               <div className="flex-1">
                 <div className="flex items-center gap-3">
-                  <div className="flex-1 h-[5px] rounded-full bg-violet-700" />
+                  <div 
+                    className="flex-1 h-[5px] rounded-full" 
+                    style={{ backgroundColor: colors.primary }}
+                  />
                   {[...Array(5)].map((_, i) => (
                     <div
                       key={i}
@@ -502,6 +530,9 @@ export default function Demographics() {
                   checked={phoneVisible}
                   onCheckedChange={setPhoneVisible}
                   className="h-5 w-9 data-[state=checked]:bg-violet-700 data-[state=unchecked]:bg-neutral-300"
+                  style={{
+                    backgroundColor: phoneVisible ? colors.primary : undefined,
+                  }}
                 />
                 <span className="text-sm text-neutral-700">
                   Make phone number visible to recruiters
@@ -624,21 +655,18 @@ export default function Demographics() {
 
             <div className="w-full h-px bg-neutral-200 my-5" />
 
-            {/* Error Message
-            {error && (
-              <div className="p-3 mb-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
-                {error}
-              </div>
-            )} */}
-
             {/* Submit Button */}
             <Button
               onClick={handleContinue}
               disabled={isSubmitting || isLoading}
-              className={`w-full h-10 rounded-full font-semibold text-white transition ${
+              style={{ 
+                backgroundColor: colors.accent,
+                color: "white",
+              }}
+              className={`w-full h-10 rounded-full font-semibold transition ${
                 isSubmitting || isLoading
-                  ? "bg-violet-400 cursor-not-allowed"
-                  : "bg-violet-700 hover:bg-violet-800 shadow-lg"
+                  ? "cursor-not-allowed opacity-70"
+                  : "hover:opacity-90 shadow-lg"
               }`}
             >
               {isLoading
@@ -650,7 +678,7 @@ export default function Demographics() {
           </main>
 
           {/* RIGHT PANEL */}
-          <aside className="w-full md:w-72 shrink-0">
+          <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
             <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-lg border border-neutral-300">
               <h3 className="text-[20px] font-semibold text-neutral-900">
                 Your Experience Index
@@ -669,9 +697,7 @@ export default function Demographics() {
               </div>
 
               {/* Current Step */}
-              <button className="w-full flex items-center gap-3 rounded-2xl  px-4 py-2 mb-3"
-              style={{backgroundColor: colors.primary}}
-              >
+              <button style={{backgroundColor: colors.primary}} className="w-full flex items-center gap-3 rounded-2xl px-4 py-2 mb-3">
                 <IconWithBackground size="small" icon={<FeatherUser />} />
                 <span className="text-sm font-medium text-neutral-900">
                   Demographics
@@ -696,6 +722,7 @@ export default function Demographics() {
           </aside>
         </div>
       </div>
-    </>
-  );
+    </div>
+  </div>
+);
 }
