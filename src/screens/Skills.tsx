@@ -189,10 +189,17 @@ export default function Skills() {
           {/* top row - back + progress */}
           <div className="flex items-center gap-4">
             <IconButton
-              size="small"
-              icon={<FeatherArrowLeft />}
-              onClick={() => navigate(-1)}
-            />
+  size="small"
+  icon={<FeatherArrowLeft />}
+  onClick={() => {
+    if (source === "dashboard") {
+      navigate("/dashboard");
+    } else {
+      navigate(-1);
+    }
+  }}
+/>
+
 
             <div className="flex-1">
               <div className="flex items-center gap-3">

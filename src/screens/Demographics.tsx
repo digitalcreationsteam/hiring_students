@@ -77,13 +77,16 @@ export default function Demographics() {
   //   navigate(nextRoute || "/");
   // }, [currentStep, nextRoute, navigate]);
 
-  useEffect(() => {
-    if (!navReady) return;
+  //   useEffect(() => {
+  //   if (!navReady) return;
 
-    if (currentStep === "demographics") return;
+  //   // allow browser back navigation
+  //   if (window.history.state?.idx > 0) return;
 
-    navigate(nextRoute || "/");
-  }, [navReady, currentStep, nextRoute, navigate]);
+  //   if (currentStep === "demographics") return;
+
+  //   navigate(nextRoute || "/");
+  // }, [navReady, currentStep, nextRoute, navigate]);
 
   /* ============================================
      LOCAL STATE
@@ -397,31 +400,12 @@ export default function Demographics() {
           <main className="w-full md:max-w-[480px] bg-white rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.06)]">
             {/* Header */}
             <div className="flex items-center gap-4 mb-6">
-              {/* <IconButton
-                size="small"
-                icon={<FeatherArrowLeft />}
-                onClick={() => navigate(-1)}
-              /> */}
               <IconButton
                 size="small"
                 icon={<FeatherArrowLeft />}
-                onClick={async () => {
-                  try {
-                    const res = await API(
-                      "POST",
-                      "/auth/verify-route",
-                      { route: "/upload-resume" }, // ⬅️ previous step
-                    );
-
-                    if (res.allowed) {
-                      navigate("/upload-resume");
-                    }
-                    // ❌ if not allowed → do nothing
-                  } catch {
-                    // fail silently
-                  }
-                }}
+                onClick={() => navigate("/upload-resume")}
               />
+
               <div className="flex-1">
                 <div className="flex items-center gap-3">
                   <div className="flex-1 h-[5px] rounded-full bg-violet-700" />

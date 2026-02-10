@@ -19,17 +19,18 @@ function SignUp() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [role, setRole] = useState<"student" | "recruiter" | "admin">("student");
+  const [role, setRole] = useState<"student" | "recruiter" | "admin">(
+    "student",
+  );
 
-const checkEmailVerification = async () => {
-  try {
-    const res = await API("GET", "/auth/verification-status");
-    return res?.isVerified;
-  } catch {
-    return false;
-  }
-};
-
+  const checkEmailVerification = async () => {
+    try {
+      const res = await API("GET", "/auth/verification-status");
+      return res?.isVerified;
+    } catch {
+      return false;
+    }
+  };
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -47,72 +48,73 @@ const checkEmailVerification = async () => {
     return true;
   };
 
-const handleSubmit = async (e: any) => {
-  e.preventDefault();
-  if (loading) return;
-  if (!validate()) return;
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    if (loading) return;
+    if (!validate()) return;
 
-  setLoading(true);
-  setError("");
+    setLoading(true);
+    setError("");
 
-  const formData = { email, firstname, lastname, password,  role  };
+    const formData = { email, firstname, lastname, password, role };
 
-  try {
-    const res = await API("POST", URL_PATH.signup, formData);
+    try {
+      const res = await API("POST", URL_PATH.signup, formData);
 
-    if (res?.success) {
-      // ✅ store token
-      localStorage.setItem("token", res.token);
-      localStorage.setItem("signupEmail", email);
 
-      // Redirect immediately to verify-email page
-     if (res?.success) {
-  localStorage.setItem("token", res.token);
-  localStorage.setItem("signupEmail", email);
+      if (res?.success) {
+        // ✅ store token
+        localStorage.setItem("token", res.token);
+        localStorage.setItem("signupEmail", email);
+        localStorage.setItem("userId", res.user._id);
 
-  // ✅ store role too (optional but useful)
-  localStorage.setItem("role", role);
+        // Redirect immediately to verify-email page
+        if (res?.success) {
+          localStorage.setItem("token", res.token);
+          localStorage.setItem("signupEmail", email);
+          localStorage.setItem("userId", res.user.id);
 
-  // ✅ redirect based on role
-  if (role === "admin") return navigate("/admin/dashboard");
-  if (role === "recruiter") return navigate("/recruiter/dashboard");
+          // ✅ store role too (optional but useful)
+          localStorage.setItem("role", role);
 
-  // student default flow
-  return navigate("/verify-email");
-}
+          // ✅ redirect based on role
+          if (role === "admin") return navigate("/admin/dashboard");
+          if (role === "recruiter") return navigate("/recruiter/dashboard");
 
+          // student default flow
+          return navigate("/verify-email");
+        }
+      }
+    } catch (err: any) {
+      setError(err?.message || "Unable to create account. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  } catch (err: any) {
-    setError(err?.message || "Unable to create account. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
+  // // ✅ Polling helper function
+  // const pollEmailVerification = async (interval: number, timeout: number) => {
+  //   const start = Date.now();
 
-// // ✅ Polling helper function
-// const pollEmailVerification = async (interval: number, timeout: number) => {
-//   const start = Date.now();
-
-//   return new Promise<boolean>(async (resolve) => {
-//     const check = async () => {
-//       try {
-//         const verified = await checkEmailVerification();
-//         if (verified) return resolve(true);
-//         if (Date.now() - start > timeout) return resolve(false); // stop after timeout
-//         setTimeout(check, interval); // try again after interval
-//       } catch {
-//         if (Date.now() - start > timeout) return resolve(false);
-//         setTimeout(check, interval);
-//       }
-//     };
-//     check();
-//   });
-// };
-
+  //   return new Promise<boolean>(async (resolve) => {
+  //     const check = async () => {
+  //       try {
+  //         const verified = await checkEmailVerification();
+  //         if (verified) return resolve(true);
+  //         if (Date.now() - start > timeout) return resolve(false); // stop after timeout
+  //         setTimeout(check, interval); // try again after interval
+  //       } catch {
+  //         if (Date.now() - start > timeout) return resolve(false);
+  //         setTimeout(check, interval);
+  //       }
+  //     };
+  //     check();
+  //   });
+  // };
 
   const handleOAuth = (provider: any) => {
-    const baseURL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+    const baseURL =
+      process.env.REACT_APP_API_URL || "http://localhost:5000/api";
     if (provider === "google") {
       window.location.href = `${baseURL}/auth/google`;
     }
@@ -121,8 +123,6 @@ const handleSubmit = async (e: any) => {
     }
   };
 
-
-
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-neutral-50 px-4">
       <div className="w-full max-w-[870px] rounded-xl border border-neutral-border bg-white shadow-md overflow-hidden">
@@ -130,11 +130,7 @@ const handleSubmit = async (e: any) => {
           {/* LEFT */}
           <div className="lg:w-[64%] bg-neutral-50 px-6 py-8 flex flex-col justify-between hidden lg:flex">
             <div className="flex flex-col gap-4">
-              <img
-                className="h-8 w-fit"
-                src="/hiringLogo.png"
-                alt="logo"
-              />
+              <img className="h-8 w-fit" src="/hiringLogo.png" alt="logo" />
               <h1 className="text-3xl leading-snug inter-font-family">
                 Everything you need to find your next role
               </h1>
@@ -316,8 +312,6 @@ const handleSubmit = async (e: any) => {
                 </p>
               </div>
 
-
-
               {/* Error */}
               <div
                 aria-live="polite"
@@ -325,9 +319,6 @@ const handleSubmit = async (e: any) => {
               >
                 {error}
               </div>
-
-              
-
 
               {/* Submit */}
               <button
