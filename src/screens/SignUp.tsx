@@ -159,7 +159,7 @@ const handleSubmit = async (e: any) => {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div style={{backgroundColor: colors.primary}} className="flex items-center justify-center w-8 h-8 rounded-full">
+                  <div style={{backgroundColor: colors.primary}}  className="flex items-center justify-center w-8 h-8 rounded-full">
                     <FeatherBriefcase className="" />
                   </div>
                   <div>
@@ -174,7 +174,7 @@ const handleSubmit = async (e: any) => {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div style={{backgroundColor: colors.primary}} className="flex items-center justify-center w-8 h-8 rounded-full">
+                  <div style={{backgroundColor: colors.primary}}  className="flex items-center justify-center w-8 h-8 rounded-full">
                     <FeatherMessageSquare className="" />
                   </div>
                   <div>
@@ -365,7 +365,7 @@ const handleSubmit = async (e: any) => {
               </span>
               <Link
                 to="/login"
-                className="font-semibold hover:underline"
+                className=" font-semibold hover:underline"
               >
                 Sign in
               </Link>

@@ -140,7 +140,7 @@ function Login() {
               <div className="w-full h-[1px] bg-gray-400 my-4 flex-shrink-0" />
               <div className="flex flex-col gap-4">
                 <div className="flex items-start gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full" style={{backgroundColor: colors.primary}} >
+                  <div style={{backgroundColor: colors.primary}} className="flex items-center justify-center w-8 h-8 rounded-full">
                     <FeatherCheckCircle className="" />
                   </div>
                   <div>
@@ -153,7 +153,7 @@ function Login() {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full" style={{backgroundColor: colors.primary}} >
+                  <div style={{backgroundColor: colors.primary}}  className="flex items-center justify-center w-8 h-8 rounded-full">
                     <FeatherBriefcase className="" />
                   </div>
                   <div>
@@ -166,7 +166,7 @@ function Login() {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full" style={{backgroundColor: colors.primary}} >
+                  <div style={{backgroundColor: colors.primary}}  className="flex items-center justify-center w-8 h-8 rounded-full">
                     <FeatherMessageSquare className="" />
                   </div>
                   <div>
@@ -289,18 +289,18 @@ function Login() {
                 {loading ? "Signing in..." : "Log in"}
               </button> */}
               <button
-              type="submit"
-              disabled={loading}
-              className={`w-full h-9 font-semibold rounded-full transition ${
-                loading ? "cursor-wait opacity-70" : "hover:opacity-90"
-              }`}
-              style={{
-                backgroundColor: colors.primary,
-                color: colors.accent,
-              }}
-            >
-              {loading ? "Signing in..." : "Log in"}
-            </button>
+  type="submit"
+  disabled={loading}
+  className={`w-full h-9 font-semibold rounded-full transition ${
+    loading ? "cursor-wait opacity-70" : "hover:opacity-90"
+  }`}
+  style={{
+    backgroundColor: colors.primary,
+    color: colors.accent,
+  }}
+>
+  {loading ? "Signing in..." : "Log in"}
+</button>
 
             </form>
 
