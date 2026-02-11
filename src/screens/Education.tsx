@@ -169,15 +169,30 @@ function YearPicker({
                     onChange(String(year));
                     setOpen(false);
                   }}
-                  className={`
-                    py-2 rounded-lg transition
-                    ${
+                  className="py-2 px-3 rounded-lg transition text-sm sm:text-base"
+                  style={{
+                    backgroundColor:
+                      value === String(year) ? colors.accent : "transparent",
+                    color:
                       value === String(year)
-                        ? "bg-violet-600 text-white"
-                        : "hover:bg-neutral-100"
+                        ? colors.background
+                        : isDisabled
+                          ? colors.neutral[400]
+                          : colors.neutral[800],
+                    cursor: isDisabled ? "not-allowed" : "pointer",
+                    opacity: isDisabled ? 0.7 : 1,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isDisabled && value !== String(year)) {
+                      e.currentTarget.style.backgroundColor =
+                        colors.primaryGlow;
                     }
-                    ${isDisabled ? "text-neutral-400" : ""}
-                  `}
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isDisabled && value !== String(year)) {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                    }
+                  }}
                 >
                   {year}
                 </button>
@@ -518,19 +533,18 @@ export default function Education() {
 
   /* -------------------- BUILD PAYLOAD -------------------- */
 
-const handleContinue = () => {
-  if (!educations.length) {
-    toast.error("Please add at least one education to continue.");
-    return;
-  }
+  const handleContinue = () => {
+    if (!educations.length) {
+      toast.error("Please add at least one education to continue.");
+      return;
+    }
 
-  if (source === "dashboard") {
-    navigate("/dashboard");
-  } else {
-    navigate("/experience", { state: { source } });
-  }
-};
-
+    if (source === "dashboard") {
+      navigate("/dashboard");
+    } else {
+      navigate("/experience", { state: { source } });
+    }
+  };
 
   const handleCurrentlyStudyingToggle = (checked: boolean) => {
     setStudying(checked);
@@ -1141,645 +1155,667 @@ const handleContinue = () => {
   //   </>
   // );
   return (
-  <div className="min-h-screen bg-neutral-50 relative overflow-hidden">
-    {/* Blended background - Covers entire page */}
-    <div className="pointer-events-none absolute inset-0">
-      <div
-        className="absolute inset-0"
-        style={{ backgroundColor: colors.background }}
-      />
+    <div className="min-h-screen bg-neutral-50 relative overflow-hidden">
+      {/* Blended background - Covers entire page */}
+      <div className="pointer-events-none absolute inset-0">
+        <div
+          className="absolute inset-0"
+          style={{ backgroundColor: colors.background }}
+        />
 
-      <div
-        className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
-        style={{
-          background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
-        }}
-      />
+        <div
+          className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
+          style={{
+            background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
+          }}
+        />
 
-      <div
-        className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
-        style={{
-          background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
-        }}
-      />
+        <div
+          className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
+          style={{
+            background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
+          }}
+        />
 
-      <div
-        className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
-        style={{
-          background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
-        }}
-      />
-    </div>
+        <div
+          className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
+          style={{
+            background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
+          }}
+        />
+      </div>
 
-    {/* Header and content with z-index to stay above background */}
-    <div className="relative z-10">
-      <HeaderLogo />
-      <ToastContainer position="top-center" autoClose={3000} />
-      <div className="flex justify-center px-4 sm:px-6 py-0 sm:py-0">
-        <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center py-8">
-          {/* Left card */}
-          <main className="w-full md:max-w-[480px] bg-white rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6">
-            {/* Top: back + progress */}
-            <div className="flex items-center gap-4">
-              <IconButton
-                size="small"
-                icon={<FeatherArrowLeft />}
-                onClick={async () => {
-                  try {
-                    const res = await API(
-                      "POST",
-                      "/auth/verify-route",
-                      { route: "/demographics" }, // ⬅️ previous step
-                    );
-
-                    if (res.allowed) {
+      {/* Header and content with z-index to stay above background */}
+      <div className="relative z-10">
+        <HeaderLogo />
+        <ToastContainer position="top-center" autoClose={3000} />
+        <div className="flex justify-center px-4 sm:px-6 py-0 sm:py-0">
+          <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center py-8">
+            {/* Left card */}
+            <main className="w-full md:max-w-[480px] bg-white rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6">
+              {/* Top: back + progress */}
+              <div className="flex items-center gap-4">
+                <IconButton
+                  size="small"
+                  icon={<FeatherArrowLeft />}
+                  onClick={() => {
+                    if (source === "dashboard") {
+                      navigate("/dashboard");
+                    } else {
                       navigate("/demographics");
                     }
-                    // ❌ if not allowed → do nothing
-                  } catch {
-                    // fail silently
-                  }
-                }}
-              />
+                  }}
+                />
 
-              <div className="flex-1 w-full max-w-full md:max-w-[420px]">
-                <div className="flex items-center gap-3">
-                  {[...Array(2)].map((_, i) => (
-                    <div
-                      key={`p-${i}`}
-                      style={{ height: 6, backgroundColor: colors.primary }}
-                      className="flex-1 rounded-full"
-                    />
-                  ))}
-                  {[...Array(4)].map((_, i) => (
-                    <div
-                      key={`n-${i}`}
-                      style={{ height: 6 }}
-                      className="flex-1 rounded-full bg-neutral-300"
-                    />
-                  ))}
+                <div className="flex-1 w-full max-w-full md:max-w-[420px]">
+                  <div className="flex items-center gap-3">
+                    {[...Array(2)].map((_, i) => (
+                      <div
+                        key={`p-${i}`}
+                        style={{ height: 6, backgroundColor: colors.primary }}
+                        className="flex-1 rounded-full"
+                      />
+                    ))}
+                    {[...Array(4)].map((_, i) => (
+                      <div
+                        key={`n-${i}`}
+                        style={{ height: 6 }}
+                        className="flex-1 rounded-full bg-neutral-300"
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
 
-         {/* Header */}
-<header className="mt-6">
-  <h2 className="text-[22px] text-neutral-900">
-    Add your education
-  </h2>
-  <p className="mt-1 text-xs text-neutral-500">
-    Your academic background helps shape your Experience Index
-  </p>
-</header>
+              {/* Header */}
+              <header className="mt-6">
+                <h2 className="text-[22px] text-neutral-900">
+                  Add your education
+                </h2>
+                <p className="mt-1 text-xs text-neutral-500">
+                  Your academic background helps shape your Experience Index
+                </p>
+              </header>
 
-{/* Education List */}
-<section className="mt-6 flex w-full flex-col gap-3">
-  {educations.map((ed) => {
-    const isSelected = selectedEducation?.id === ed.id;
+              {/* Education List */}
+              <section className="mt-6 flex w-full flex-col gap-3">
+                {educations.map((ed) => {
+                  const isSelected = selectedEducation?.id === ed.id;
 
-    return (
-      <div
-        key={ed.id}
-        role="button"
-        tabIndex={0}
-        onClick={() => setSelectedEducation(isSelected ? null : ed)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            setSelectedEducation(isSelected ? null : ed);
-          }
-        }}
-        className="rounded-3xl px-4 py-3 cursor-pointer transition-all duration-200 focus:outline-none"
-        style={{
-          backgroundColor: isSelected ? `${colors.primary}14` : colors.white,
-          border: `1px solid ${
-            isSelected ? colors.primary : colors.neutral[200]
-          }`,
-          boxShadow: isSelected ? `0 0 0 3px ${colors.primary}22` : "none",
-        }}
-      >
+                  return (
+                    <div
+                      key={ed.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() =>
+                        setSelectedEducation(isSelected ? null : ed)
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setSelectedEducation(isSelected ? null : ed);
+                        }
+                      }}
+                      className="rounded-3xl px-4 py-3 cursor-pointer transition-all duration-200 focus:outline-none"
+                      style={{
+                        backgroundColor: isSelected
+                          ? `${colors.primary}14`
+                          : colors.white,
+                        border: `1px solid ${
+                          isSelected ? colors.primary : colors.neutral[200]
+                        }`,
+                        boxShadow: isSelected
+                          ? `0 0 0 3px ${colors.primary}22`
+                          : "none",
+                      }}
+                    >
+                      {/* 🔹 TOP ROW */}
+                      <div className="flex items-center justify-between">
+                        {/* Left */}
+                        <div className="flex items-center gap-3 min-w-0">
+                          <Avatar
+                            size="large"
+                            square
+                            className="!rounded-3xl shadow-sm"
+                            style={{
+                              backgroundColor: colors.primaryGlow,
+                              color: colors.neutral[800],
+                            }}
+                          >
+                            {ed.schoolName
+                              .split(" ")
+                              .slice(0, 2)
+                              .map((s) => s[0])
+                              .join("")}
+                          </Avatar>
 
-                    {/* 🔹 TOP ROW */}
-                    <div className="flex items-center justify-between">
-                      {/* Left */}
-                      <div className="flex items-center gap-3 min-w-0">
-                        <Avatar
-                          size="large"
-                          square
-                          className="!rounded-3xl shadow-sm bg-violet-200 text-violet-700"
-                        >
-                          {ed.schoolName
-                            .split(" ")
-                            .slice(0, 2)
-                            .map((s) => s[0])
-                            .join("")}
-                        </Avatar>
-
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-sm font-semibold text-neutral-900 truncate">
-                            {getDegreeLabel(ed.degree)}{" "}
-                          </span>
-                          <span className="text-xs text-neutral-500 truncate">
-                            {ed.schoolName}
-                          </span>
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-sm font-semibold text-neutral-900 truncate">
+                              {getDegreeLabel(ed.degree)}{" "}
+                            </span>
+                            <span className="text-xs text-neutral-500 truncate">
+                              {ed.schoolName}
+                            </span>
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Right */}
-                      <div className="flex flex-col items-end gap-2 shrink-0">
-                        <IconButton
-                          size="small"
-                          icon={<FeatherX />}
-                          aria-label={`Delete education ${ed.degree}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDeleteId(ed.id);
-                          }}
-                          className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
-                        />
+                        {/* Right */}
+                        <div className="flex flex-col items-end gap-2 shrink-0">
+                          <IconButton
+                            size="small"
+                            icon={<FeatherX />}
+                            aria-label={`Delete education ${ed.degree}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteId(ed.id);
+                            }}
+                            className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
+                          />
 
-                        <span className="text-xs text-neutral-500">
-                          {ed.startYear}
-                          {ed.currentlyStudying
-                            ? " - Present"
-                            : ed.endYear
-                              ? ` - ${ed.endYear}`
-                              : ""}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* 🔹 DETAILS (same card, same border) */}
-                    {isSelected && (
-                      <>
-                        <div className="my-4 border-t border-neutral-200" />
-
-                        <div className="flex flex-col gap-3 text-sm text-neutral-800 px-1">
-                          <div>
-                            <span className="font-medium">Degree:</span>{" "}
-                            {getDegreeLabel(ed.degree)}{" "}
-                          </div>
-
-                          <div>
-                            <span className="font-medium">Field of study:</span>{" "}
-                            {ed.fieldOfStudy}
-                          </div>
-
-                          <div>
-                            <span className="font-medium">Institution:</span>{" "}
-                            {ed.schoolName}
-                          </div>
-
-                          <div>
-                            <span className="font-medium">Duration:</span>{" "}
+                          <span className="text-xs text-neutral-500">
                             {ed.startYear}
                             {ed.currentlyStudying
                               ? " - Present"
                               : ed.endYear
                                 ? ` - ${ed.endYear}`
                                 : ""}
-                          </div>
-
-                          {ed.gpa && (
-                            <div>
-                              <span className="font-medium">GPA:</span> {ed.gpa}
-                            </div>
-                          )}
+                          </span>
                         </div>
-                      </>
-                    )}
-                  </div>
-                );
-              })}
-            </section>
+                      </div>
 
-            {/* Form */}
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleAddEducation();
-              }}
-              className="mt-6 flex flex-col gap-4"
-            >
-             {/* Degree */}
-<div className="flex flex-col gap-1">
-  <label className="text-[12px] font-medium text-neutral-900">
-    Degree <span className="text-red-500">*</span>
-  </label>
+                      {/* 🔹 DETAILS (same card, same border) */}
+                      {isSelected && (
+                        <>
+                          <div className="my-4 border-t border-neutral-200" />
 
-  <SubframeCore.DropdownMenu.Root>
-    <SubframeCore.DropdownMenu.Trigger asChild>
-      {/* ✅ Trigger must have EXACTLY ONE child element */}
-      <div
-  className="flex h-9 items-center justify-between rounded-full border border-neutral-300 px-3 cursor-pointer hover:bg-neutral-50"
-  style={{ backgroundColor: colors.white }}
->
-  <span
-    className="text-[12px]"
-    style={{ color: degree ? colors.accent : "#9CA3AF" }}
-  >
-    {DEGREE_OPTIONS.find((d) => d.value === degree)?.label || "Select Degree"}
-  </span>
+                          <div className="flex flex-col gap-3 text-sm text-neutral-800 px-1">
+                            <div>
+                              <span className="font-medium">Degree:</span>{" "}
+                              {getDegreeLabel(ed.degree)}{" "}
+                            </div>
 
-  <FeatherChevronDown style={{ color: "#6B7280" }} />
-</div>
+                            <div>
+                              <span className="font-medium">
+                                Field of study:
+                              </span>{" "}
+                              {ed.fieldOfStudy}
+                            </div>
 
-    </SubframeCore.DropdownMenu.Trigger>
+                            <div>
+                              <span className="font-medium">Institution:</span>{" "}
+                              {ed.schoolName}
+                            </div>
 
-<SubframeCore.DropdownMenu.Portal>
-  <SubframeCore.DropdownMenu.Content
-  sideOffset={4}
-    align="start"
+                            <div>
+                              <span className="font-medium">Duration:</span>{" "}
+                              {ed.startYear}
+                              {ed.currentlyStudying
+                                ? " - Present"
+                                : ed.endYear
+                                  ? ` - ${ed.endYear}`
+                                  : ""}
+                            </div>
 
-    className="bg-white text-neutral-900 rounded-2xl shadow-lg py-1 max-h-[220px] overflow-y-auto border border-neutral-300 min-w-[200px]"
-    style={{ zIndex: 999999 }}
-    
-  >
-    {DEGREE_OPTIONS.map((item) => (
-      <SubframeCore.DropdownMenu.Item
-        key={item.value}
-        className="
+                            {ed.gpa && (
+                              <div>
+                                <span className="font-medium">GPA:</span>{" "}
+                                {ed.gpa}
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
+              </section>
+
+              {/* Form */}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleAddEducation();
+                }}
+                className="mt-6 flex flex-col gap-4"
+              >
+                {/* Degree */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-[12px] font-medium text-neutral-900">
+                    Degree <span className="text-red-500">*</span>
+                  </label>
+
+                  <SubframeCore.DropdownMenu.Root>
+                    <SubframeCore.DropdownMenu.Trigger asChild>
+                      {/* ✅ Trigger must have EXACTLY ONE child element */}
+                      <div
+                        className="flex h-9 items-center justify-between rounded-full border border-neutral-300 px-3 cursor-pointer hover:bg-neutral-50"
+                        style={{ backgroundColor: colors.white }}
+                      >
+                        <span
+                          className="text-[12px]"
+                          style={{ color: degree ? colors.accent : "#9CA3AF" }}
+                        >
+                          {DEGREE_OPTIONS.find((d) => d.value === degree)
+                            ?.label || "Select Degree"}
+                        </span>
+
+                        <FeatherChevronDown style={{ color: "#6B7280" }} />
+                      </div>
+                    </SubframeCore.DropdownMenu.Trigger>
+
+                    <SubframeCore.DropdownMenu.Portal>
+                      <SubframeCore.DropdownMenu.Content
+                        sideOffset={4}
+                        align="start"
+                        className="bg-white text-neutral-900 rounded-2xl shadow-lg py-1 max-h-[220px] overflow-y-auto border border-neutral-300 min-w-[200px]"
+                        style={{ zIndex: 999999 }}
+                      >
+                        {DEGREE_OPTIONS.map((item) => (
+                          <SubframeCore.DropdownMenu.Item
+                            key={item.value}
+                            className="
           px-4 py-2 text-sm
           text-neutral-900
           cursor-pointer
           hover:bg-neutral-100
           outline-none
         "
-        onSelect={() => setDegree(item.value)}
-      >
-        {item.label}
-      </SubframeCore.DropdownMenu.Item>
-    ))}
-  </SubframeCore.DropdownMenu.Content>
-</SubframeCore.DropdownMenu.Portal>
-  </SubframeCore.DropdownMenu.Root>
-</div>
-
-
-              {/* Field of Study */}
-              <TextField
-                className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-                label={
-                  <span className="text-[12px]">
-                    Field of Study <span className="text-red-500">*</span>{" "}
-                  </span>
-                }
-                helpText={
-                  <span className="text-[12px]">
-                    Your major or concentration{" "}
-                  </span>
-                }
-              >
-                <TextField.Input
-                  className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0
-             text-sm placeholder:text-xs placeholder:text-neutral-400"
-                  placeholder="e.g., Computer Science, Business Administration"
-                  value={fieldOfStudy}
-                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                    setFieldOfStudy(ev.target.value)
-                  }
-                />
-              </TextField>
-
-              {/* School Name */}
-              <TextField
-                className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-                label={
-                  <span className="text-[12px]">
-                    School Name <span className="text-red-500">*</span>{" "}
-                  </span>
-                }
-                helpText=""
-              >
-                <TextField.Input
-                  className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0
-             text-sm placeholder:text-xs placeholder:text-neutral-400"
-                  placeholder="Name of institution"
-                  value={schoolName}
-                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                    setSchoolName(ev.target.value)
-                  }
-                />
-              </TextField>
-
-              {/* Years */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Start Year */}
-                <div className="flex flex-col gap-1">
-                  <label className="text-[12px] font-medium">
-                    Start Year <span className="text-red-500">*</span>
-                  </label>
-
-                  <YearPicker
-                    value={startYear}
-                    onChange={setStartYear}
-                    minYear={1950}
-                    maxYear={new Date().getFullYear()}
-                  />
+                            onSelect={() => setDegree(item.value)}
+                          >
+                            {item.label}
+                          </SubframeCore.DropdownMenu.Item>
+                        ))}
+                      </SubframeCore.DropdownMenu.Content>
+                    </SubframeCore.DropdownMenu.Portal>
+                  </SubframeCore.DropdownMenu.Root>
                 </div>
 
-                {/* End Year */}
-                <div className="flex flex-col gap-1">
-                  <label className="text-[12px] font-medium">
-                    End Year <span className="text-red-500">*</span>
-                  </label>
-                  <YearPicker
-                    value={endYear}
-                    onChange={setEndYear}
-                    disabled={currentlyStudying}
-                    minYear={Number(startYear) || 1950}
-                    maxYear={new Date().getFullYear()}
+                {/* Field of Study */}
+                <TextField
+                  className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
+                  label={
+                    <span className="text-[12px]">
+                      Field of Study{" "}
+                      <span className="text-red-500">*</span>{" "}
+                    </span>
+                  }
+                  helpText={
+                    <span className="text-[12px]">
+                      Your major or concentration{" "}
+                    </span>
+                  }
+                >
+                  <TextField.Input
+                    className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0
+             text-sm placeholder:text-xs placeholder:text-neutral-400"
+                    placeholder="e.g., Computer Science, Business Administration"
+                    value={fieldOfStudy}
+                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                      setFieldOfStudy(ev.target.value)
+                    }
                   />
+                </TextField>
+
+                {/* School Name */}
+                <TextField
+                  className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
+                  label={
+                    <span className="text-[12px]">
+                      School Name <span className="text-red-500">*</span>{" "}
+                    </span>
+                  }
+                  helpText=""
+                >
+                  <TextField.Input
+                    className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0
+             text-sm placeholder:text-xs placeholder:text-neutral-400"
+                    placeholder="Name of institution"
+                    value={schoolName}
+                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                      setSchoolName(ev.target.value)
+                    }
+                  />
+                </TextField>
+
+                {/* Years */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Start Year */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[12px] font-medium">
+                      Start Year <span className="text-red-500">*</span>
+                    </label>
+
+                    <YearPicker
+                      value={startYear}
+                      onChange={setStartYear}
+                      minYear={1950}
+                      maxYear={new Date().getFullYear()}
+                    />
+                  </div>
+
+                  {/* End Year */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[12px] font-medium">
+                      End Year <span className="text-red-500">*</span>
+                    </label>
+                    <YearPicker
+                      value={endYear}
+                      onChange={setEndYear}
+                      disabled={currentlyStudying}
+                      minYear={Number(startYear) || 1950}
+                      maxYear={new Date().getFullYear()}
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* Currently Studying Toggle */}
-              <div className="flex items-center gap-3">
-                <Switch
-                  checked={currentlyStudying}
-                  onCheckedChange={handleCurrentlyStudyingToggle}
-                  tabIndex={0}
-                  role="switch"
-                  aria-checked={currentlyStudying}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      handleCurrentlyStudyingToggle(!currentlyStudying);
-                    }
-                  }}
-                 className="h-5 w-9 transition-colors"
-    style={{
-      backgroundColor: currentlyStudying
-        ? colors.primary        // ON color
-        : colors.neutral?.[200] || "#D1D5DB", // OFF color fallback
-    }}
-                />
-
-                <span className="text-sm text-neutral-700">
-                  I am currently studying
-                </span>
-              </div>
-
-              {/* GPA Field - US 4-point scale */}
-              <TextField
-                className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-                label={<span className="text-[12px]">GPA</span>}
-              >
-                <TextField.Input
-                  className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0"
-                  placeholder="e.g., 3.8 (out of 4)"
-                  value={gpa}
-                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) => {
-                    const value = ev.target.value.replace(/[^0-9.]/g, "");
-                    const decimalCount = (value.match(/\./g) || []).length;
-                    if (decimalCount <= 1) {
-                      setGpa(value);
-                      if (value && cgpa) {
-                        setCGpa("");
+                {/* Currently Studying Toggle */}
+                <div className="flex items-center gap-3">
+                  <Switch
+                    checked={currentlyStudying}
+                    onCheckedChange={handleCurrentlyStudyingToggle}
+                    tabIndex={0}
+                    role="switch"
+                    aria-checked={currentlyStudying}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleCurrentlyStudyingToggle(!currentlyStudying);
                       }
-                    }
-                  }}
-                />
-              </TextField>
+                    }}
+                    className="h-5 w-9 transition-colors"
+                    style={{
+                      backgroundColor: currentlyStudying
+                        ? colors.primary // ON color
+                        : colors.neutral?.[200] || "#D1D5DB", // OFF color fallback
+                    }}
+                  />
 
-              {/* CGPA Field - Indian 10-point scale */}
-              <TextField
-                className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-                label={<span className="text-[12px]">CGPA</span>}
-              >
-                <TextField.Input
-                  className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0"
-                  placeholder="e.g., 7.8 (out of 10)"
-                  value={cgpa}
-                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) => {
-                    const value = ev.target.value.replace(/[^0-9.]/g, "");
-                    const decimalCount = (value.match(/\./g) || []).length;
-                    if (decimalCount <= 1) {
-                      setCGpa(value);
-                      if (value && gpa) {
-                        setGpa("");
+                  <span className="text-sm text-neutral-700">
+                    I am currently studying
+                  </span>
+                </div>
+
+                {/* GPA Field - US 4-point scale */}
+                <TextField
+                  className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
+                  label={<span className="text-[12px]">GPA</span>}
+                >
+                  <TextField.Input
+                    className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0"
+                    placeholder="e.g., 3.8 (out of 4)"
+                    value={gpa}
+                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) => {
+                      const value = ev.target.value.replace(/[^0-9.]/g, "");
+                      const decimalCount = (value.match(/\./g) || []).length;
+                      if (decimalCount <= 1) {
+                        setGpa(value);
+                        if (value && cgpa) {
+                          setCGpa("");
+                        }
                       }
-                    }
-                  }}
-                />
-              </TextField>
-              <div className="mt-2 flex flex-col sm:flex-row gap-3 items-center">
-                <Button
-                  type="button"
-                  disabled={isSubmitting}
-                  variant="neutral-secondary"
-                  icon={<FeatherPlus />}
-                  className="w-full rounded-full h-10 px-4 border-neutral-300"
-                  onClick={handleAddEducation}
-                >
-                  {isSubmitting ? "Adding..." : "Add another education"}
-                </Button>
-                <div className="flex-1" />
-              </div>
-            </form>
-            {/* Top form horizontal line */}
-            <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
-            <footer>
-              <Button
-                onClick={handleContinue}
-                disabled={!canContinue || isSubmitting}
-                style={{ backgroundColor: colors.accent, color: "Background" }}
-                className={`
-    w-full h-10 rounded-full transition-all
-    ${
-      !canContinue || isSubmitting
-        ? "bg-violet-300 cursor-not-allowed"
-        : "shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
-    }
-  `}
-              >
-                {isSubmitting ? "Saving..." : "Continue"}
-              </Button>
-            </footer>
-          </main>
+                    }}
+                  />
+                </TextField>
 
-          {/* Right panel */}
-          <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
-            <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
-              <h3 className="text-[20px] text-neutral-900">
-                Your Experience Index
-              </h3>
-
-              <div className="flex items-center justify-center py-6">
-                <span
-                  aria-live="polite"
-                  className="font-['Afacad_Flux'] text-[32px] sm:text-[40px] md:text-[48px] font-[500] leading-[56px] text-neutral-300"
+                {/* CGPA Field - Indian 10-point scale */}
+                <TextField
+                  className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
+                  label={<span className="text-[12px]">CGPA</span>}
                 >
-                  {displayedIndex ?? 0}
-                </span>
-              </div>
+                  <TextField.Input
+                    className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0"
+                    placeholder="e.g., 7.8 (out of 10)"
+                    value={cgpa}
+                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) => {
+                      const value = ev.target.value.replace(/[^0-9.]/g, "");
+                      const decimalCount = (value.match(/\./g) || []).length;
+                      if (decimalCount <= 1) {
+                        setCGpa(value);
+                        if (value && gpa) {
+                          setGpa("");
+                        }
+                      }
+                    }}
+                  />
+                </TextField>
+                
+                <div className="mt-2 flex flex-col sm:flex-row gap-3 items-center">
+                  <Button
+                    type="button"
+                    disabled={isSubmitting}
+                    variant="neutral-secondary"
+                    icon={<FeatherPlus />}
+                    className="w-full rounded-full h-10 px-4 border-neutral-300"
+                    onClick={handleAddEducation}
+                  >
+                    {isSubmitting ? "Adding..." : "Add another education"}
+                  </Button>
+                  <div className="flex-1" />
+                </div>
+              </form>
+
 
               {/* Top form horizontal line */}
               <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
+              <footer>
+                <Button
+                  onClick={handleContinue}
+                  disabled={!canContinue || isSubmitting}
+                  className="w-full h-10 sm:h-11 rounded-full text-sm sm:text-base font-semibold transition-all active:scale-[0.99]"
+                  style={{
+                    backgroundColor:
+                      !canContinue || isSubmitting
+                        ? colors.neutral[200]
+                        : colors.accent,
+                    color: colors.background,
+                    cursor:
+                      !canContinue || isSubmitting ? "not-allowed" : "pointer",
+                    opacity: !canContinue || isSubmitting ? 0.75 : 1,
+                    boxShadow:
+                      !canContinue || isSubmitting
+                        ? "none"
+                        : "0 10px 24px rgba(0,0,0,0.08)",
+                  }}
+                >
+                  {isSubmitting ? "Saving..." : "Continue"}
+                </Button>
+              </footer>
+            </main>
 
-              <div className="mt-4">
-                <div className="text-[16px] text-neutral-800 mb-3">
-                  Progress Steps
+            {/* Right panel */}
+            <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
+              <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
+                <h3 className="text-[20px] text-neutral-900">
+                  Your Experience Index
+                </h3>
+
+                <div className="flex items-center justify-center py-6">
+                  <span
+                    aria-live="polite"
+                    className="font-['Afacad_Flux'] text-[32px] sm:text-[40px] md:text-[48px] font-[500] leading-[56px] text-neutral-300"
+                  >
+                    {displayedIndex ?? 0}
+                  </span>
                 </div>
 
-                {/* ⚪ Completed — Demographics */}
-                <button
-                  type="button"
-                  className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3 hover:bg-neutral-50"
-                >
-                  <IconWithBackground
-                    size="small"
-                    icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                    className="!bg-green-100 !rounded-full !p-3"
-                  />
-                  <span className="text-sm text-neutral-700">Demographics</span>
-                </button>
+                {/* Top form horizontal line */}
+                <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
 
-                {/* 🟣 Active — Education */}
-                <button
-                  style={{ backgroundColor: colors.primary}}
-                  type="button"
-                  className="w-full flex items-center gap-3 rounded-2xl px-4 py-2 mb-3 hover:shadow-sm"
-                >
-                  <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white shadow-sm">
+                <div className="mt-4">
+                  <div className="text-[16px] text-neutral-800 mb-3">
+                    Progress Steps
+                  </div>
+
+                  {/* ⚪ Completed — Demographics */}
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3 hover:bg-neutral-50"
+                  >
                     <IconWithBackground
                       size="small"
-                      icon={<FeatherGraduationCap />}
+                      icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
+                      className="!bg-green-100 !rounded-full !p-3"
                     />
-                  </div>
-                  <span className="text-sm font-semibold text-neutral-900">
-                    Education
-                  </span>
-                </button>
+                    <span className="text-sm text-neutral-700">
+                      Demographics
+                    </span>
+                  </button>
 
-                {/* Inactive steps */}
-                <button
-                  type="button"
-                  className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-default-background px-4 py-2 mb-3 hover:bg-neutral-50"
-                >
-                  <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white">
-                    <IconWithBackground
-                      variant="neutral"
-                      size="small"
-                      icon={<FeatherBriefcase />}
-                    />
-                  </div>
-                  <span className="text-sm text-neutral-500">Experience</span>
-                </button>
+                  {/* 🟣 Active — Education */}
+                  <button
+                    style={{ backgroundColor: colors.primary }}
+                    type="button"
+                    className="w-full flex items-center gap-3 rounded-2xl px-4 py-2 mb-3 hover:shadow-sm"
+                  >
+                    <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white shadow-sm">
+                      <IconWithBackground
+                        size="small"
+                        icon={<FeatherGraduationCap />}
+                      />
+                    </div>
+                    <span className="text-sm font-semibold text-neutral-900">
+                      Education
+                    </span>
+                  </button>
 
-                <button
-                  type="button"
-                  className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-default-background px-4 py-2 mb-3 hover:bg-neutral-50"
-                >
-                  <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white">
-                    <IconWithBackground
-                      variant="neutral"
-                      size="small"
-                      icon={<FeatherFileCheck />}
-                    />
-                  </div>
-                  <span className="text-sm text-neutral-500">
-                    Certifications
-                  </span>
-                </button>
+                  {/* Inactive steps */}
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-default-background px-4 py-2 mb-3 hover:bg-neutral-50"
+                  >
+                    <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white">
+                      <IconWithBackground
+                        variant="neutral"
+                        size="small"
+                        icon={<FeatherBriefcase />}
+                      />
+                    </div>
+                    <span className="text-sm text-neutral-500">Experience</span>
+                  </button>
 
-                <button
-                  type="button"
-                  className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-default-background px-4 py-2 mb-3 hover:bg-neutral-50"
-                >
-                  <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white">
-                    <IconWithBackground
-                      variant="neutral"
-                      size="small"
-                      icon={<FeatherAward />}
-                    />
-                  </div>
-                  <span className="text-sm text-neutral-500">Awards</span>
-                </button>
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-default-background px-4 py-2 mb-3 hover:bg-neutral-50"
+                  >
+                    <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white">
+                      <IconWithBackground
+                        variant="neutral"
+                        size="small"
+                        icon={<FeatherFileCheck />}
+                      />
+                    </div>
+                    <span className="text-sm text-neutral-500">
+                      Certifications
+                    </span>
+                  </button>
 
-                <button
-                  type="button"
-                  className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-default-background px-4 py-2 hover:bg-neutral-50"
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-default-background px-4 py-2 mb-3 hover:bg-neutral-50"
+                  >
+                    <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white">
+                      <IconWithBackground
+                        variant="neutral"
+                        size="small"
+                        icon={<FeatherAward />}
+                      />
+                    </div>
+                    <span className="text-sm text-neutral-500">Awards</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-default-background px-4 py-2 hover:bg-neutral-50"
+                  >
+                    <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white">
+                      <IconWithBackground
+                        variant="neutral"
+                        size="small"
+                        icon={<FeatherPackage />}
+                      />
+                    </div>
+                    <span className="text-sm text-neutral-500">Projects</span>
+                  </button>
+                </div>
+              </div>
+            </aside>
+          </div>
+          {deleteId && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+              <div
+                className="w-[360px] rounded-2xl p-6 shadow-xl"
+                style={{ backgroundColor: colors.white }}
+              >
+                <div className="flex justify-between items-center mb-4">
+                  <h3
+                    className="text-lg font-semibold"
+                    style={{ color: colors.accent }}
+                  >
+                    Are you sure?
+                  </h3>
+
+                  <button
+                    onClick={() => setDeleteId(null)}
+                    className="transition"
+                    style={{ color: colors.neutral[400] }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.color = colors.accent)
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.color = colors.neutral[400])
+                    }
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <p
+                  className="text-sm mb-6"
+                  style={{ color: colors.neutral[600] }}
                 >
-                  <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white">
-                    <IconWithBackground
-                      variant="neutral"
-                      size="small"
-                      icon={<FeatherPackage />}
-                    />
-                  </div>
-                  <span className="text-sm text-neutral-500">Projects</span>
-                </button>
+                  Do you really want to delete this education?
+                </p>
+
+                <div className="flex gap-3">
+                  {/* Cancel */}
+                  <Button
+                    variant="neutral-secondary"
+                    className="flex-1 rounded-3xl"
+                    onClick={() => setDeleteId(null)}
+                  >
+                    Cancel
+                  </Button>
+
+                  {/* Confirm */}
+                  <Button
+                    className="flex-1 rounded-3xl transition"
+                    onClick={handleRemove}
+                    disabled={isSubmitting}
+                    style={{
+                      backgroundColor: isSubmitting
+                        ? `${colors.primary}66`
+                        : colors.primary,
+                      color: colors.accent,
+                      cursor: isSubmitting ? "not-allowed" : "pointer",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isSubmitting)
+                        e.currentTarget.style.backgroundColor =
+                          colors.secondary;
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isSubmitting)
+                        e.currentTarget.style.backgroundColor = colors.primary;
+                    }}
+                  >
+                    {isSubmitting ? "Deleting..." : "Yes"}
+                  </Button>
+                </div>
               </div>
             </div>
-          </aside>
+          )}
         </div>
-        {deleteId && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-    <div
-      className="w-[360px] rounded-2xl p-6 shadow-xl"
-      style={{ backgroundColor: colors.white }}
-    >
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold" style={{ color: colors.accent }}>
-          Are you sure?
-        </h3>
-
-        <button
-          onClick={() => setDeleteId(null)}
-          className="transition"
-          style={{ color: colors.neutral[400] }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = colors.accent)}
-          onMouseLeave={(e) => (e.currentTarget.style.color = colors.neutral[400])}
-        >
-          ✕
-        </button>
-      </div>
-
-      <p className="text-sm mb-6" style={{ color: colors.neutral[600] }}>
-        Do you really want to delete this education?
-      </p>
-
-      <div className="flex gap-3">
-        {/* Cancel */}
-        <Button
-          variant="neutral-secondary"
-          className="flex-1 rounded-3xl"
-          onClick={() => setDeleteId(null)}
-        >
-          Cancel
-        </Button>
-
-        {/* Confirm */}
-        <Button
-          className="flex-1 rounded-3xl transition"
-          onClick={handleRemove}
-          disabled={isSubmitting}
-          style={{
-            backgroundColor: isSubmitting
-              ? `${colors.primary}66`
-              : colors.primary,
-            color: colors.accent,
-            cursor: isSubmitting ? "not-allowed" : "pointer",
-          }}
-          onMouseEnter={(e) => {
-            if (!isSubmitting)
-              e.currentTarget.style.backgroundColor = colors.secondary;
-          }}
-          onMouseLeave={(e) => {
-            if (!isSubmitting)
-              e.currentTarget.style.backgroundColor = colors.primary;
-          }}
-        >
-          {isSubmitting ? "Deleting..." : "Yes"}
-        </Button>
       </div>
     </div>
-  </div>
-)}
-
-      </div>
-    </div>
-  </div>
-);
+  );
 }

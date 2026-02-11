@@ -95,7 +95,7 @@ export default function ResetPasswordSuccess() {
   className="w-full h-10 rounded-3xl font-semibold transition"
   style={{
     backgroundColor: colors.primary,
-    color: colors.white,
+    color: colors.accent,
   }}
   onMouseEnter={(e) =>
     (e.currentTarget.style.backgroundColor = colors.secondary)

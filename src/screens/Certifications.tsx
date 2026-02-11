@@ -183,25 +183,41 @@ function MonthYearPicker({
               const formatted = `${String(index + 1).padStart(2, "0")}/${year}`;
 
               return (
-                <button
-                  key={month}
-                  type="button"
-                  disabled={disabledMonth}
-                  onClick={() => {
-                    onChange(formatted);
-                    setOpen(false);
-                  }}
-                  className={`py-2 rounded-lg transition
-                    ${
-                      value === formatted
-                        ? "bg-violet-600 text-white"
-                        : "hover:bg-neutral-100"
-                    }
-                    ${disabledMonth ? "text-neutral-400 cursor-not-allowed" : ""}
-                  `}
-                >
-                  {month}
-                </button>
+               <button
+  key={month}
+  type="button"
+  disabled={disabledMonth}
+  onClick={() => {
+    onChange(formatted);
+    setOpen(false);
+  }}
+  className="py-2 px-3 rounded-lg transition text-sm sm:text-base"
+  style={{
+    backgroundColor:
+      value === formatted ? colors.accent : "transparent",
+    color:
+      value === formatted
+        ? colors.background
+        : disabledMonth
+        ? colors.neutral[400]
+        : colors.neutral[800],
+    cursor: disabledMonth ? "not-allowed" : "pointer",
+    opacity: disabledMonth ? 0.7 : 1,
+  }}
+  onMouseEnter={(e) => {
+    if (!disabledMonth && value !== formatted) {
+      e.currentTarget.style.backgroundColor = colors.primaryGlow;
+    }
+  }}
+  onMouseLeave={(e) => {
+    if (!disabledMonth && value !== formatted) {
+      e.currentTarget.style.backgroundColor = "transparent";
+    }
+  }}
+>
+  {month}
+</button>
+
               );
             })}
           </div>
@@ -1157,30 +1173,17 @@ const handleContinue = () => {
             {/* top - back + progress */}
             <div className="flex w-full items-center justify-center gap-4">
               <IconButton
-                size="small"
-                icon={<FeatherArrowLeft />}
-                onClick={async () => {
-                  try {
-                    // 1️⃣ If came from dashboard → always go back to dashboard
-                    if (source === "dashboard") {
-                      navigate("/dashboard");
-                      return;
-                    }
-        
-                    // 2️⃣ Otherwise → ask backend if education is allowed
-                    const res = await API("POST", "/auth/verify-route", {
-                      route: "/experience",
-                    });
-        
-                    if (res.allowed) {
-                      navigate("/education", { state: { source } });
-                    }
-                    // ❌ else do nothing (education already completed)
-                  } catch {
-                    // silent fail
-                  }
-                }}
-              />
+  size="small"
+  icon={<FeatherArrowLeft />}
+  onClick={() => {
+    if (source === "dashboard") {
+      navigate("/dashboard");
+    } else {
+      navigate(-1);
+    }
+  }}
+/>
+
               <div className="flex-1 w-full max-w-full md:max-w-[420px]">
                 <div className="flex items-center gap-3">
                   {[...Array(4)].map((_, i) => (
@@ -1243,19 +1246,24 @@ style={{
                     <div className="flex items-center justify-between">
                       {/* Left */}
                       <div className="flex items-center gap-3 min-w-0">
-                        <Avatar
-                          size="large"
-                          square
-                          className="!rounded-3xl bg-violet-200 text-violet-700"
-                        >
-                          {c.issuer
-                            ? c.issuer
-                                .split(" ")
-                                .slice(0, 2)
-                                .map((s) => s[0])
-                                .join("")
-                            : "C"}
-                        </Avatar>
+<Avatar
+  size="large"
+  square
+  className="!rounded-3xl shadow-sm"
+  style={{
+    backgroundColor: colors.primaryGlow,
+    color: colors.neutral[800],
+  }}
+>
+  {c.issuer
+    ? c.issuer
+        .split(" ")
+        .slice(0, 2)
+        .map((s) => s[0])
+        .join("")
+    : "C"}
+</Avatar>
+
 
                         <div className="flex flex-col min-w-0">
                           <span className="text-sm font-semibold text-neutral-900 truncate">
@@ -1311,18 +1319,24 @@ style={{
                           )}
 
                           {c.credentialLink && (
-                            <div>
-                              <span className="font-medium">Credential:</span>{" "}
-                              <a
-                                href={c.credentialLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-violet-700 underline"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                View
-                              </a>
-                            </div>
+<div>
+  <span style={{ color: colors.neutral[800] }} className="font-medium">
+    Credential:
+  </span>{" "}
+  <a
+    href={c.credentialLink}
+    target="_blank"
+    rel="noopener noreferrer"
+    onClick={(e) => e.stopPropagation()}
+    className="underline transition"
+    style={{ color: colors.accent }}
+    onMouseEnter={(e) => (e.currentTarget.style.color = colors.neutral[800])}
+    onMouseLeave={(e) => (e.currentTarget.style.color = colors.accent)}
+  >
+    View
+  </a>
+</div>
+
                           )}
                         </div>
                       </>
@@ -1599,19 +1613,31 @@ style={{
                 </div>
 
                 {/* Certifications — active (purple) */}
-                <div style={{backgroundColor: colors.primary}} className="flex items-center gap-3 rounded-2xl px-4 py-2 mb-3">
-                  <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white shadow-sm">
-                    <IconWithBackground
-                      size="small"
-                      variant="neutral"
-                      className="!bg-white !text-violet-600"
-                      icon={<FeatherFileCheck />}
-                    />
-                  </div>
-                  <span className="text-sm font-semibold text-neutral-900">
-                    Certifications
-                  </span>
-                </div>
+<div
+  style={{ backgroundColor: colors.primary }}
+  className="flex items-center gap-3 rounded-2xl px-4 py-2 mb-3"
+>
+  <div
+    className="flex items-center justify-center h-8 w-8 rounded-2xl shadow-sm"
+    style={{ backgroundColor: colors.white }}
+  >
+    <IconWithBackground
+      size="small"
+      variant="neutral"
+      className="!bg-transparent"
+      style={{ color: colors.accent }}
+      icon={<FeatherFileCheck />}
+    />
+  </div>
+
+  <span
+    className="text-sm font-semibold"
+    style={{ color: colors.neutral[800] }}
+  >
+    Certifications
+  </span>
+</div>
+
 
                 {/* Awards — Inactive */}
                 <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">

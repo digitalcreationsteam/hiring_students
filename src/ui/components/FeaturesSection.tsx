@@ -1,4 +1,6 @@
-// src/components/FeaturesSection.tsx - Updated with color variables
+// src/components/FeaturesSection.tsx - Enhanced and optimized
+'use client';
+
 import { uniTalentColors } from 'src/common/Colors';
 
 const FeaturesSection = () => {
@@ -62,122 +64,192 @@ const FeaturesSection = () => {
   ];
 
   return (
-    <section className="py-20 pb-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="features" className="relative w-full py-16 sm:py-20 lg:py-28 overflow-hidden">
+      {/* Background */}
+      <div 
+        style={{ backgroundColor: uniTalentColors.background }}
+        className="absolute inset-0"
+      >
+        {/* Subtle Grid Background */}
+        <div 
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: `
+              linear-gradient(90deg, ${uniTalentColors.primary} 1px, transparent 1px),
+              linear-gradient(${uniTalentColors.primary} 1px, transparent 1px)
+            `,
+            backgroundSize: '60px 60px',
+            pointerEvents: 'none',
+          }}
+        />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <div className="mb-12 sm:mb-16 lg:mb-20">
+          <span 
+            style={{ color: uniTalentColors.primary }}
+            className="text-xs sm:text-sm font-semibold uppercase tracking-widest block mb-4"
+          >
+            How It Works
+          </span>
+          <h2 
+            style={{ color: uniTalentColors.text }}
+            className="text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight max-w-4xl"
+          >
+            Here's the difference.
+          </h2>
+        </div>
 
         {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-0">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 mb-16 sm:mb-20 lg:mb-24">
           {features.map((feature, index) => (
             <div 
               key={index} 
               style={{ 
                 backgroundColor: uniTalentColors.background,
-                borderColor: uniTalentColors.lightGray
+                borderColor: uniTalentColors.primary,
               }}
-              className="group p-8 rounded-2xl border hover:border-#060606 transition-all duration-300 hover:shadow-lg relative overflow-hidden"
+              className="group p-6 sm:p-7 lg:p-8 rounded-xl sm:rounded-2xl border-2 border-opacity-30 hover:border-opacity-100 transition-all duration-500 hover:shadow-lg relative overflow-hidden h-full flex flex-col"
             >
               {/* Icon Container with Hover Effect */}
-              <div className="mb-6 relative z-10">
+              <div className="mb-5 sm:mb-6 relative z-10">
                 <div 
                   style={{ 
-                    backgroundColor: uniTalentColors.primary,
-                    borderColor: uniTalentColors.lightGray
+                    backgroundColor: `${uniTalentColors.primary}20`,
+                    borderColor: uniTalentColors.primary,
                   }}
-                  className="inline-flex p-3 rounded-xl border group-hover:scale-110 transition-transform duration-300"
+                  className="inline-flex p-3 sm:p-3.5 rounded-lg sm:rounded-xl border border-opacity-50 group-hover:scale-110 group-hover:shadow-lg transition-all duration-300"
                 >
-                  <div style={{ color: uniTalentColors.text }}>
+                  <div style={{ color: uniTalentColors.primary }}>
                     {feature.icon}
                   </div>
                 </div>
               </div>
               
               {/* Feature Content */}
-              <div className="relative z-10">
-                <h3 style={{ color: uniTalentColors.text }} className="text-xl font-bold mb-4 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="relative z-10 flex-1">
+                <h3 
+                  style={{ color: uniTalentColors.text }} 
+                  className="text-lg sm:text-xl lg:text-2xl font-bold mb-3 sm:mb-4 leading-tight"
+                >
                   {feature.title}
                 </h3>
                 
-                <p style={{ color: uniTalentColors.text }} className="opacity-80 leading-relaxed mb-6">
+                <p 
+                  style={{ color: uniTalentColors.text }} 
+                  className="text-sm sm:text-base opacity-75 leading-relaxed"
+                >
                   {feature.description}
                 </p>
               </div>
               
               {/* Animated Bottom Border */}
-              <div className="relative z-10">
+              <div className="relative z-10 mt-6 sm:mt-7 lg:mt-8">
                 <div 
-                  style={{ borderColor: uniTalentColors.lightGray }}
-                  className="mt-6 pt-6 border-t"
+                  style={{ borderColor: `${uniTalentColors.primary}40` }}
+                  className="pt-6 border-t"
                 >
                   <div 
                     style={{ backgroundColor: uniTalentColors.primary }}
-                    className="h-1 w-0 group-hover:w-full transition-all duration-500 ease-out"
-                  ></div>
+                    className="h-1 w-0 group-hover:w-full transition-all duration-500 ease-out rounded-full"
+                  />
                 </div>
               </div>
 
               {/* Subtle Background Pattern on Hover */}
               <div 
                 style={{ backgroundColor: uniTalentColors.primary }}
-                className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300"
-              ></div>
+                className="absolute inset-0 opacity-0 group-hover:opacity-3 transition-opacity duration-300"
+              />
             </div>
           ))}
         </div>
 
-        {/* Closing Statement 
-        <div className="text-center">
-          <div 
-            style={{ 
-              backgroundColor: uniTalentColors.primary,
-              borderColor: uniTalentColors.lightGray
-            }}
-            className="inline-block px-8 py-8 rounded-2xl border max-w-4xl mx-auto relative overflow-hidden"
-          >
-            {/* Background Pattern }
-            <div 
-              style={{ backgroundColor: uniTalentColors.text }}
-              className="absolute top-0 right-0 w-32 h-32 rounded-full -translate-y-16 translate-x-16 opacity-5"
-            ></div>
-            <div 
-              style={{ backgroundColor: uniTalentColors.text }}
-              className="absolute bottom-0 left-0 w-24 h-24 rounded-full translate-y-12 -translate-x-12 opacity-5"
-            ></div>
-
-            <div className="relative z-10">
-              <p style={{ color: uniTalentColors.text }} className="text-2xl md:text-3xl font-bold mb-4">
-                This is what merit-based hiring looks like.
-              </p>
-              <p style={{ color: uniTalentColors.text }} className="text-lg opacity-80 mb-8 max-w-2xl mx-auto">
-                And it starts with you taking the first assessment. Join thousands of Product Managers who've found their dream roles through UniTalent.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button 
-                  style={{ 
-                    backgroundColor: uniTalentColors.text,
-                    color: uniTalentColors.background
-                  }}
-                  className="font-semibold py-3 px-8 rounded-xl hover:opacity-90 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg"
+        {/* Comparison Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 mb-16 sm:mb-20 lg:mb-24 items-center">
+          {/* Left Side - The Problem */}
+          <div>
+            <h3 
+              style={{ color: uniTalentColors.text }}
+              className="text-xl sm:text-2xl lg:text-3xl font-bold mb-6 sm:mb-8"
+            >
+              The Old Way
+            </h3>
+            
+            <ul className="space-y-4 sm:space-y-5">
+              {[
+                'Resumes disappear into ATS black holes',
+                'Identical-looking applications',
+                'Filtered by keywords, not skills',
+                'Referrals matter more than talent',
+                'No idea where you stand'
+              ].map((item, idx) => (
+                <li 
+                  key={idx}
+                  style={{ color: uniTalentColors.text }}
+                  className="flex items-start text-sm sm:text-base opacity-75"
                 >
-                  Start Free Assessment
-                </button>
-                
-                <button 
-                  style={{ 
-                    backgroundColor: uniTalentColors.background,
-                    color: uniTalentColors.text,
-                    borderColor: uniTalentColors.text
-                  }}
-                  className="font-semibold py-3 px-8 rounded-xl border hover:opacity-80 hover:border-#FFD85F hover:shadow-lg transition-all duration-300"
-                >
-                  View Success Stories →
-                </button>
-              </div>
-            </div>
+                  <svg 
+                    className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0 opacity-40" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  {item}
+                </li>
+              ))}
+            </ul>
           </div>
-        </div> */}
+
+          {/* Right Side - UniTalent */}
+          <div>
+            <h3 
+              style={{ color: uniTalentColors.text }}
+              className="text-xl sm:text-2xl lg:text-3xl font-bold mb-6 sm:mb-8"
+            >
+              <span style={{ color: uniTalentColors.primary }}>UniTalent</span> Way
+            </h3>
+            
+            <ul className="space-y-4 sm:space-y-5">
+              {[
+                'Your profile is immediately visible',
+                'Ranked based on proven skills',
+                'Filtered by actual capabilities',
+                'Merit matters—not connections',
+                'Clear visibility into your ranking'
+              ].map((item, idx) => (
+                <li 
+                  key={idx}
+                  style={{ color: uniTalentColors.text }}
+                  className="flex items-start text-sm sm:text-base opacity-85"
+                >
+                  <svg 
+                    className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0"
+                    style={{ color: uniTalentColors.primary }}
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
 
       </div>
+
+      <style>{`
+        * {
+          scroll-behavior: smooth;
+        }
+      `}</style>
     </section>
   );
 };

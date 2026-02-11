@@ -1,17 +1,14 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import { IconButton } from "../ui/components/IconButton";
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { FeatherArrowLeft, FeatherX } from "@subframe/core";
+
 import HeaderLogo from "src/ui/components/HeaderLogo";
-import { IconWithBackground } from "../ui/components/IconWithBackground";
+import { IconButton } from "../ui/components/IconButton";
 import { TextField } from "../ui/components/TextField";
 import { Button } from "../ui/components/Button";
-import {
-  FeatherArrowLeft,
-  FeatherAlertTriangle,
-  FeatherX,
-} from "@subframe/core";
-import { useNavigate, useLocation } from "react-router-dom";
+
 import API, { URL_PATH } from "src/common/API";
 import { colors } from "../common/Colors";
 
@@ -20,12 +17,11 @@ export default function Skills() {
   const location = useLocation();
   const source = location.state?.source; // "dashboard" | undefined
 
-  console.log("SKILLS source: ", source);
-
   const [input, setInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const [skills, setSkills] = useState<string[]>([]);
+
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const suggested = [
     "Data Analysis",
@@ -42,9 +38,6 @@ export default function Skills() {
     "Metrics & KPIs",
   ];
 
-  const inputRef = useRef<HTMLInputElement | null>(null);
-
-  // use these values instead of prior scTextFieldClass / scInputClass
   const scTextFieldClass =
     "w-full [&>label]:text-[12px] [&>label]:font-medium [&>div]:h-8 [&>div]:rounded-full [&>div]:bg-neutral-100 [&>div]:!border-none";
 
@@ -59,6 +52,10 @@ export default function Skills() {
     if (!exists) setSkills((prev) => [...prev, s]);
   };
 
+  const removeSkill = (s: string) => {
+    setSkills((prev) => prev.filter((k) => k !== s));
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -67,11 +64,6 @@ export default function Skills() {
     }
   };
 
-  const removeSkill = (s: string) => {
-    setSkills((prev) => prev.filter((k) => k !== s));
-  };
-
-  //========POST SKILLS API ======================
   const handleContinue = async () => {
     if (skills.length === 0) {
       alert("Add at least one skill to continue.");
@@ -94,21 +86,11 @@ export default function Skills() {
       await API(
         "POST",
         URL_PATH.updateUserDomainSkills,
-        {
-          userId,
-          domainId,
-          skills,
-        },
-        {
-          Authorization: `Bearer ${token}`,
-        }
+        { userId, domainId, skills },
+        { Authorization: `Bearer ${token}` }
       );
 
-      if (source === "dashboard") {
-        navigate("/dashboard");
-      } else {
-        navigate("/assessment-intro");
-      }
+      navigate(source === "dashboard" ? "/dashboard" : "/assessment-intro");
     } catch (error: any) {
       console.error("Skill save failed:", error);
       alert(
@@ -120,7 +102,6 @@ export default function Skills() {
     }
   };
 
-  // GET SKILLS API------
   useEffect(() => {
     const fetchSkills = async () => {
       try {
@@ -132,13 +113,8 @@ export default function Skills() {
           "user-id": userId,
         });
 
-        console.log("FULL RESPONSE 👉", res);
-
         const skillsFromApi = res?.[0]?.skills;
-
-        if (Array.isArray(skillsFromApi)) {
-          setSkills(skillsFromApi);
-        }
+        if (Array.isArray(skillsFromApi)) setSkills(skillsFromApi);
       } catch (err) {
         console.error("Failed to fetch skills:", err);
       }
@@ -147,29 +123,27 @@ export default function Skills() {
     fetchSkills();
   }, []);
 
-  return (
-    <div className="min-h-screen bg-neutral-50 relative overflow-hidden">
-      {/* Blended background - Covers entire page */}
-      <div className="pointer-events-none absolute inset-0">
-        <div
-          className="absolute inset-0"
-          style={{ backgroundColor: colors.background }}
-        />
+  const isDisabled = skills.length === 0 || isSubmitting;
 
+  return (
+    <div
+      className="min-h-screen relative overflow-hidden"
+      style={{ backgroundColor: colors.background }}
+    >
+      {/* Blended background */}
+      <div className="pointer-events-none absolute inset-0">
         <div
           className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
           style={{
             background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
           }}
         />
-
         <div
           className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
           style={{
             background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
           }}
         />
-
         <div
           className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
           style={{
@@ -178,51 +152,72 @@ export default function Skills() {
         />
       </div>
 
-      {/* Header Logo with relative positioning */}
       <div className="relative z-10">
         <HeaderLogo />
       </div>
 
-      {/* Main content */}
-      <div className="flex justify-center items-center px-6 py-0 relative z-10">
-        <main className="w-full max-w-[720px] bg-white rounded-3xl shadow-[0_10px_30px_rgba(40,0,60,0.06)] border border-gray-300 px-10 py-8">
-          {/* top row - back + progress */}
-          <div className="flex items-center gap-4">
+      <div className="relative z-10 flex justify-center px-4 sm:px-6 md:px-8 py-6 sm:py-8">
+        <main
+          className="w-full max-w-[720px] rounded-3xl shadow-xl border px-6 sm:px-8 md:px-10 py-6 sm:py-8 backdrop-blur-md"
+          style={{
+            backgroundColor: `${colors.white}CC`,
+            borderColor: colors.neutral[200],
+          }}
+        >
+          {/* Top row */}
+          <div className="flex items-center gap-3 sm:gap-4">
             <IconButton
               size="small"
               icon={<FeatherArrowLeft />}
-              onClick={() => navigate(-1)}
+              onClick={() => {
+                if (source === "dashboard") navigate("/dashboard");
+                else navigate(-1);
+              }}
             />
 
             <div className="flex-1">
-              <div className="flex items-center gap-3">
-                {[...Array(3)].map((_, i) => (
+              <div className="flex items-center gap-2 sm:gap-3">
+                {Array.from({ length: 3 }).map((_, i) => (
                   <div
                     key={`p-${i}`}
-                    style={{ height: 6, backgroundColor: colors.primary }}
-                    className="flex-1 rounded-full"
+                    className="flex-1 rounded-full h-1.5 sm:h-2"
+                    style={{ backgroundColor: colors.primary }}
                   />
                 ))}
-                {[...Array(2)].map((_, i) => (
+                {Array.from({ length: 2 }).map((_, i) => (
                   <div
                     key={`n-${i}`}
-                    style={{ height: 6 }}
-                    className="flex-1 rounded-full bg-gray-300"
+                    className="flex-1 rounded-full h-1.5 sm:h-2"
+                    style={{ backgroundColor: colors.neutral[200] }}
                   />
                 ))}
               </div>
             </div>
           </div>
+
           {/* Header */}
-          <h2 className="mt-8 text-[22px]">Add your skills</h2>
-          <p className="text-xs text-neutral-500">
-            Add your key skills to help recruiters discover your profile and
-            match you with relevant opportunities
-          </p>
+          <div className="mt-6 sm:mt-8 flex flex-col gap-1">
+            <h2
+              className="text-[20px] sm:text-[22px] md:text-[26px] font-semibold"
+              style={{ color: colors.neutral[800] }}
+            >
+              Add your skills
+            </h2>
+
+            <p
+              className="text-xs sm:text-sm leading-relaxed"
+              style={{ color: colors.neutral[600] }}
+            >
+              Add your key skills to help recruiters discover your profile and
+              match you with relevant opportunities
+            </p>
+          </div>
 
           {/* Your Skills */}
           <div className="mt-8 flex flex-col gap-2">
-            <span className="text-[16px]  text-neutral-800">Your Skills *</span>
+            <span className="text-[16px]" style={{ color: colors.neutral[800] }}>
+              Your Skills *
+            </span>
 
             <TextField className={scTextFieldClass} label="">
               <TextField.Input
@@ -235,20 +230,23 @@ export default function Skills() {
               />
             </TextField>
 
-            {/* Added skills */}
             <div className="flex flex-wrap items-center gap-3 mt-1">
               {skills.map((s) => (
                 <div
                   key={s}
-                  className="inline-flex items-center gap-2 rounded-full bg-neutral-100 px-3"
+                  className="inline-flex items-center gap-2 rounded-full px-3 py-1"
+                  style={{ backgroundColor: colors.neutral[100] }}
                 >
-                  <span className="text-[16px] text-neutral-700">{s}</span>
+                  <span className="text-[16px]" style={{ color: colors.neutral[600] }}>
+                    {s}
+                  </span>
 
                   <IconButton
                     size="small"
                     icon={<FeatherX />}
                     onClick={() => removeSkill(s)}
-                    className="!bg-transparent !text-neutral-500 !w-6 !h-6 [&>svg]:w-3 [&>svg]:h-3"
+                    className="!bg-transparent !w-6 !h-6 [&>svg]:w-3 [&>svg]:h-3"
+                    style={{ color: colors.neutral[600] }}
                     aria-label={`Remove ${s}`}
                   />
                 </div>
@@ -258,14 +256,15 @@ export default function Skills() {
 
           {/* Suggested Skills */}
           <div className="mt-8">
-            <div className="rounded-3xl bg-gray-200  px-4 py-4 flex flex-col gap-3">
-              {/* Header INSIDE container */}
-              <span className="text-[18px] text-neutral-800 mt-1">
+            <div
+              className="rounded-3xl px-4 py-4 flex flex-col gap-3"
+              style={{ backgroundColor: colors.neutral[200] }}
+            >
+              <span className="text-[18px]" style={{ color: colors.neutral[800] }}>
                 Suggested Skills for Product Managers
               </span>
 
-              {/* Pills */}
-              <div className="flex flex-wrap rounded-3xl gap-3 mt-2">
+              <div className="flex flex-wrap gap-3 mt-2">
                 {suggested.map((s) => {
                   const isAdded = skills.some(
                     (k) => k.toLowerCase() === s.toLowerCase()
@@ -277,11 +276,13 @@ export default function Skills() {
                       type="button"
                       disabled={isAdded}
                       onClick={() => addSkill(s)}
-                      className={`px-3 rounded-full text-sm transition-all ${
-                        isAdded
-                          ? "bg-neutral-100 border-neutral-200 text-neutral-400 cursor-default"
-                          : "bg-neutral-150 border-neutral-200 text-neutral-700 hover:bg-white hover:shadow-xl"
-                      }`}
+                      className="px-3 py-1 rounded-full text-sm transition-all border"
+                      style={{
+                        backgroundColor: isAdded ? colors.neutral[100] : colors.neutral[200],
+                        borderColor: colors.neutral[200],
+                        color: isAdded ? colors.neutral[400] : colors.neutral[600],
+                        cursor: isAdded ? "default" : "pointer",
+                      }}
                     >
                       {s}
                     </button>
@@ -292,14 +293,25 @@ export default function Skills() {
           </div>
 
           {/* Divider */}
-          <div className="w-full h-px bg-neutral-200 my-8" />
+          <div
+            className="w-full h-px my-8"
+            style={{ backgroundColor: colors.secondary }}
+          />
 
           <footer>
             <Button
-              style={{ backgroundColor: colors.primary, color: "black" }}
-              className="w-full h-10 rounded-full from-violet-600 to-violet-600  shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
               onClick={handleContinue}
-              disabled={skills.length === 0 || isSubmitting}
+              disabled={isDisabled}
+              className="w-full h-10 sm:h-11 rounded-full text-sm sm:text-base font-semibold transition active:scale-[0.99]"
+              style={{
+                backgroundColor: isDisabled ? colors.neutral[200] : colors.accent,
+                color: colors.background,
+                cursor: isDisabled ? "not-allowed" : "pointer",
+                opacity: isDisabled ? 0.75 : 1,
+                boxShadow: isDisabled
+                  ? "none"
+                  : "0 10px 24px rgba(0,0,0,0.08)",
+              }}
             >
               {isSubmitting ? "Saving..." : "Continue"}
             </Button>
@@ -309,4 +321,3 @@ export default function Skills() {
     </div>
   );
 }
-

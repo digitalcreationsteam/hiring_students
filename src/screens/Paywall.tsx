@@ -125,13 +125,9 @@ function Paywall() {
       // ✅ Step 2: Initiate Dodo payment
       const subscriptionId = subscriptionResponse.data.subscriptionId;
 
-      const paymentResponse = await API(
-        "POST",
-        URL_PATH.initiateDodoPayment,
-        {
-          subscriptionId,
-        },
-      );
+      const paymentResponse = await API("POST", URL_PATH.initiateDodoPayment, {
+        subscriptionId,
+      });
 
       console.log("💳 Dodo payment response:", paymentResponse);
 
@@ -146,7 +142,6 @@ function Paywall() {
       console.log("💾 Stored subscriptionId in localStorage:", subscriptionId);
       window.location.href = paymentResponse.paymentUrl;
       return; // ⛔ stop execution here
-
 
       // ✅ Step 2: Get updated navigation status (after subscription created)
       const statusResponse = await API("GET", URL_PATH.getUserStatus);
@@ -176,10 +171,7 @@ function Paywall() {
         statusResponse.navigation.nextRoute,
       );
       // navigate(statusResponse.navigation.nextRoute);
-      if (
-        subscriptionResponse?.success
-
-      ) {
+      if (subscriptionResponse?.success) {
         navigate(statusResponse.navigation.nextRoute);
       } else {
         navigate(statusResponse.navigation.nextRoute);
@@ -219,60 +211,58 @@ function Paywall() {
     });
   };
 
- if (isLoadingPlans) {
-  return (
-    <div
-      className="min-h-screen flex items-center justify-center"
-      style={{ backgroundColor: colors.background }}
-    >
-      <div className="text-center">
-        <div
-          className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto"
-          style={{ borderColor: colors.primary }}
-        ></div>
-
-        <p className="mt-4 text-sm" style={{ color: colors.neutral[600] }}>
-          Loading plans...
-        </p>
-      </div>
-    </div>
-  );
-}
-
-
-  return (
-  <div className="min-h-screen w-full flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 py-10 relative">
-    
-    {/* Blended background - fixed behind everything */}
-    <div className="pointer-events-none fixed inset-0 -z-10">
+  if (isLoadingPlans) {
+    return (
       <div
-        className="absolute inset-0"
+        className="min-h-screen flex items-center justify-center"
         style={{ backgroundColor: colors.background }}
-      />
+      >
+        <div className="text-center">
+          <div
+            className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto"
+            style={{ borderColor: colors.primary }}
+          ></div>
 
-      <div
-        className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
-        style={{
-          background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
-        }}
-      />
+          <p className="mt-4 text-sm" style={{ color: colors.neutral[600] }}>
+            Loading plans...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
-      <div
-        className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
-        style={{
-          background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
-        }}
-      />
+  return (
+    <div className="min-h-screen w-full flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 py-10 relative">
+      {/* Blended background - fixed behind everything */}
+      <div className="pointer-events-none fixed inset-0 -z-10">
+        <div
+          className="absolute inset-0"
+          style={{ backgroundColor: colors.background }}
+        />
 
-      <div
-        className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
-        style={{
-          background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
-        }}
-      />
-    </div>
-    
-          <div className="w-full max-w-[760px] flex flex-col items-center gap-8 sm:gap-10">
+        <div
+          className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
+          style={{
+            background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
+          }}
+        />
+
+        <div
+          className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
+          style={{
+            background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
+          }}
+        />
+
+        <div
+          className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
+          style={{
+            background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
+          }}
+        />
+      </div>
+
+      <div className="w-full max-w-[760px] flex flex-col items-center gap-8 sm:gap-10">
         {/* Heading */}
         <div className="flex flex-col items-center gap-2 text-center">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
@@ -285,88 +275,110 @@ function Paywall() {
 
         {/* Plans Grid */}
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          {plans.map((plan: SubscriptionPlan) => {
+            const isSelected = selectedPlanId === plan._id;
 
-      {plans.map((plan: SubscriptionPlan) => {
-  const isSelected = selectedPlanId === plan._id;
+            return (
+              <div
+                key={plan._id}
+                onClick={() => setSelectedPlanId(plan._id)}
+                className={`cursor-pointer w-full  rounded-3xl p-6 flex flex-col gap-6 shadow-sm border-2 transition-all duration-200 ${
+                  isSelected ? "scale-[1.02]" : "hover:shadow-md"
+                }`}
+                style={{
+                  backgroundColor: colors.white,
+                  borderColor: isSelected
+                    ? colors.primary
+                    : colors.neutral[200],
+                  boxShadow: isSelected
+                    ? `0 0 0 4px ${colors.primary}22`
+                    : undefined,
+                }}
+              >
+                {/* Plan Header */}
+                <div>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h2
+                        className="text-xl font-bold"
+                        style={{ color: colors.accent }}
+                      >
+                        {plan.planName}
+                      </h2>
+                      <p
+                        className="text-sm mt-1"
+                        style={{ color: colors.neutral[600] }}
+                      >
+                        {plan.description}
+                      </p>
+                    </div>
 
-  return (
-    <div
-      key={plan._id}
-      onClick={() => setSelectedPlanId(plan._id)}
-      className={`cursor-pointer w-full  rounded-3xl p-6 flex flex-col gap-6 shadow-sm border-2 transition-all duration-200 ${
-        isSelected ? "scale-[1.02]" : "hover:shadow-md"
-      }`}
-      style={{
-        backgroundColor: colors.white,
-        borderColor: isSelected ? colors.primary : colors.neutral[200],
-        boxShadow: isSelected
-          ? `0 0 0 4px ${colors.primary}22`
-          : undefined,
-      }}
-    >
-      {/* Plan Header */}
-      <div>
-        <div className="flex items-start justify-between">
-          <div>
-            <h2 className="text-xl font-bold" style={{ color: colors.accent }}>
-              {plan.planName}
-            </h2>
-            <p className="text-sm mt-1" style={{ color: colors.neutral[600] }}>
-              {plan.description}
-            </p>
-          </div>
+                    {isPopularPlan(plan) && (
+                      <div
+                        className="flex items-center gap-1 text-xs font-medium px-3 py-1 rounded-full"
+                        style={{
+                          backgroundColor: `${colors.primary}1A`,
+                          color: colors.primary,
+                        }}
+                      >
+                        <FeatherStar className="w-3 h-3" />
+                        <span>Popular</span>
+                      </div>
+                    )}
+                  </div>
 
-          {isPopularPlan(plan) && (
-            <div
-              className="flex items-center gap-1 text-xs font-medium px-3 py-1 rounded-full"
-              style={{
-                backgroundColor: `${colors.primary}1A`,
-                color: colors.primary,
-              }}
-            >
-              <FeatherStar className="w-3 h-3" />
-              <span>Popular</span>
-            </div>
-          )}
-        </div>
+                  {/* Price */}
+                  <p
+                    className="text-2xl font-bold mt-4"
+                    style={{ color: colors.accent }}
+                  >
+                    {formatPrice(plan)}
+                  </p>
 
-        {/* Price */}
-        <p className="text-2xl font-bold mt-4" style={{ color: colors.accent }}>
-          {formatPrice(plan)}
-        </p>
+                  {/* Trial period */}
+                  {plan.trialPeriod > 0 && (
+                    <p
+                      className="text-sm mt-1"
+                      style={{ color: colors.accent }}
+                    >
+                      {plan.trialPeriod}-day free trial
+                    </p>
+                  )}
+                </div>
 
-        {/* Trial period */}
-        {plan.trialPeriod > 0 && (
-<p className="text-sm mt-1" style={{ color: colors.accent }}>
-            {plan.trialPeriod}-day free trial
-          </p>
-        )}
-      </div>
+                {/* Features */}
+                <div className="flex flex-col gap-3">
+                  {getPlanFeatures(plan).map(
+                    (feature: string, index: number) => (
+                      <div key={index} className="flex items-start gap-3">
+                        <div
+                          className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5"
+                          style={{
+                            backgroundColor: isSelected
+                              ? `${colors.primary}1A`
+                              : colors.neutral[100],
+                          }}
+                        >
+                          <FeatherCheck
+                            className="w-3 h-3"
+                            style={{
+                              color: isSelected
+                                ? colors.primary
+                                : colors.neutral[600],
+                            }}
+                          />
+                        </div>
 
-      {/* Features */}
-      <div className="flex flex-col gap-3">
-        {getPlanFeatures(plan).map((feature: string, index: number) => (
-          <div key={index} className="flex items-start gap-3">
-            <div
-              className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5"
-              style={{
-                backgroundColor: isSelected
-                  ? `${colors.primary}1A`
-                  : colors.neutral[100],
-              }}
-            >
-              <FeatherCheck
-                className="w-3 h-3"
-                style={{ color: isSelected ? colors.primary : colors.neutral[600] }}
-              />
-            </div>
-
-            <span className="text-sm" style={{ color: colors.neutral[800] }}>
-              {feature}
-            </span>
-          </div>
-        ))}
-      </div>
+                        <span
+                          className="text-sm"
+                          style={{ color: colors.neutral[800] }}
+                        >
+                          {feature}
+                        </span>
+                      </div>
+                    ),
+                  )}
+                </div>
 
       {/* Limits */}
       <div
@@ -403,7 +415,7 @@ function Paywall() {
     style={{
       backgroundColor: `${colors.status.absent}15`,
       borderColor: `${colors.status.absent}40`,
-      color: colors.status.absent,
+      color: colors.accent,
     }}
   >
     {error}
@@ -412,28 +424,25 @@ function Paywall() {
 
 
       {/* Continue Button */}
-<Button
+<button
   disabled={isLoading || !selectedPlanId}
   onClick={handleContinue}
-  className="w-full max-w-[820px] h-14 rounded-2xl font-semibold text-base transition-all duration-300 flex items-center justify-center gap-2"
+  className="w-full max-w-[820px] h-12 sm:h-14 rounded-2xl font-semibold text-sm sm:text-base transition-all duration-300 flex items-center justify-center gap-2"
   style={{
-    backgroundColor: isLoading || !selectedPlanId
-      ? colors.neutral[200]
-      : colors.primary,
-    color: isLoading || !selectedPlanId
-      ? colors.accent
-      : colors.accent,
-    boxShadow: isLoading || !selectedPlanId
-      ? "none"
-      : `0 10px 25px ${colors.primary}30`,
-    transform: isLoading || !selectedPlanId ? "none" : "translateY(0)",
+    backgroundColor:
+      isLoading || !selectedPlanId ? colors.neutral[200] : colors.primary,
+    color: colors.accent,
+    boxShadow:
+      isLoading || !selectedPlanId ? "none" : `0 10px 25px ${colors.primary}30`,
+    cursor: isLoading || !selectedPlanId ? "not-allowed" : "pointer",
+    opacity: isLoading || !selectedPlanId ? 0.75 : 1,
   }}
 >
   {isLoading ? (
     <>
       <div
-        className="animate-spin rounded-full h-5 w-5 border-b-2"
-        style={{ borderColor: colors.accent }}
+        className="animate-spin rounded-full h-5 w-5 border-2 border-transparent"
+        style={{ borderTopColor: colors.accent }}
       />
       Processing...
     </>
@@ -444,19 +453,19 @@ function Paywall() {
   ) : (
     "Select a Plan to Continue"
   )}
-</Button>
-
-       {/* Back Button */}
-<button
-  onClick={() => navigate(-1)}
-  className="text-sm transition"
-  style={{ color: colors.accent }}
-  onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.8")}
-  onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
->
-  ← Go back
 </button>
 
+
+        {/* Back Button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="text-sm transition"
+          style={{ color: colors.accent }}
+          onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.8")}
+          onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+        >
+          ← Go back
+        </button>
       </div>
     </div>
   );

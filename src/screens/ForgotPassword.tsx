@@ -97,15 +97,18 @@ export default function ForgotPassword() {
 <button
   onClick={handleSubmit}
   disabled={loading}
-  className="w-full h-10 rounded-3xl font-semibold transition"
+  className="w-full h-10 sm:h-11 rounded-3xl text-sm sm:text-base font-semibold transition active:scale-[0.99]"
   style={{
-    backgroundColor: loading ? colors.neutral[400] : colors.primary,
-    color: colors.white,
+    backgroundColor: loading ? colors.neutral[200] : colors.primary,
+    color: colors.accent,
     cursor: loading ? "not-allowed" : "pointer",
+    opacity: loading ? 0.75 : 1,
+    boxShadow: loading ? "none" : "0 10px 24px rgba(0,0,0,0.08)",
   }}
 >
   {loading ? "Sending..." : "Reset Password"}
 </button>
+
 
         </div>
       </div>

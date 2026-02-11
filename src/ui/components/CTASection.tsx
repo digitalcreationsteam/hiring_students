@@ -1,211 +1,165 @@
-// src/components/CTASection.tsx
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Link } from "react-router-dom";
 import { uniTalentColors } from 'src/common/Colors';
-import { Send, CheckCircle, Users, TrendingUp, Shield } from 'lucide-react';
 
 const CTASection = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    currentRole: '',
-    yearsExperience: ''
-  });
-  
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [error, setError] = useState('');
+  const [scrollY, setScrollY] = useState(0);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    setError('');
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Basic validation
-    if (!formData.name || !formData.email) {
-      setError('Please fill in all required fields');
-      return;
-    }
-
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      setError('Please enter a valid email address');
-      return;
-    }
-
-    setIsSubmitting(true);
-    setError('');
-
-    // Simulate API call
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Form submitted:', formData);
-      setIsSubmitted(true);
-      
-      // Reset form after 3 seconds
-      setTimeout(() => {
-        setFormData({
-          name: '',
-          email: '',
-          currentRole: '',
-          yearsExperience: ''
-        });
-        setIsSubmitted(false);
-      }, 3000);
-    } catch (err) {
-      setError('Something went wrong. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const benefits = [
-    {
-      icon: Users,
-      title: 'Join 5,000+ PMs',
-      description: 'Already transforming their careers'
-    },
-    {
-      icon: TrendingUp,
-      title: '3.2x More Interviews',
-      description: 'Average increase for our members'
-    },
-    {
-      icon: Shield,
-      title: 'No Spam, Ever',
-      description: 'We respect your privacy'
-    }
-  ];
-
-  const experienceOptions = [
-    { value: '', label: 'Select experience' },
-    { value: '0-1', label: '0-1 years' },
-    { value: '1-3', label: '1-3 years' },
-    { value: '3-5', label: '3-5 years' },
-    { value: '5+', label: '5+ years' }
-  ];
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <section id="contact" className="py-16 md:py-24 relative overflow-hidden">
-      {/* Background with subtle pattern */}
+    <section id="contact" className="relative w-full py-16 sm:py-20 lg:py-24 overflow-hidden">
+      {/* Background */}
       <div 
         style={{ backgroundColor: uniTalentColors.background }}
         className="absolute inset-0"
       >
-        {/* Grid pattern */}
+        {/* Subtle Grid */}
         <div 
-          className="absolute inset-0 opacity-5"
+          className="absolute inset-0 opacity-10"
           style={{
             backgroundImage: `
               linear-gradient(90deg, ${uniTalentColors.primary} 1px, transparent 1px),
               linear-gradient(${uniTalentColors.primary} 1px, transparent 1px)
             `,
-            backgroundSize: '40px 40px',
+            backgroundSize: '60px 60px',
+            transform: `translateY(${scrollY * 0.05}px)`,
+            pointerEvents: 'none',
           }}
         />
-        
-        {/* Decorative elements */}
-        <div 
-          style={{ backgroundColor: uniTalentColors.primary }}
-          className="absolute top-10 right-10 w-64 h-64 rounded-full opacity-5 blur-3xl"
-        />
-        <div 
-          style={{ backgroundColor: uniTalentColors.primary }}
-          className="absolute bottom-10 left-10 w-48 h-48 rounded-full opacity-5 blur-3xl"
-        />
       </div>
 
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left Column - Content */}
-          <div className="space-y-8">
-            <div>
-              <div 
-                style={{ 
-                  backgroundColor: `${uniTalentColors.primary}20`,
-                  color: uniTalentColors.primary
-                }}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-4"
-              >
-                <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: uniTalentColors.primary }} />
-                Limited Time Offer
-              </div>
-              
-              <h2 
-                style={{ color: uniTalentColors.text }}
-                className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6"
-              >
-                Ready to Break Through the 
-                <span 
-                  style={{ color: uniTalentColors.primary }}
-                  className="block mt-2"
-                >
-                  Broken Hiring System?
-                </span>
-              </h2>
-              
-              <p 
-                style={{ color: uniTalentColors.text }}
-                className="text-lg opacity-80 mb-8"
-              >
-                Join thousands of Product Managers who've transformed their job search with UniTalent. 
-                Get your free skill assessment and personalized ranking in minutes.
-              </p>
-            </div>
+      {/* Content */}
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Main Content */}
+        <div className="text-center">
+          {/* Heading */}
+          <h2 
+            style={{ color: uniTalentColors.text }}
+            className="text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight mb-6 sm:mb-8"
+          >
+            Ready to get your fair shot?
+          </h2>
 
-            {/* Benefits */}
-            <div className="space-y-4">
-              {benefits.map((benefit, index) => {
-                const Icon = benefit.icon;
-                return (
-                  <div key={index} className="flex items-center gap-4">
-                    <div 
-                      style={{ 
-                        backgroundColor: uniTalentColors.primary,
-                        color: uniTalentColors.text
-                      }}
-                      className="p-2 rounded-lg"
-                    >
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h4 style={{ color: uniTalentColors.text }} className="font-semibold">
-                        {benefit.title}
-                      </h4>
-                      <p style={{ color: uniTalentColors.text }} className="text-sm opacity-70">
-                        {benefit.description}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+          {/* Subheading */}
+          <p 
+            style={{ color: uniTalentColors.text }}
+            className="text-base sm:text-lg lg:text-xl opacity-80 leading-relaxed max-w-3xl mx-auto mb-10 sm:mb-12 lg:mb-14"
+          >
+            Join thousands of Product Managers breaking through the broken hiring system. Start your free assessment today.
+          </p>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col xs:flex-row gap-4 sm:gap-6 justify-center max-w-2xl mx-auto">
+            {/* Sign Up Button */}
+            <Link to="/signup" 
+              style={{
+                background: `linear-gradient(135deg, ${uniTalentColors.primary} 0%, ${uniTalentColors.primaryLight || '#FFEDB2'} 100%)`,
+                color: uniTalentColors.text,
+                boxShadow: `0 8px 20px ${uniTalentColors.primary}66`,
+              }}
+              className="w-full xs:flex-1 px-6 sm:px-8 lg:px-10 py-3 sm:py-4 font-bold rounded-lg sm:rounded-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 group text-sm sm:text-base"
+            >
+              <span className="flex items-center justify-center">
+                Sign Up Free
+                <svg 
+                  className="w-4 h-4 sm:w-5 sm:h-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-300"
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </span>
+            </Link>
+
+            {/* Login Button */}
+            <Link to="/login" 
+              style={{
+                backgroundColor: 'transparent',
+                color: uniTalentColors.text,
+                borderColor: uniTalentColors.primary,
+              }}
+              className="w-full xs:flex-1 px-6 sm:px-8 lg:px-10 py-3 sm:py-4 font-bold rounded-lg sm:rounded-xl border-2 border-opacity-50 hover:border-opacity-100 hover:shadow-lg active:scale-95 transition-all duration-300 text-sm sm:text-base"
+            >
+              Log In
+            </Link>
           </div>
 
-          {/* Right Column - Form */}
-          <div 
-            style={{ backgroundColor: uniTalentColors.background }}
-            className=" w-full h-auto"
-            >
-              <div
-                 className="relative rounded-xl overflow-hidden shadow-2xl transform transition-all duration-300 hover:shadow-3xl hover:scale-[1.01]">
-
-              </div>
-              <img 
-                style={{ height: window.innerWidth < 768 ? '300px' : '550px' }}
-                src="/studentImg.jpg" 
-                alt="Student Image" 
-                className="w-full rounded-xl shadow-lg object-cover object-center"
-              />
+          {/* Stats Row - Single Line */}
+          <div className="mt-12 sm:mt-16 lg:mt-20 flex justify-center items-center gap-6 sm:gap-8 lg:gap-12 flex-wrap">
+            <div className="flex items-center gap-2">
+              <span 
+                style={{ color: uniTalentColors.primary }}
+                className="text-xl sm:text-2xl lg:text-3xl font-bold"
+              >
+                5,000+
+              </span>
+              <span 
+                style={{ color: uniTalentColors.text }}
+                className="text-xs sm:text-sm opacity-70"
+              >
+                PMs Transformed
+              </span>
             </div>
-         
 
+            <div 
+              style={{ backgroundColor: uniTalentColors.primary }}
+              className="w-px h-6 opacity-30"
+            />
+
+            <div className="flex items-center gap-2">
+              <span 
+                style={{ color: uniTalentColors.primary }}
+                className="text-xl sm:text-2xl lg:text-3xl font-bold"
+              >
+                3.2x
+              </span>
+              <span 
+                style={{ color: uniTalentColors.text }}
+                className="text-xs sm:text-sm opacity-70"
+              >
+                More Interviews
+              </span>
+            </div>
+
+            <div 
+              style={{ backgroundColor: uniTalentColors.primary }}
+              className="w-px h-6 opacity-30"
+            />
+
+            <div className="flex items-center gap-2">
+              <span 
+                style={{ color: uniTalentColors.primary }}
+                className="text-xl sm:text-2xl lg:text-3xl font-bold"
+              >
+                85%
+              </span>
+              <span 
+                style={{ color: uniTalentColors.text }}
+                className="text-xs sm:text-sm opacity-70"
+              >
+                Success Rate
+              </span>
+            </div>
+          </div>
         </div>
       </div>
+
+      <style>{`
+        * {
+          scroll-behavior: smooth;
+        }
+      `}</style>
     </section>
   );
 };

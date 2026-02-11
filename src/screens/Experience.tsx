@@ -160,26 +160,41 @@ function MonthYearPicker({
               const formatted = `${String(idx + 1).padStart(2, "0")}/${year}`;
 
               return (
-                <button
-                  key={m}
-                  type="button"
-                  disabled={disabledMonth}
-                  onClick={() => {
-                    onChange(formatted);
-                    setOpen(false);
-                  }}
-                  className={`
-                    py-2 rounded-lg transition
-                    ${
-                      value === formatted
-                        ? "bg-violet-600 text-white"
-                        : "hover:bg-neutral-100"
-                    }
-                    ${disabledMonth ? "text-neutral-400" : ""}
-                  `}
-                >
-                  {m}
-                </button>
+              <button
+  key={m}
+  type="button"
+  disabled={disabledMonth}
+  onClick={() => {
+    onChange(formatted);
+    setOpen(false);
+  }}
+  className="py-2 px-3 rounded-lg transition text-sm sm:text-base"
+  style={{
+    backgroundColor:
+      value === formatted ? colors.accent : "transparent",
+    color:
+      value === formatted
+        ? colors.background
+        : disabledMonth
+        ? colors.neutral[400]
+        : colors.neutral[800],
+    cursor: disabledMonth ? "not-allowed" : "pointer",
+    opacity: disabledMonth ? 0.7 : 1,
+  }}
+  onMouseEnter={(e) => {
+    if (!disabledMonth && value !== formatted) {
+      e.currentTarget.style.backgroundColor = colors.primaryGlow;
+    }
+  }}
+  onMouseLeave={(e) => {
+    if (!disabledMonth && value !== formatted) {
+      e.currentTarget.style.backgroundColor = "transparent";
+    }
+  }}
+>
+  {m}
+</button>
+
               );
             })}
           </div>
@@ -663,30 +678,17 @@ export default function Experience() {
             {/* top row - back + progress */}
             <div className="flex items-center gap-4">
               <IconButton
-                size="small"
-                icon={<FeatherArrowLeft />}
-                onClick={async () => {
-                  try {
-                    // 1️⃣ If came from dashboard → always go back to dashboard
-                    if (source === "dashboard") {
-                      navigate("/dashboard");
-                      return;
-                    }
+  size="small"
+  icon={<FeatherArrowLeft />}
+  onClick={() => {
+    if (source === "dashboard") {
+      navigate("/dashboard");
+    } else {
+      navigate(-1);
+    }
+  }}
+/>
 
-                    // 2️⃣ Otherwise → ask backend if education is allowed
-                    const res = await API("POST", "/auth/verify-route", {
-                      route: "/education",
-                    });
-
-                    if (res.allowed) {
-                      navigate("/education", { state: { source } });
-                    }
-                    // ❌ else do nothing (education already completed)
-                  } catch {
-                    // silent fail
-                  }
-                }}
-              />
 
               <div className="flex-1 w-full max-w-full md:max-w-[420px]">
                 <div className="flex items-center gap-3">
@@ -754,16 +756,21 @@ style={{
                       {/* Left */}
                       <div className="flex items-center gap-3 min-w-0">
                         <Avatar
-                          size="large"
-                          square
-                          className="!rounded-3xl shadow-sm bg-violet-200 text-violet-700"
-                        >
-                          {(exp.company || "")
-                            .split(" ")
-                            .slice(0, 2)
-                            .map((w) => w[0])
-                            .join("")}
-                        </Avatar>
+  size="large"
+  square
+  className="!rounded-3xl shadow-sm"
+  style={{
+    backgroundColor: colors.primaryGlow,
+    color: colors.neutral[800],
+  }}
+>
+  {(exp.company || "")
+    .split(" ")
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")}
+</Avatar>
+
 
                         <div className="flex flex-col min-w-0">
                           <span className="text-sm font-semibold text-neutral-900 truncate">
@@ -1026,21 +1033,25 @@ style={{
             {/* Top form horizontal line */}
             <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
             <footer>
-              <Button
-                onClick={handleContinue}
-                disabled={!canContinue || isSubmitting}
-                style={{ backgroundColor: colors.accent }}
-                className={`
-    w-full h-10 rounded-full transition-all
-    ${
+<Button
+  onClick={handleContinue}
+  disabled={!canContinue || isSubmitting}
+  className="w-full h-10 sm:h-11 rounded-full text-sm sm:text-base font-semibold transition-all active:scale-[0.99]"
+  style={{
+    backgroundColor:
+      !canContinue || isSubmitting ? colors.neutral[200] : colors.accent,
+    color: colors.background,
+    cursor: !canContinue || isSubmitting ? "not-allowed" : "pointer",
+    opacity: !canContinue || isSubmitting ? 0.75 : 1,
+    boxShadow:
       !canContinue || isSubmitting
-        ? "bg-violet-300 cursor-not-allowed"
-        : "shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
-    }
-  `}
-              >
-                {isSubmitting ? "Saving..." : "Continue"}
-              </Button>
+        ? "none"
+        : "0 10px 24px rgba(0,0,0,0.08)",
+  }}
+>
+  {isSubmitting ? "Saving..." : "Continue"}
+</Button>
+
             </footer>
           </main>
 

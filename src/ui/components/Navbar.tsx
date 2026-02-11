@@ -10,7 +10,7 @@ const Navbar = () => {
         setIsOpen(!isOpen);
     };
 
-    const menuItems = ["Home", "Features", "Testimonials", "Contact"];
+    const menuItems = ["Home", "Features", "Contact"];
 
     // Simple scroll function
     const handleScroll = (sectionId: string) => {

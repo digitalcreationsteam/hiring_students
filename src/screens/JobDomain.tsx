@@ -10,6 +10,7 @@ import * as SubframeCore from "@subframe/core";
 import API, { URL_PATH } from "src/common/API";
 import { useAppDispatch } from "src/store/hooks";
 import { setNavigation } from "src/store/slices/onboardingSlice";
+import { colors } from "src/common/Colors";
 
 const notify = (msg: string) => {
   console.warn(msg);
@@ -212,89 +213,166 @@ function JobDomain() {
   return (
     <>
       <HeaderLogo />
-      <div className="min-h-screen bg-neutral-50 px-8 py-0 flex items-center justify-center">
-        <div className="flex max-w-[660px] w-full mx-auto">
-          <div className="flex w-full flex-col gap-8 rounded-3xl border border-neutral-300 bg-white px-10 py-8 shadow-lg">
-            {/* Header */}
-            <div className="flex items-center gap-4">
-              <IconButton
-                size="small"
-                icon={<FeatherArrowLeft />}
-                onClick={() => navigate(-1)}
-              />
+{/* 🌈 Blended background - fixed behind everything */}
+    <div className="pointer-events-none fixed inset-0 -z-10">
+      <div
+        className="absolute inset-0"
+        style={{ backgroundColor: colors.background }}
+      />
 
-              <div className="flex flex-1 gap-2">
-                {[...Array(2)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-1 flex-1 rounded-full bg-violet-700"
-                  />
-                ))}
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="h-1 flex-1 rounded-full bg-gray-300" />
-                ))}
-              </div>
-            </div>
+      <div
+        className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
+        style={{
+          background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
+        }}
+      />
 
-            {/* Title */}
-            <div>
-              <h2 className="text-[22px] text-neutral-900">
-                Choose your job domain
-              </h2>
-              <p className="text-xs text-neutral-500">
-                Your domain and skills will decide your assessment and rankings
-              </p>
-            </div>
+      <div
+        className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
+        style={{
+          background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
+        }}
+      />
 
-            {/* Domain Dropdown */}
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-neutral-900">
-                Job Domain <span className="text-red-500">*</span>
-              </label>
+      <div
+        className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
+        style={{
+          background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
+        }}
+      />
+    </div> 
+    
+    {/* Page */}
+    <div className="min-h-screen px-4 sm:px-6 md:px-8 py-6 sm:py-8 flex items-center justify-center">
+      <div className="w-full max-w-[660px] mx-auto">
+        <div
+          className="flex w-full flex-col gap-6 sm:gap-8 rounded-3xl border px-5 sm:px-8 md:px-10 py-7 sm:py-8 shadow-xl backdrop-blur-md"
+          style={{
+            backgroundColor: `${colors.white}CC`,
+            borderColor: colors.neutral[200],
+          }}
+        >
+           
+         {/* Header */}
+<div className="flex items-center gap-3 sm:gap-4">
+  <IconButton
+    size="small"
+    icon={<FeatherArrowLeft />}
+    onClick={() => navigate(-1)}
+  />
 
-            <SubframeCore.DropdownMenu.Root
-              open={isDomainOpen}
-              onOpenChange={setIsDomainOpen}
+  <div className="flex flex-1 gap-2">
+    {[...Array(2)].map((_, i) => (
+      <div
+        key={`done-${i}`}
+        className="h-1 flex-1 rounded-full"
+        style={{ backgroundColor: colors.primary }}
+      />
+    ))}
+
+    {[...Array(3)].map((_, i) => (
+      <div
+        key={`todo-${i}`}
+        className="h-1 flex-1 rounded-full"
+        style={{ backgroundColor: colors.neutral[200] }}
+      />
+    ))}
+  </div>
+</div>
+
+
+           {/* Title */}
+<div className="flex flex-col gap-1">
+  <h2
+    className="text-[20px] sm:text-[22px] md:text-[26px] font-semibold"
+    style={{ color: colors.neutral[800] }}
+  >
+    Choose your job domain
+  </h2>
+
+  <p
+    className="text-xs sm:text-sm"
+    style={{ color: colors.neutral[600] }}
+  >
+    Your domain and skills will decide your assessment and rankings
+  </p>
+</div>
+
+{/* Domain Dropdown */}
+<div className="flex flex-col gap-2">
+  <label
+    className="text-sm font-medium"
+    style={{ color: colors.neutral[800] }}
+  >
+    Job Domain <span className="text-red-500">*</span>
+  </label>
+
+  <SubframeCore.DropdownMenu.Root
+    open={isDomainOpen}
+    onOpenChange={setIsDomainOpen}
+  >
+    <SubframeCore.DropdownMenu.Trigger asChild>
+      <div
+        className="flex h-10 sm:h-11 items-center justify-between rounded-3xl border px-4 cursor-pointer transition"
+        style={{
+          backgroundColor: `${colors.white}CC`,
+          borderColor: colors.neutral[200],
+        }}
+      >
+        <span
+          className="text-sm sm:text-base"
+          style={{
+            color: domain ? colors.neutral[800] : colors.neutral[400],
+          }}
+        >
+          {domain?.name || "Select your domain"}
+        </span>
+
+        <FeatherChevronDown style={{ color: colors.neutral[600] }} />
+      </div>
+    </SubframeCore.DropdownMenu.Trigger>
+
+    <SubframeCore.DropdownMenu.Content asChild align="start" sideOffset={6}>
+      <div
+        className="rounded-2xl z-10 shadow-lg py-2 max-h-[260px] overflow-y-auto border backdrop-blur-md"
+        style={{
+          backgroundColor: `${colors.white}F2`,
+          borderColor: colors.neutral[200],
+        }}
+      >
+        {domains.map((item) => {
+          const selected = domain?.id === item._id;
+
+          return (
+            <div
+              key={item._id}
+              onClick={() => {
+                console.log("🎯 Domain selected:", item.name);
+                setDomain({ id: item._id, name: item.name });
+                setIsDomainOpen(false);
+              }}
+              className="px-4 py-2 cursor-pointer text-sm sm:text-base transition"
+              style={{
+                backgroundColor: selected ? colors.primaryGlow : "transparent",
+                color: colors.neutral[800],
+                fontWeight: selected ? 600 : 400,
+              }}
+              onMouseEnter={(e) => {
+                if (!selected) e.currentTarget.style.backgroundColor = `${colors.primaryGlow}99`;
+              }}
+              onMouseLeave={(e) => {
+                if (!selected) e.currentTarget.style.backgroundColor = "transparent";
+              }}
             >
-              <SubframeCore.DropdownMenu.Trigger asChild>
-                <div className="flex h-10 items-center justify-between rounded-3xl border border-neutral-300 px-4 bg-neutral-50 cursor-pointer">
-                  <span
-                    className={domain ? "text-neutral-600" : "text-neutral-400"}
-                  >
-                    {domain?.name || "Select your domain"}
-                  </span>
-                  <FeatherChevronDown />
-                </div>
-              </SubframeCore.DropdownMenu.Trigger>
-
-              <SubframeCore.DropdownMenu.Content
-                asChild
-                align="start"
-                sideOffset={4}
-              >
-                <div className="bg-white rounded-2xl shadow-lg py-2 max-h-[260px] overflow-y-auto">
-                  {domains.map((item) => (
-                    <div
-                      key={item._id}
-                      onClick={() => {
-                        console.log("🎯 Domain selected:", item.name);
-                        setDomain({ id: item._id, name: item.name });
-                        setIsDomainOpen(false);
-                        // setSubDomain(null); // reset subdomain when domain changes
-                      }}
-                      className={`px-4 py-2 cursor-pointer text-sm hover:bg-violet-50 ${
-                        domain?.id === item._id
-                          ? "bg-violet-100 font-semibold"
-                          : ""
-                          }`}
-                      >
-                        {item.name}
-                      </div>
-                    ))}
-                  </div>
-                </SubframeCore.DropdownMenu.Content>
-              </SubframeCore.DropdownMenu.Root>
+              {item.name}
             </div>
+          );
+        })}
+      </div>
+    </SubframeCore.DropdownMenu.Content>
+  </SubframeCore.DropdownMenu.Root>
+</div>
+
 
             {/* SubDomain Dropdown */}
             {/* <div className="flex flex-col gap-2">
@@ -353,15 +431,20 @@ function JobDomain() {
 
             {/* Footer */}
             <Button
-              onClick={handleContinue}
-              disabled={!domain || isSubmitting}
-              className={`h-9 w-full rounded-2xl text-white ${isSubmitting
-                ? "bg-violet-300"
-                : "bg-violet-600 hover:bg-violet-700"
-                }`}
-            >
-              {isSubmitting ? "Saving..." : "Continue"}
-            </Button>
+  onClick={handleContinue}
+  disabled={!domain || isSubmitting}
+  className="w-full h-10 sm:h-11 rounded-2xl text-sm sm:text-base font-semibold transition active:scale-[0.99]"
+  style={{
+    backgroundColor:
+      !domain || isSubmitting ? colors.neutral[200] : colors.accent,
+    color: colors.background,
+    cursor: !domain || isSubmitting ? "not-allowed" : "pointer",
+    opacity: !domain || isSubmitting ? 0.7 : 1,
+  }}
+>
+  {isSubmitting ? "Saving..." : "Continue"}
+</Button>
+
           </div>
         </div>
       </div>

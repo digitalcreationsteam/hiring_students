@@ -46,7 +46,5 @@ export default function LoginSuccess() {
     navigate("/login", { replace: true });
   }, [navigate]);
 
-  return (
-    <h1>Login Successful!</h1>
-  );
+  return null;
 }

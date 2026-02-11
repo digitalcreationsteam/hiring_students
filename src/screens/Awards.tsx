@@ -20,7 +20,8 @@ import {
 import API, { URL_PATH } from "src/common/API";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { colors } from "src/common/Colors";
+import { colors } from "../common/Colors";
+
 
 type AwardEntry = {
   id: string;
@@ -89,24 +90,37 @@ function EndYearPicker({
         <div className="absolute z-50 mt-2 w-64 rounded-2xl border border-neutral-300 bg-white shadow-lg p-3 max-h-60 overflow-auto">
           <div className="grid grid-cols-4 gap-2 text-sm">
             {years.map((year) => (
-              <button
-                key={year}
-                type="button"
-                onClick={() => {
-                  onChange(String(year));
-                  setOpen(false);
-                }}
-                className={`
-                  py-2 rounded-lg transition
-                  ${
-                    value === String(year)
-                      ? "bg-violet-600 text-white"
-                      : "hover:bg-neutral-100"
-                  }
-                `}
-              >
-                {year}
-              </button>
+<button
+  key={year}
+  type="button"
+  onClick={() => {
+    onChange(String(year));
+    setOpen(false);
+  }}
+  className="py-2 px-3 rounded-lg transition text-sm sm:text-base"
+  style={{
+    backgroundColor:
+      value === String(year) ? colors.accent : "transparent",
+    color:
+      value === String(year)
+        ? colors.background
+        : colors.neutral[800],
+    cursor: "pointer",
+  }}
+  onMouseEnter={(e) => {
+    if (value !== String(year)) {
+      e.currentTarget.style.backgroundColor = colors.primaryGlow;
+    }
+  }}
+  onMouseLeave={(e) => {
+    if (value !== String(year)) {
+      e.currentTarget.style.backgroundColor = "transparent";
+    }
+  }}
+>
+  {year}
+</button>
+
             ))}
           </div>
         </div>
