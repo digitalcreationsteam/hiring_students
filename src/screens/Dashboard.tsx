@@ -18,6 +18,14 @@ import { Progress } from "../ui/components/Progress";
 import { colors } from "../common/Colors";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import HeaderLogo from "../ui/components/HeaderLogo";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../ui/components/Card";
+
 // import Chat from "../ui/components/chat/Chat";
 
 import {
@@ -48,6 +56,7 @@ import {
   FeatherSettings,
   FeatherLogOut,
 } from "@subframe/core";
+// import HeaderLogo from "@/ui/components/HeaderLogo";
 
 /* ==================== TYPES ==================== */
 
@@ -362,7 +371,7 @@ export default function Dashboard() {
   const openMyChat = () => {
     const studentId = localStorage.getItem("userId");
     if (!studentId) {
-       toast.error("User ID not found. Please login again.");
+      toast.error("User ID not found. Please login again.");
       return;
     }
     navigate(`/chat/${studentId}`);
@@ -377,7 +386,7 @@ export default function Dashboard() {
 
   const handleAssessmentClick = () => {
     if (isAssessmentCompleted) {
-       toast.success("Assessment already completed");
+      toast.success("Assessment already completed");
       return;
     }
 
@@ -410,7 +419,7 @@ export default function Dashboard() {
       setSelectedAvatarFile(null);
     } catch (error) {
       console.error("Failed to save profile image", error);
-       toast.error("Failed to save profile image");
+      toast.error("Failed to save profile image");
     } finally {
       setIsSavingAvatar(false);
     }
@@ -423,14 +432,14 @@ export default function Dashboard() {
 
     // Validate file size (e.g., max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-       toast.error("File size should be less than 5MB");
+      toast.error("File size should be less than 5MB");
       return;
     }
 
     // Validate file type
     const validTypes = ["image/jpeg", "image/png", "image/webp"];
     if (!validTypes.includes(file.type)) {
-       toast.error("Please select a valid image (JPEG, PNG, or WebP)");
+      toast.error("Please select a valid image (JPEG, PNG, or WebP)");
       return;
     }
 
@@ -463,7 +472,7 @@ export default function Dashboard() {
       }, 1000);
     } catch (error) {
       console.error("Upload failed:", error);
-       toast.error("Failed to upload profile picture");
+      toast.error("Failed to upload profile picture");
       // Revert to old avatar if available
       // if (user?.avatarUrl) {
       //   setAvatar(user.avatarUrl);
@@ -501,1054 +510,1018 @@ export default function Dashboard() {
 
   /* ==================== UI ==================== */
 
-return (
-  // <DefaultPageLayout>
-  <>
-    <ToastContainer position="top-center" autoClose={3000} />
-    <div
-      className="min-h-screen w-full overflow-y-auto pb-12 relative"
-      style={{ backgroundColor: colors.white }}
-    >
-      {/* Blended background */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div
-          className="absolute inset-0"
-          style={{ backgroundColor: colors.background }}
-        />
+  return (
+    // <DefaultPageLayout>
+    <>
+      <ToastContainer position="top-center" autoClose={3000} />
+      <div
+        className="min-h-screen w-full overflow-y-auto pb-12 relative"
+        style={{ backgroundColor: colors.white,  fontFamily: "'Inter', sans-serif" }}
+      >
+        {/* Blended background */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div
+            className="absolute inset-0"
+            style={{ backgroundColor: colors.background }}
+          />
 
-        <div
-          className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
-          style={{
-            background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
-          }}
-        />
+          <div
+            className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
+            style={{
+              background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
+            }}
+          />
 
-        <div
-          className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
-          style={{
-            background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
-          }}
-        />
+          <div
+            className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
+            style={{
+              background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
+            }}
+          />
 
-        <div
-          className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
-          style={{
-            background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
-          }}
-        />
-      </div>
-
-      {/* TOP WELCOME BANNER */}
-      <div className="w-full relative z-10" style={{ borderColor: colors.aqua }}>
-        <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-end gap-4 px-4 sm:px-8 py-8 mb-8">
-          <div className="space-y-1">
-            <img
-              className="h-8 w-24 object-cover"
-              src="/hiringLogo2.png"
-              alt="hiringLogo"
-            />
-            <h1
-              className="text-3xl md:text-4xl font-bold tracking-tight"
-              style={{ color: colors.accent }}
-            >
-              Welcome back, {user.name} 👋
-            </h1>
-            <p className="text-lg" style={{ color: colors.accent }}>
-              Track progress, discover opportunities, and level up your
-              Hireability score.
-            </p>
-          </div>
-          <div className="flex gap-3 items-center">
-            <div
-              
-              className="rounded-full px-4 py-2 font-semibold shadow-sm text-black"
-              style={{
-                backgroundColor: colors.primary,
-                color: "#000",
-              }}
-              onClick={() => navigate(`/chat/$`)}
-            >
-              Message
-            </div>
-
-            {/* PROFILE DROPDOWN */}
-            <div className="relative" ref={profileMenuRef}>
-              <div
-                className="cursor-pointer"
-                onClick={() => setIsProfileMenuOpen((prev) => !prev)}
-              >
-                <Avatar
-                  size="large"
-                  image={avatar}
-                  style={{ boxShadow: `0 0 0 2px ${colors.aqua}` }}
-                />
-              </div>
-
-              {isProfileMenuOpen && (
-                <div
-                  className="absolute right-0 mt-2 w-44 rounded-xl border bg-white shadow-lg z-50">
-                  <button
-                    onClick={() => navigate("/dashboard")}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium hover:bg-neutral-100 rounded-t-xl"
-                  >
-                    <FeatherUser2 className="w-4 h-4" />
-                    Profile
-                  </button>
-
-                  <button
-                    onClick={() => navigate("/settings")}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium hover:bg-neutral-100"
-                  >
-                    <FeatherSettings className="w-4 h-4" />
-                    Settings
-                  </button>
-
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium hover:bg-neutral-100 rounded-b-xl text-red-600"
-                  >
-                    <FeatherLogOut className="w-4 h-4" />
-                    Log out
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
+          <div
+            className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
+            style={{
+              background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
+            }}
+          />
         </div>
-      </div>
 
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="flex flex-col gap-8 lg:flex-row">
-          {/* --- LEFT SIDEBAR --- */}
-          <div className="flex w-full flex-col gap-6 lg:w-[340px] lg:flex-none">
-            {/* Profile Card */}
-            <div
-              className="flex w-full flex-col items-center gap-3 rounded-[2rem] border shadow-sm text-center px-6 py-8"
-              style={{
-                backgroundColor: colors.white,
-               
-              }}
-            >
-              <div
-                className="relative cursor-pointer group mb-2"
-                onClick={() => fileRef.current?.click()}
-              >
-                <Avatar
-                  size="x-large"
-                  image={avatar}
-                  style={{ boxShadow: `0 0 0 4px ${colors.primaryGlow}` }}
-                >
-                  PP
-                </Avatar>
-                <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
-                  <span className="text-white text-xs font-bold uppercase">
-                    Change
-                  </span>
-                </div>
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarChange}
-                  className="hidden"
-                />
-              </div>
+        {/* TOP WELCOME BANNER */}
+        <div className="w-full relative" style={{ borderColor: colors.aqua }}>
+          <HeaderLogo />
+        </div>
 
-              <div className="space-y-1">
-                <div className="flex items-center justify-center gap-2">
-                  <span
-                    className="text-xl font-bold"
-                    style={{ color: colors.accent }}
-                  >
-                    {user.name}
-                  </span>
-                  {/* <FeatherCheckCircle
-                    className="w-4 h-4"
-                    style={{ color: colors.secondary }}
-                  /> */}
-                </div>
-                <p
-                  className="text-sm font-medium"
-                  style={{ color: colors.secondary }}
-                >
-                  {user.domain}
-                </p>
-                <div
-                  className="flex items-center justify-center gap-1 text-xs"
-                  style={{ color: colors.neutral[400] }}
-                >
-                  {/* <FeatherMapPin className="w-3 h-3" /> */}
-                  <span>{user.location}</span>
-                </div>
-              </div>
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mt-10">
+          <div className="flex flex-col gap-8 lg:flex-row">
+            {/* --- LEFT SIDEBAR --- */}
+            <div className="flex w-full flex-col gap-6 lg:w-[340px] lg:flex-none">
 
-              <div className="mt-4 flex w-full justify-center">
-                <div
-                  className="
-      inline-flex items-center gap-3
-      rounded-2xl
-      px-5 py-3
-      border
-      shadow-sm
-    "
-                  style={{
-                    backgroundColor: colors.primaryGlow,
-                    // borderColor: colors.aqua,
-                    color: colors.accent,
-                  }}
-                >
-                  {/* Icon bubble */}
-                  <div
-                    className="h-9 w-9 rounded-xl flex items-center justify-center"
-                    style={{
-                      backgroundColor: colors.primary,
-                      // border: `1px solid ${colors.aqua}`,
-                    }}
-                  >
-                    <FeatherTrophy className="w-5 h-5" />
-                  </div>
-
-                  {/* Text */}
-                  <div className="flex flex-col leading-none">
-                    <span className="text-[13px] font-semibold opacity-90">
-                      Global Rank
-                    </span>
-                    <span className="text-[22px] font-extrabold mt-1">
-                      #{rankData?.global?.rank ?? 0}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* ACTIVITY INTENSITY (Placed here as requested) */}
-            <div
-              className="flex w-full flex-col gap-4 rounded-[2rem] border shadow-sm px-6 py-6"
-              style={{
-                backgroundColor: colors.white,
-                // borderColor: colors.aqua,
-                color: colors.accent
-              }}
-            >
-              <span
-                className="text-sm font-bold"
-                style={{ }}
-              >
-                Activity This Week
-              </span>
-              <div className="space-y-4">
-                {[
-                  {
-                    label: "Case Studies",
-                    pct: "45%",
-                    color: colors.accent,
-                    val: "3/5",
-                  },
-                  {
-                    label: "Hackathons",
-                    pct: "50%",
-                    color: colors.secondary,
-                    val: "1/2",
-                  },
-                ].map((item, idx) => (
-                  <div key={idx} className="space-y-1">
-                    <div className="flex justify-between text-[11px] font-bold">
-                      <span style={{ color: colors.neutral[600] }}>
-                        {item.label}
-                      </span>
-                      <span style={{ color: colors.primary }}>{item.val}</span>
-                    </div>
-                    <div
-                      className="h-1.5 w-full rounded-full overflow-hidden"
-                      style={{ backgroundColor: colors.cream }}
-                    >
-                      <div
-                        className="h-full rounded-full transition-all"
-                        style={{ width: item.pct, backgroundColor: item.color }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div
-                className="mt-2 rounded-xl px-3 py-2 text-center text-[10px] font-bold"
+              <Card
+                className="flex w-full flex-col items-center gap-3 rounded-[2rem] border shadow-sm text-center"
                 style={{
-                  backgroundColor: colors.primaryGlow,
-                  color: colors.accent,
+                  backgroundColor: colors.white,
                 }}
               >
-                You're more active than 78% of peers
-              </div>
-            </div>
-
-            {/* PROFESSIONAL RESUME (SIDEBAR) */}
-            <div
-              className="rounded-[2rem] p-6 border shadow-sm space-y-6"
-              style={{
-                backgroundColor: colors.white,
-              }}
-            >
-              <h3
-                className="text-sm font-bold border-b pb-3 flex items-center gap-2"
-                style={{ color: colors.accent }}
-              >
-                <FeatherFileText
-                  className="w-4 h-4"
-                  style={{ color: colors.accent }}
-                />{" "}
-                Professional Resume
-              </h3>
-
-              {/* Experience */}
-              <div className="space-y-4">
-                <p
-                  className="text-[10px] font-black uppercase tracking-widest"
-                  style={{ color: colors.accent }}
-                >
-                  Experience
-                </p>
-                <div
-                  className="space-y-4 border-l-2 ml-1"
-                  style={{ borderColor: colors.accent }}
-                >
-                  {workExperience?.slice(0, 2).map((exp, i) => (
-                    <div key={i} className="pl-4 relative">
-                      <div
-                        className="absolute w-2 h-2 rounded-full -left-[5px] top-1 ring-2 ring-white"
-                        style={{ backgroundColor: colors.accent }}
-                      />
-                      <h4
-                        className="text-xs font-bold leading-tight"
-                        style={{ color: colors.accent }}
-                      >
-                        {exp.jobTitle}
-                      </h4>
-                      <p
-                        className="text-[10px]"
-                        style={{ color: colors.accent }}
-                      >
-                        {exp.companyName}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              {/* Projects */}
-              <div className="space-y-3">
-                <p
-                  className="text-[10px] font-black uppercase tracking-widest"
-                  style={{ color: colors.accent }}
-                >
-                  Projects
-                </p>
-
-                {projects?.slice(0, 2).map((proj, i) => (
+                <CardContent className="px-6 py-8 flex w-full flex-col items-center gap-3">
+                  {/* Avatar Section */}
                   <div
-                    key={i}
-                    className="relative pl-4 pr-3 py-3 rounded-xl border transition hover:shadow-md"
-                    style={{
-                      backgroundColor: colors.primaryGlow,
-                      // borderColor: colors.aqua,
-                      color: colors.accent
-                    }}
+                    className="relative cursor-pointer group mb-2"
+                    onClick={() => fileRef.current?.click()}
                   >
-                    {/* Left accent bar */}
-                    <span
-                      className="absolute left-0 top-3 bottom-3 w-1 rounded-full"
-                      style={{ backgroundColor: colors.accent }}
+                    <Avatar
+                      size="x-large"
+                      image={avatar}
+                      style={{ boxShadow: `0 0 0 4px ${colors.primaryGlow}` }}
+                    >
+                      PP
+                    </Avatar>
+
+                    <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+                      <span className="text-white text-xs font-bold uppercase">
+                        Change
+                      </span>
+                    </div>
+
+                    <input
+                      ref={fileRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarChange}
+                      className="hidden"
                     />
-
-                    {/* Project index */}
-                    <span
-                      className="text-[9px] font-bold mb-1 inline-block"
-                      style={{ color: colors.accent }}
-                    >
-                      Project {i + 1}
-                    </span>
-
-                    <h4
-                      className="text-[12px] font-bold leading-tight truncate"
-                      style={{ color: colors.accent }}
-                    >
-                      {proj.title}
-                    </h4>
-
-                    <p
-                      className="text-[10px] mt-1 leading-snug line-clamp-2"
-                      style={{ color: colors.accent }}
-                    >
-                      {proj.summary}
-                    </p>
                   </div>
-                ))}
-              </div>
 
-              {/* Certifications */}
-              <div className="space-y-3">
-                <p
-                  className="text-[10px] font-black uppercase tracking-widest"
-                  style={{ color: colors.accent }}
-                >
-                  Certifications
-                </p>
-
-                {certifications?.slice(0, 2).map((cert, i) => (
-                  <div
-                    key={i}
-                    className="flex items-start gap-3 p-3 rounded-xl border shadow-sm"
-                    style={{
-                      backgroundColor: colors.primaryGlow,
-                      // borderColor: colors.aqua,
-                    }}
-                  >
-                    {/* Icon */}
-                    <div className="mt-0.5">
-                      <FeatherAward
-                        className="w-4 h-4"
-                        style={{ color: colors.accent }}
-                      />
-                    </div>
-
-                    {/* Text */}
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className="text-[11px] font-bold truncate"
+                  {/* User Info */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-center gap-2">
+                      <span
+                        className="text-xl"
                         style={{ color: colors.accent }}
                       >
-                        {cert.name}
-                      </p>
-
-                      <p
-                        className="text-[9px] mt-0.5 truncate"
-                        style={{ color: colors.accent }}
-                      >
-                        Issued by {cert.issuedBy}
-                      </p>
+                        {user.name}
+                      </span>
                     </div>
 
-                    {/* Date */}
                     <p
-                      className="text-[10px] font-semibold whitespace-nowrap"
-                      style={{ color: colors.primary }}
+                      className="text-sm "
+                      style={{ color: colors.secondary }}
                     >
-                      {cert.issueYear}
+                      {user.domain}
                     </p>
-                  </div>
-                ))}
-              </div>
 
-              {/* Education & Certs */}
-              <div className="space-y-3 pt-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-[10px] font-black uppercase tracking-widest">
-                    Education
-                  </p>
-                  <div className="flex gap-1">
-                    {certifications?.slice(0, 3).map((_, i) => (
-                      <FeatherCheckCircle
-                        key={i}
-                        className="w-3 h-3 text-green-500"
-                      />
-                    ))}
+                    <div
+                      className="flex items-center justify-center gap-1 text-xs"
+                      style={{ color: colors.neutral[400] }}
+                    >
+                      <span>{user.location}</span>
+                    </div>
                   </div>
-                </div>
-                {education?.map((edu, i) => (
-                  <div key={i} className="text-[11px] space-y-0.5">
-                    <p className="font-bold text-neutral-800 leading-tight">
-                      {edu.schoolName}
-                    </p>
-                    <p className="text-neutral-500">{edu.degree}</p>
-                    <p className="text-[10px] text-neutral-400 whitespace-nowrap">
-                      {edu.startYear}
-                      {edu.endYear ? ` – ${edu.endYear}` : " – Present"}
-                    </p>
-                  </div>
-                ))}
-              </div>
 
-              {/* Skills */}
-              <div className="space-y-2">
-                <p
-                  className="text-[10px] font-black uppercase tracking-widest"
-                  style={{ color: colors.accent }}
-                >
-                  Skills
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {skills?.slice(0, 6).map((skill, i) => (
-                    <span
-                      key={i}
-                      className="px-2 py-1 border rounded-md text-[9px] font-bold uppercase"
+                  {/* Rank Section */}
+                  <div className="mt-4 flex w-full justify-center">
+                    <div
+                      className="inline-flex items-center gap-3 rounded-2xl px-5 py-3 border shadow-sm"
                       style={{
-                        backgroundColor: colors.primary,
-                        // borderColor: colors.aqua,
+                        backgroundColor: colors.primaryGlow,
                         color: colors.accent,
                       }}
                     >
-                      {typeof skill === "string" ? skill : skill.name}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+                      {/* Icon bubble */}
+                      <div
+                        className="h-9 w-9 rounded-xl flex items-center justify-center"
+                        style={{
+                          backgroundColor: colors.primary,
+                        }}
+                      >
+                        <FeatherTrophy className="w-5 h-5" />
+                      </div>
 
-          {/* --- CENTER DASHBOARD --- */}
-          <div className="flex w-full flex-col gap-8 lg:max-w-[800px]">
-            {/* Rankings Cards */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {[
-                {
-                  label: "Global Rank",
-                  val: rankData.global,
-                  pct: rankData.global.percentile,
-                  icon: <FeatherGlobe />,
-                  theme: colors.accent,
-                },
-                {
-                  label: "California",
-                  val: rankData.state,
-                  pct: rankData.state.percentile,
-                  icon: <FeatherMap />,
-                  theme: colors.secondary,
-                },
-                {
-                  label: "San Francisco",
-                  val: rankData.city,
-                  pct: rankData.city.percentile,
-                  icon: <FeatherMapPin />,
-                  theme: colors.primary,
-                },
-                // {
-                //   label: "Stanford",
-                //   val: rankData.university,
-                //   pct: rankData.university.percentile,
-                //   icon: <FeatherUniversity />,
-                //   theme: colors.accent,
-                // },
-              ].map((rank, i) => (
-                <div
-                  key={i}
-                  className="flex flex-col items-center gap-2 rounded-3xl border p-6 shadow-sm text-center"
-                  style={{
-                    backgroundColor: colors.white,
-                    // borderColor: colors.aqua,
-                  }}
-                >
-                  <div
-                    className="h-10 w-10 flex items-center justify-center rounded-full"
-                    style={{ backgroundColor: colors.primary, color: colors.accent }}
-                  >
-                    {rank.icon}
+                      {/* Text */}
+                      <div className="flex flex-col leading-none">
+                        <span className="text-[13px] opacity-90">
+                          Global Rank
+                        </span>
+
+                        <span className="text-[22px] font-extrabold mt-1">
+                          #{rankData?.global?.rank ?? 0}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest opacity-50">
-                    {rank.label}
-                  </span>
-                  <span
-                    className="text-3xl font-black"
-                    style={{ color: rank.theme }}
-                  >
-                    {rank.val.rank}
-                  </span>
-                  <Badge
-                    className="border-none text-[10px] font-bold"
+                </CardContent>
+              </Card>
+
+              <Card
+                className="w-full rounded-[2rem] shadow-sm border"
+                style={{
+                  backgroundColor: colors.white,
+                  color: colors.accent,
+                }}
+              >
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">
+                    Activity This Week
+                  </CardTitle>
+                </CardHeader>
+
+                <CardContent className="space-y-5">
+                  {[
+                    {
+                      label: "Case Studies",
+                      pct: "45%",
+                      color: colors.accent,
+                      val: "3/5",
+                    },
+                    {
+                      label: "Hackathons",
+                      pct: "50%",
+                      color: colors.secondary,
+                      val: "1/2",
+                    },
+                  ].map((item, idx) => (
+                    <div key={idx} className="space-y-1">
+                      <div className="flex justify-between text-[11px]">
+                        <span style={{ color: colors.neutral[600] }}>
+                          {item.label}
+                        </span>
+                        <span style={{ color: colors.primary }}>
+                          {item.val}
+                        </span>
+                      </div>
+
+                      <div
+                        className="h-1.5 w-full rounded-full overflow-hidden"
+                        style={{ backgroundColor: colors.cream }}
+                      >
+                        <div
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{
+                            width: item.pct,
+                            backgroundColor: item.color,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+
+                  <div
+                    className="mt-2 rounded-xl px-3 py-2 text-center text-[10px]"
                     style={{
                       backgroundColor: colors.primaryGlow,
                       color: colors.accent,
                     }}
                   >
-                    Top {rank.pct}%
-                  </Badge>
-                </div>
-              ))}
-            </div>
-
-            {/* Hireability Hero Index */}
-            <div
-              className="w-full rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden"
-              style={{ backgroundColor: "white", color: colors.accent }}
-            >
-              <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
-                <div className="relative h-40 w-40 flex items-center justify-center">
-                  <svg className="absolute w-full h-full transform -rotate-90">
-                    <circle
-                      cx="80"
-                      cy="80"
-                      r="72"
-                      stroke="rgba(255,255,255,0.1)"
-                      strokeWidth="10"
-                      fill="transparent"
-                    />
-                    <circle
-                      cx="80"
-                      cy="80"
-                      r="72"
-                      stroke={colors.accent}
-                      strokeWidth="10"
-                      fill="transparent"
-                      strokeDasharray="452.4"
-                      strokeDashoffset={
-                        452.4 - 452.4 * (hireability.totalScore / 1000)
-                      }
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  <div className="text-center" style={{ borderColor: colors.primaryGlow}}>
-                    <span
-                      className="text-4xl font-black"
-                      style={{ color: colors.accent }}
-                    >
-                      {hireability.totalScore}
-                    </span>
-                    <p className="text-[10px] uppercase opacity-60 font-bold tracking-widest">
-                      Total Index
-                    </p>
+                    You're more active than 78% of peers
                   </div>
-                </div>
-
-                <div className="flex-1 space-y-6">
-                  <div className="flex items-center justify-between gap-3">
-                    {/* Left: Title */}
-                    <h3
-                      className="text-lg sm:text-xl font-bold"
-                      style={{ color: colors.accent }}
-                    >
-                      Hireability Index
-                    </h3>
-
-                    {/* Right: Weekly growth */}
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-sm font-bold text-green-600">
-                        +{hireability?.weeklyChange ?? 0}
-                      </span>
-
-                      <span
-                        className="text-xs font-semibold"
-                        style={{ color: colors.secondary }}
-                      >
-                        this week
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest opacity-70">
-                        <span>Skill Index</span>
-                        <span>
-                          {hireability.skill.score}/{hireability.skill.max}
-                        </span>
-                      </div>
-                      <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
-                        <div
-                          className="h-full"
-                          style={{
-                            width: `${skillProgress}%`,
-                            backgroundColor: colors.accent,
-                          }}
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest opacity-70">
-                        <span>Experience</span>
-                        <span>
-                          {hireability.experience.score}/
-                          {hireability.experience.max}
-                        </span>
-                      </div>
-                      <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
-                        <div
-                          className="h-full"
-                          style={{
-                            width: `${experienceProgress}%`,
-                            backgroundColor: colors.aqua,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <Button
-                    className="border-none px-8 rounded-2xl font-bold h-12 transition-transform hover:scale-105"
-                    style={{
-                      backgroundColor: colors.accent,
-                      color: colors.primary,
-                    }}
-                  >
-                    Improve Score Now
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Recommended Actions */}
-            <div className="space-y-4">
-              {/* Header */}
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <h3 className="text-lg sm:text-xl font-bold text-neutral-900">
-                  Recommended Actions
-                </h3>
-
-                <span className="w-fit text-[10px] sm:text-xs font-bold text-yellow-600 bg-yellow-50 px-3 py-1 rounded-full border border-yellow-100">
-                  4 Actions Available
-                </span>
-              </div>
-
-              {/* Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                {/* Assessment */}
-                <div className="bg-white border border-neutral-200 p-4 sm:p-6 rounded-3xl sm:rounded-[2rem] hover:border-violet-300 transition-all group shadow-sm">
-                  <div className="flex justify-between items-start mb-4 sm:mb-6">
-                    <div style={{backgroundColor: colors.primary}} className="p-3 rounded-2xl text-black transition-colors">
-                      <FeatherFileText />
-                    </div>
-
-                    <Badge style={{backgroundColor: colors.primary, color: colors.accent}} className="border-none font-bold text-[10px] uppercase tracking-wider">
-                      +50 Skill
-                    </Badge>
-                  </div>
-
-                  <h4 className="text-base sm:text-lg font-bold mb-2">
-                    Complete Assessment
-                  </h4>
-                  <p className="text-sm text-neutral-500 mb-4 sm:mb-6 leading-relaxed">
-                    Begin evaluation and boost your credibility with
-                    role-specific eval.
-                  </p>
-
-                  {/* Footer row responsive */}
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[10px] font-bold flex items-center gap-1">
-                        <FeatherRepeat className="w-3 h-3" /> Paid retakes: 1
-                      </span>
-                      <span className="text-[10px] font-bold flex items-center gap-1">
-                        <FeatherGift className="w-3 h-3" /> Free retakes: 1
-                      </span>
-                    </div>
-
-                    {isAssessmentCompleted ? (
-                      // ❌ DISABLED STATE (like Notify Me)
-                      <Button
-                        disabled
-                        className="w-full sm:w-auto rounded-2xl bg-neutral-200 text-neutral-500 cursor-not-allowed border-none px-5 sm:px-6"
-                      >
-                        Completed
-                      </Button>
-                    ) : (
-                      // ✅ ENABLED STATE
-                      <Button
-                        variant="brand-primary"
-                        className="w-full sm:w-auto rounded-2xl px-5 sm:px-6"
-                        style={{
-                          backgroundColor: colors.accent,
-                          color: "white"
-                        }}
-                        onClick={handleAssessmentClick}
-                      >
-                        Start Now
-                      </Button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Case Studies */}
-                <div className="bg-white border border-neutral-200 p-4 sm:p-6 rounded-3xl sm:rounded-[2rem] hover:border-green-300 transition-all group shadow-sm">
-                  <div className="flex justify-between items-start mb-4 sm:mb-6">
-                    <div style={{backgroundColor: colors.primary, color: colors.accent}} className="p-3 rounded-2xl group-hover:bg-green-600 group-hover:text-white transition-colors">
-                      <FeatherBookOpen />
-                    </div>
-
-                    <Badge style={{backgroundColor: colors.primary, color: colors.accent}} className="border-none font-bold text-[10px] uppercase tracking-wider">
-                      +40 Exp
-                    </Badge>
-                  </div>
-
-                  <h4 className="text-base sm:text-lg font-bold mb-2">
-                    Solve Case Studies
-                  </h4>
-                  <p className="text-sm text-neutral-500 mb-4 sm:mb-6 leading-relaxed">
-                    Solving cases shows recruiters your effort to increase your
-                    knowledge base.
-                  </p>
-
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
-                      <FeatherClock className="w-3 h-3" /> 20 min
-                    </span>
-
-                    <Button
-                      variant="brand-primary"
-                      style={{backgroundColor: colors.accent}}
-                      className="w-full sm:w-auto rounded-2xl px-5 sm:px-6"
-                      onClick={() => handleNavigate("/case-assessments")}
-                    >
-                      Start Now
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Hackathons */}
-                <div className="bg-neutral-50 border border-neutral-200 p-4 sm:p-6 rounded-3xl sm:rounded-[2rem] opacity-80 group shadow-sm">
-                  <div className="flex justify-between items-start mb-4 sm:mb-6">
-                    <div className="p-3 bg-neutral-200 rounded-2xl text-neutral-500">
-                      <FeatherUsers />
-                    </div>
-
-                    <Badge
-                      variant="neutral"
-                      icon={<FeatherLock />}
-                      className="bg-gray-100 text-gray-600 border-none font-bold text-[10px] uppercase"
-                    >
-                      Coming Soon
-                    </Badge>
-                  </div>
-
-                  <h4 className="text-base sm:text-lg font-bold mb-2 text-neutral-700">
-                    Participate in Hackathons
-                  </h4>
-                  <p className="text-sm text-neutral-400 mb-4 sm:mb-6 leading-relaxed">
-                    Collaborate and build visibility with other PMs in upcoming
-                    events.
-                  </p>
-
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
-                      <FeatherCalendar className="w-3 h-3" /> Starts in 5 days
-                    </span>
-
-                    <Button
-                      disabled
-                      className="w-full sm:w-auto rounded-2xl bg-neutral-200 text-neutral-500 cursor-not-allowed border-none px-5 sm:px-6"
-                    >
-                      Notify Me
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Courses */}
-                <div className="bg-neutral-50 border border-neutral-200 p-4 sm:p-6 rounded-3xl sm:rounded-[2rem] opacity-80 group shadow-sm">
-                  <div className="flex justify-between items-start mb-4 sm:mb-6">
-                    <div className="p-3 bg-neutral-200 rounded-2xl text-neutral-500">
-                      <FeatherBook />
-                    </div>
-
-                    <Badge
-                      variant="neutral"
-                      icon={<FeatherLock />}
-                      className="bg-gray-100 text-gray-600 border-none font-bold text-[10px] uppercase"
-                    >
-                      Coming Soon
-                    </Badge>
-                  </div>
-
-                  <h4 className="text-base sm:text-lg font-bold mb-2 text-neutral-700">
-                    Courses
-                  </h4>
-                  <p className="text-sm text-neutral-400 mb-4 sm:mb-6 leading-relaxed">
-                    Complete structured learning path to earn verified PM
-                    badges.
-                  </p>
-
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <span className="text-xs font-bold text-neutral-400 flex items-center gap-1">
-                      <FeatherClock className="w-3 h-3" /> 8 weeks
-                    </span>
-
-                    <Button
-                      disabled
-                      className="w-full sm:w-auto rounded-2xl bg-neutral-200 text-neutral-500 cursor-not-allowed border-none px-5 sm:px-6"
-                    >
-                      Notify Me
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* --- RIGHT SIDEBAR --- */}
-          <div className="flex w-full flex-col gap-6 lg:w-[340px] lg:flex-none">
-            {/* Mini Leaderboard */}
-            <div
-              className="bg-white rounded-[2rem] border shadow-sm p-6"
-              style={{ }}
-            >
-              <h3
-                className="text-sm font-bold mb-4 flex items-center gap-2"
-                style={{ color: colors.accent }}
+                </CardContent>
+              </Card>
+              <Card
+                className="w-full rounded-[2rem] shadow-sm border"
+                style={{ backgroundColor: colors.white }}
               >
-                <FeatherTrophy
-                  className="w-4 h-4"
-                  style={{ color: colors.accent }}
-                />{" "}
-                Top PMs at Stanford
-              </h3>
-              <div className="space-y-3 mb-4">
+                <CardHeader className="pb-3 border-b">
+                  <CardTitle
+                    className="text-sm flex items-center gap-2"
+                    style={{ color: colors.accent }}
+                  >
+                    <FeatherFileText
+                      className="w-4 h-4"
+                      style={{ color: colors.accent }}
+                    />
+                    Professional Resume
+                  </CardTitle>
+                </CardHeader>
+
+                <CardContent className="p-6 space-y-6">
+                  {/* Experience */}
+                  <div className="space-y-4">
+                    <p
+                      className="text-[10px] font-black uppercase tracking-widest"
+                      style={{ color: colors.accent }}
+                    >
+                      Experience
+                    </p>
+
+                    <div
+                      className="space-y-4 border-l-2 ml-1"
+                      style={{ borderColor: colors.accent }}
+                    >
+                      {workExperience?.slice(0, 2).map((exp, i) => (
+                        <div key={i} className="pl-4 relative">
+                          <div
+                            className="absolute w-2 h-2 rounded-full -left-[5px] top-1 ring-2 ring-white"
+                            style={{ backgroundColor: colors.accent }}
+                          />
+
+                          <h4
+                            className="text-xs leading-tight"
+                            style={{ color: colors.accent }}
+                          >
+                            {exp.jobTitle}
+                          </h4>
+
+                          <p
+                            className="text-[10px]"
+                            style={{ color: colors.accent }}
+                          >
+                            {exp.companyName}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Projects */}
+                  <div className="space-y-3">
+                    <p
+                      className="text-[10px] font-black uppercase tracking-widest"
+                      style={{ color: colors.accent }}
+                    >
+                      Projects
+                    </p>
+
+                    {projects?.slice(0, 2).map((proj, i) => (
+                      <div
+                        key={i}
+                        className="relative pl-4 pr-3 py-3 rounded-xl border transition hover:shadow-md"
+                        style={{
+                          backgroundColor: colors.cream,
+                          borderColor: colors.aqua,
+                        }}
+                      >
+                        <span
+                          className="absolute left-0 top-3 bottom-3 w-1 rounded-full"
+                          style={{ backgroundColor: colors.accent }}
+                        />
+
+                        <span
+                          className="text-[9px] mb-1 inline-block"
+                          style={{ color: colors.accent }}
+                        >
+                          Project {i + 1}
+                        </span>
+
+                        <h4
+                          className="text-[12px] font-bold leading-tight truncate"
+                          style={{ color: colors.primary }}
+                        >
+                          {proj.title}
+                        </h4>
+
+                        <p
+                          className="text-[10px] mt-1 leading-snug line-clamp-2"
+                          style={{ color: colors.secondary }}
+                        >
+                          {proj.summary}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Certifications */}
+                  <div className="space-y-3">
+                    <p
+                      className="text-[10px] font-black uppercase tracking-widest"
+                      style={{ color: colors.accent }}
+                    >
+                      Certifications
+                    </p>
+
+                    {certifications?.slice(0, 2).map((cert, i) => (
+                      <div
+                        key={i}
+                        className="flex items-start gap-3 p-3 rounded-xl border shadow-sm"
+                        style={{
+                          backgroundColor: colors.mint,
+                          borderColor: colors.aqua,
+                        }}
+                      >
+                        <div className="mt-0.5">
+                          <FeatherAward
+                            className="w-4 h-4"
+                            style={{ color: colors.accent }}
+                          />
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <p
+                            className="text-[11px] truncate"
+                            style={{ color: colors.primary }}
+                          >
+                            {cert.name}
+                          </p>
+
+                          <p
+                            className="text-[9px] mt-0.5 truncate"
+                            style={{ color: colors.secondary }}
+                          >
+                            Issued by {cert.issuedBy}
+                          </p>
+                        </div>
+
+                        <p
+                          className="text-[10px] whitespace-nowrap"
+                          style={{ color: colors.primary }}
+                        >
+                          {cert.issueYear}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Education */}
+                  <div className="space-y-3 pt-2">
+                    <div className="flex items-center justify-between">
+                      <p
+                        className="text-[10px] font-black uppercase tracking-widest"
+                        style={{ color: colors.accent }}
+                      >
+                        Education
+                      </p>
+
+                      <div className="flex gap-1">
+                        {certifications?.slice(0, 3).map((_, i) => (
+                          <FeatherCheckCircle
+                            key={i}
+                            className="w-3 h-3 text-green-500"
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {education?.map((edu, i) => (
+                      <div key={i} className="text-[11px] space-y-0.5">
+                        <p className="text-neutral-800 leading-tight">
+                          {edu.schoolName}
+                        </p>
+                        <p className="text-neutral-500">{edu.degree}</p>
+                        <p className="text-[10px] text-neutral-400 whitespace-nowrap">
+                          {edu.startYear}
+                          {edu.endYear ? ` – ${edu.endYear}` : " – Present"}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Skills */}
+                  <div className="space-y-2">
+                    <p
+                      className="text-[10px] font-black uppercase tracking-widest"
+                      style={{ color: colors.accent }}
+                    >
+                      Skills
+                    </p>
+
+                    <div className="flex flex-wrap gap-1.5">
+                      {skills?.slice(0, 6).map((skill, i) => (
+                        <span
+                          key={i}
+                          className="px-2 py-1 border rounded-md text-[9px] uppercase"
+                          style={{
+                            backgroundColor: colors.white,
+                            borderColor: colors.aqua,
+                            color: colors.primary,
+                          }}
+                        >
+                          {typeof skill === "string" ? skill : skill.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* --- CENTER DASHBOARD --- */}
+            <div className="flex w-full flex-col gap-8 lg:max-w-[800px]">
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {[
                   {
-                    rank: 1,
-                    name: "Anjali Sharma",
-                    score: 425,
+                    label: "Global Rank",
+                    val: rankData.global,
+                    pct: rankData.global.percentile,
+                    icon: <FeatherGlobe />,
                     theme: colors.accent,
                   },
                   {
-                    rank: 2,
-                    name: "Rahul Kumar",
-                    score: 398,
+                    label: "California",
+                    val: rankData.state,
+                    pct: rankData.state.percentile,
+                    icon: <FeatherMap />,
                     theme: colors.secondary,
                   },
                   {
-                    rank: 23,
-                    name: "You",
-                    score: 350,
+                    label: "San Francisco",
+                    val: rankData.city,
+                    pct: rankData.city.percentile,
+                    icon: <FeatherMapPin />,
                     theme: colors.primary,
-                    isUser: true,
                   },
-                ].map((p, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center gap-3 p-3 rounded-2xl"
+                ].map((rank, i) => (
+                  <Card
+                    key={i}
+                    className="rounded-3xl shadow-sm border"
                     style={{
-                      backgroundColor: p.isUser ? colors.mint : colors.cream,
+                      backgroundColor: colors.white,
                     }}
                   >
-                    <div
-                      className="w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black"
-                      style={{ backgroundColor: colors.white, color: p.theme }}
-                    >
-                      #{p.rank}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className="text-xs font-bold truncate"
-                        style={{ color: p.theme }}
+                    <CardContent className="flex flex-col items-center gap-2 p-6 text-center">
+                      <div
+                        className="h-10 w-10 flex items-center justify-center rounded-full"
+                        style={{
+                          backgroundColor: colors.primary,
+                          color: colors.accent,
+                        }}
                       >
-                        {p.name}
-                      </p>
-                      <p
-                        className="text-[10px] opacity-60"
-                        style={{ color: colors.accent }}
+                        {rank.icon}
+                      </div>
+
+                      <span className="text-[10px] uppercase tracking-widest opacity-50">
+                        {rank.label}
+                      </span>
+
+                      <span
+                        className="text-3xl font-black"
+                        style={{ color: rank.theme }}
                       >
-                        Score: {p.score}
-                      </p>
-                    </div>
-                  </div>
+                        {rank.val.rank}
+                      </span>
+
+                      <Badge
+                        className="border-none text-[10px]"
+                        style={{
+                          backgroundColor: colors.primaryGlow,
+                          color: colors.accent,
+                        }}
+                      >
+                        Top {rank.pct}%
+                      </Badge>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
-              <div
-                className="w-full h-9 text-[11px] font-bold rounded-xl border-none text-center"
-                style={{ backgroundColor: colors.primary, color: colors.accent }}
-                onClick={() => handleNavigate("/leaderboard")}
+
+              <Card
+                className="w-full rounded-[2.5rem] shadow-xl overflow-hidden"
+                style={{ backgroundColor: "white", color: colors.accent }}
               >
-                Full Leaderboard
-              </div>
-            </div>
+                <CardContent className="p-8">
+                  <div className="flex flex-col md:flex-row items-center gap-8">
+                    {/* Circular Progress */}
+                    <div className="relative h-40 w-40 flex items-center justify-center">
+                      <svg className="absolute w-full h-full transform -rotate-90">
+                        <circle
+                          cx="80"
+                          cy="80"
+                          r="72"
+                          stroke="rgba(0,0,0,0.08)"
+                          strokeWidth="10"
+                          fill="transparent"
+                        />
+                        <circle
+                          cx="80"
+                          cy="80"
+                          r="72"
+                          stroke={colors.accent}
+                          strokeWidth="10"
+                          fill="transparent"
+                          strokeDasharray="452.4"
+                          strokeDashoffset={
+                            452.4 - 452.4 * (hireability.totalScore / 1000)
+                          }
+                          strokeLinecap="round"
+                        />
+                      </svg>
 
-            {/* Visibility Probability */}
-            <div
-              className="rounded-[2.5rem] p-8 shadow-lg text-center relative overflow-hidden"
-              style={{ backgroundColor: colors.white, color: colors.accent }}
-            >
-              <div className="relative z-10">
-                <p className="text-xs font-black uppercase tracking-widest opacity-70">
-                  Visibility Probability
-                </p>
-                <div className="text-6xl font-black my-4">
-                  {recruiterVisibility}%
-                </div>
-                <div
-                  className="p-3 rounded-2xl text-[10px] font-bold"
-                  style={{ backgroundColor: colors.primary, color: colors.accent }}
-                >
-                  Based on rankings and case studies solved.
-                </div>
-              </div>
-            </div>
+                      <div className="text-center">
+                        <span
+                          className="text-4xl font-black"
+                          style={{ color: colors.accent }}
+                        >
+                          {hireability.totalScore}
+                        </span>
 
-            {/* Profile Views */}
-            <div
-              className="bg-white rounded-[2rem] border shadow-sm p-6"
-              style={{}}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3
-                  className="text-sm font-bold"
-                  style={{ color: colors.accent }}
-                >
-                  Profile Views
-                </h3>
-                <Badge
-                  className="border-none font-bold text-[10px]"
-                  style={{
-                    backgroundColor: colors.primary,
-                    color: "black",
-                  }}
-                >
-                  15
-                </Badge>
-              </div>
-              <div className="space-y-3">
-                {[
-                  {
-                    name: "Sarah Kim",
-                    role: "Google",
-                    img: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=64",
-                  },
-                  {
-                    name: "Michael J.",
-                    role: "Meta",
-                    img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=64",
-                  },
-                ].map((viewer, idx) => (
-                  <div key={idx} className="flex items-center gap-3">
-                    <Avatar
-                      size="small"
-                      image={viewer.img}
-                      style={{ boxShadow: `0 0 0 2px ${colors.cream}` }}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className="text-xs font-bold truncate"
-                        style={{ color: colors.accent }}
+                        <p className="text-[10px] uppercase opacity-60 font-bold tracking-widest">
+                          Total Index
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Right Side Content */}
+                    <div className="flex-1 space-y-6">
+                      {/* Header */}
+                      <div className="flex items-center justify-between gap-3">
+                        <h3
+                          className="text-lg sm:text-xl"
+                          style={{ color: colors.accent }}
+                        >
+                          Hireability Index
+                        </h3>
+
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-sm text-green-600">
+                            +{hireability?.weeklyChange ?? 0}
+                          </span>
+
+                          <span
+                            className="text-xs"
+                            style={{ color: colors.secondary }}
+                          >
+                            this week
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Skill + Experience Bars */}
+                      <div className="grid grid-cols-2 gap-4">
+                        {/* Skill */}
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-[10px] uppercase tracking-widest opacity-70">
+                            <span>Skill Index</span>
+                            <span>
+                              {hireability.skill.score}/{hireability.skill.max}
+                            </span>
+                          </div>
+
+                          <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden">
+                            <div
+                              className="h-full"
+                              style={{
+                                width: `${skillProgress}%`,
+                                backgroundColor: colors.accent,
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Experience */}
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-[10px] uppercase tracking-widest opacity-70">
+                            <span>Experience</span>
+                            <span>
+                              {hireability.experience.score}/
+                              {hireability.experience.max}
+                            </span>
+                          </div>
+
+                          <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden">
+                            <div
+                              className="h-full"
+                              style={{
+                                width: `${experienceProgress}%`,
+                                backgroundColor: colors.aqua,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Button */}
+                      <Button
+                        className="border-none px-8 rounded-2xl h-12 transition-transform hover:scale-105"
+                        style={{
+                          backgroundColor: colors.accent,
+                          color: colors.primary,
+                        }}
                       >
-                        {viewer.name}
-                      </p>
-                      <p
-                        className="text-[10px] truncate opacity-60"
-                        style={{ color: colors.accent }}
-                      >
-                        {viewer.role}
-                      </p>
+                        Improve Score Now
+                      </Button>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
+                </CardContent>
+              </Card>
 
-            {/* Quick Update Buttons */}
-            <div className="mt-6">
-              <div
-                className="rounded-3xl border bg-white overflow-hidden"
-                style={{ }}
-              >
+              <div className="space-y-4">
                 {/* Header */}
-                <div className="px-5 pt-5 pb-3">
-                  <p
-                    className="text-lg font-extrabold"
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <h3 className="text-lg sm:text-xl text-neutral-900">
+                    Recommended Actions
+                  </h3>
+
+                  <span className="w-fit text-[10px] sm:text-xs text-yellow-600 bg-yellow-50 px-3 py-1 rounded-full border border-yellow-100">
+                    4 Actions Available
+                  </span>
+                </div>
+
+                {/* Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                  {/* ================= Assessment ================= */}
+                  <Card className="border border-neutral-200 rounded-3xl sm:rounded-[2rem] shadow-sm bg-white transition-all">
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex justify-between items-start mb-4 sm:mb-6">
+                        <div
+                          style={{ backgroundColor: colors.primary }}
+                          className="p-3 rounded-2xl text-black"
+                        >
+                          <FeatherFileText />
+                        </div>
+
+                        <Badge
+                          style={{
+                            backgroundColor: colors.primary,
+                            color: colors.accent,
+                          }}
+                          className="border-none text-[10px] uppercase tracking-wider"
+                        >
+                          +50 Skill
+                        </Badge>
+                      </div>
+
+                      <h4 className="text-base sm:text-lg mb-2">
+                        Complete Assessment
+                      </h4>
+
+                      <p className="text-sm text-neutral-500 mb-4 sm:mb-6 leading-relaxed">
+                        Begin evaluation and boost your credibility with
+                        role-specific eval.
+                      </p>
+
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[10px] flex items-center gap-1">
+                            <FeatherRepeat className="w-3 h-3" /> Paid retakes:
+                            1
+                          </span>
+                          <span className="text-[10px] flex items-center gap-1">
+                            <FeatherGift className="w-3 h-3" /> Free retakes: 1
+                          </span>
+                        </div>
+
+                        {isAssessmentCompleted ? (
+                          <Button
+                            disabled
+                            className="w-full sm:w-auto rounded-2xl bg-neutral-200 text-neutral-500 cursor-not-allowed border-none px-5 sm:px-6"
+                          >
+                            Completed
+                          </Button>
+                        ) : (
+                          <Button
+                            className="w-full sm:w-auto rounded-2xl px-5 sm:px-6"
+                            style={{
+                              backgroundColor: colors.accent,
+                              color: "white",
+                            }}
+                            onClick={handleAssessmentClick}
+                          >
+                            Start Now
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* ================= Case Studies ================= */}
+                  <Card className="border border-neutral-200 rounded-3xl sm:rounded-[2rem] shadow-sm bg-white transition-all">
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex justify-between items-start mb-4 sm:mb-6">
+                        <div
+                          style={{
+                            backgroundColor: colors.primary,
+                            color: colors.accent,
+                          }}
+                          className="p-3 rounded-2xl"
+                        >
+                          <FeatherBookOpen />
+                        </div>
+
+                        <Badge
+                          style={{
+                            backgroundColor: colors.primary,
+                            color: colors.accent,
+                          }}
+                          className="border-none text-[10px] uppercase tracking-wider"
+                        >
+                          +40 Exp
+                        </Badge>
+                      </div>
+
+                      <h4 className="text-base sm:text-lg mb-2">
+                        Solve Case Studies
+                      </h4>
+
+                      <p className="text-sm text-neutral-500 mb-4 sm:mb-6 leading-relaxed">
+                        Solving cases shows recruiters your effort to increase
+                        your knowledge base.
+                      </p>
+
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <span className="text-xs text-neutral-400 flex items-center gap-1">
+                          <FeatherClock className="w-3 h-3" /> 20 min
+                        </span>
+
+                        <Button
+                          className="w-full sm:w-auto rounded-2xl px-5 sm:px-6"
+                          style={{ backgroundColor: colors.accent }}
+                          onClick={() => handleNavigate("/case-assessments")}
+                        >
+                          Start Now
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* ================= Hackathons ================= */}
+                  <Card className="bg-white border rounded-3xl sm:rounded-[2rem] shadow-sm opacity-80">
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex justify-between items-start mb-4 sm:mb-6">
+                        <div className="p-3 bg-neutral-200 rounded-2xl text-neutral-500">
+                          <FeatherUsers />
+                        </div>
+
+                        <Badge className="bg-gray-100 text-gray-600 border-none text-[10px] uppercase">
+                          Coming Soon
+                        </Badge>
+                      </div>
+
+                      <h4 className="text-base sm:text-lg mb-2 text-neutral-700">
+                        Participate in Hackathons
+                      </h4>
+
+                      <p className="text-sm text-neutral-400 mb-4 sm:mb-6 leading-relaxed">
+                        Collaborate and build visibility with other PMs in
+                        upcoming events.
+                      </p>
+
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <span className="text-xs text-neutral-400 flex items-center gap-1">
+                          <FeatherCalendar className="w-3 h-3" /> Starts in 5
+                          days
+                        </span>
+
+                        <Button
+                          disabled
+                          className="w-full sm:w-auto rounded-2xl bg-neutral-200 text-neutral-500 cursor-not-allowed border-none px-5 sm:px-6"
+                        >
+                          Notify Me
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* ================= Courses ================= */}
+                  <Card className="bg-white rounded-3xl sm:rounded-[2rem] shadow-sm opacity-80">
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex justify-between items-start mb-4 sm:mb-6">
+                        <div className="p-3 bg-neutral-200 rounded-2xl text-neutral-500">
+                          <FeatherBook />
+                        </div>
+
+                        <Badge className="bg-gray-100 text-gray-600 border-none text-[10px] uppercase">
+                          Coming Soon
+                        </Badge>
+                      </div>
+
+                      <h4 className="text-base sm:text-lg mb-2 text-neutral-700">
+                        Courses
+                      </h4>
+
+                      <p className="text-sm text-neutral-400 mb-4 sm:mb-6 leading-relaxed">
+                        Complete structured learning path to earn verified PM
+                        badges.
+                      </p>
+
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <span className="text-xs text-neutral-400 flex items-center gap-1">
+                          <FeatherClock className="w-3 h-3" /> 8 weeks
+                        </span>
+
+                        <Button
+                          disabled
+                          className="w-full sm:w-auto rounded-2xl bg-neutral-200 text-neutral-500 cursor-not-allowed border-none px-5 sm:px-6"
+                        >
+                          Notify Me
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+
+            {/* --- RIGHT SIDEBAR --- */}
+            <div className="flex w-full flex-col gap-6 lg:w-[340px] lg:flex-none">
+              <Card className="bg-white rounded-[2rem] border shadow-sm">
+                <CardHeader className="pb-2">
+                  <CardTitle
+                    className="text-sm flex items-center gap-2"
+                    style={{ color: colors.accent }}
+                  >
+                    <FeatherTrophy
+                      className="w-4 h-4"
+                      style={{ color: colors.accent }}
+                    />
+                    Top PMs at Stanford
+                  </CardTitle>
+                </CardHeader>
+
+                <CardContent className="space-y-3">
+                  {[
+                    {
+                      rank: 1,
+                      name: "Anjali Sharma",
+                      score: 425,
+                      theme: colors.accent,
+                    },
+                    {
+                      rank: 2,
+                      name: "Rahul Kumar",
+                      score: 398,
+                      theme: colors.secondary,
+                    },
+                    {
+                      rank: 23,
+                      name: "You",
+                      score: 350,
+                      theme: colors.primary,
+                      isUser: true,
+                    },
+                  ].map((p, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-3 p-3 rounded-2xl"
+                      style={{
+                        backgroundColor: p.isUser ? colors.mint : colors.cream,
+                      }}
+                    >
+                      <div
+                        className="w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black"
+                        style={{
+                          backgroundColor: colors.white,
+                          color: p.theme,
+                        }}
+                      >
+                        #{p.rank}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <p
+                          className="text-xs truncate"
+                          style={{ color: p.theme }}
+                        >
+                          {p.name}
+                        </p>
+                        <p
+                          className="text-[10px] opacity-60"
+                          style={{ color: colors.accent }}
+                        >
+                          Score: {p.score}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+
+                  <Button
+                    className="w-full h-9 text-[11px] rounded-xl border-none"
+                    style={{
+                      backgroundColor: colors.primary,
+                      color: colors.accent,
+                    }}
+                    onClick={() => handleNavigate("/leaderboard")}
+                  >
+                    Full Leaderboard
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card
+                className="rounded-[2.5rem] shadow-lg text-center overflow-hidden"
+                style={{ backgroundColor: colors.white, color: colors.accent }}
+              >
+                <CardContent className="p-8">
+                  <p className="text-xs font-black uppercase tracking-widest opacity-70">
+                    Visibility Probability
+                  </p>
+
+                  <div className="text-6xl font-black my-4">
+                    {recruiterVisibility}%
+                  </div>
+
+                  <div
+                    className="p-3 rounded-2xl text-[10px] font-bold"
+                    style={{
+                      backgroundColor: colors.primary,
+                      color: colors.accent,
+                    }}
+                  >
+                    Based on rankings and case studies solved.
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white rounded-[2rem] border shadow-sm">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle
+                    className="text-sm font-bold"
+                    style={{ color: colors.accent }}
+                  >
+                    Profile Views
+                  </CardTitle>
+
+                  <Badge
+                    className="border-none text-[10px]"
+                    style={{
+                      backgroundColor: colors.primary,
+                      color: "black",
+                    }}
+                  >
+                    15
+                  </Badge>
+                </CardHeader>
+
+                <CardContent className="space-y-3">
+                  {[
+                    {
+                      name: "Sarah Kim",
+                      role: "Google",
+                      img: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=64",
+                    },
+                    {
+                      name: "Michael J.",
+                      role: "Meta",
+                      img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=64",
+                    },
+                  ].map((viewer, idx) => (
+                    <div key={idx} className="flex items-center gap-3">
+                      <Avatar
+                        size="small"
+                        image={viewer.img}
+                        style={{ boxShadow: `0 0 0 2px ${colors.cream}` }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p
+                          className="text-xs truncate"
+                          style={{ color: colors.accent }}
+                        >
+                          {viewer.name}
+                        </p>
+                        <p
+                          className="text-[10px] truncate opacity-60"
+                          style={{ color: colors.accent }}
+                        >
+                          {viewer.role}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              <Card className="rounded-3xl border bg-white overflow-hidden">
+                <CardHeader>
+                  <CardTitle
+                    className="text-lg"
                     style={{ color: colors.accent }}
                   >
                     Update Your Profile
-                  </p>
-                  <p
-                    className="mt-1 text-xs"
-                    style={{ color: colors.accent }}
-                  >
+                  </CardTitle>
+                  <p className="mt-1 text-xs" style={{ color: colors.accent }}>
                     Got new updates? Add them over here!
                   </p>
-                </div>
+                </CardHeader>
 
-                <div className="px-5 pb-5 flex flex-col gap-4">
+                <CardContent className="flex flex-col gap-4">
                   {[
                     {
                       label: "Experience",
@@ -1590,15 +1563,12 @@ return (
                     <div
                       key={i}
                       className="rounded-2xl border bg-white px-4 py-4"
-                      style={{ borderColor: "#E5E7EB" }}
                     >
-                      {/* Row top: icon + title */}
                       <div className="flex items-start gap-3">
-                        {/* icon bubble */}
                         <div
                           className="flex h-9 w-9 items-center justify-center rounded-full"
                           style={{
-                            backgroundColor: `${colors.primary}`,
+                            backgroundColor: colors.primary,
                             color: colors.accent,
                           }}
                         >
@@ -1607,7 +1577,7 @@ return (
 
                         <div className="min-w-0 flex-1">
                           <p
-                            className="text-sm font-extrabold"
+                            className="text-sm"
                             style={{ color: colors.accent }}
                           >
                             {item.label}
@@ -1621,53 +1591,25 @@ return (
                         </div>
                       </div>
 
-                      {/* CTA button full width like screenshot */}
-                      <button
+                      <Button
                         onClick={() => handleNavigate(item.path)}
-                        className="mt-4 w-full rounded-2xl py-3 text-sm font-extrabold transition active:scale-[0.99]"
+                        className="mt-4 w-full rounded-2xl py-3 text-sm"
                         style={{
                           backgroundColor: colors.accent,
                           color: "#fff",
                         }}
                       >
                         + Add {item.label}
-                      </button>
-
-                      {/* Divider like screenshot (except last) */}
-                      {i !== 4 && (
-                        <div className="mt-4 h-px w-full bg-neutral-200" />
-                      )}
+                      </Button>
                     </div>
                   ))}
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             </div>
-
-            {/* // CHATBOAT TESTING */}
-
-            {/* <div className="mt-4 flex gap-2">
-              <input
-                className="border p-2 flex-1"
-                placeholder="Paste recruiter userId"
-                value={testOtherUserId}
-                onChange={(e) => setTestOtherUserId(e.target.value)}
-              />
-              <button
-                className="px-4 py-2 rounded-lg bg-indigo-600 text-white"
-                onClick={() =>
-                  testOtherUserId && navigate(`/chat/${testOtherUserId}`)
-                }
-              >
-                Chat With Recruiter
-              </button>
-            </div> */}
           </div>
         </div>
       </div>
-    </div>
-  </>
-  // </DefaultPageLayout>
-);
+    </>
+    // </DefaultPageLayout>
+  );
 }
-
-// export default Dashboard;

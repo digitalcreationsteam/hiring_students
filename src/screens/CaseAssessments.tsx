@@ -16,6 +16,8 @@ import {
   FeatherTarget,
 } from "@subframe/core";
 import HeaderLogo from "src/ui/components/HeaderLogo";
+import { useRef } from "react";
+
 
 /* ==================== TYPES ==================== */
 
@@ -29,6 +31,7 @@ type BackendCase = {
   maxAttempts: number;
   isActive: boolean;
   createdAt: string;
+  isSubmitted?: boolean; 
 };
 
 type CaseItem = {
@@ -39,6 +42,7 @@ type CaseItem = {
   points: number;
   minutes: number;
   icon: React.ReactNode;
+  isSubmitted?: boolean;
 };
 
 type StudentProfile = {
@@ -116,9 +120,11 @@ function StepCard({
 function CaseCard({
   item,
   onStart,
+   loading
 }: {
   item: CaseItem;
   onStart: (id: string) => void;
+  loading: boolean;
 }) {
   return (
     <div className="flex grow shrink-0 basis-0 flex-col items-start gap-4 rounded-3xl border border-solid border-neutral-border bg-white px-4 sm:px-6 py-4 sm:py-6 shadow-sm">
@@ -156,19 +162,38 @@ function CaseCard({
       >
         Start Case Study
       </Button> */}
-      <Button
+      {/* <Button
   variant="brand-primary"
-  style={{ backgroundColor: colors.primary }}
+  style={{ backgroundColor: colors.accent }}
   className="
     w-full rounded-2xl hover:opacity-90
-    [&_span]:!text-black
-    [&_svg]:!text-black
+    [&_span]:!text-white
+    [&_svg]:!text-white
   "
   onClick={() => onStart(item._id)}
   iconRight={<FeatherArrowRight className="ml-2 w-4 h-4" />}
 >
   Start Case Study
+</Button> */}
+
+    <Button
+  variant="brand-primary"
+  disabled={item.isSubmitted}
+  style={{
+    backgroundColor: item.isSubmitted ? "#D1D5DB" : colors.accent
+  }}
+  className="
+    w-full rounded-2xl hover:opacity-90
+    [&_span]:!text-white
+    [&_svg]:!text-white
+  "
+  onClick={() => onStart(item._id)}
+  iconRight={!item.isSubmitted && <FeatherArrowRight className="ml-2 w-4 h-4" />}
+>
+  {item.isSubmitted ? "Already Submitted" : "Start Case Study"}
 </Button>
+
+
 
     </div>
   );
@@ -191,6 +216,10 @@ export default function CaseAssessmentsPage() {
     avatar: DEFAULT_AVATAR,
   });
   const [loadingProfile, setLoadingProfile] = useState(true);
+  // const [startingCaseId, setStartingCaseId] = useState<string | null>(null);
+  const isStartingRef = useRef(false);
+const [startingCaseId, setStartingCaseId] = useState<string | null>(null);
+
 
   /* ==================== API CALLS ==================== */
   const fetchStudentProfile = useCallback(async () => {
@@ -230,6 +259,7 @@ export default function CaseAssessmentsPage() {
   }, []);
 
   const onStart = async (caseId: string) => {
+    if (startingCaseId) return;
     try {
       const res = await API("POST", URL_PATH.startCase(caseId), {});
       const { attemptId, opening } = res;
@@ -244,6 +274,8 @@ export default function CaseAssessmentsPage() {
       console.error("Start case failed:", err);
     }
   };
+
+  
 
   /* ==================== EFFECTS ==================== */
   useEffect(() => {
@@ -264,6 +296,7 @@ export default function CaseAssessmentsPage() {
         difficulty,
         points: c.totalQuestions * 2,
         minutes: c.totalQuestions * 5,
+        isSubmitted: c.isSubmitted,
         icon: (
           <div
             className="h-10 w-10 rounded-2xl grid place-items-center"
@@ -421,7 +454,7 @@ export default function CaseAssessmentsPage() {
 
               <div className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredCases.map((c) => (
-                  <CaseCard key={c._id} item={c} onStart={onStart} />
+                  <CaseCard key={c._id} item={c} onStart={onStart}  loading={startingCaseId === c._id} />
                 ))}
               </div>
 
