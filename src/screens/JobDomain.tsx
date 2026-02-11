@@ -334,7 +334,7 @@ function JobDomain() {
 
     <SubframeCore.DropdownMenu.Content asChild align="start" sideOffset={6}>
       <div
-        className="rounded-2xl shadow-lg py-2 max-h-[260px] overflow-y-auto border backdrop-blur-md"
+        className="rounded-2xl z-10 shadow-lg py-2 max-h-[260px] overflow-y-auto border backdrop-blur-md"
         style={{
           backgroundColor: `${colors.white}F2`,
           borderColor: colors.neutral[200],

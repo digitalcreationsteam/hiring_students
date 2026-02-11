@@ -423,43 +423,38 @@ function Paywall() {
 )}
 
 
-        {/* Continue Button */}
-        <Button
-          disabled={isLoading || !selectedPlanId}
-          onClick={handleContinue}
-          className="w-full max-w-[820px] h-12 sm:h-14 rounded-2xl font-semibold text-sm sm:text-base transition-all duration-300 flex items-center justify-center gap-2"
-          style={{
-            backgroundColor:
-              isLoading || !selectedPlanId
-                ? colors.neutral[200]
-                : colors.primary,
-            color: colors.accent,
-            boxShadow:
-              isLoading || !selectedPlanId
-                ? "none"
-                : `0 10px 25px ${colors.primary}30`,
-            cursor: isLoading || !selectedPlanId ? "not-allowed" : "pointer",
-            opacity: isLoading || !selectedPlanId ? 0.75 : 1,
-          }}
-        >
-          {isLoading ? (
-            <>
-              <div
-                className="animate-spin rounded-full h-5 w-5 border-2 border-transparent"
-                style={{ borderTopColor: colors.accent }}
-              />
-              Processing...
-            </>
-          ) : selectedPlanId ? (
-            getSelectedPlan()?.price === 0 ? (
-              "Continue with Free Plan"
-            ) : (
-              `Subscribe to ${getSelectedPlan()?.planName}`
-            )
-          ) : (
-            "Select a Plan to Continue"
-          )}
-        </Button>
+      {/* Continue Button */}
+<button
+  disabled={isLoading || !selectedPlanId}
+  onClick={handleContinue}
+  className="w-full max-w-[820px] h-12 sm:h-14 rounded-2xl font-semibold text-sm sm:text-base transition-all duration-300 flex items-center justify-center gap-2"
+  style={{
+    backgroundColor:
+      isLoading || !selectedPlanId ? colors.neutral[200] : colors.primary,
+    color: colors.accent,
+    boxShadow:
+      isLoading || !selectedPlanId ? "none" : `0 10px 25px ${colors.primary}30`,
+    cursor: isLoading || !selectedPlanId ? "not-allowed" : "pointer",
+    opacity: isLoading || !selectedPlanId ? 0.75 : 1,
+  }}
+>
+  {isLoading ? (
+    <>
+      <div
+        className="animate-spin rounded-full h-5 w-5 border-2 border-transparent"
+        style={{ borderTopColor: colors.accent }}
+      />
+      Processing...
+    </>
+  ) : selectedPlanId ? (
+    getSelectedPlan()?.price === 0
+      ? "Continue with Free Plan"
+      : `Subscribe to ${getSelectedPlan()?.planName}`
+  ) : (
+    "Select a Plan to Continue"
+  )}
+</button>
+
 
         {/* Back Button */}
         <button
