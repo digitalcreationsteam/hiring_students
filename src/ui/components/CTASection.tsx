@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Link } from "react-router-dom";
 import { uniTalentColors } from 'src/common/Colors';
 
 const CTASection = () => {
@@ -60,7 +61,7 @@ const CTASection = () => {
           {/* CTA Buttons */}
           <div className="flex flex-col xs:flex-row gap-4 sm:gap-6 justify-center max-w-2xl mx-auto">
             {/* Sign Up Button */}
-            <button 
+            <Link to="/signup" 
               style={{
                 background: `linear-gradient(135deg, ${uniTalentColors.primary} 0%, ${uniTalentColors.primaryLight || '#FFEDB2'} 100%)`,
                 color: uniTalentColors.text,
@@ -79,10 +80,10 @@ const CTASection = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </span>
-            </button>
+            </Link>
 
             {/* Login Button */}
-            <button 
+            <Link to="/login" 
               style={{
                 backgroundColor: 'transparent',
                 color: uniTalentColors.text,
@@ -91,7 +92,7 @@ const CTASection = () => {
               className="w-full xs:flex-1 px-6 sm:px-8 lg:px-10 py-3 sm:py-4 font-bold rounded-lg sm:rounded-xl border-2 border-opacity-50 hover:border-opacity-100 hover:shadow-lg active:scale-95 transition-all duration-300 text-sm sm:text-base"
             >
               Log In
-            </button>
+            </Link>
           </div>
 
           {/* Stats Row - Single Line */}

@@ -412,7 +412,7 @@ function Paywall() {
 
 
       {/* Continue Button */}
-<Button
+<button
   disabled={isLoading || !selectedPlanId}
   onClick={handleContinue}
   className="w-full max-w-[820px] h-12 sm:h-14 rounded-2xl font-semibold text-sm sm:text-base transition-all duration-300 flex items-center justify-center gap-2"
@@ -441,7 +441,7 @@ function Paywall() {
   ) : (
     "Select a Plan to Continue"
   )}
-</Button>
+</button>
 
 
        {/* Back Button */}
