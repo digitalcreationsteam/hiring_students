@@ -403,7 +403,7 @@ function Paywall() {
     style={{
       backgroundColor: `${colors.status.absent}15`,
       borderColor: `${colors.status.absent}40`,
-      color: colors.status.absent,
+      color: colors.accent,
     }}
   >
     {error}

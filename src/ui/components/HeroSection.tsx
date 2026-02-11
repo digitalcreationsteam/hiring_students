@@ -120,10 +120,10 @@ const HeroSection = () => {
               style={{ color: '#FFFFFF' }}
               className="text-4xl xs:text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight tracking-tight mb-4 sm:mb-6 lg:mb-8"
             >
-              You've Done Everything Right.
+              Reimagining Talent Discovery
             </h1>
             
-            {/* Gradient Text */}
+            {/* Gradient Text 
             <h2 
               className="text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight"
               style={{
@@ -140,6 +140,8 @@ const HeroSection = () => {
             >
               So Why Aren't You Getting Interviews?
             </h2>
+            */}    
+
           </div>
 
           {/* Subtitle */}

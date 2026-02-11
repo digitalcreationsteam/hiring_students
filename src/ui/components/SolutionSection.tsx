@@ -96,13 +96,13 @@ const SolutionSection = () => {
               key={index}
               className="group"
             >
-              {/* Feature Number */}
+              {/* Feature Number 
               <span 
                 style={{ color: uniTalentColors.primary }}
                 className="text-xs sm:text-sm font-bold opacity-40 mb-3 block"
               >
                 0{index + 1}
-              </span>
+              </span> */}
 
               {/* Feature Title */}
               <h3 

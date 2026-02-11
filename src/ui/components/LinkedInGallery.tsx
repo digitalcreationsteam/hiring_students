@@ -213,11 +213,11 @@ const [images] = useState([
         }
 
         .animate-scroll {
-          animation: scroll 60s linear infinite;
+          animation: scroll 40s linear infinite;
         }
 
         .animate-scroll-reverse {
-          animation: scroll-reverse 60s linear infinite;
+          animation: scroll-reverse 40s linear infinite;
         }
 
         .animate-fade-in {
