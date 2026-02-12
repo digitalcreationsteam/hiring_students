@@ -1177,7 +1177,9 @@ export default function Awards() {
                         icon={<FeatherAward />}
                       />
                     </div>
-                    <span className="text-sm font-semibold text-neutral-900">
+                    <span className="text-sm font-medium text-neutral-900"
+                     style={{color: colors.white}}
+                    >
                       Awards
                     </span>
                   </div>

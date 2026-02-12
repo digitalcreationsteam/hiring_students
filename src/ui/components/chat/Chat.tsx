@@ -486,15 +486,43 @@ const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   }
 
   return (
-    <div className="min-h-screen w-full" style={{ backgroundColor: colors.white }}>
+<div className="min-h-screen w-full" >
+       {/* Blended background - fixed behind everything */}
+       <div className="pointer-events-none fixed inset-0 -z-10">
+         <div
+           className="absolute inset-0"
+           style={{ backgroundColor: colors.background }}
+         />
+ 
+         <div
+           className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
+           style={{
+             background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
+           }}
+         />
+ 
+         <div
+           className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
+           style={{
+             background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
+           }}
+         />
+ 
+         <div
+           className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
+           style={{
+             background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
+           }}
+         />
+  </div>
       {/* TOP BAR */}
-      <div className="w-full border-b" style={{ borderColor: colors.aqua }}>
+      <div className="w-full border-b" style={{ borderColor: colors.primary }}>
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate("/dashboard")}
               className="h-9 w-9 rounded-xl border flex items-center justify-center hover:bg-gray-50 transition"
-              style={{ borderColor: colors.aqua }}
+              style={{ borderColor: colors.primary }}
               title="Back"
             >
               <FeatherArrowLeft />
@@ -513,7 +541,7 @@ const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
           <div className="hidden md:flex items-center gap-2 flex-1 max-w-[520px]">
             <div
               className="flex items-center gap-2 w-full rounded-2xl border px-3 py-2"
-              style={{ borderColor: colors.aqua, backgroundColor: colors.cream }}
+              style={{ borderColor: colors.primary, backgroundColor: colors.primaryGlow, }}
             >
               <FeatherSearch className="w-4 h-4" />
               <input
@@ -532,7 +560,7 @@ const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
             <Avatar
               size="small"
               image={student.avatar}
-              style={{ boxShadow: `0 0 0 2px ${colors.aqua}` }}
+              style={{ boxShadow: `0 0 0 2px ${colors.primary}` }}
             />
           </div>
         </div>
@@ -544,18 +572,18 @@ const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
           {/* LEFT SIDEBAR */}
           <div
             className="w-[320px] hidden lg:flex flex-col border rounded-3xl overflow-hidden"
-            style={{ borderColor: colors.aqua, backgroundColor: colors.white }}
+            style={{ borderColor: colors.primary, backgroundColor: colors.white }}
           >
             <div
               className="p-4 border-b flex items-center justify-between"
-              style={{ borderColor: colors.aqua }}
+              style={{ borderColor: colors.primary }}
             >
               <div className="text-sm font-black" style={{ color: colors.primary }}>
                 Recruiters
               </div>
               <button
                 className="h-9 w-9 rounded-xl border flex items-center justify-center hover:bg-gray-50 transition"
-                style={{ borderColor: colors.aqua }}
+                style={{ borderColor: colors.primary }}
                 title="New message"
               >
                 <FeatherEdit3 />
@@ -575,8 +603,8 @@ const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
                       key={r.userId}
                       className="w-full text-left px-4 py-3 border-b hover:bg-neutral-50 transition"
                       style={{
-                        borderColor: colors.cream,
-                        backgroundColor: active ? colors.mint : colors.white,
+                        borderColor: colors.primaryGlow,
+                        backgroundColor: active ? colors.primaryGlow : colors.white,
                       }}
                       onClick={() => navigate(`/chat/${r.userId}`)}
                     >
@@ -599,7 +627,7 @@ const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
                             <div className="mt-2">
                               <Badge
                                 className="border-none text-[10px] font-bold"
-                                style={{ backgroundColor: colors.cream, color: colors.secondary }}
+                                style={{ backgroundColor: colors.secondary, color: colors.white }}
                               >
                                 {r.unread} new
                               </Badge>
@@ -617,18 +645,18 @@ const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
           {/* CHAT PANEL */}
           <div
             className="flex-1 border rounded-3xl overflow-hidden flex flex-col"
-            style={{ borderColor: colors.aqua, backgroundColor: colors.white }}
+            style={{ borderColor: colors.primary, backgroundColor: colors.white }}
           >
             {/* Chat header */}
             <div
               className="px-4 py-3 border-b flex items-center justify-between"
-              style={{ borderColor: colors.aqua }}
+              style={{ borderColor: colors.primaryGlow }}
             >
               <div className="flex items-center gap-3">
                 <Avatar
                   size="small"
                   image={activeRecruiter?.avatar || DEFAULT_AVATAR}
-                  style={{ boxShadow: `0 0 0 2px ${colors.aqua}` }}
+                  style={{ boxShadow: `0 0 0 2px ${colors.primaryGlow}` }}
                 />
                 <div className="flex flex-col">
                   <div className="text-sm font-black" style={{ color: colors.primary }}>
@@ -642,7 +670,7 @@ const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
               <button
                 className="h-9 w-9 rounded-xl border flex items-center justify-center hover:bg-gray-50 transition"
-                style={{ borderColor: colors.aqua }}
+                style={{ borderColor: colors.primary }}
               >
                 <FeatherMoreVertical />
               </button>
@@ -682,7 +710,7 @@ const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
                             style={
                               isMe
                                 ? { backgroundColor: colors.secondary, color: colors.white }
-                                : { backgroundColor: colors.white, borderColor: colors.cream, color: colors.primary }
+                                : { backgroundColor: colors.white, borderColor: colors.primaryGlow, color: colors.primary }
                             }
                           >
                             {m.text}
@@ -707,7 +735,7 @@ const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
                       <div className="max-w-[70%]">
                         <div
                           className="px-4 py-3 rounded-2xl text-sm border"
-                          style={{ backgroundColor: colors.white, borderColor: colors.cream }}
+                          style={{ backgroundColor: colors.white, borderColor: colors.primary }}
                         >
                           <div className="flex space-x-1">
                             <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
@@ -727,12 +755,12 @@ const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
             {/* Composer */}
             <div
               className="p-3 border-t"
-              style={{ borderColor: colors.aqua, backgroundColor: colors.white }}
+              style={{ borderColor: colors.primary, backgroundColor: colors.white }}
             >
               <div className="flex gap-2">
                 <input
-                  className="flex-1 border rounded-2xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-300 transition"
-                  style={{ borderColor: colors.aqua, backgroundColor: colors.cream }}
+                  className="flex-1 border rounded-2xl px-4 py-3 text-sm outline-none focus:ring-2  transition"
+                  style={{ borderColor: colors.secondary, backgroundColor: colors.secondary, color: colors.white }}
                   placeholder="Write a message…"
                   value={input}
                   onChange={handleInputChange}

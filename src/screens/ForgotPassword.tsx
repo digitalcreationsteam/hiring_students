@@ -100,7 +100,7 @@ export default function ForgotPassword() {
   className="w-full h-10 sm:h-11 rounded-3xl text-sm sm:text-base font-semibold transition active:scale-[0.99]"
   style={{
     backgroundColor: loading ? colors.neutral[200] : colors.primary,
-    color: colors.accent,
+    color: colors.white,
     cursor: loading ? "not-allowed" : "pointer",
     opacity: loading ? 0.75 : 1,
     boxShadow: loading ? "none" : "0 10px 24px rgba(0,0,0,0.08)",

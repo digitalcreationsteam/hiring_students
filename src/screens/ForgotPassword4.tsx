@@ -104,7 +104,7 @@ export default function ResetPasswordSuccess() {
     (e.currentTarget.style.backgroundColor = colors.primary)
   }
 >
-<span style={{ color: colors.accent }}>
+<span style={{ color: colors.white }}>
   Log In
 </span>
 

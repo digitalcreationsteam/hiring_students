@@ -160,7 +160,7 @@ return (
 
               <div className="flex flex-col gap-4">
                 <div className="flex items-start gap-3">
-                  <div style={{backgroundColor: colors.primary}} className="flex items-center justify-center w-8 h-8 rounded-full">
+                  <div style={{backgroundColor: colors.primary, color: colors.white}} className="flex items-center justify-center w-8 h-8 rounded-full">
                     <FeatherCheckCircle className="" />
                   </div>
                   <div>
@@ -173,7 +173,7 @@ return (
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div style={{backgroundColor: colors.primary}}  className="flex items-center justify-center w-8 h-8 rounded-full">
+                  <div style={{backgroundColor: colors.primary, color: colors.white}}  className="flex items-center justify-center w-8 h-8 rounded-full">
                     <FeatherBriefcase className="" />
                   </div>
                   <div>
@@ -188,7 +188,7 @@ return (
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div style={{backgroundColor: colors.primary}}  className="flex items-center justify-center w-8 h-8 rounded-full">
+                  <div style={{backgroundColor: colors.primary, color: colors.white}}  className="flex items-center justify-center w-8 h-8 rounded-full">
                     <FeatherMessageSquare className="" />
                   </div>
                   <div>
@@ -359,7 +359,7 @@ return (
   }`}
   style={{
     backgroundColor: colors.primary,
-    color: colors.accent,
+    color: colors.white,
   }}
 >
   {loading ? "Creating..." : "Create account"}

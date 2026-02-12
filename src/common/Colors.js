@@ -1,42 +1,15 @@
-/**
- * Project Color Palette
- * * Primary (Dark Blue): #0C2C47 - Best for text headings and deep backgrounds
- * Secondary (Deep Teal): #2D5652 - Good for secondary backgrounds or sidebars
- * Accent (Gold/Yellow): #E2A54D - Best for primary buttons, highlights, and icons
- * Light Aqua: #97D3CD - Used for badges, borders, and soft backgrounds
- * Cream/Pink: #FFFAE6 - Main page background or card fill
- * Mint: #E4F2EA - Success states or secondary card backgrounds
- */
-
-// export const colors = {
-//   primary: "#0C2C47",    // Dark Blue
-//   secondary: "#2D5652",  // Deep Teal
-//   accent: "#E2A54D",     // Gold/Yellow
-//   aqua: "#97D3CD",       // Light Aqua
-//   cream: "#FFFAE6",      // Main Background
-//   mint: "#E4F2EA",       // Success Mint
-//   white: "#FFFFFF",
-//   neutral: {
-//     50: "#F9FAFB",
-//     100: "#F3F4F6",
-//     200: "#E5E7EB",
-//     400: "#9CA3AF",
-//     600: "#4B5563",
-//   }
-// };
-
 
 // src/common/Colors.js
 
 export const colors = {
   // The vibrant yellow used for the 'Hired' bar and active highlights
-  primary: "#FFD85F", 
+  primary: "#1A2C42", 
 
   // The soft, buttery yellow used for the background 'glow' effect
-  primaryGlow: "#FBF3D5",
+  primaryGlow: "#BFC7CA",
 
   // Replaced #F8F8F8 with the soft atmospheric grey from the image
-  background: "#E9EAE9", 
+  background: "#D5D6D8", 
 
   // Pure white for the 'glass' base (usually used with opacity: white/30)
   white: "#FFFFFF",
@@ -45,7 +18,7 @@ export const colors = {
   accent: "#1F2937", 
 
   // Borders should be semi-transparent white, but for solid fallbacks:
-  secondary: "#D1D5DB", 
+  secondary: "#2E4056", 
 
   neutral: {
     50: "#FAFAFA",

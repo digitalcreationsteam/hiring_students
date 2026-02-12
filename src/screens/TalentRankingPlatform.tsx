@@ -1036,14 +1036,14 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
             className="w-full h-11 sm:h-12 rounded-3xl text-[15px] sm:text-[16px] font-semibold transition active:scale-[0.99]"
             style={{
               backgroundColor: colors.primary,
-              color: colors.accent,
+              color: colors.white,
             }}
             onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.9")}
             onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
           >
             <span
               className="text-[15px] sm:text-[16px] font-semibold"
-              style={{ color: colors.accent }}
+              style={{ color: colors.white }}
             >
               Finish Profile Setup
             </span>

@@ -1631,8 +1631,8 @@ style={{
   </div>
 
   <span
-    className="text-sm font-semibold"
-    style={{ color: colors.neutral[800] }}
+    className="text-sm font-medium"
+     style={{color: colors.white}}
   >
     Certifications
   </span>

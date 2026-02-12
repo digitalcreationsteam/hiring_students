@@ -248,7 +248,7 @@ onBlur={(e) => {
   className="w-full h-10 rounded-3xl font-semibold transition"
   style={{
     backgroundColor: loading ? colors.neutral[400] : colors.primary,
-    color: colors.accent,
+    color: colors.white,
     cursor: loading ? "not-allowed" : "pointer",
   }}
 >

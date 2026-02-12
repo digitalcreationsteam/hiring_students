@@ -59,6 +59,31 @@ type EducationEntry = {
   cgpa?: string;
 };
 
+type UniversityEntry = {
+  id: string;
+  name: string;
+  country: string;
+  state?: string;
+  city?: string;
+  website?: string;
+};
+
+function useDebouncedValue<T>(value: T, delay = 250) {
+  const [debounced, setDebounced] = React.useState(value);
+
+  React.useEffect(() => {
+    const id = window.setTimeout(() => setDebounced(value), delay);
+    return () => window.clearTimeout(id);
+  }, [value, delay]);
+
+  return debounced;
+}
+
+
+
+
+
+
 const normalize = (v: string) => v.replace(/\s+/g, " ").trim();
 
 const isValidYear = (value: string) => {
@@ -204,6 +229,168 @@ function YearPicker({
     </div>
   );
 }
+
+// SchoolNameDropdown
+function SchoolNameDropdown({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  disabled?: boolean;
+}) {
+  const [open, setOpen] = React.useState(false);
+  const [query, setQuery] = React.useState(value || "");
+  const debouncedQuery = useDebouncedValue(query, 250);
+
+  const [loading, setLoading] = React.useState(false);
+const [items, setItems] = React.useState<UniversityEntry[]>([]);
+  const [error, setError] = React.useState<string | null>(null);
+
+  const wrapRef = React.useRef<HTMLDivElement>(null);
+
+  // close on outside click
+  React.useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  // keep query in sync if parent changes value
+  React.useEffect(() => {
+    setQuery(value || "");
+  }, [value]);
+
+  // fetch results when open + typing
+React.useEffect(() => {
+  if (!open) return;
+
+  const q = debouncedQuery.trim();
+  if (q.length < 2) {
+    setItems([]);
+    setError(null);
+    return;
+  }
+
+  (async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // ✅ CALL YOUR BACKEND (MongoDB)
+      const res = await API(
+        "GET",
+        `${URL_PATH.getunivercitylist}?query=${encodeURIComponent(q)}&limit=30`
+      );
+
+      const list = (res?.data || []) as any[];
+
+      const mapped: UniversityEntry[] = list.map((u) => ({
+        id: u._id,
+        name: u.name,
+        country: u.country,
+        state: u.state,
+        city: u.city,
+        website: u.website,
+      }));
+
+      setItems(mapped);
+    } catch (e: any) {
+      setItems([]);
+      setError(e?.message || "Could not load universities");
+    } finally {
+      setLoading(false);
+    }
+  })();
+}, [debouncedQuery, open]);
+
+
+  return (
+    <div className="relative" ref={wrapRef}>
+      <label className="text-[12px] font-medium text-neutral-900">
+        School Name <span className="text-red-500">*</span>
+      </label>
+
+      <input
+        disabled={disabled}
+        value={query}
+        placeholder="Search your university (India / US)"
+        onFocus={() => !disabled && setOpen(true)}
+        onClick={() => !disabled && setOpen(true)}
+        onChange={(e) => {
+          const v = e.target.value;
+          setQuery(v);
+          onChange(v); // allow manual typing also
+          if (!open) setOpen(true);
+        }}
+        className={`mt-1 w-full h-10 px-4 rounded-full border border-neutral-300 bg-white text-sm focus:outline-none ${
+          disabled ? "opacity-70 cursor-not-allowed" : ""
+        }`}
+        style={{ color: colors.accent }}
+      />
+
+      {open && !disabled && (
+        <div className="absolute z-50 mt-2 w-full rounded-2xl border border-neutral-300 bg-white shadow-lg overflow-hidden">
+          <div className="px-3 py-2 text-xs border-b border-neutral-200 flex items-center justify-between">
+            <span style={{ color: colors.neutral[600] }}>
+              {loading ? "Searching..." : "Type 2+ characters to search"}
+            </span>
+            <button
+              type="button"
+              className="text-xs"
+              style={{ color: colors.neutral[600] }}
+              onClick={() => setOpen(false)}
+            >
+              Close
+            </button>
+          </div>
+
+          <div className="max-h-[240px] overflow-y-auto">
+            {error && (
+              <div className="px-3 py-2 text-sm" style={{ color: colors.neutral[600] }}>
+                {error}
+              </div>
+            )}
+
+            {!error && !loading && items.length === 0 && debouncedQuery.trim().length >= 2 && (
+              <div className="px-3 py-2 text-sm" style={{ color: colors.neutral[600] }}>
+                No matches. You can keep typing to enter custom name.
+              </div>
+            )}
+
+            {items.map((u) => (
+              <button
+                key={u.id}
+                type="button"
+                className="w-full text-left px-4 py-2 text-sm hover:bg-neutral-100"
+                onClick={() => {
+                  onChange(u.name);
+                  setQuery(u.name);
+                  setOpen(false);
+                }}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <span className="truncate" style={{ color: colors.accent }}>
+                    {u.name}
+                  </span>
+                  <span className="shrink-0 text-xs" style={{ color: colors.neutral[400] }}>
+                    {u.country}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 export default function Education() {
   const navigate = useNavigate();
@@ -1456,26 +1643,13 @@ export default function Education() {
                   />
                 </TextField>
 
-                {/* School Name */}
-                <TextField
-                  className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-                  label={
-                    <span className="text-[12px]">
-                      School Name <span className="text-red-500">*</span>{" "}
-                    </span>
-                  }
-                  helpText=""
-                >
-                  <TextField.Input
-                    className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0
-             text-sm placeholder:text-xs placeholder:text-neutral-400"
-                    placeholder="Name of institution"
-                    value={schoolName}
-                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                      setSchoolName(ev.target.value)
-                    }
-                  />
-                </TextField>
+{/* School Name */}
+<SchoolNameDropdown
+  value={schoolName}
+  onChange={setSchoolName}
+  disabled={isSubmitting}
+/>
+
 
                 {/* Years */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1663,7 +1837,7 @@ export default function Education() {
 
                   {/* 🟣 Active — Education */}
                   <button
-                    style={{ backgroundColor: colors.primary }}
+                    style={{ backgroundColor: colors.primary,  }}
                     type="button"
                     className="w-full flex items-center gap-3 rounded-2xl px-4 py-2 mb-3 hover:shadow-sm"
                   >
@@ -1673,7 +1847,10 @@ export default function Education() {
                         icon={<FeatherGraduationCap />}
                       />
                     </div>
-                    <span className="text-sm font-semibold text-neutral-900">
+                    
+                    <span className="text-sm font-medium text-neutral-900"
+                    style={{color: colors.white}}
+                    >
                       Education
                     </span>
                   </button>

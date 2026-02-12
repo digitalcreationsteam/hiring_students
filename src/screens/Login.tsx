@@ -169,7 +169,7 @@ function Login() {
               <div className="w-full h-[1px] bg-gray-400 my-4 flex-shrink-0" />
               <div className="flex flex-col gap-4">
                 <div className="flex items-start gap-3">
-                  <div style={{backgroundColor: colors.primary}} className="flex items-center justify-center w-8 h-8 rounded-full">
+                  <div style={{backgroundColor: colors.primary, color: colors.white}} className="flex items-center justify-center w-8 h-8 rounded-full">
                     <FeatherCheckCircle className="" />
                   </div>
                   <div>
@@ -182,7 +182,7 @@ function Login() {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div style={{backgroundColor: colors.primary}}  className="flex items-center justify-center w-8 h-8 rounded-full">
+                  <div style={{backgroundColor: colors.primary, color: colors.white}}  className="flex items-center justify-center w-8 h-8 rounded-full">
                     <FeatherBriefcase className="" />
                   </div>
                   <div>
@@ -195,7 +195,7 @@ function Login() {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div style={{backgroundColor: colors.primary}}  className="flex items-center justify-center w-8 h-8 rounded-full">
+                  <div style={{backgroundColor: colors.primary, color: colors.white}}  className="flex items-center justify-center w-8 h-8 rounded-full">
                     <FeatherMessageSquare className="" />
                   </div>
                   <div>
@@ -325,7 +325,7 @@ function Login() {
   }`}
   style={{
     backgroundColor: colors.primary,
-    color: colors.accent,
+    color: colors.white,
   }}
 >
   {loading ? "Signing in..." : "Log in"}
