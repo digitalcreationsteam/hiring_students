@@ -56,6 +56,7 @@ import {
   FeatherSettings,
   FeatherLogOut,
 } from "@subframe/core";
+import Navbar from "src/ui/components/Navbar";
 // import HeaderLogo from "@/ui/components/HeaderLogo";
 
 /* ==================== TYPES ==================== */
@@ -522,34 +523,34 @@ export default function Dashboard() {
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div
             className="absolute inset-0"
-            style={{ backgroundColor: colors.background }}
+            // style={{ backgroundColor: colors.background }}
           />
 
           <div
             className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
-            style={{
-              background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
-            }}
+            // style={{
+            //   background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
+            // }}
           />
 
           <div
             className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
-            style={{
-              background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
-            }}
+            // style={{
+            //   background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
+            // }}
           />
 
           <div
             className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
-            style={{
-              background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
-            }}
+            // style={{
+            //   background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
+            // }}
           />
         </div>
 
         {/* TOP WELCOME BANNER */}
         <div className="w-full relative" style={{ borderColor: colors.aqua }}>
-          <HeaderLogo />
+          <Navbar />
         </div>
 
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mt-10">
@@ -558,9 +559,10 @@ export default function Dashboard() {
             <div className="flex w-full flex-col gap-6 lg:w-[340px] lg:flex-none">
 
               <Card
-                className="flex w-full flex-col items-center gap-3 rounded-[2rem] border shadow-sm text-center"
+                className="flex w-full flex-col items-center gap-3 rounded-[2rem] shadow-sm text-center "
                 style={{
                   backgroundColor: colors.white,
+                  border: `1.5px solid ${colors.primaryGlow}`
                 }}
               >
                 <CardContent className="px-6 py-8 flex w-full flex-col items-center gap-3">
@@ -623,7 +625,7 @@ export default function Dashboard() {
                     <div
                       className="inline-flex items-center gap-3 rounded-2xl px-5 py-3 border shadow-sm"
                       style={{
-                        backgroundColor: colors.background,
+                        backgroundColor: colors.background2,
                         color: colors.accent,
                       }}
                     >
@@ -658,6 +660,7 @@ export default function Dashboard() {
                 style={{
                   backgroundColor: colors.white,
                   color: colors.accent,
+                  border: `1.5px solid ${colors.primaryGlow}`
                 }}
               >
                 <CardHeader className="pb-2">
@@ -709,7 +712,7 @@ export default function Dashboard() {
                   <div
                     className="mt-2 rounded-xl px-3 py-2 text-center text-[10px]"
                     style={{
-                      backgroundColor: colors.primary,
+                      backgroundColor: colors.secondary,
                       color: colors.white,
                     }}
                   >
@@ -719,7 +722,7 @@ export default function Dashboard() {
               </Card>
               <Card
                 className="w-full rounded-[2rem] shadow-sm border"
-                style={{ backgroundColor: colors.white }}
+                style={{ backgroundColor: colors.white, border: `1.5px solid ${colors.primaryGlow}` }}
               >
                 <CardHeader className="pb-3 border-b">
                   <CardTitle
@@ -727,10 +730,15 @@ export default function Dashboard() {
                     style={{ color: colors.accent }}
                   >
                     <div className="w-9 h-9 rounded-full">
-                      <FeatherFileText
+                      {/* <FeatherFileText
                         className="w-9 h-9 rounded-full pl-2.5"
                         style={{ color: colors.white, background: colors.primary }}
-                      />
+                      /> */}
+                       <img
+        src="/resume.png"   // change to your image name
+        alt="Trophy"
+        className="w-7 h-7 object-contain"
+      />
                     </div>
                     
                     Professional Resume
@@ -944,21 +952,21 @@ export default function Dashboard() {
                     label: "Global Rank",
                     val: rankData.global,
                     pct: rankData.global.percentile,
-                    icon: <FeatherGlobe />,
+                    icon: "/glob.png",
                     theme: colors.accent,
                   },
                   {
                     label: "California",
                     val: rankData.state,
                     pct: rankData.state.percentile,
-                    icon: <FeatherMap />,
+                    icon: "/state.png",
                     theme: colors.secondary,
                   },
                   {
                     label: "San Francisco",
                     val: rankData.city,
                     pct: rankData.city.percentile,
-                    icon: <FeatherMapPin />,
+                    icon: "/city.png",
                     theme: colors.primary,
                   },
                 ].map((rank, i) => (
@@ -967,10 +975,11 @@ export default function Dashboard() {
                     className="rounded-3xl shadow-sm border"
                     style={{
                       backgroundColor: colors.white,
+                      border: `1.5px solid ${colors.primaryGlow}`
                     }}
                   >
                     <CardContent className="flex flex-col items-center gap-2 p-6 text-center">
-                      <div
+                      {/* <div
                         className="h-10 w-10 flex items-center justify-center rounded-full"
                         style={{
                           backgroundColor: colors.primary,
@@ -978,9 +987,27 @@ export default function Dashboard() {
                         }}
                       >
                         {rank.icon}
+                      </div> */}
+
+                      <div
+                        className="h-10 w-10 flex items-center justify-center rounded-full"
+                        // style={{
+                        //   backgroundColor: colors.primary,
+                        //   color: colors.white,
+                        // }}
+                      >
+                        {typeof rank.icon === "string" ? (
+                          <img
+                            src={rank.icon}
+                            alt={rank.label}
+                            className="h-7 w-7 object-contain"
+                          />
+                        ) : (
+                          rank.icon
+                        )}
                       </div>
 
-                      <span className="text-[10px] uppercase tracking-widest opacity-50">
+                      <span style={{color: "black"}} className="text-[10px] uppercase tracking-widest">
                         {rank.label}
                       </span>
 
@@ -1007,7 +1034,7 @@ export default function Dashboard() {
 
               <Card
                 className="w-full rounded-[2.5rem] shadow-xl overflow-hidden"
-                style={{ backgroundColor: "white", color: colors.accent }}
+                style={{ backgroundColor: "white", color: colors.accent, border: `1.5px solid ${colors.primaryGlow}`   }}
               >
                 <CardContent className="p-8">
                   <div className="flex flex-col md:flex-row items-center gap-8">
@@ -1039,7 +1066,7 @@ export default function Dashboard() {
 
                       <div className="text-center">
                         <span
-                          className="text-4xl font-black"
+                          className="text-xl font-black"
                           style={{ color: colors.primary }}
                         >
                           {hireability.totalScore}
@@ -1124,7 +1151,7 @@ export default function Dashboard() {
                       <Button
                         className="border-none px-8 rounded-2xl h-12 transition-transform hover:scale-105"
                         style={{
-                          backgroundColor: colors.primary,
+                          backgroundColor: colors.secondary,
                           color: colors.white,
                         }}
                       >
@@ -1148,22 +1175,27 @@ export default function Dashboard() {
                 </div>
 
                 {/* Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 items-start">
                   {/* ================= Assessment ================= */}
-                  <Card className="border border-neutral-200 rounded-3xl sm:rounded-[2rem] shadow-sm bg-white transition-all">
-                    <CardContent className="p-4 sm:p-6">
+                  <Card style={{border: `1.5px solid ${colors.primaryGlow}`   }} className="border border-neutral-200 rounded-3xl sm:rounded-[2rem] shadow-sm bg-white transition-all">
+                    <CardContent className="pt-2 pb-0 px-4 sm:pt-3 sm:pb-3 sm:px-3">
                       <div className="flex justify-between items-start mb-4 sm:mb-6">
                         <div
-                          style={{ backgroundColor: colors.primary, color: colors.white }}
-                          className="p-3 rounded-2xl text-black"
+                          // style={{ backgroundColor: colors.primary, color: colors.white }}
+                          className=" rounded-2xl text-black"
                         >
-                          <FeatherFileText />
+                          {/* <FeatherFileText /> */}
+                          <img
+                          src="/assessment.png"   // change to your image name
+                          alt="Trophy"
+                          className="w-8 h-8 object-contain"
+                        />
                         </div>
 
                         <Badge
                           style={{
-                            backgroundColor: colors.primary,
-                            color: colors.white,
+                            backgroundColor: colors.aqua,
+                            color: "black",
                           }}
                           className="border-none text-[10px] uppercase tracking-wider"
                         >
@@ -1202,7 +1234,7 @@ export default function Dashboard() {
                           <Button
                             className="w-full sm:w-auto rounded-2xl px-5 sm:px-6"
                             style={{
-                              backgroundColor: colors.primary,
+                              backgroundColor: colors.secondary,
                               color: "white",
                             }}
                             onClick={handleAssessmentClick}
@@ -1215,23 +1247,28 @@ export default function Dashboard() {
                   </Card>
 
                   {/* ================= Case Studies ================= */}
-                  <Card className="border border-neutral-200 rounded-3xl sm:rounded-[2rem] shadow-sm bg-white transition-all">
-                    <CardContent className="p-4 sm:p-6">
+                  <Card style={{border: `1.5px solid ${colors.primaryGlow}`}} className="border border-neutral-200 rounded-3xl sm:rounded-[2rem] shadow-sm bg-white transition-all">
+                    <CardContent className="pt-2 pb-0 px-4 sm:pt-3 sm:pb-3 sm:px-3">
                       <div className="flex justify-between items-start mb-4 sm:mb-6">
                         <div
                           style={{
-                            backgroundColor: colors.primary,
-                            color: colors.white,
+                            // backgroundColor: colors.primary,
+                            // color: colors.white,
                           }}
-                          className="p-3 rounded-2xl"
+                          className="rounded-2xl"
                         >
-                          <FeatherBookOpen />
+                          {/* <FeatherBookOpen /> */}
+                          <img
+                          src="/book.png"   // change to your image name
+                          alt="Trophy"
+                          className="w-8 h-8 object-contain"
+                        />
                         </div>
 
                         <Badge
                           style={{
-                            backgroundColor: colors.primary,
-                            color: colors.white,
+                            backgroundColor: colors.aqua,
+                            color: "black",
                           }}
                           className="border-none text-[10px] uppercase tracking-wider"
                         >
@@ -1255,7 +1292,7 @@ export default function Dashboard() {
 
                         <Button
                           className="w-full sm:w-auto rounded-2xl px-5 sm:px-6"
-                          style={{ backgroundColor: colors.primary }}
+                          style={{ backgroundColor: colors.secondary }}
                           onClick={() => handleNavigate("/case-assessments")}
                         >
                           Start Now
@@ -1265,7 +1302,7 @@ export default function Dashboard() {
                   </Card>
 
                   {/* ================= Hackathons ================= */}
-                  <Card className="bg-white border rounded-3xl sm:rounded-[2rem] shadow-sm opacity-80">
+                  <Card style={{border: `1.5px solid ${colors.primaryGlow}`, cursor: "not-allowed"}} className="bg-white border rounded-3xl sm:rounded-[2rem] shadow-sm opacity-80">
                     <CardContent className="p-4 sm:p-6">
                       <div className="flex justify-between items-start mb-4 sm:mb-6">
                         <div className="p-3 bg-neutral-200 rounded-2xl text-neutral-500">
@@ -1303,7 +1340,7 @@ export default function Dashboard() {
                   </Card>
 
                   {/* ================= Courses ================= */}
-                  <Card className="bg-white rounded-3xl sm:rounded-[2rem] shadow-sm opacity-80">
+                  <Card style={{border: `1.5px solid ${colors.primaryGlow}`, cursor: "not-allowed"}} className="bg-white rounded-3xl sm:rounded-[2rem] shadow-sm opacity-80">
                     <CardContent className="p-4 sm:p-6">
                       <div className="flex justify-between items-start mb-4 sm:mb-6">
                         <div className="p-3 bg-neutral-200 rounded-2xl text-neutral-500">
@@ -1344,16 +1381,21 @@ export default function Dashboard() {
 
             {/* --- RIGHT SIDEBAR --- */}
             <div className="flex w-full flex-col gap-6 lg:w-[340px] lg:flex-none">
-              <Card className="bg-white rounded-[2rem] border shadow-sm">
+              <Card style={{border: `1.5px solid ${colors.primaryGlow}`}} className="bg-white rounded-[2rem] border shadow-sm">
                 <CardHeader className="pb-2">
                   <CardTitle
                     className="text-sm font-bold flex items-center gap-2"
                     style={{ color: colors.accent }}
                   >
-                    <FeatherTrophy
+                    {/* <FeatherTrophy
                       style={{backgroundColor: colors.primary, color: colors.white}}
                       className="w-8 h-8 rounded-full pl-2.5"
-                    />
+                    /> */}
+                    <img
+        src="/trophy.png"   // change to your image name
+        alt="Trophy"
+        className="w-7 h-7 object-contain"
+      />
                     Top PMs at Stanford
                   </CardTitle>
                 </CardHeader>
@@ -1384,7 +1426,7 @@ export default function Dashboard() {
                       key={idx}
                       className="flex items-center gap-3 p-3 rounded-2xl"
                       style={{
-                        backgroundColor: p.isUser ? colors.primaryGlow : colors.background,
+                        backgroundColor: p.isUser ? colors.aqua : colors.background,
                       }}
                     >
                       <div
@@ -1417,7 +1459,7 @@ export default function Dashboard() {
                   <Button
                     className="w-full h-9 text-[11px] rounded-xl border-none"
                     style={{
-                      backgroundColor: colors.primary,
+                      backgroundColor: colors.secondary,
                       color: colors.accent,
                     }}
                     onClick={() => handleNavigate("/leaderboard")}
@@ -1429,7 +1471,7 @@ export default function Dashboard() {
 
               <Card
                 className="rounded-[2.5rem] shadow-lg text-center overflow-hidden"
-                style={{ backgroundColor: colors.white, color: colors.accent }}
+                style={{ backgroundColor: colors.white, color: colors.accent, border: `1.5px solid ${colors.primaryGlow}`}}
               >
                 <CardContent className="p-8">
                   <p className="text-xs font-black uppercase tracking-widest opacity-70">
@@ -1443,7 +1485,7 @@ export default function Dashboard() {
                   <div
                     className="p-3 rounded-2xl text-[10px] font-bold"
                     style={{
-                      backgroundColor: colors.primary,
+                      backgroundColor: colors.secondary,
                       color: colors.white,
                     }}
                   >
@@ -1452,7 +1494,7 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-white rounded-[2rem] border shadow-sm">
+              <Card style={{border: `1.5px solid ${colors.primaryGlow}`}}  className="bg-white rounded-[2rem] border shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle
                     className="text-sm font-bold"
@@ -1510,7 +1552,7 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="rounded-3xl border bg-white overflow-hidden">
+              <Card style={{border: `1.5px solid ${colors.primaryGlow}`}}  className="rounded-3xl border bg-white overflow-hidden">
                 <CardHeader>
                   <CardTitle
                     className="text-lg"
@@ -1570,7 +1612,7 @@ export default function Dashboard() {
                         <div
                           className="flex h-9 w-9 items-center justify-center rounded-full"
                           style={{
-                            backgroundColor: colors.primary,
+                            backgroundColor: colors.secondary,
                             color: colors.white,
                           }}
                         >
@@ -1597,7 +1639,7 @@ export default function Dashboard() {
                         onClick={() => handleNavigate(item.path)}
                         className="mt-4 w-full rounded-2xl py-3 text-sm"
                         style={{
-                          backgroundColor: colors.primary,
+                          backgroundColor: colors.secondary,
                           color: "#fff",
                         }}
                       >

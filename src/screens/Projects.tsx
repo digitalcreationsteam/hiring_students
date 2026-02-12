@@ -20,6 +20,7 @@ import API, { URL_PATH } from "src/common/API";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { colors } from "../common/Colors";
+import Navbar from "src/ui/components/Navbar";
 
 type ProjectEntry = {
   id: string;
@@ -840,7 +841,7 @@ export default function Projects() {
   // );
   return (
     <>
-      <HeaderLogo />
+      <Navbar />
       <ToastContainer position="top-center" autoClose={3000} />
 
       {/* Blended background - fixed behind everything */}

@@ -23,6 +23,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Country, State, City } from "country-state-city";
 import { colors } from "src/common/Colors";
+import Navbar from "src/ui/components/Navbar";
 
 interface DemographicsData {
   fullName: string;
@@ -425,7 +426,7 @@ export default function Demographics() {
       {/* Header and content with z-index to stay above background */}
       <div className="relative z-10">
         <ToastContainer position="top-center" autoClose={2000} />
-        <HeaderLogo />
+        <Navbar />
         <div className="flex justify-center px-4 sm:px-6 py-0 sm:py-0">
           <div className="w-full max-w-[1000px] mx-auto flex flex-col md:flex-row gap-6 md:gap-8 justify-center py-8">
             {/* LEFT CARD */}

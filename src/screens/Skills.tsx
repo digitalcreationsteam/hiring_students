@@ -11,6 +11,7 @@ import { Button } from "../ui/components/Button";
 
 import API, { URL_PATH } from "src/common/API";
 import { colors } from "../common/Colors";
+import Navbar from "src/ui/components/Navbar";
 
 export default function Skills() {
   const navigate = useNavigate();
@@ -153,7 +154,7 @@ export default function Skills() {
       </div>
 
       <div className="relative z-10">
-        <HeaderLogo />
+        <Navbar />
       </div>
 
       <div className="relative z-10 flex justify-center px-4 sm:px-6 md:px-8 py-6 sm:py-8">

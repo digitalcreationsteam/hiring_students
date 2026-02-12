@@ -16,6 +16,7 @@ import { FeatherTrendingUp } from "@subframe/core";
 import { FeatherZap } from "@subframe/core";
 import API, { URL_PATH } from "src/common/API";
 import { colors } from "src/common/Colors";
+import Navbar from "src/ui/components/Navbar";
 
 function AssessmentIntro3() {
   const navigate = useNavigate();
@@ -130,7 +131,7 @@ function AssessmentIntro3() {
 
     {/* Header and content with z-index to stay above background */}
     <div className="relative z-10">
-      <HeaderLogo />
+      <Navbar />
       <div className="flex min-h-screen w-full justify-center px-4 sm:px-6 lg:px-8 py-0 sm:py-0">
         <div className="mx-auto flex w-full max-w-[1200px] flex-col items-start gap-6 sm:gap-8 py-8">
           <Button

@@ -47,9 +47,10 @@ export const colors = {
   secondary: "#2E4056",
   slate: "#AAB5B7",
   primaryGlow: "#BFC7CA",
-  background: "#D5D6D8",
+  background: "#f8f8f8",
   accent: "#1F2937",
   white: "#FFFFFF",
+  background2: "#f8f8f8",
 
   neutral: {
     50: "#FAFAFA",
@@ -67,7 +68,7 @@ export const colors = {
     absentText: "#4B5563",
   },
 
-aqua: "#97D3CD",       // Light Aqua
+aqua: "#C5E1B8",       // Light Aqua
   cream: "#FFFAE6",      // Main Background
   mint: "#E4F2EA",
 
