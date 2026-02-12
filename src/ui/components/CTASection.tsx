@@ -64,7 +64,7 @@ const CTASection = () => {
             <Link to="/signup" 
               style={{
                 background: `linear-gradient(135deg, ${uniTalentColors.primary} 0%, ${uniTalentColors.primaryLight || '#FFEDB2'} 100%)`,
-                color: uniTalentColors.text,
+                color: uniTalentColors.lightGray,
                 boxShadow: `0 8px 20px ${uniTalentColors.primary}66`,
               }}
               className="w-full xs:flex-1 px-6 sm:px-8 lg:px-10 py-3 sm:py-4 font-bold rounded-lg sm:rounded-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 group text-sm sm:text-base"

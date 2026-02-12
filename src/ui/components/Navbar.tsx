@@ -29,7 +29,7 @@ const Navbar = () => {
                     <img
                         src="/BlackHiringLogo.png"
                         alt="Company Logo"
-                        className="h-9 w-50 object-contain"
+                        className="h-9 w-40 object-contain"
                     />
                 </div>
 
@@ -67,7 +67,7 @@ const Navbar = () => {
                         to="/signup" 
                         style={{ 
                             backgroundColor: uniTalentColors.primary,
-                            color: uniTalentColors.text
+                            color: uniTalentColors.lightGray
                         }}
                         className="px-6 py-2 rounded-lg font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
                     >

@@ -72,11 +72,11 @@ export const colors = {
 // NEW UNITALENT COLOR PALETTE - Added separately without modifying existing colors
 export const uniTalentColors = {
   // Client's specific color palette for UniTalent landing page
-  primary: "#FFD85F",      // Yellow accent
+  primary: "#1A2C42",      // Yellow accent
   lightGray: "#D9D9D9",    // Borders and dividers
   background: "#F8F8F8",   // Main background
   text: "#060606",         // All text content
-  secondary:"#7C3AED",
+  secondary:"#2E4056",
   // Extended palette
   primaryLight: "#FFEDB2", // Light yellow for gradients
   

@@ -50,10 +50,9 @@ const router = createBrowserRouter([
   {
     index: true,
     element: isAuthenticated()
-      ? <Navigate to="/LandingPage" replace />
+      ? <Navigate to="/dashboard" replace />
       : <LandingPage />,
   },
-  { path: "/LandingPage", element: <LandingPage /> },
   { path: "/signup", element: <SignUp /> },
   { path: "/login", element: <LogIn /> },
   { path: "/login-success", element: <LoginSuccess /> },
