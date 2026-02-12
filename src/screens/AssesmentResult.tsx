@@ -737,7 +737,7 @@ if (res?.integrity) {
             {/* City */}
             <div className="flex min-w-[220px] grow flex-col items-center gap-3 rounded-3xl border border-violet-200 bg-gradient-to-b from-[#F4F2FF] to-white px-6 py-8 shadow-md">
               <IconWithBackground
-                style={{backgroundColor: colors.primary, color: colors.accent}}
+                style={{backgroundColor: colors.primary, color: colors.white}}
                 className="rounded-full text-[20px]"
                 variant="brand"
                 size="large"
@@ -752,7 +752,7 @@ if (res?.integrity) {
             {/* Country */}
             <div className="flex min-w-[220px] grow flex-col items-center gap-3 rounded-3xl border border-violet-200 bg-gradient-to-b from-[#F4F2FF] to-white px-6 py-8 shadow-md">
               <IconWithBackground
-                style={{backgroundColor: colors.primary, color: colors.accent}}
+                style={{backgroundColor: colors.primary, color: colors.white}}
                 className="rounded-full text-[20px]"
                 variant="brand"
                 size="large"
@@ -767,7 +767,7 @@ if (res?.integrity) {
             {/* Global */}
             <div className="flex min-w-[220px] grow flex-col items-center gap-3 rounded-3xl border border-violet-200 bg-gradient-to-b from-[#F4F2FF] to-white px-6 py-8 shadow-md">
               <IconWithBackground
-                style={{backgroundColor: colors.primary, color: colors.accent}}
+                style={{backgroundColor: colors.primary, color: colors.white}}
                 className="rounded-full text-[20px]"
                 variant="brand"
                 size="large"
@@ -794,7 +794,7 @@ if (res?.integrity) {
           </div> */}
           <div className="flex w-full items-center justify-center">
   <Button
-    style={{ backgroundColor: colors.accent }}
+    style={{ backgroundColor: colors.primary }}
     className="
       w-full max-w-[180px] h-10 rounded-2xl hover:opacity-90 font-semibold
       [&_span]:!text-white

@@ -623,7 +623,7 @@ export default function Dashboard() {
                     <div
                       className="inline-flex items-center gap-3 rounded-2xl px-5 py-3 border shadow-sm"
                       style={{
-                        backgroundColor: colors.primaryGlow,
+                        backgroundColor: colors.background,
                         color: colors.accent,
                       }}
                     >
@@ -632,9 +632,10 @@ export default function Dashboard() {
                         className="h-9 w-9 rounded-xl flex items-center justify-center"
                         style={{
                           backgroundColor: colors.primary,
+                          color: colors.white
                         }}
                       >
-                        <FeatherTrophy className="w-5 h-5" />
+                        <FeatherTrophy className="w-5 h-5 ml-1" />
                       </div>
 
                       {/* Text */}
@@ -660,7 +661,7 @@ export default function Dashboard() {
                 }}
               >
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm">
+                  <CardTitle className="text-sm font-bold">
                     Activity This Week
                   </CardTitle>
                 </CardHeader>
@@ -670,19 +671,19 @@ export default function Dashboard() {
                     {
                       label: "Case Studies",
                       pct: "45%",
-                      color: colors.accent,
+                      color: colors.primary,
                       val: "3/5",
                     },
                     {
                       label: "Hackathons",
                       pct: "50%",
-                      color: colors.secondary,
+                      color: colors.primary,
                       val: "1/2",
                     },
                   ].map((item, idx) => (
                     <div key={idx} className="space-y-1">
                       <div className="flex justify-between text-[11px]">
-                        <span style={{ color: colors.neutral[600] }}>
+                        <span style={{ color: colors.accent }}>
                           {item.label}
                         </span>
                         <span style={{ color: colors.primary }}>
@@ -692,7 +693,7 @@ export default function Dashboard() {
 
                       <div
                         className="h-1.5 w-full rounded-full overflow-hidden"
-                        style={{ backgroundColor: colors.cream }}
+                        style={{ backgroundColor: colors.background }}
                       >
                         <div
                           className="h-full rounded-full transition-all duration-500"
@@ -708,8 +709,8 @@ export default function Dashboard() {
                   <div
                     className="mt-2 rounded-xl px-3 py-2 text-center text-[10px]"
                     style={{
-                      backgroundColor: colors.primaryGlow,
-                      color: colors.accent,
+                      backgroundColor: colors.primary,
+                      color: colors.white,
                     }}
                   >
                     You're more active than 78% of peers
@@ -722,13 +723,16 @@ export default function Dashboard() {
               >
                 <CardHeader className="pb-3 border-b">
                   <CardTitle
-                    className="text-sm flex items-center gap-2"
+                    className="text-sm font-bold flex items-center gap-2"
                     style={{ color: colors.accent }}
                   >
-                    <FeatherFileText
-                      className="w-4 h-4"
-                      style={{ color: colors.accent }}
-                    />
+                    <div className="w-9 h-9 rounded-full">
+                      <FeatherFileText
+                        className="w-9 h-9 rounded-full pl-2.5"
+                        style={{ color: colors.white, background: colors.primary }}
+                      />
+                    </div>
+                    
                     Professional Resume
                   </CardTitle>
                 </CardHeader>
@@ -786,8 +790,7 @@ export default function Dashboard() {
                         key={i}
                         className="relative pl-4 pr-3 py-3 rounded-xl border transition hover:shadow-md"
                         style={{
-                          backgroundColor: colors.cream,
-                          borderColor: colors.aqua,
+                          backgroundColor: colors.background,
                         }}
                       >
                         <span
@@ -833,8 +836,7 @@ export default function Dashboard() {
                         key={i}
                         className="flex items-start gap-3 p-3 rounded-xl border shadow-sm"
                         style={{
-                          backgroundColor: colors.mint,
-                          borderColor: colors.aqua,
+                          backgroundColor: colors.background,
                         }}
                       >
                         <div className="mt-0.5">
@@ -919,9 +921,9 @@ export default function Dashboard() {
                           key={i}
                           className="px-2 py-1 border rounded-md text-[9px] uppercase"
                           style={{
-                            backgroundColor: colors.white,
-                            borderColor: colors.aqua,
-                            color: colors.primary,
+                            backgroundColor: colors.background,
+                            // borderColor: colors.aqua,
+                            color: colors.accent,
                           }}
                         >
                           {typeof skill === "string" ? skill : skill.name}
@@ -972,7 +974,7 @@ export default function Dashboard() {
                         className="h-10 w-10 flex items-center justify-center rounded-full"
                         style={{
                           backgroundColor: colors.primary,
-                          color: colors.accent,
+                          color: colors.white,
                         }}
                       >
                         {rank.icon}
@@ -992,7 +994,7 @@ export default function Dashboard() {
                       <Badge
                         className="border-none text-[10px]"
                         style={{
-                          backgroundColor: colors.primaryGlow,
+                          backgroundColor: colors.background,
                           color: colors.accent,
                         }}
                       >
@@ -1038,7 +1040,7 @@ export default function Dashboard() {
                       <div className="text-center">
                         <span
                           className="text-4xl font-black"
-                          style={{ color: colors.accent }}
+                          style={{ color: colors.primary }}
                         >
                           {hireability.totalScore}
                         </span>
@@ -1054,7 +1056,7 @@ export default function Dashboard() {
                       {/* Header */}
                       <div className="flex items-center justify-between gap-3">
                         <h3
-                          className="text-lg sm:text-xl"
+                          className="text-lg sm:text-xl font-bold"
                           style={{ color: colors.accent }}
                         >
                           Hireability Index
@@ -1111,7 +1113,7 @@ export default function Dashboard() {
                               className="h-full"
                               style={{
                                 width: `${experienceProgress}%`,
-                                backgroundColor: colors.aqua,
+                                backgroundColor: colors.background,
                               }}
                             />
                           </div>
@@ -1122,8 +1124,8 @@ export default function Dashboard() {
                       <Button
                         className="border-none px-8 rounded-2xl h-12 transition-transform hover:scale-105"
                         style={{
-                          backgroundColor: colors.accent,
-                          color: colors.primary,
+                          backgroundColor: colors.primary,
+                          color: colors.white,
                         }}
                       >
                         Improve Score Now
@@ -1140,7 +1142,7 @@ export default function Dashboard() {
                     Recommended Actions
                   </h3>
 
-                  <span className="w-fit text-[10px] sm:text-xs text-yellow-600 bg-yellow-50 px-3 py-1 rounded-full border border-yellow-100">
+                  <span style={{background: colors.primaryGlow, color: colors.accent}} className="w-fit text-[10px] sm:text-xs px-3 py-1 rounded-full">
                     4 Actions Available
                   </span>
                 </div>
@@ -1152,7 +1154,7 @@ export default function Dashboard() {
                     <CardContent className="p-4 sm:p-6">
                       <div className="flex justify-between items-start mb-4 sm:mb-6">
                         <div
-                          style={{ backgroundColor: colors.primary }}
+                          style={{ backgroundColor: colors.primary, color: colors.white }}
                           className="p-3 rounded-2xl text-black"
                         >
                           <FeatherFileText />
@@ -1161,7 +1163,7 @@ export default function Dashboard() {
                         <Badge
                           style={{
                             backgroundColor: colors.primary,
-                            color: colors.accent,
+                            color: colors.white,
                           }}
                           className="border-none text-[10px] uppercase tracking-wider"
                         >
@@ -1200,7 +1202,7 @@ export default function Dashboard() {
                           <Button
                             className="w-full sm:w-auto rounded-2xl px-5 sm:px-6"
                             style={{
-                              backgroundColor: colors.accent,
+                              backgroundColor: colors.primary,
                               color: "white",
                             }}
                             onClick={handleAssessmentClick}
@@ -1219,7 +1221,7 @@ export default function Dashboard() {
                         <div
                           style={{
                             backgroundColor: colors.primary,
-                            color: colors.accent,
+                            color: colors.white,
                           }}
                           className="p-3 rounded-2xl"
                         >
@@ -1229,7 +1231,7 @@ export default function Dashboard() {
                         <Badge
                           style={{
                             backgroundColor: colors.primary,
-                            color: colors.accent,
+                            color: colors.white,
                           }}
                           className="border-none text-[10px] uppercase tracking-wider"
                         >
@@ -1253,7 +1255,7 @@ export default function Dashboard() {
 
                         <Button
                           className="w-full sm:w-auto rounded-2xl px-5 sm:px-6"
-                          style={{ backgroundColor: colors.accent }}
+                          style={{ backgroundColor: colors.primary }}
                           onClick={() => handleNavigate("/case-assessments")}
                         >
                           Start Now
@@ -1345,12 +1347,12 @@ export default function Dashboard() {
               <Card className="bg-white rounded-[2rem] border shadow-sm">
                 <CardHeader className="pb-2">
                   <CardTitle
-                    className="text-sm flex items-center gap-2"
+                    className="text-sm font-bold flex items-center gap-2"
                     style={{ color: colors.accent }}
                   >
                     <FeatherTrophy
-                      className="w-4 h-4"
-                      style={{ color: colors.accent }}
+                      style={{backgroundColor: colors.primary, color: colors.white}}
+                      className="w-8 h-8 rounded-full pl-2.5"
                     />
                     Top PMs at Stanford
                   </CardTitle>
@@ -1382,7 +1384,7 @@ export default function Dashboard() {
                       key={idx}
                       className="flex items-center gap-3 p-3 rounded-2xl"
                       style={{
-                        backgroundColor: p.isUser ? colors.mint : colors.cream,
+                        backgroundColor: p.isUser ? colors.primaryGlow : colors.background,
                       }}
                     >
                       <div
@@ -1442,7 +1444,7 @@ export default function Dashboard() {
                     className="p-3 rounded-2xl text-[10px] font-bold"
                     style={{
                       backgroundColor: colors.primary,
-                      color: colors.accent,
+                      color: colors.white,
                     }}
                   >
                     Based on rankings and case studies solved.
@@ -1463,7 +1465,7 @@ export default function Dashboard() {
                     className="border-none text-[10px]"
                     style={{
                       backgroundColor: colors.primary,
-                      color: "black",
+                      color: colors.white,
                     }}
                   >
                     15
@@ -1569,7 +1571,7 @@ export default function Dashboard() {
                           className="flex h-9 w-9 items-center justify-center rounded-full"
                           style={{
                             backgroundColor: colors.primary,
-                            color: colors.accent,
+                            color: colors.white,
                           }}
                         >
                           {item.icon}
@@ -1595,7 +1597,7 @@ export default function Dashboard() {
                         onClick={() => handleNavigate(item.path)}
                         className="mt-4 w-full rounded-2xl py-3 text-sm"
                         style={{
-                          backgroundColor: colors.accent,
+                          backgroundColor: colors.primary,
                           color: "#fff",
                         }}
                       >

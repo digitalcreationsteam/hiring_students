@@ -102,7 +102,7 @@ function StepCard({
       <div className="flex w-full items-center gap-3">
         <div
           className="h-10 w-10 rounded-2xl flex items-center justify-center"
-          style={{ backgroundColor: colors.primary, color: "black" }}
+          style={{ backgroundColor: colors.primary, color: colors.white }}
         >
           {icon}
         </div>
@@ -128,7 +128,7 @@ function CaseCard({
 }) {
   return (
     <div className="flex grow shrink-0 basis-0 flex-col items-start gap-4 rounded-3xl border border-solid border-neutral-border bg-white px-4 sm:px-6 py-4 sm:py-6 shadow-sm">
-      <div style={{color: "black"}} className="flex justify-between w-full items-center gap-3 ">
+      <div style={{color: colors.white}} className="flex justify-between w-full items-center gap-3 ">
         {item.icon}
         <DifficultyChip label={item.difficulty} />
       </div>

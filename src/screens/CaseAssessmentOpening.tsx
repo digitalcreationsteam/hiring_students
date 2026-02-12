@@ -491,7 +491,7 @@ function CaseAssessmentOpening() {
                     <span className="px-3 py-1 rounded-full text-xs font-semibold"
                       style={{
                         backgroundColor: colors.primary,
-                        color: "black"
+                        color: colors.white
                       }}
                     >
                       Read Carefully
@@ -507,9 +507,9 @@ function CaseAssessmentOpening() {
                       <h3 className="text-base font-semibold text-neutral-900 mb-3 flex items-center gap-2">
   <span
     className="w-10 h-10 flex items-center justify-center rounded-full"
-    style={{ backgroundColor: colors.primary }}
+    style={{ backgroundColor: colors.primary, color: colors.white }}
   >
-    <FeatherBook className="w-5 h-5 text-black" />
+    <FeatherBook className="w-5 h-5" />
   </span>
 
   Scenario Overview
@@ -612,7 +612,7 @@ function CaseAssessmentOpening() {
               <div className="bg-white rounded-2xl border border-neutral-200 p-6 shadow-sm">
                 <div className="flex flex-col items-center text-center gap-4">
                   <IconWithBackground
-                    style={{ backgroundColor: primaryColor, color: "black" }}
+                    style={{ backgroundColor: primaryColor, color: colors.white }}
                     className="rounded-2xl"
                     size="large"
                     icon={<FeatherCheckCircle />}
@@ -701,7 +701,7 @@ function CaseAssessmentOpening() {
               {/* CTA Button - Sticky */}
               <div className="sticky top-6">
                 <Button
-                  style={{ backgroundColor: colors.accent, color: "black" }}
+                  style={{ backgroundColor: colors.primary, color: colors.white}}
                   className="w-full h-12 rounded-xl hover:opacity-90 text-white font-semibold shadow-lg"
                   size="large"
                   icon={<FeatherZap />}
@@ -739,7 +739,7 @@ function ContextCard({ icon, label, value, color, compact = false }: any) {
             className="p-2 rounded-lg"
             style={{ 
               backgroundColor: colors.primary,
-              color: "black"
+              color: colors.white
             }}
           >
             {icon}

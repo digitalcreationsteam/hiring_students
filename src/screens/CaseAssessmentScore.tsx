@@ -84,7 +84,7 @@ export default function CaseAssessmentScore() {
         <div className="pointer-events-none absolute inset-0">
           <div
             className="absolute inset-0"
-            style={{ backgroundColor: colors.background }}
+            style={{ backgroundColor: colors.secondary }}
           />
 
           <div
@@ -218,7 +218,7 @@ export default function CaseAssessmentScore() {
               style={{ backgroundColor: colors.primary }}
             >
               <FeatherCheckCircle
-                className="w-6 h-6 text-black absolute inset-0 m-2.5"
+                className="w-6 h-6 text-black absolute inset-0 m-2.5 text-white"
               />
             </div>
               {/* Header */}
@@ -298,11 +298,11 @@ export default function CaseAssessmentScore() {
                     console.log("Navigating to reveal page with caseId:", caseId);
                     navigate(`/case-assessment-revel/${caseId}`, { state: { score, caseId } });
                   }}
-                  style={{ backgroundColor: colors.primary }}
+                  style={{ backgroundColor: colors.primary , color: colors.white}}
                   className="
                     w-full rounded-2xl py-4
                     hover:opacity-90 transition-opacity
-                    [&_span]:!text-black
+                    [&_span]:!text-white
                     shadow-sm
                   "
                   size="large"

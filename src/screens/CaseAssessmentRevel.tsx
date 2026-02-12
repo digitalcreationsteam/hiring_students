@@ -1175,9 +1175,9 @@ export default function CaseAssessmentReveal() {
             </Button>
 
             <Button
-            style={{backgroundColor: colors.primary, color: colors.accent}}
+            style={{backgroundColor: colors.primaryGlow, color: colors.white}}
               variant="neutral-secondary"
-              className="w-full h-12"
+              className="w-full h-12 text-white"
               icon={<FeatherHome />}
               onClick={() => navigate("/dashboard")}
             >
@@ -1194,7 +1194,7 @@ export default function CaseAssessmentReveal() {
               Take Regular Assessment
             </Button> */}
             <Button
-            style={{ backgroundColor: colors.accent }}
+            style={{ backgroundColor: colors.primary }}
             className="w-full h-12 !text-white"
             icon={<FeatherArrowRight />}
             onClick={() => navigate("/assessment")}

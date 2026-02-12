@@ -291,7 +291,7 @@ export default function CaseAssessmentQuestions() {
                     return (
                       <div
                         key={idx}
-                        style={{ backgroundColor: colors.accent, color: "white" }}
+                        style={{ backgroundColor: colors.primaryGlow, color: "black" }}
                         onClick={() => setCurrentIndex(idx)}
                         className="flex h-10 w-10 flex-none items-center justify-center rounded-2xl cursor-pointer"
                       >
@@ -306,7 +306,7 @@ export default function CaseAssessmentQuestions() {
                     return (
                       <div
                         key={idx}
-                        style={{ backgroundColor: colors.primary, color: "black" }}
+                        style={{ backgroundColor: colors.secondary, color: colors.white}}
                         onClick={() => setCurrentIndex(idx)}
                         className="flex h-10 w-10 flex-none items-center justify-center rounded-2xl cursor-pointer"
                       >
@@ -335,13 +335,13 @@ export default function CaseAssessmentQuestions() {
 
               <div className="flex w-full flex-col items-start gap-2">
                 <div className="flex w-full items-center gap-2">
-                  <div style={{ backgroundColor: colors.accent }} className="flex h-3 w-3 flex-none items-start rounded-full" />
+                  <div style={{ backgroundColor: colors.primaryGlow }} className="flex h-3 w-3 flex-none items-start rounded-full" />
                   <span className="text-caption font-caption text-default-font">
                     Current
                   </span>
                 </div>
                 <div className="flex w-full items-center gap-2">
-                  <div style={{ backgroundColor: colors.primary }} className="flex h-3 w-3 flex-none items-start rounded-full" />
+                  <div style={{ backgroundColor: colors.secondary }} className="flex h-3 w-3 flex-none items-start rounded-full" />
                   <span className="text-caption font-caption text-default-font">
                     Answered
                   </span>
@@ -436,7 +436,7 @@ export default function CaseAssessmentQuestions() {
                       className="px-3 py-1 rounded-full text-xs font-bold border"
                       style={{
                         backgroundColor: colors.primary,
-                        color: "black"
+                        color: colors.white
                       }}
                     >
                       {question.marks || 5} Marks
@@ -467,7 +467,7 @@ export default function CaseAssessmentQuestions() {
                             transition-colors duration-200
                             ${isSelected ? "bg-[var(--primary-color)]" : "bg-white"}
                           `}
-                          style={isSelected ? { backgroundColor: colors.primary } : {}}
+                          style={isSelected ? { backgroundColor: colors.background } : {}}
                           hideCheckbox={true}
                           checked={isSelected}
                           onCheckedChange={(checked: boolean) => {
@@ -500,15 +500,15 @@ export default function CaseAssessmentQuestions() {
                 <div className="flex w-full flex-col sm:flex-row gap-3 sm:gap-0 sm:justify-end">
                   <Button
                     disabled={!selected || submitting}
-                    style={{ backgroundColor: colors.primary }}
+                    style={{ backgroundColor: colors.primary, color: colors.white }}
                     className="
                       h-10 px-6 rounded-full hover:opacity-90
                       shadow-[0_6px_18px_rgba(99,52,237,0.18)]
-                      [&_span]:!text-black
-                      [&_svg]:!text-black
+                      [&_span]:!text-white
+                      [&_svg]:!text-white
                     "
                     size="large"
-                    iconRight={<FeatherArrowRight />}
+                    iconRight={<FeatherArrowRight style={{color: colors.white}} />}
                     onClick={handleSubmit}
                   >
                     {submitting ? "Submitting..." : "Submit Answer"}

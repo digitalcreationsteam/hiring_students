@@ -141,7 +141,7 @@ function AssessmentIntro3() {
           />
           <div className="flex w-full flex-col items-center gap-6 ">
             <IconWithBackground
-              style={{backgroundColor: colors.accent, color: colors.white}}
+              style={{backgroundColor: colors.primary, color: colors.white}}
               className="rounded-2xl"
               size="large"
               icon={<FeatherFileText />}
@@ -166,7 +166,7 @@ function AssessmentIntro3() {
             <div className="flex grow shrink-0 basis-0 flex-col items-start gap-4 rounded-3xl border border-solid border-neutral-border bg-white px-4 sm:px-6 py-4 sm:py-6 shadow-sm">
               <div className="flex w-full items-center gap-3">
                 <IconWithBackground
-                  style={{backgroundColor: colors.primary, color: colors.accent}}
+                  style={{backgroundColor: colors.primary, color: colors.white}}
                   className="rounded-2xl"
                   variant="brand"
                   size="medium"
@@ -201,7 +201,7 @@ function AssessmentIntro3() {
             <div className="flex grow shrink-0 basis-0 flex-col items-start gap-4 rounded-3xl border border-solid border-neutral-border bg-white px-4 sm:px-6 py-4 sm:py-6 shadow-sm">
               <div className="flex w-full items-center gap-3">
                 <IconWithBackground
-                  style={{backgroundColor: colors.primary, color: colors.accent}}
+                  style={{backgroundColor: colors.primary, color: colors.white}}
                   className="rounded-2xl"
                   variant="brand"
                   size="medium"
@@ -239,7 +239,7 @@ function AssessmentIntro3() {
             <div className="flex grow shrink-0 basis-0 flex-col items-start gap-4 rounded-3xl border border-solid border-neutral-border bg-white px-4 sm:px-6 py-4 sm:py-6 shadow-sm">
               <div className="flex w-full items-center gap-3">
                 <IconWithBackground
-                  style={{backgroundColor: colors.primary, color: colors.accent}}
+                  style={{backgroundColor: colors.primary, color: colors.white}}
                   className="rounded-2xl"
                   variant="brand"
                   size="medium"
@@ -301,8 +301,8 @@ function AssessmentIntro3() {
           <div className="flex w-full flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 pt-8">
             <Button
               disabled={loading}
-              style={{ backgroundColor: colors.accent, color: "white" }}
-              className="w-full max-w-[260px] h-10 rounded-2xl hover:bg-violet-700 text-white font-semibold disabled:opacity-60 p-4"
+              style={{ backgroundColor: colors.primary, color: "white" }}
+              className="w-full max-w-[260px] h-10 rounded-2xl hover:bg-violet-700 text-white disabled:opacity-60 p-6"
               size="large"
               icon={<FeatherZap />}
               onClick={handleBeginAssessment}

@@ -547,14 +547,14 @@ const handleSubmit = async () => {
     if (isCurrent) {
       return (
         <div
-          style={{backgroundColor: colors.accent, color: "white"}}
+          style={{backgroundColor: colors.primaryGlow, color: "accent"}}
           key={qIndex}
           onClick={() => {
             if (!saving) goToQuestion(qIndex);
           }}
           className="flex h-10 w-10 flex-none items-center justify-center rounded-2xl cursor-pointer"
         >
-          <span style={{color: "white"}} className="text-body-bold font-body-bold text-brand-600">
+          <span className="text-body-bold font-body-bold text-brand-600">
             {qIndex + 1}
           </span>
         </div>
@@ -564,7 +564,7 @@ const handleSubmit = async () => {
     if (isAnswered) {
       return (
         <div
-        style={{backgroundColor: colors.primary, color: "black"}}
+        style={{backgroundColor: colors.secondary, color: colors.white}}
           key={qIndex}
           onClick={() => {
             if (!saving) goToQuestion(qIndex);
@@ -678,13 +678,13 @@ const totalMarks = useMemo(() => {
 
             <div className="flex w-full flex-col items-start gap-2">
               <div className="flex w-full items-center gap-2">
-                <div style={{backgroundColor: colors.accent}} className="flex h-3 w-3 flex-none items-start rounded-full" />
+                <div style={{backgroundColor: colors.primaryGlow}} className="flex h-3 w-3 flex-none items-start rounded-full" />
                 <span className="text-caption font-caption text-default-font">
                   Current
                 </span>
               </div>
               <div className="flex w-full items-center gap-2">
-                <div style={{backgroundColor: colors.primary}} className="flex h-3 w-3 flex-none items-start rounded-full" />
+                <div style={{backgroundColor: colors.secondary}} className="flex h-3 w-3 flex-none items-start rounded-full" />
                 <span className="text-caption font-caption text-default-font">
                   Answered
                 </span>
@@ -778,7 +778,7 @@ const totalMarks = useMemo(() => {
                     className="px-3 py-1 rounded-full text-xs font-bold border"
                     style={{
                       backgroundColor: colors.primary,
-                      color: "black"
+                      color: colors.white
                     }}
                   >
                     {currentMarks} Marks
@@ -850,7 +850,7 @@ const totalMarks = useMemo(() => {
           transition-colors duration-200
           ${isSelected ? "bg-[var(--primary-color)]" : "bg-white"}
         `}
-        style={isSelected ? { backgroundColor: colors.primary } : {}}
+        style={isSelected ? { backgroundColor: colors.background } : {}}
         hideCheckbox={true}
         checked={isSelected}
         onCheckedChange={(checked: boolean) => {
@@ -895,11 +895,10 @@ const totalMarks = useMemo(() => {
                 <div className="flex gap-3 w-full sm:w-auto">
                   <Button
                   disabled={saving || currentIndex === 0}
-                  style={{ backgroundColor: colors.primary }}
+                  style={{ backgroundColor: colors.primary, color: colors.white }}
                   className="
                     h-10 px-6 rounded-full hover:opacity-90
                     shadow-[0_6px_18px_rgba(99,52,237,0.18)]
-                    [&_span]:!text-black
                   "
                   size="large"
                   onClick={prevQuestion}
@@ -919,15 +918,13 @@ const totalMarks = useMemo(() => {
                 </div>
                 <Button
                   disabled={saving}
-                  style={{ backgroundColor: colors.primary }}
+                  style={{ backgroundColor: colors.primary, color: colors.white }}
                   className="
                     h-10 px-6 rounded-full hover:opacity-90
                     shadow-[0_6px_18px_rgba(99,52,237,0.18)]
-                    [&_span]:!text-black
-                    [&_svg]:!text-black
                   "
                   size="large"
-                  iconRight={<FeatherArrowRight />}
+                  iconRight={<FeatherArrowRight style={{color: colors.white}} />}
                   onClick={nextQuestion}
                 >
                   {currentIndex < questions.length - 1 ? "Next Question" : "Submit"}
