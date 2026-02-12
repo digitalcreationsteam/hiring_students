@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-
-=======
->>>>>>> shreya
 // src/common/Colors.js
 
 // export const colors = {
