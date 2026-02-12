@@ -26,11 +26,13 @@ const Navbar = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
                 {/* Logo */}
                 <div className="flex items-center gap-3">
-                    <img
-                        src="/BlackhiringLogo.png"
-                        alt="Company Logo"
-                        className="h-9 w-40 object-contain"
-                    />
+                    <Link to="/" onClick={() => handleScroll("home")}>
+                        <img
+                            src="/BlackhiringLogo.png"
+                            alt="Company Logo"
+                            className="h-9 w-40 object-contain"
+                        />
+                    </Link>
                 </div>
 
                 {/* Desktop Menu */}

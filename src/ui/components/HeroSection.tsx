@@ -156,7 +156,7 @@ const HeroSection = () => {
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center max-w-2xl mx-auto mb-8 sm:mb-10 lg:mb-12 animate-fade-in-up" style={{ animationDelay: '0.3s' } as React.CSSProperties}>
             <button 
               style={{ 
-                background: `linear-gradient(135deg, ${uniTalentColors.primary} 0%, ${uniTalentColors.primaryLight || '#FFEDB2'} 100%)`,
+                background: `linear-gradient(135deg, ${uniTalentColors.primary} 0%, ${uniTalentColors.secondary || '#FFEDB2'} 100%)`,
                 color: uniTalentColors.lightGray,
                 boxShadow: `0 8px 30px ${uniTalentColors.primary}66`,
               }}

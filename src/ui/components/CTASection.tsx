@@ -63,7 +63,7 @@ const CTASection = () => {
             {/* Sign Up Button */}
             <Link to="/signup" 
               style={{
-                background: `linear-gradient(135deg, ${uniTalentColors.primary} 0%, ${uniTalentColors.primaryLight || '#FFEDB2'} 100%)`,
+                background: `linear-gradient(135deg, ${uniTalentColors.primary} 0%, ${uniTalentColors.secondary || '#FFEDB2'} 100%)`,
                 color: uniTalentColors.lightGray,
                 boxShadow: `0 8px 20px ${uniTalentColors.primary}66`,
               }}

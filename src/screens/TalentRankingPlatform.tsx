@@ -1063,8 +1063,8 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
           <div className="flex w-full flex-col gap-4 items-center sm:items-start">
             <div className="flex items-center gap-3">
               <img
-                className="h-8 w-24 object-cover"
-                src="/hiringLogo.png"
+                className="h-10 w-32 object-contain"
+                src="/hiringLogo2.png"
                 alt="hiringLogo"
               />
             </div>

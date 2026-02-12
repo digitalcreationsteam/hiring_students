@@ -156,7 +156,7 @@ function Login() {
           <div className="w-full lg:w-[64%] bg-neutral-50 px-4 sm:px-6 py-6 sm:py-8 flex flex-col justify-between">
             <div className="flex flex-col gap-4">
               <img
-                className="h-8 w-fit"
+                className="h-8 w-40 object-contain"
                 src="/hiringLogo2.png"
                 alt="Company logo"
               />

@@ -146,7 +146,7 @@ return (
           <div className="lg:w-[64%] bg-neutral-50 px-6 py-8 flex flex-col justify-between hidden lg:flex">
             <div className="flex flex-col gap-4">
               <img
-                className="h-8 w-fit"
+                className="h-8 w-40 object-contain"
                 src="/hiringLogo2.png"
                 alt="logo"
               />
