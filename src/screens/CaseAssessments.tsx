@@ -245,20 +245,41 @@ const [startingCaseId, setStartingCaseId] = useState<string | null>(null);
     }
   }, []);
 
+  // const fetchCases = useCallback(async () => {
+  //   try {
+  //     setLoadingCases(true);
+  //     const res = await API("GET", URL_PATH.getAllCases, {
+  //       page: 1,
+  //       limit: 20
+  //     });
+  //     setCases(res?.data || []);
+  //   } catch (err) {
+  //     console.error("fetchCases failed:", err);
+  //   } finally {
+  //     setLoadingCases(false);
+  //   }
+  // }, []);
   const fetchCases = useCallback(async () => {
-    try {
-      setLoadingCases(true);
-      const res = await API("GET", URL_PATH.getAllCases, {
-        page: 1,
-        limit: 20
-      });
-      setCases(res?.data || []);
-    } catch (err) {
-      console.error("fetchCases failed:", err);
-    } finally {
-      setLoadingCases(false);
+  try {
+    setLoadingCases(true);
+    const res = await API("GET", URL_PATH.getAllCases, {
+      page: 1,
+      limit: 20
+    });
+    setCases(res?.data || []);
+  } catch (err: any) {
+    console.error("fetchCases failed:", err);
+
+    if (err?.response?.status === 403 &&
+        err?.response?.data?.code === "UPGRADE_REQUIRED") {
+      
+      navigate("/pricing"); // or show modal
+      return;
     }
-  }, []);
+  } finally {
+    setLoadingCases(false);
+  }
+}, [navigate]);
 
   const onStart = async (caseId: string) => {
     if (startingCaseId) return;
