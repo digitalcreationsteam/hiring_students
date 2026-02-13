@@ -406,7 +406,7 @@ const Navbar = () => {
               <button
                 key={item}
                 onClick={() => handleScroll(item)}
-                style={{ color: uniTalentColors.text }}
+                style={{ color: uniTalentColors.white }}
                 className="relative group font-bold transition-all duration-300 bg-none border-none"
               >
                 <span className="relative z-10">{item}</span>
@@ -425,8 +425,8 @@ const Navbar = () => {
             <>
               <Link
                 to="/login"
-                style={{ color: uniTalentColors.text }}
-                className="font-bold hover:opacity-80 transition-all duration-300"
+                style={{backgroundColor: uniTalentColors.lightGray, color: uniTalentColors.primary }}
+                className="px-6 py-2 rounded-lg font-semibold transition-all duration-300 hover:scale-105"
               >
                 Login
               </Link>
@@ -434,8 +434,8 @@ const Navbar = () => {
               <Link
                 to="/signup"
                 style={{
-                  backgroundColor: uniTalentColors.primary,
-                  color: uniTalentColors.lightGray,
+                  backgroundColor: uniTalentColors.lightGray,
+                  color: uniTalentColors.primary,
                 }}
                 className="px-6 py-2 rounded-lg font-semibold transition-all duration-300 hover:scale-105"
               >

@@ -874,7 +874,7 @@ export default function Projects() {
       </div>
 
       <div className="min-h-screen flex justify-center px-6 py-0">
-        <div className="w-full max-w-[1100px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
+        <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center py-8">
           {/* Left card */}
           <main
             className="
