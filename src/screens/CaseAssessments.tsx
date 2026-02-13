@@ -131,7 +131,7 @@ function CaseCard({
   return (
     <div className="flex grow shrink-0 basis-0 flex-col items-start gap-4 rounded-3xl border border-solid border-neutral-border bg-white px-4 sm:px-6 py-4 sm:py-6 shadow-sm">
       <div style={{color: colors.white}} className="flex justify-between w-full items-center gap-3 ">
-        {item.icon}
+        {/* {item.icon} */}
         <DifficultyChip label={item.difficulty} />
       </div>
       
@@ -420,7 +420,7 @@ const [startingCaseId, setStartingCaseId] = useState<string | null>(null);
         onClick={() => setFilter(t)}
         className="px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200"
         style={{
-          backgroundColor: active ? colors.accent : colors.primaryGlow,
+          backgroundColor: active ? colors.primary : colors.white,
           color: active ? "white" : "#444",
           borderColor: active ? colors.accent : "#E5E7EB", // light gray border
         }}

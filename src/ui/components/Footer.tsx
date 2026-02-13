@@ -217,12 +217,19 @@ const Footer = () => {
 
             {/* Brand */}
             <div className="text-center md:text-left">
-              <h2
+              {/* <h2
                 // style={{ color: uniTalentColors.text }}
                 className="text-lg font-semibold"
               >
                 UniTalent
-              </h2>
+              </h2> */}
+              <div className="flex items-center gap-3">
+          <img
+            src="/UNITALENT.png"
+            alt="Company Logo"
+            className="h-9 w-40 object-contain"
+          />
+        </div>
               <p
                 // style={{ color: uniTalentColors.text }}
                 className="opacity-70 text-xs"

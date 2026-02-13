@@ -518,7 +518,7 @@ const Navbar = () => {
         <button
           onClick={toggleMenu}
           className="md:hidden p-2 rounded-lg"
-          style={{ color: uniTalentColors.text }}
+          style={{ color: colors.white }}
         >
           {isOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
