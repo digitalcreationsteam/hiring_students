@@ -86,12 +86,26 @@ export default function PaymentSuccess({ }: PaymentSuccessProps) {
 
     if (isLoading || paymentStatus === "verifying") {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+            <div className="min-h-screen w-full flex items-center justify-center relative">
+                {/* 🎨 Linear gradient background */}
+                <div 
+                    className="pointer-events-none fixed inset-0 -z-10"
+                    style={{
+                        background: `linear-gradient(
+                            to bottom,
+                            #d9d9d9 0%,
+                            #cfd3d6 25%,
+                            #9aa6b2 55%,
+                            #2E4056 100%
+                        )`,
+                        width: "100%",
+                    }}
+                />
                 <div className="text-center">
                     <div className="animate-spin mb-4">
-                        <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full mx-auto"></div>
+                        <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full mx-auto"></div>
                     </div>
-                    <p className="text-gray-600 font-medium">Verifying your payment...</p>
+                    <p className="text-gray-700 font-medium">Verifying your payment...</p>
                 </div>
             </div>
         );
@@ -99,7 +113,21 @@ export default function PaymentSuccess({ }: PaymentSuccessProps) {
 
     if (paymentStatus === "failed" || paymentStatus === "error") {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-red-50 to-orange-100 p-4">
+            <div className="min-h-screen w-full flex items-center justify-center p-4 relative">
+                {/* 🎨 Linear gradient background */}
+                <div 
+                    className="pointer-events-none fixed inset-0 -z-10"
+                    style={{
+                        background: `linear-gradient(
+                            to bottom,
+                            #d9d9d9 0%,
+                            #cfd3d6 25%,
+                            #9aa6b2 55%,
+                            #2E4056 100%
+                        )`,
+                        width: "100%",
+                    }}
+                />
                 <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full text-center">
                     <h1 className="text-3xl font-bold text-red-600 mb-4">Payment Failed</h1>
                     <p className="text-gray-600 mb-6">
@@ -117,7 +145,22 @@ export default function PaymentSuccess({ }: PaymentSuccessProps) {
     }
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 p-4">
+        <div className="min-h-screen w-full flex items-center justify-center p-4 relative">
+            {/* 🎨 Linear gradient background */}
+            <div 
+                className="pointer-events-none fixed inset-0 -z-10"
+                style={{
+                    background: `linear-gradient(
+                        to bottom,
+                        #d9d9d9 0%,
+                        #cfd3d6 25%,
+                        #9aa6b2 55%,
+                        #2E4056 100%
+                    )`,
+                    width: "100%",
+                }}
+            />
+            
             <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full">
                 {/* Success Icon */}
                 <div className="flex justify-center mb-8">

@@ -20,6 +20,7 @@ import API, { URL_PATH } from "src/common/API";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { colors } from "../common/Colors";
+import Footer from "../ui/components/Footer";
 
 type ProjectEntry = {
   id: string;
@@ -519,7 +520,7 @@ export default function Projects() {
   //             })}
   //           </section>
 
-  //           {/* 
+  //           {/*
   //         {selectedProject && (
   //           <div className="rounded-3xl border border-neutral-300 bg-white px-6 py-5">
   //             <div className="flex items-center justify-between mb-4">
@@ -843,35 +844,20 @@ export default function Projects() {
       <HeaderLogo />
       <ToastContainer position="top-center" autoClose={3000} />
 
-      {/* Blended background - fixed behind everything */}
-      <div className="pointer-events-none fixed inset-0 -z-10">
-        <div
-          className="absolute inset-0"
-          style={{ backgroundColor: colors.background }}
-        />
-
-        <div
-          className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
-          style={{
-            background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
-          }}
-        />
-
-        <div
-          className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
-          style={{
-            background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
-          }}
-        />
-
-        <div
-          className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
-          style={{
-            background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
-          }}
-        />
-      </div>
-
+      {/* 🎨 Linear gradient background - fixed behind everything */}
+      <div
+        className="pointer-events-none fixed inset-0 -z-10"
+        style={{
+          background: `linear-gradient(
+          to bottom,
+          #d9d9d9 0%,
+          #cfd3d6 25%,
+          #9aa6b2 55%,
+          #2E4056 100%
+        )`,
+          width: "100%",
+        }}
+      />
       <div className="min-h-screen flex justify-center px-6 py-0">
         <div className="w-full max-w-[1100px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
           {/* Left card */}
@@ -890,17 +876,17 @@ export default function Projects() {
           >
             {/* top row - back + progress */}
             <div className="flex items-center gap-4">
-             <IconButton
-  size="small"
-  icon={<FeatherArrowLeft />}
-  onClick={() => {
-    if (source === "dashboard") {
-      navigate("/dashboard");
-    } else {
-      navigate(-1);
-    }
-  }}
-/>
+              <IconButton
+                size="small"
+                icon={<FeatherArrowLeft />}
+                onClick={() => {
+                  if (source === "dashboard") {
+                    navigate("/dashboard");
+                  } else {
+                    navigate(-1);
+                  }
+                }}
+              />
 
               <div className="flex-1 w-full max-w-full md:max-w-[420px]">
                 <div className="flex items-center gap-3">
@@ -948,15 +934,17 @@ export default function Projects() {
                       }
                     }}
                     className="rounded-3xl px-4 py-3 cursor-pointer transition-all duration-200 focus:outline-none"
-                   style={{
-                     backgroundColor: isSelected ? `${colors.primary}10` : colors.white,
-                     border: `1px solid ${
-                       isSelected ? colors.primary : colors.neutral[400]
-                     }`,
-                     boxShadow: isSelected
-                       ? `0 4px 14px ${colors.primary}22`
-                       : "0 1px 3px rgba(0,0,0,0.04)",
-                   }}
+                    style={{
+                      backgroundColor: isSelected
+                        ? `${colors.primary}10`
+                        : colors.white,
+                      border: `1px solid ${
+                        isSelected ? colors.primary : colors.neutral[400]
+                      }`,
+                      boxShadow: isSelected
+                        ? `0 4px 14px ${colors.primary}22`
+                        : "0 1px 3px rgba(0,0,0,0.04)",
+                    }}
                   >
                     {/* 🔹 TOP ROW */}
                     <div className="flex items-center justify-between">
@@ -1159,26 +1147,26 @@ export default function Projects() {
             <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
 
             <footer>
-<Button
-  onClick={handleContinue}
-  disabled={!canContinue || isSubmitting}
-  className="w-full h-10 rounded-full transition-all font-semibold"
-  style={{
-    backgroundColor:
-      !canContinue || isSubmitting
-        ? `${colors.accent}66`   // faded when disabled
-        : colors.accent,
-    color: colors.accent,               // black text
-    cursor: !canContinue || isSubmitting ? "not-allowed" : "pointer",
-    boxShadow:
-      !canContinue || isSubmitting
-        ? "none"
-        : "0 6px 18px rgba(99,52,237,0.18)",
-  }}
->
-  {isSubmitting ? "Saving..." : "Continue"}
-</Button>
-
+              <Button
+                onClick={handleContinue}
+                disabled={!canContinue || isSubmitting}
+                className="w-full h-10 rounded-full transition-all font-semibold"
+                style={{
+                  backgroundColor:
+                    !canContinue || isSubmitting
+                      ? `${colors.accent}66` // faded when disabled
+                      : colors.accent,
+                  color: colors.accent, // black text
+                  cursor:
+                    !canContinue || isSubmitting ? "not-allowed" : "pointer",
+                  boxShadow:
+                    !canContinue || isSubmitting
+                      ? "none"
+                      : "0 6px 18px rgba(99,52,237,0.18)",
+                }}
+              >
+                {isSubmitting ? "Saving..." : "Continue"}
+              </Button>
             </footer>
           </main>
 
@@ -1259,7 +1247,10 @@ export default function Projects() {
                 </div>
 
                 {/* Certifications — active (purple) */}
-                <div className="flex items-center gap-3 rounded-2xl border border-gray-300 px-4 py-2 mb-3" style={{background: colors.primary}}>
+                <div
+                  className="flex items-center gap-3 rounded-2xl border border-gray-300 px-4 py-2 mb-3"
+                  style={{ background: colors.primary }}
+                >
                   <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white shadow-sm">
                     <IconWithBackground
                       size="small"
@@ -1268,8 +1259,9 @@ export default function Projects() {
                       icon={<FeatherPackage />}
                     />
                   </div>
-                  <span className="text-sm font-medium text-neutral-900"
-                   style={{color: colors.white}}
+                  <span
+                    className="text-sm font-medium text-neutral-900"
+                    style={{ color: colors.white }}
                   >
                     Projects
                   </span>
@@ -1278,78 +1270,89 @@ export default function Projects() {
             </div>
           </aside>
         </div>
-       {deleteProjectId && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-    <div
-      className="w-[360px] rounded-2xl p-6 shadow-xl"
-      style={{ backgroundColor: colors.white }}
-    >
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold" style={{ color: colors.accent }}>
-          Are you sure?
-        </h3>
-        <button
-          onClick={() => setDeleteProjectId(null)}
-          className="transition"
-          style={{ color: colors.neutral[600] }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = colors.accent)}
-          onMouseLeave={(e) => (e.currentTarget.style.color = colors.neutral[600])}
-        >
-          ✕
-        </button>
+        {deleteProjectId && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div
+              className="w-[360px] rounded-2xl p-6 shadow-xl"
+              style={{ backgroundColor: colors.white }}
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3
+                  className="text-lg font-semibold"
+                  style={{ color: colors.accent }}
+                >
+                  Are you sure?
+                </h3>
+                <button
+                  onClick={() => setDeleteProjectId(null)}
+                  className="transition"
+                  style={{ color: colors.neutral[600] }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = colors.accent)
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = colors.neutral[600])
+                  }
+                >
+                  ✕
+                </button>
+              </div>
+
+              <p
+                className="text-sm mb-6"
+                style={{ color: colors.neutral[600] }}
+              >
+                Do you really want to delete this project?
+              </p>
+
+              <div className="flex gap-3">
+                {/* Cancel */}
+                <Button
+                  className="flex-1 rounded-3xl transition"
+                  onClick={() => setDeleteProjectId(null)}
+                  style={{
+                    backgroundColor: colors.primary,
+                    color: colors.accent,
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundColor = colors.secondary)
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.backgroundColor = colors.primary)
+                  }
+                >
+                  Cancel
+                </Button>
+
+                {/* Yes */}
+                <Button
+                  className="flex-1 rounded-3xl transition"
+                  onClick={handleRemove}
+                  disabled={isSubmitting}
+                  style={{
+                    backgroundColor: isSubmitting
+                      ? `${colors.primary}66`
+                      : colors.primary,
+                    color: colors.accent,
+                    cursor: isSubmitting ? "not-allowed" : "pointer",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isSubmitting)
+                      e.currentTarget.style.backgroundColor = colors.secondary;
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isSubmitting)
+                      e.currentTarget.style.backgroundColor = colors.primary;
+                  }}
+                >
+                  {isSubmitting ? "Deleting..." : "Yes"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-
-      <p className="text-sm mb-6" style={{ color: colors.neutral[600] }}>
-        Do you really want to delete this project?
-      </p>
-
-      <div className="flex gap-3">
-        {/* Cancel */}
-        <Button
-          className="flex-1 rounded-3xl transition"
-          onClick={() => setDeleteProjectId(null)}
-          style={{
-            backgroundColor: colors.primary,
-            color: colors.accent,
-          }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.backgroundColor = colors.secondary)
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.backgroundColor = colors.primary)
-          }
-        >
-          Cancel
-        </Button>
-
-        {/* Yes */}
-        <Button
-          className="flex-1 rounded-3xl transition"
-          onClick={handleRemove}
-          disabled={isSubmitting}
-          style={{
-            backgroundColor: isSubmitting ? `${colors.primary}66` : colors.primary,
-            color: colors.accent,
-            cursor: isSubmitting ? "not-allowed" : "pointer",
-          }}
-          onMouseEnter={(e) => {
-            if (!isSubmitting)
-              e.currentTarget.style.backgroundColor = colors.secondary;
-          }}
-          onMouseLeave={(e) => {
-            if (!isSubmitting)
-              e.currentTarget.style.backgroundColor = colors.primary;
-          }}
-        >
-          {isSubmitting ? "Deleting..." : "Yes"}
-        </Button>
-      </div>
-    </div>
-  </div>
-)}
-
-      </div>
+    <Footer />
     </>
   );
 }
-

@@ -1,5 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { colors } from "src/common/Colors";
+import Footer from "../ui/components/Footer";
+
 
 export default function EmailVerifiedSuccess() {
   const navigate = useNavigate();
@@ -24,8 +27,25 @@ export default function EmailVerifiedSuccess() {
   // }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4">
-      <div className="bg-white w-full max-w-md rounded-2xl p-8 text-center">
+    <div className="min-h-screen w-full flex items-center justify-center px-4 relative">
+      
+      {/* 🎨 Linear gradient background - fixed behind everything */}
+      <div 
+        className="pointer-events-none fixed inset-0 -z-10"
+        style={{
+          background: `linear-gradient(
+            to bottom,
+            #d9d9d9 0%,
+            #cfd3d6 25%,
+            #9aa6b2 55%,
+            #2E4056 100%
+          )`,
+          width: "100%",
+        }}
+      />
+      
+      {/* Content Card */}
+      <div className="bg-white w-full max-w-md rounded-2xl p-8 text-center shadow-lg">
         
         {/* Success Icon */}
         <div className="flex justify-center mb-6">
@@ -39,13 +59,13 @@ export default function EmailVerifiedSuccess() {
 
         <p className="text-gray-500 mb-8">
           Your email address has been verified successfully.
-        
         </p>
 
         {/* Button */}
         <button
           onClick={() => navigate("/talent-ranking", { replace: true })}
-          className="w-full h-10 bg-violet-600 text-white rounded-3xl font-semibold hover:bg-violet-700 transition"
+          className="w-full h-10 text-white rounded-3xl font-semibold  transition"
+          style={{ backgroundColor: colors.primary,  color: colors.white,}}
         >
           Welcome To UniTalent
         </button>

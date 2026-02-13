@@ -70,7 +70,7 @@ export const URL_PATH = {
   getEducation: "/user/education",
   deleteEducation: "/user/education",
 
-getunivercitylist: "/universities",
+getunivercitylist: "/user/universities",
 
   /* ---------- WORK EXPERIENCE ---------- */
   experience: "/user/work",

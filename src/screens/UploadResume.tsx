@@ -19,6 +19,8 @@ import API, { URL_PATH } from "src/common/API";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { colors } from "src/common/Colors";
+import Footer from "../ui/components/Footer";
+
 
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
@@ -327,34 +329,20 @@ useEffect(() => {
 
 <div className="min-h-screen w-full flex items-center justify-center px-4 sm:px-6 py-6 sm:py-8 relative overflow-hidden">
   
-  {/* Blended Background Layer */}
-  <div className="pointer-events-none absolute inset-0 -z-10">
-    <div
-      className="absolute inset-0"
-      style={{ backgroundColor: colors.background }}
-    />
-
-    <div
-      className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
+   {/* 🎨 Linear gradient background - fixed behind everything */}
+    <div 
+      className="pointer-events-none fixed inset-0 -z-10"
       style={{
-        background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
+        background: `linear-gradient(
+          to bottom,
+          #d9d9d9 0%,
+          #cfd3d6 25%,
+          #9aa6b2 55%,
+          #2E4056 100%
+        )`,
+        width: "100%",
       }}
     />
-
-    <div
-      className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
-      style={{
-        background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
-      }}
-    />
-
-    <div
-      className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
-      style={{
-        background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
-      }}
-    />
-  </div>
 
       <div className="w-full max-w-[576px] flex flex-col items-start gap-6 rounded-3xl border border-gray-400 bg-white px-4 sm:px-6 md:px-8 py-6 sm:py-8 shadow-[0_12px_30px_rgba(15,15,15,0.06)]">
         {/* Back + Progress Bar */}
@@ -505,6 +493,7 @@ useEffect(() => {
 
       </div>
     </div>
+    <Footer />
   </>
   );
 }

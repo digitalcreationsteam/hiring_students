@@ -31,37 +31,26 @@ import { colors } from "src/common/Colors";
 
 function TalentRankingPlatform() {
   const navigate = useNavigate();
+  
   return (
     <div className="flex min-h-screen w-full flex-col items-center overflow-x-hidden relative">
-      {/* ✅ Blended background - fixed behind everything */}
-      <div className="pointer-events-none fixed inset-0 -z-10">
-        <div
-          className="absolute inset-0"
-          style={{ backgroundColor: colors.background }}
-        />
+      {/* 🎨 Linear gradient background - fixed behind everything */}
+      <div 
+        className="pointer-events-none fixed inset-0 -z-10"
+        style={{
+          background: `linear-gradient(
+            to bottom,
+            #d9d9d9 0%,
+            #cfd3d6 25%,
+            #9aa6b2 55%,
+            #2E4056 100%
+          )`,
+          width: "100%",
+        }}
+      />
 
-        <div
-          className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
-          style={{
-            background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
-          }}
-        />
-
-        <div
-          className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
-          style={{
-            background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
-          }}
-        />
-
-        <div
-          className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
-          style={{
-            background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
-          }}
-        />
-      </div>
-      <div className="flex w-full flex-col items-center px-4 sm:px-6 py-16 sm:py-24 lg:py-32">
+      {/* Hero Section */}
+      <div className="flex w-full flex-col items-center px-4 sm:px-6 py-16 sm:py-24 lg:py-32 relative z-10">
         <div className="flex w-full max-w-[768px] flex-col items-start gap-8">
           <div className="flex flex-col items-start gap-6">
             <Badge
@@ -91,8 +80,8 @@ function TalentRankingPlatform() {
               <div
                 className="flex items-start gap-4 rounded-3xl px-6 py-5 shadow-lg"
                 style={{
-                  backgroundColor: `${colors.primary}14`, // soft brand tint
-                  border: `1px solid ${colors.primary}40`,
+                  backgroundColor: `${colors.white}`,
+                  border: `1px solid ${colors.primary}60`,
                 }}
               >
                 <div className="flex grow shrink-0 basis-0 flex-col items-start gap-3">
@@ -198,10 +187,8 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
         </div>
       </div>
 
-      <div
-        className="flex w-full flex-col items-center px-6 py-24"
-        style={{ backgroundColor: colors.background }}
-      >
+      {/* How It Works Section - Keep white background cards on gradient */}
+      <div className="flex w-full flex-col items-center px-6 py-24 relative z-10">
         <div className="flex w-full max-w-[1280px] flex-col items-start gap-12">
           {/* Heading */}
           <div className="flex flex-col items-start gap-3">
@@ -223,11 +210,11 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
             </span>
           </div>
 
-          {/* Cards */}
+          {/* Cards - All white with shadows */}
           <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {/* Step 1 */}
             <div
-              className="flex grow flex-col items-start gap-4 rounded-3xl px-6 py-6 shadow-sm"
+              className="flex grow flex-col items-start gap-4 rounded-3xl px-6 py-6 shadow-lg"
               style={{
                 backgroundColor: colors.white,
                 border: `1px solid ${colors.neutral[200]}`,
@@ -236,7 +223,7 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
               <div
                 className="flex h-10 w-10 items-center justify-center rounded-full font-medium"
                 style={{
-                  backgroundColor: `${colors.primary}34`, // soft tint
+                  backgroundColor: `${colors.primary}34`,
                   color: colors.accent,
                 }}
               >
@@ -261,42 +248,66 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
             </div>
 
             {/* Step 2 */}
-            <div className="flex grow flex-col items-start gap-4 rounded-3xl border border-neutral-200 bg-white px-6 py-6 shadow-sm">
+            <div 
+              className="flex grow flex-col items-start gap-4 rounded-3xl px-6 py-6 shadow-lg"
+              style={{
+                backgroundColor: colors.white,
+                border: `1px solid ${colors.neutral[200]}`,
+              }}
+            >
               <div
                 className="flex h-10 w-10 items-center justify-center rounded-full font-medium"
                 style={{
-                  backgroundColor: `${colors.primary}34`, // soft tint
+                  backgroundColor: `${colors.primary}34`,
                   color: colors.accent,
                 }}
               >
                 2
               </div>
               <div className="flex flex-col items-start gap-2">
-                <span className="font-['Inter'] text-[22px] font-[600] leading-[22px] text-default-font">
+                <span 
+                  className="font-['Inter'] text-[22px] font-[600] leading-[22px]"
+                  style={{ color: colors.accent }}
+                >
                   Score Generation
                 </span>
-                <span className="font-['Inter'] text-[16px] leading-[22px] text-neutral-600">
+                <span 
+                  className="font-['Inter'] text-[16px] leading-[22px]"
+                  style={{ color: colors.neutral[600] }}
+                >
                   The system processes inputs to generate your Experience Index.
                 </span>
               </div>
             </div>
 
             {/* Step 3 */}
-            <div className="flex grow flex-col items-start gap-4 rounded-3xl border border-neutral-200 bg-white px-6 py-6 shadow-sm">
+            <div 
+              className="flex grow flex-col items-start gap-4 rounded-3xl px-6 py-6 shadow-lg"
+              style={{
+                backgroundColor: colors.white,
+                border: `1px solid ${colors.neutral[200]}`,
+              }}
+            >
               <div
                 className="flex h-10 w-10 items-center justify-center rounded-full font-medium"
                 style={{
-                  backgroundColor: `${colors.primary}34`, // soft tint
+                  backgroundColor: `${colors.primary}34`,
                   color: colors.accent,
                 }}
               >
                 3
               </div>
               <div className="flex flex-col items-start gap-2">
-                <span className="font-['Inter'] text-[22px] font-[600] leading-[22px] text-default-font">
+                <span 
+                  className="font-['Inter'] text-[22px] font-[600] leading-[22px]"
+                  style={{ color: colors.accent }}
+                >
                   Skill Assessment
                 </span>
-                <span className="font-['Inter'] text-[16px] leading-[22px] text-neutral-600">
+                <span 
+                  className="font-['Inter'] text-[16px] leading-[22px]"
+                  style={{ color: colors.neutral[600] }}
+                >
                   A role-specific assessment measures current job-ready
                   capability and provides you with the Skill Index.
                 </span>
@@ -304,21 +315,33 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
             </div>
 
             {/* Step 4 */}
-            <div className="flex grow flex-col items-start gap-4 rounded-3xl border border-neutral-200 bg-white px-6 py-6 shadow-sm">
+            <div 
+              className="flex grow flex-col items-start gap-4 rounded-3xl px-6 py-6 shadow-lg"
+              style={{
+                backgroundColor: colors.white,
+                border: `1px solid ${colors.neutral[200]}`,
+              }}
+            >
               <div
                 className="flex h-10 w-10 items-center justify-center rounded-full font-medium"
                 style={{
-                  backgroundColor: `${colors.primary}34`, // soft tint
+                  backgroundColor: `${colors.primary}34`,
                   color: colors.accent,
                 }}
               >
                 4
               </div>
               <div className="flex flex-col items-start gap-2">
-                <span className="font-['Inter'] text-[22px] font-[600] leading-[22px] text-default-font">
+                <span 
+                  className="font-['Inter'] text-[22px] font-[600] leading-[22px]"
+                  style={{ color: colors.accent }}
+                >
                   Recruiter Access
                 </span>
-                <span className="font-['Inter'] text-[16px] leading-[22px] text-neutral-600">
+                <span 
+                  className="font-['Inter'] text-[16px] leading-[22px]"
+                  style={{ color: colors.neutral[600] }}
+                >
                   Your aggregated indexes feed into UniTalent’s ranking system,
                   enabling recruiters to efficiently discover high-performing
                   candidates.
@@ -329,7 +352,8 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
         </div>
       </div>
 
-      <div className="flex w-full flex-col items-center px-4 py-16 sm:px-6 sm:py-24 lg:py-32">
+      {/* Three-Score Architecture Section */}
+      <div className="flex w-full flex-col items-center px-4 py-16 sm:px-6 sm:py-24 lg:py-32 relative z-10">
         <div className="flex w-full max-w-[1280px] flex-col items-start gap-16">
           <div className="flex flex-col items-start gap-4">
             <span
@@ -351,6 +375,7 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
           </div>
 
           <div className="flex w-full flex-col items-start gap-8">
+            {/* Experience Index Card */}
             <div className="flex w-full flex-col items-center gap-6 md:flex-row md:items-start">
               <div className="flex w-16 rounded-xl flex-col items-center pt-2">
                 <IconWithBackground
@@ -372,6 +397,7 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
                   border: `1px solid ${colors.neutral[200]}`,
                 }}
               >
+                {/* ... Experience Index content remains the same ... */}
                 <div className="flex flex-col items-start gap-3">
                   <span
                     className="font-['Inter'] text-[30px] font-[600] leading-[36px] -tracking-[0.02em]"
@@ -464,6 +490,7 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
               </div>
             </div>
 
+            {/* Skill Index Card */}
             <div className="flex w-full flex-col items-center gap-6 md:flex-row md:items-start">
               <div className="flex w-16 flex-none flex-col items-center pt-2">
                 <IconWithBackground
@@ -486,6 +513,7 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
                   border: `1px solid ${colors.neutral[200]}`,
                 }}
               >
+                {/* ... Skill Index content remains the same ... */}
                 <div className="flex flex-col items-start gap-3">
                   <span
                     className="font-['Inter'] text-[30px] font-[600] leading-[36px] -tracking-[0.02em]"
@@ -578,6 +606,7 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
               </div>
             </div>
 
+            {/* Hireability Index Card */}
             <div className="flex w-full flex-col items-center gap-6 md:flex-row md:items-start">
               <div className="flex w-16 flex-none flex-col items-center pt-2">
                 <IconWithBackground
@@ -600,6 +629,7 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
                   border: `1px solid ${colors.neutral[200]}`,
                 }}
               >
+                {/* ... Hireability Index content remains the same ... */}
                 <div className="flex flex-col items-start gap-3">
                   <span
                     className="font-['Inter'] text-[30px] font-[600] leading-[36px] -tracking-[0.02em]"
@@ -633,7 +663,7 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
                     The Hireability Index is your central score — the number
                     that pulls together your skills and your hard-earned
                     experience to show the world exactly how job-ready you are.
-                    It’s what determines your rank in your university, city,
+                    It's what determines your rank in your university, city,
                     state, and across the entire country — helping recruiters
                     instantly spot the best talent at the most granular level.
                     No more getting lost in a stack of résumés. Your ability
@@ -651,7 +681,7 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
                       className="font-['Inter'] text-[14px] font-[500] leading-[20px] -tracking-[0.01em]"
                       style={{ color: colors.accent }}
                     >
-                      How It’s Measured
+                      How It's Measured
                     </span>
 
                     <div className="flex flex-col items-start gap-3">
@@ -690,10 +720,8 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
         </div>
       </div>
 
-      <div
-        className="flex w-full flex-col items-center px-6 py-24 shadow-lg"
-        style={{ backgroundColor: colors.background }}
-      >
+      {/* Global Benchmarking Layer - Keep cards white */}
+      <div className="flex w-full flex-col items-center px-6 py-24 relative z-10">
         <div className="flex w-full max-w-[1280px] flex-col items-start gap-12">
           <div className="flex flex-col items-start gap-4">
             <span
@@ -723,12 +751,13 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
           </div>
 
           <div
-            className="flex w-full flex-col items-start gap-6 rounded-3xl px-8 py-8"
+            className="flex w-full flex-col items-start gap-6 rounded-3xl px-8 py-8 shadow-lg"
             style={{
               backgroundColor: colors.white,
               border: `1px solid ${colors.neutral[200]}`,
             }}
           >
+            {/* ... Ranking Structure content remains the same ... */}
             <div className="flex flex-col items-start gap-2">
               <span
                 className="font-['Inter'] text-[20px] font-[600] leading-[28px] -tracking-[0.01em]"
@@ -944,10 +973,8 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
         </div>
       </div>
 
-      <div
-        className="flex w-full flex-col items-center px-6 py-24"
-        style={{ backgroundColor: colors.background }}
-      >
+      {/* Impact on Hiring Operations - Keep cards white */}
+      <div className="flex w-full flex-col items-center px-6 py-24 relative z-10">
         <div className="flex w-full max-w-[768px] flex-col items-start gap-12">
           <span
             className="font-['Inter'] text-[26px] sm:text-[32px] lg:text-[40px] font-[600] leading-tight sm:leading-[40px] lg:leading-[48px] -tracking-[0.04em]"
@@ -957,7 +984,7 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
           </span>
 
           <div
-            className="flex w-full flex-col items-start gap-6 rounded-3xl px-8 py-8 shadow-sm"
+            className="flex w-full flex-col items-start gap-6 rounded-3xl px-8 py-8 shadow-lg"
             style={{
               backgroundColor: colors.white,
               border: `1px solid ${colors.neutral[200]}`,
@@ -1010,10 +1037,8 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
         </div>
       </div>
 
-      <div
-        className="flex w-full flex-col items-center px-6 py-24"
-        style={{ backgroundColor: colors.background }}
-      >
+      {/* CTA Section */}
+      <div className="flex w-full flex-col items-center px-6 py-24 relative z-10">
         <div className="flex w-full max-w-[768px] flex-col items-center gap-8 text-center">
           <div className="flex flex-col items-center gap-4">
             <span
@@ -1033,7 +1058,7 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
           <Button
             size="large"
             onClick={() => navigate("/paywall")}
-            className="w-full h-11 sm:h-12 rounded-3xl text-[15px] sm:text-[16px] font-semibold transition active:scale-[0.99]"
+            className="w-full h-11 sm:h-12 rounded-3xl text-[15px] sm:text-[16px] font-semibold transition active:scale-[0.99] shadow-lg"
             style={{
               backgroundColor: colors.primary,
               color: colors.white,
@@ -1051,14 +1076,16 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
         </div>
       </div>
 
+      {/* Footer - Keep white background */}
       <div
-        className="w-full px-6 py-12"
+        className="w-full px-6 py-12 relative z-10"
         style={{
           borderTop: `1px solid ${colors.neutral[200]}`,
-          backgroundColor: colors.background,
+          backgroundColor: colors.white,
         }}
       >
         <div className="mx-auto grid w-full max-w-[1024px] grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
+          {/* ... Footer content remains exactly the same ... */}
           {/* Brand */}
           <div className="flex w-full flex-col gap-4 items-center sm:items-start">
             <div className="flex items-center gap-3">
