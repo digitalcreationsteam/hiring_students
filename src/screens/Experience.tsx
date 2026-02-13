@@ -27,12 +27,9 @@ import "react-toastify/dist/ReactToastify.css";
 import * as SubframeCore from "@subframe/core";
 import { FeatherChevronDown } from "@subframe/core";
 import { colors } from "src/common/Colors";
-<<<<<<< HEAD
 import Navbar from "src/ui/components/Navbar";
-=======
 import Footer from "../ui/components/Footer";
 
->>>>>>> aditya
 
 const ROLE_TITLES = [
   { label: "Internship", value: "internship" },
