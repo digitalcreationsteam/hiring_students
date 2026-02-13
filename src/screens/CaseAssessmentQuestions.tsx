@@ -11,6 +11,8 @@ import { FeatherClock } from "@subframe/core";
 import { FeatherSidebar } from "@subframe/core";
 import { FeatherX } from "@subframe/core";
 import { colors } from "src/common/Colors";
+import Navbar from "src/ui/components/Navbar";
+import Footer from "src/ui/components/Footer";
 
 type Option = {
   key: string;
@@ -223,35 +225,23 @@ export default function CaseAssessmentQuestions() {
   );
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div
+    style={{
+      background: `linear-gradient(
+        to bottom,
+        #d9d9d9 0%,
+        #cfd3d6 25%,
+        #9aa6b2 55%,
+        #2E4056 100%
+      )`,
+      width: "100%",
+    }}
+    className="min-h-screen relative overflow-hidden">
+
+      <div className="w-full relative" style={{ borderColor: colors.aqua }}>
+          <Navbar />
+        </div>
       {/* Blended background - Covers entire page */}
-      <div className="pointer-events-none absolute inset-0">
-        <div
-          className="absolute inset-0"
-          style={{ backgroundColor: colors.background }}
-        />
-
-        <div
-          className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
-          style={{
-            background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
-          }}
-        />
-
-        <div
-          className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
-          style={{
-            background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
-          }}
-        />
-
-        <div
-          className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
-          style={{
-            background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
-          }}
-        />
-      </div>
 
       {/* Header and content with z-index to stay above background */}
       <div className="relative z-10">
@@ -519,6 +509,7 @@ export default function CaseAssessmentQuestions() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

@@ -506,7 +506,7 @@ const Navbar = () => {
             /* Other pages → only Logout */
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-5 py-2 rounded-lg font-semibold transition-all duration-300 hover:bg-red-50 text-red-600"
+              className="flex items-center gap-2 px-5 py-2 rounded-lg font-semibold transition-all duration-300 bg-red-50 text-red-600"
             >
               <LogOut size={18} />
               Logout

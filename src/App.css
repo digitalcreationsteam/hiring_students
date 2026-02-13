@@ -55,13 +55,13 @@
 }
 
 * {
-  font-family: 'Inter', sans-serif;
+  font-family: "DM Sans", sans-serif;
 }
 
 
-.inter-font-family {
+/* .inter-font-family {
   font-family: 'Inter', sans-serif;
-}
+} */
 
 
 /* Add to your global CSS file */

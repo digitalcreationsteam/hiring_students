@@ -1,69 +1,10 @@
-// import React, { useEffect } from "react";
-// import { useLocation, useNavigate } from "react-router-dom";
-// import { Button } from "../ui/components/Button";
-
-// export default function CaseAssessmentScore() {
-//   const { state } = useLocation();
-// const { attemptId, caseId, score, retryAvailable } = state || {};
-//   const navigate = useNavigate();
-
-//    useEffect(() => {
-//     console.log("Full state from navigation:", state);
-//     console.log("attemptId:", attemptId);
-//     console.log("caseId:", caseId);
-//   }, [state, attemptId, caseId]);
-
-// //   React.useEffect(() => {
-// //   if (score === undefined) {
-
-// //     navigate("/case-assessments");
-// //   }
-// // }, [score, navigate]);
-
-
-// if (score === undefined) return null;
-
-//   return (
-//     <div className="min-h-screen flex items-center justify-center bg-neutral-50 p-6">
-//       <div className="bg-white p-8 rounded-3xl shadow-sm max-w-md text-center">
-
-//         <h1 className="text-2xl font-bold mb-4">Case Assessment Completed 🎉</h1>
-
-//         <p className="text-lg mb-6">
-//           Your Score: <strong>{score}</strong>
-//         </p>
-
-//         <div className="flex flex-col gap-3">
-//           <Button
-//             className="bg-violet-600 text-white rounded-xl"
-//             // onClick={() => navigate("/case-assessment-revel")}
-//             onClick={() => {
-//                console.log("Navigating to reveal page with caseId:", caseId);
-//                 navigate(`/case-assessment-revel/${caseId}`)
-//             }}
-//           >
-//             Reveal
-//           </Button>
-
-//           {retryAvailable && (
-//             <Button
-//               variant="neutral-secondary"
-//               onClick={() => navigate("/case-assessments")}
-//             >
-//               Retry Case Assessment
-//             </Button>
-//           )}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
 import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../ui/components/Button";
 import { FeatherCheckCircle, FeatherEye, FeatherRefreshCw, FeatherHome, FeatherArrowLeft } from "@subframe/core";
 import { colors } from "src/common/Colors";
+import Navbar from "src/ui/components/Navbar";
+import Footer from "src/ui/components/Footer";
 
 export default function CaseAssessmentScore() {
   const { state } = useLocation();
@@ -108,7 +49,8 @@ export default function CaseAssessmentScore() {
             }}
           />
         </div>
-
+        {/* Blended background */}
+        
         <div className="relative z-10 flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="text-lg text-gray-700 mb-4">Loading score...</div>
@@ -149,36 +91,24 @@ export default function CaseAssessmentScore() {
   const scoreCategory = getScoreCategory(score);
 
   return (
-    <div className="min-h-screen bg-neutral-50 relative overflow-hidden">
+    <div
+    style={{
+      background: `linear-gradient(
+        to bottom,
+        #d9d9d9 0%,
+        #cfd3d6 25%,
+        #9aa6b2 55%,
+        #2E4056 100%
+      )`,
+      width: "100%",
+    }}
+    className="min-h-screen bg-neutral-50 relative overflow-hidden">
+
+      <div className="w-full relative" style={{ borderColor: colors.aqua }}>
+          <Navbar />
+        </div>
       {/* Blended background - Covers entire page */}
-      <div className="pointer-events-none absolute inset-0">
-        <div
-          className="absolute inset-0"
-          style={{ backgroundColor: colors.background }}
-        />
-
-        <div
-          className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
-          style={{
-            background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
-          }}
-        />
-
-        <div
-          className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
-          style={{
-            background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
-          }}
-        />
-
-        <div
-          className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
-          style={{
-            background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
-          }}
-        />
-      </div>
-
+      
       {/* Header and content with z-index to stay above background */}
       <div className="relative z-10">
         <div className="min-h-screen w-full flex justify-center px-4 py-4 sm:py-6 lg:py-12">
@@ -344,6 +274,7 @@ export default function CaseAssessmentScore() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

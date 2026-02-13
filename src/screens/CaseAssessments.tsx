@@ -17,6 +17,8 @@ import {
 } from "@subframe/core";
 import HeaderLogo from "src/ui/components/HeaderLogo";
 import { useRef } from "react";
+import Navbar from "src/ui/components/Navbar";
+import Footer from "src/ui/components/Footer";
 
 
 /* ==================== TYPES ==================== */
@@ -325,39 +327,27 @@ const [startingCaseId, setStartingCaseId] = useState<string | null>(null);
 
   /* ==================== UI ==================== */
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div
+    style={{
+      background: `linear-gradient(
+        to bottom,
+        #d9d9d9 0%,
+        #cfd3d6 25%,
+        #9aa6b2 55%,
+        #2E4056 100%
+      )`,
+      width: "100%",
+    }}
+    className="min-h-screen relative overflow-hidden">
       {/* Blended background - Covers entire page */}
-      <div className="pointer-events-none absolute inset-0">
-        <div
-          className="absolute inset-0"
-          style={{ backgroundColor: colors.background || "#f8fafc" }}
-        />
-
-        <div
-          className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
-          style={{
-            background: `radial-gradient(circle at 60% 60%, ${colors.primary || "#7c3aed"}AA, transparent 52%)`,
-          }}
-        />
-
-        <div
-          className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
-          style={{
-            background: `radial-gradient(circle at 50% 30%, ${colors.secondary || "#4f46e5"}99, transparent 62%)`,
-          }}
-        />
-
-        <div
-          className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
-          style={{
-            background: `radial-gradient(circle at 50% 50%, ${colors.accent || "#ec4899"}44, transparent 62%)`,
-          }}
-        />
-      </div>
+      
+      <div className="w-full relative" style={{ borderColor: colors.aqua }}>
+          <Navbar />
+        </div>
 
       {/* Header and content with z-index to stay above background */}
       <div className="relative z-10">
-        <HeaderLogo />
+        {/* <HeaderLogo /> */}
         
         <div className="flex min-h-screen w-full justify-center px-4 sm:px-6 lg:px-8 py-0 sm:py-0">
           <div className="mx-auto flex w-full max-w-[1200px] flex-col items-start gap-6 sm:gap-8 py-8">
@@ -467,6 +457,7 @@ const [startingCaseId, setStartingCaseId] = useState<string | null>(null);
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

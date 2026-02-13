@@ -57,6 +57,7 @@ import {
   FeatherLogOut,
 } from "@subframe/core";
 import Navbar from "src/ui/components/Navbar";
+import Footer from "src/ui/components/Footer";
 // import HeaderLogo from "@/ui/components/HeaderLogo";
 
 /* ==================== TYPES ==================== */
@@ -516,37 +517,20 @@ export default function Dashboard() {
     <>
       <ToastContainer position="top-center" autoClose={3000} />
       <div
-        className="min-h-screen w-full overflow-y-auto pb-12 relative"
-        style={{ backgroundColor: colors.white,  fontFamily: "'Inter', sans-serif" }}
+      style={{
+    background: `linear-gradient(
+      to bottom,
+      #d9d9d9 0%,
+      #cfd3d6 25%,
+      #9aa6b2 55%,
+      #2E4056 100%
+    )`,
+    width: "100%",
+    fontFamily: "'Poppins', sans-serif",
+  }}
+        className="min-h-screen w-full relative"
+        // style={{ backgroundColor: colors.white,  fontFamily: "'Inter', sans-serif" }}
       >
-        {/* Blended background */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div
-            className="absolute inset-0"
-            // style={{ backgroundColor: colors.background }}
-          />
-
-          <div
-            className="absolute -top-40 -left-40 h-[560px] w-[560px] rounded-full blur-3xl opacity-55"
-            // style={{
-            //   background: `radial-gradient(circle at 60% 60%, ${colors.primary}AA, transparent 52%)`,
-            // }}
-          />
-
-          <div
-            className="absolute -top-48 right-[-220px] h-[680px] w-[680px] rounded-full blur-3xl opacity-35"
-            // style={{
-            //   background: `radial-gradient(circle at 50% 30%, ${colors.secondary}99, transparent 62%)`,
-            // }}
-          />
-
-          <div
-            className="absolute bottom-[-260px] left-[15%] h-[760px] w-[760px] rounded-full blur-3xl opacity-20"
-            // style={{
-            //   background: `radial-gradient(circle at 50% 50%, ${colors.accent}44, transparent 62%)`,
-            // }}
-          />
-        </div>
 
         {/* TOP WELCOME BANNER */}
         <div className="w-full relative" style={{ borderColor: colors.aqua }}>
@@ -564,6 +548,7 @@ export default function Dashboard() {
                   backgroundColor: colors.white,
                   border: `1.5px solid ${colors.primaryGlow}`
                 }}
+                
               >
                 <CardContent className="px-6 py-8 flex w-full flex-col items-center gap-3">
                   {/* Avatar Section */}
@@ -1652,6 +1637,7 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+        <Footer />
       </div>
     </>
     // </DefaultPageLayout>

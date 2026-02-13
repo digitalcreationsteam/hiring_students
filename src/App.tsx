@@ -45,6 +45,7 @@ import CaseAssessmentRevel from "./screens/CaseAssessmentRevel";
 import PaymentProcessing from "./ui/components/PaymentProcessing";
 
 import "./App.css";
+import NotFound from "./screens/NotFound";
 
 const router = createBrowserRouter([
   {
@@ -317,6 +318,10 @@ const router = createBrowserRouter([
     ),
   },
 
+  {
+  path: "*",
+  element: <NotFound />,
+}
 
 ]);
 
