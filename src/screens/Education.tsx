@@ -418,9 +418,8 @@ export default function Education() {
   const [startYear, setStartYear] = useState("");
   const [endYear, setEndYear] = useState("");
   const [currentlyStudying, setStudying] = useState(false);
-  const [gpa, setGpa] = useState("");
-  const [cgpa, setCGpa] = useState("");
-  const [gradeSystem, setGradeSystem] = useState<"gpa" | "cgpa">("gpa"); // New state for grade system
+  const [gradeType, setGradeType] = useState<"gpa" | "cgpa">("gpa"); // Dropdown selection
+  const [gradeValue, setGradeValue] = useState(""); // Single input field
 
   const [isExpIndexLoading, setIsExpIndexLoading] = useState(true);
   const [experiencePoints, setExperiencePoints] =
@@ -450,45 +449,33 @@ export default function Education() {
         return "End year must be after start year";
     }
 
-    // Check if at least one grade is provided
-    const hasGPA = gpa.trim().length > 0;
-    const hasCGPA = cgpa.trim().length > 0;
+// Check if grade value is provided
+if (!gradeValue.trim() || gradeValue.trim().length === 0) {
+  return `Please enter ${gradeType === "gpa" ? "GPA" : "CGPA"}`;
+}
 
-    if (!hasGPA && !hasCGPA) {
-      return "Please enter either GPA or CGPA";
-    }
-
-    // If both are entered, ask user to choose one
-    if (hasGPA && hasCGPA) {
-      return "Please enter only one: either GPA (4.0 scale) or CGPA (10.0 scale)";
-    }
-
-    // Validate GPA if provided (0-4 scale)
-    if (hasGPA) {
-      if (!/^(4(\.0{1,2})?|[0-3](\.[0-9]{1,2})?)$/.test(gpa))
-        return "GPA must be between 0 and 4.0 (e.g., 3.5, 4.0)";
-    }
-
-    // Validate CGPA if provided (0-10 scale)
-    if (hasCGPA) {
-      if (!/^(10(\.0{1,2})?|[0-9](\.\d{1,2})?)$/.test(cgpa))
-        return "CGPA must be between 0 and 10 (e.g., 7.5, 9.2)";
-    }
+// Validate based on selected type
+if (gradeType === "gpa") {
+  if (!/^(4(\.0{1,2})?|[0-3](\.[0-9]{1,2})?)$/.test(gradeValue))
+    return "GPA must be between 0 and 4.0 (e.g., 3.5, 4.0)";
+} else {
+  if (!/^(10(\.0{1,2})?|[0-9](\.\d{1,2})?)$/.test(gradeValue))
+    return "CGPA must be between 0 and 10 (e.g., 7.5, 9.2)";
+}
 
     return null;
   };
 
-  const resetForm = () => {
-    setDegree("");
-    setFieldOfStudy("");
-    setSchoolName("");
-    setStartYear("");
-    setEndYear("");
-    setStudying(false);
-    setGpa("");
-    setCGpa("");
-    setGradeSystem("gpa");
-  };
+ const resetForm = () => {
+  setDegree("");
+  setFieldOfStudy("");
+  setSchoolName("");
+  setStartYear("");
+  setEndYear("");
+  setStudying(false);
+  setGradeType("gpa");
+  setGradeValue("");
+};
 
   const hasEducationOverlap = () => {
     const newStart = Number(startYear);
@@ -581,22 +568,22 @@ export default function Education() {
       : Number(endYear) - Number(startYear);
 
     // ✅ API payload - include both GPA and CGPA
-    const payload = {
-      educations: [
-        {
-          degree,
-          fieldOfStudy: toTitleCase(fieldOfStudy),
-          schoolName: toTitleCase(schoolName),
-          startYear: Number(startYear),
-          endYear: currentlyStudying ? null : Number(endYear),
-          currentlyStudying,
-          duration,
-          gpa: gpa ? Number(gpa) : null,
-          cgpa: cgpa ? Number(cgpa) : null,
-          gradeSystem: gradeSystem, // Send which system was used
-        },
-      ],
-    };
+ const payload = {
+  educations: [
+    {
+      degree,
+      fieldOfStudy: toTitleCase(fieldOfStudy),
+      schoolName: toTitleCase(schoolName),
+      startYear: Number(startYear),
+      endYear: currentlyStudying ? null : Number(endYear),
+      currentlyStudying,
+      duration,
+      gpa: gradeType === "gpa" ? Number(gradeValue) : null,
+      cgpa: gradeType === "cgpa" ? Number(gradeValue) : null,
+      gradeSystem: gradeType, // Send which system was used
+    },
+  ],
+};
 
     try {
       setIsSubmitting(true);
@@ -1540,11 +1527,16 @@ export default function Education() {
                             </div>
 
                             {ed.gpa && (
-                              <div>
-                                <span className="font-medium">GPA:</span>{" "}
-                                {ed.gpa}
-                              </div>
-                            )}
+  <div>
+    <span className="font-medium">GPA:</span> {ed.gpa}
+  </div>
+)}
+
+{ed.cgpa && (
+  <div>
+    <span className="font-medium">CGPA:</span> {ed.cgpa}
+  </div>
+)}
                           </div>
                         </>
                       )}
@@ -1706,57 +1698,87 @@ export default function Education() {
                 </div>
 
                 {/* GPA Field - US 4-point scale */}
-                <TextField
-                  className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-                  label={<span className="text-[12px]">GPA</span>}
-                >
-                  <TextField.Input
-                    className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0"
-                    placeholder="e.g., 3.8 (out of 4)"
-                    value={gpa}
-                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) => {
-                      const value = ev.target.value.replace(/[^0-9.]/g, "");
-                      const decimalCount = (value.match(/\./g) || []).length;
-                      if (decimalCount <= 1) {
-                        setGpa(value);
-                        if (value && cgpa) {
-                          setCGpa("");
-                        }
-                      }
-                    }}
-                  />
-                </TextField>
+                {/* Grade Type Selector Dropdown */}
+<div className="flex flex-col gap-1">
+  <label className="text-[12px] font-medium text-neutral-900">
+    Grade System <span className="text-red-500">*</span>
+  </label>
 
-                              {/* ✅ OR Divider (ADD THIS) */}
-              <div className="flex items-center gap-3 my-1">
-                <div className="flex-1 h-px bg-neutral-300" />
-                <span className="text-[11px] text-neutral-500 font-medium tracking-wide">
-                  OR
-                </span>
-                <div className="flex-1 h-px bg-neutral-300" />
-              </div>
+  <SubframeCore.DropdownMenu.Root>
+    <SubframeCore.DropdownMenu.Trigger asChild>
+      <div
+        className="flex h-9 items-center justify-between rounded-full border border-neutral-300 px-3 cursor-pointer hover:bg-neutral-50"
+        style={{ backgroundColor: colors.white }}
+      >
+        <span
+          className="text-[12px]"
+          style={{ color: gradeType ? colors.accent : "#9CA3AF" }}
+        >
+          {gradeType === "gpa" ? "GPA (4.0 scale)" : "CGPA (10.0 scale)"}
+        </span>
 
-                {/* CGPA Field - Indian 10-point scale */}
-                <TextField
-                  className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-                  label={<span className="text-[12px]">CGPA</span>}
-                >
-                  <TextField.Input
-                    className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0"
-                    placeholder="e.g., 7.8 (out of 10)"
-                    value={cgpa}
-                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) => {
-                      const value = ev.target.value.replace(/[^0-9.]/g, "");
-                      const decimalCount = (value.match(/\./g) || []).length;
-                      if (decimalCount <= 1) {
-                        setCGpa(value);
-                        if (value && gpa) {
-                          setGpa("");
-                        }
-                      }
-                    }}
-                  />
-                </TextField>
+        <FeatherChevronDown style={{ color: "#6B7280" }} />
+      </div>
+    </SubframeCore.DropdownMenu.Trigger>
+
+    <SubframeCore.DropdownMenu.Portal>
+      <SubframeCore.DropdownMenu.Content
+        sideOffset={4}
+        align="start"
+        className="bg-white text-neutral-900 rounded-2xl shadow-lg py-1 border border-neutral-300 min-w-[200px]"
+        style={{ zIndex: 999999 }}
+      >
+        <SubframeCore.DropdownMenu.Item
+          className="px-4 py-2 text-sm text-neutral-900 cursor-pointer hover:bg-neutral-100 outline-none"
+          onSelect={() => {
+            setGradeType("gpa");
+            setGradeValue(""); // Clear value when switching
+          }}
+        >
+          GPA (4.0 scale)
+        </SubframeCore.DropdownMenu.Item>
+
+        <SubframeCore.DropdownMenu.Item
+          className="px-4 py-2 text-sm text-neutral-900 cursor-pointer hover:bg-neutral-100 outline-none"
+          onSelect={() => {
+            setGradeType("cgpa");
+            setGradeValue(""); // Clear value when switching
+          }}
+        >
+          CGPA (10.0 scale)
+        </SubframeCore.DropdownMenu.Item>
+      </SubframeCore.DropdownMenu.Content>
+    </SubframeCore.DropdownMenu.Portal>
+  </SubframeCore.DropdownMenu.Root>
+</div>
+
+{/* Single Grade Input Field */}
+<TextField
+  className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
+  label={
+    <span className="text-[12px]">
+      {gradeType === "gpa" ? "GPA" : "CGPA"}{" "}
+      <span className="text-red-500">*</span>
+    </span>
+  }
+>
+  <TextField.Input
+    className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0"
+    placeholder={
+      gradeType === "gpa"
+        ? "e.g., 3.8 (out of 4)"
+        : "e.g., 7.8 (out of 10)"
+    }
+    value={gradeValue}
+    onChange={(ev: React.ChangeEvent<HTMLInputElement>) => {
+      const value = ev.target.value.replace(/[^0-9.]/g, "");
+      const decimalCount = (value.match(/\./g) || []).length;
+      if (decimalCount <= 1) {
+        setGradeValue(value);
+      }
+    }}
+  />
+</TextField>
                 
                 <div className="mt-2 flex flex-col sm:flex-row gap-3 items-center">
                   <Button
