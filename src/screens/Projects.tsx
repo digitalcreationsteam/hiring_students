@@ -1332,21 +1332,21 @@ export default function Projects() {
                   disabled={isSubmitting}
                   style={{
                     backgroundColor: isSubmitting
-                      ? `${colors.primary}66`
-                      : colors.primary,
+                      ? `${colors.red}66`
+                      : colors.red,
                     color: colors.accent,
                     cursor: isSubmitting ? "not-allowed" : "pointer",
                   }}
                   onMouseEnter={(e) => {
                     if (!isSubmitting)
-                      e.currentTarget.style.backgroundColor = colors.secondary;
+                      e.currentTarget.style.backgroundColor = colors.red;
                   }}
                   onMouseLeave={(e) => {
                     if (!isSubmitting)
-                      e.currentTarget.style.backgroundColor = colors.primary;
+                      e.currentTarget.style.backgroundColor = colors.red;
                   }}
                 >
-                  {isSubmitting ? "Deleting..." : "Yes"}
+                  {isSubmitting ? "Deleting..." : "Delete"}
                 </Button>
               </div>
             </div>

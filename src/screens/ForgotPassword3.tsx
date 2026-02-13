@@ -4,6 +4,9 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import API, { URL_PATH } from "../common/API";
 import { colors } from "src/common/Colors";
+import Navbar from "src/ui/components/Navbar";
+import Footer from "../ui/components/Footer";
+
 
 
 export default function SetNewPassword() {
@@ -73,6 +76,8 @@ export default function SetNewPassword() {
   return (
     <>
     <ToastContainer position="top-center" autoClose={2000}/>
+    <Navbar />
+
 <div className="min-h-screen flex items-center justify-center px-4 relative">
   {/* 🎨 Linear gradient background - fixed behind everything */}
     <div 
@@ -177,6 +182,10 @@ onBlur={(e) => {
 
       </div>
     </div>
+    
+  <div>
+        <Footer />
+      </div>
     </>
   );
 }

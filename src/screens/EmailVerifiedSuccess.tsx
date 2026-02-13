@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { colors } from "src/common/Colors";
+import Navbar from "src/ui/components/Navbar";
+
 import Footer from "../ui/components/Footer";
 
 
@@ -27,6 +29,7 @@ export default function EmailVerifiedSuccess() {
   // }, [navigate]);
 
   return (
+    <>
     <div className="min-h-screen w-full flex items-center justify-center px-4 relative">
       
       {/* 🎨 Linear gradient background - fixed behind everything */}
@@ -71,5 +74,9 @@ export default function EmailVerifiedSuccess() {
         </button>
       </div>
     </div>
+      <div>
+        <Footer />
+      </div>
+      </>
   );
 }

@@ -8,6 +8,8 @@ import { FeatherClock, FeatherMailCheck } from "@subframe/core";
 
 import API, { URL_PATH } from "src/common/API";
 import { colors } from "src/common/Colors";
+import Navbar from "src/ui/components/Navbar";
+
 import Footer from "../ui/components/Footer";
 
 
@@ -131,6 +133,9 @@ useEffect(() => {
 
 
 return (
+  <>
+  <Navbar />
+
   <div className="flex min-h-screen w-full items-center justify-center py-12 px-4 relative">
 
     {/* 🎨 Linear gradient background - fixed behind everything */}
@@ -213,6 +218,11 @@ return (
         </div>
       </div>
     </div>
+    
+  <div>
+        <Footer />
+      </div>
+      </>
   );
 }
 
