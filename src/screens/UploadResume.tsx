@@ -19,6 +19,7 @@ import API, { URL_PATH } from "src/common/API";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { colors } from "src/common/Colors";
+import Navbar from "src/ui/components/Navbar";
 import Footer from "../ui/components/Footer";
 
 
@@ -326,6 +327,8 @@ useEffect(() => {
   return (
     <>
     <ToastContainer position="top-center" autoClose={2000} />
+    <Navbar />
+
 
 <div className="min-h-screen w-full flex items-center justify-center px-4 sm:px-6 py-6 sm:py-8 relative overflow-hidden">
   

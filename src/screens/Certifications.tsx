@@ -1171,20 +1171,20 @@ style={{
     onClick={handleRemove}
     disabled={isSubmitting}
     style={{
-      backgroundColor: isSubmitting ? `${colors.primary}55` : colors.primary,
+      backgroundColor: isSubmitting ? `${colors.red}55` : colors.red,
       color: colors.accent,
       cursor: isSubmitting ? "not-allowed" : "pointer",
     }}
     onMouseEnter={(e) => {
       if (!isSubmitting)
-        e.currentTarget.style.backgroundColor = colors.secondary;
+        e.currentTarget.style.backgroundColor = colors.red;
     }}
     onMouseLeave={(e) => {
       if (!isSubmitting)
-        e.currentTarget.style.backgroundColor = colors.primary;
+        e.currentTarget.style.backgroundColor = colors.red;
     }}
   >
-    {isSubmitting ? "Deleting..." : "Yes"}
+    {isSubmitting ? "Deleting..." : "Delete"}
   </Button>
 </div>
 

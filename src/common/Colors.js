@@ -51,6 +51,7 @@ export const colors = {
   accent: "#1F2937",
   white: "#FFFFFF",
   background2: "#f8f8f8",
+  red: "#F54927",
 
   neutral: {
     50: "#FAFAFA",
@@ -66,6 +67,7 @@ export const colors = {
     invitedText: "#15803D", 
     absent: "#F3F4F6",  // Light grey background
     absentText: "#4B5563",
+    
   },
 
 aqua: "#C5E1B8",       // Light Aqua

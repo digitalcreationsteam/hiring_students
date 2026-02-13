@@ -5,7 +5,8 @@ import "react-toastify/dist/ReactToastify.css";
 
 import API, { URL_PATH } from "../common/API";
 import { colors } from "src/common/Colors";
-
+import Footer from "../ui/components/Footer";
+import Navbar from "src/ui/components/Navbar";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -42,30 +43,31 @@ export default function ForgotPassword() {
   return (
     <>
       <ToastContainer position="top-center" autoClose={3000} />
-
-<div className="min-h-screen flex items-center justify-center px-4 relative">
- {/* 🎨 Linear gradient background - fixed behind everything */}
-    <div 
-      className="pointer-events-none fixed inset-0 -z-10"
-      style={{
-        background: `linear-gradient(
+ <Navbar />
+      <div className="min-h-screen flex flex-col items-center justify-center  relative">
+       
+        {/* 🎨 Linear gradient background - fixed behind everything */}
+        <div
+          className="pointer-events-none fixed inset-0 -z-10"
+          style={{
+            background: `linear-gradient(
           to bottom,
           #d9d9d9 0%,
           #cfd3d6 25%,
           #9aa6b2 55%,
           #2E4056 100%
         )`,
-        width: "100%",
-      }}
-    />
-    
-<div
-  className="w-full max-w-md rounded-3xl p-6 shadow-[0_6px_20px_rgba(15,15,15,0.06)]"
-  style={{
-    backgroundColor: colors.white,
-    border: `1px solid ${colors.neutral[200]}`,
-  }}
->
+            width: "100%",
+          }}
+        />
+
+        <div
+          className="w-full max-w-md rounded-3xl p-6 shadow-[0_6px_20px_rgba(15,15,15,0.06)]"
+          style={{
+            backgroundColor: colors.white,
+            border: `1px solid ${colors.neutral[200]}`,
+          }}
+        >
           <button onClick={() => navigate(-1)} className="mb-6">
             ←
           </button>
@@ -84,23 +86,24 @@ export default function ForgotPassword() {
             onChange={(e) => setEmail(e.target.value)}
           />
 
-<button
-  onClick={handleSubmit}
-  disabled={loading}
-  className="w-full h-10 sm:h-11 rounded-3xl text-sm sm:text-base font-semibold transition active:scale-[0.99]"
-  style={{
-    backgroundColor: loading ? colors.neutral[200] : colors.primary,
-    color: colors.white,
-    cursor: loading ? "not-allowed" : "pointer",
-    opacity: loading ? 0.75 : 1,
-    boxShadow: loading ? "none" : "0 10px 24px rgba(0,0,0,0.08)",
-  }}
->
-  {loading ? "Sending..." : "Reset Password"}
-</button>
-
-
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="w-full h-10 sm:h-11 rounded-3xl text-sm sm:text-base font-semibold transition active:scale-[0.99]"
+            style={{
+              backgroundColor: loading ? colors.neutral[200] : colors.primary,
+              color: colors.white,
+              cursor: loading ? "not-allowed" : "pointer",
+              opacity: loading ? 0.75 : 1,
+              boxShadow: loading ? "none" : "0 10px 24px rgba(0,0,0,0.08)",
+            }}
+          >
+            {loading ? "Sending..." : "Reset Password"}
+          </button>
         </div>
+      </div>
+      <div>
+        <Footer />
       </div>
     </>
   );

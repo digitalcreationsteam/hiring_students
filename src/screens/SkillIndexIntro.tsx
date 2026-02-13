@@ -9,6 +9,7 @@ import { FeatherArrowLeft } from "@subframe/core";
 import { FeatherInfo } from "@subframe/core";
 import { useNavigate } from "react-router-dom";
 import { colors } from "src/common/Colors";
+import Navbar from "src/ui/components/Navbar";
 import Footer from "../ui/components/Footer";
 
 
@@ -16,7 +17,7 @@ function SkillIndexIntro() {
   const navigate = useNavigate();
   return (
     <>
-      <HeaderLogo />
+    <Navbar />
      {/* 🎨 Linear gradient background - fixed behind everything */}
     <div 
       className="pointer-events-none fixed inset-0 -z-10"

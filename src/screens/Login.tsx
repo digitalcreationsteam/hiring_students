@@ -15,6 +15,9 @@ import { setToken } from "src/store/slices/authSlice";
 import { setUserProfile } from "src/store/slices/userSlice";
 import { setNavigation } from "src/store/slices/onboardingSlice"; // ✅ NEW
 import { colors } from "src/common/Colors";
+import Footer from "../ui/components/Footer";
+import Navbar from "src/ui/components/Navbar";
+
 
 function Login() {
   const navigate = useNavigate();
@@ -65,15 +68,15 @@ function Login() {
       });
 
       if (!response?.success) {
-      setError("Invalid credentials. Please try again.");
-      return;
-    }
+        setError("Invalid credentials. Please try again.");
+        return;
+      }
 
-       // 🔐 ROLE CHECK (CRITICAL)
-    if (response.user.role !== "student") {
-      setError("You are not authorized as student");
-      return;
-    }
+      // 🔐 ROLE CHECK (CRITICAL)
+      if (response.user.role !== "student") {
+        setError("You are not authorized as student");
+        return;
+      }
 
       if (response?.success) {
         dispatch(setToken(response.token));
@@ -110,7 +113,7 @@ function Login() {
   };
 
   const handleOAuth = (provider: "google" | "linkedin") => {
-    const baseURL =  BASE_URL; //process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+    const baseURL = BASE_URL; //process.env.REACT_APP_API_URL || "http://localhost:5000/api";
     if (provider === "google") {
       window.location.href = `${baseURL}/auth/google`;
     }
@@ -120,23 +123,24 @@ function Login() {
   };
 
   return (
-  <div className="min-h-screen w-full flex items-center justify-center px-4 sm:px-6 relative">
-
-    {/* 🎨 Linear gradient background - fixed behind everything */}
-    <div 
-      className="pointer-events-none fixed inset-0 -z-10"
-      style={{
-        background: `linear-gradient(
+    <>
+    <Navbar />
+    <div className="min-h-screen w-full flex items-center justify-center px-4 sm:px-6 relative">
+      {/* 🎨 Linear gradient background - fixed behind everything */}
+      <div
+        className="pointer-events-none fixed inset-0 -z-10"
+        style={{
+          background: `linear-gradient(
           to bottom,
           #d9d9d9 0%,
           #cfd3d6 25%,
           #9aa6b2 55%,
           #2E4056 100%
         )`,
-        width: "100%",
-      }}
-    />
-    
+          width: "100%",
+        }}
+      />
+
       <div className="w-full max-w-[870px] rounded-none sm:rounded-xl border border-neutral-border bg-white shadow-sm sm:shadow-md overflow-hidden">
         <div className="flex flex-col lg:flex-row w-full relative">
           {/* LEFT */}
@@ -156,7 +160,13 @@ function Login() {
               <div className="w-full h-[1px] bg-gray-400 my-4 flex-shrink-0" />
               <div className="flex flex-col gap-4">
                 <div className="flex items-start gap-3">
-                  <div style={{backgroundColor: colors.primary, color: colors.white}} className="flex items-center justify-center w-8 h-8 rounded-full">
+                  <div
+                    style={{
+                      backgroundColor: colors.primary,
+                      color: colors.white,
+                    }}
+                    className="flex items-center justify-center w-8 h-8 rounded-full"
+                  >
                     <FeatherCheckCircle className="" />
                   </div>
                   <div>
@@ -169,7 +179,13 @@ function Login() {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div style={{backgroundColor: colors.primary, color: colors.white}}  className="flex items-center justify-center w-8 h-8 rounded-full">
+                  <div
+                    style={{
+                      backgroundColor: colors.primary,
+                      color: colors.white,
+                    }}
+                    className="flex items-center justify-center w-8 h-8 rounded-full"
+                  >
                     <FeatherBriefcase className="" />
                   </div>
                   <div>
@@ -182,7 +198,13 @@ function Login() {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div style={{backgroundColor: colors.primary, color: colors.white}}  className="flex items-center justify-center w-8 h-8 rounded-full">
+                  <div
+                    style={{
+                      backgroundColor: colors.primary,
+                      color: colors.white,
+                    }}
+                    className="flex items-center justify-center w-8 h-8 rounded-full"
+                  >
                     <FeatherMessageSquare className="" />
                   </div>
                   <div>
@@ -277,10 +299,7 @@ function Login() {
 
               <div className="flex justify-between items-center">
                 <div />
-                <Link
-                  to="/forgot-password"
-                  className="text-xs hover:underline"
-                >
+                <Link to="/forgot-password" className="text-xs hover:underline">
                   Forgot password?
                 </Link>
               </div>
@@ -305,37 +324,40 @@ function Login() {
                 {loading ? "Signing in..." : "Log in"}
               </button> */}
               <button
-  type="submit"
-  disabled={loading}
-  className={`w-full h-9 font-semibold rounded-full transition ${
-    loading ? "cursor-wait opacity-70" : "hover:opacity-90"
-  }`}
-  style={{
-    backgroundColor: colors.primary,
-    color: colors.white,
-  }}
->
-  {loading ? "Signing in..." : "Log in"}
-</button>
-
+                type="submit"
+                disabled={loading}
+                className={`w-full h-9 font-semibold rounded-full transition ${
+                  loading ? "cursor-wait opacity-70" : "hover:opacity-90"
+                }`}
+                style={{
+                  backgroundColor: colors.primary,
+                  color: colors.white,
+                }}
+              >
+                {loading ? "Signing in..." : "Log in"}
+              </button>
             </form>
 
             <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
 
             <div className="flex flex-wrap justify-center gap-1 text-xs text-center">
               <span className="text-subtext-color">Don't have an account?</span>
-              <Link
-                to="/signup"
-                className="font-semibold hover:underline"
-              >
+              <Link to="/signup" className="font-semibold hover:underline">
                 Sign up
               </Link>
             </div>
           </div>
         </div>
+
+       
       </div>
     </div>
+     <div>
+          <Footer />
+        </div>
+       </> 
   );
+  
 }
 
 export default Login;

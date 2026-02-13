@@ -10,6 +10,9 @@ import {
 import { IconWithBackground, OAuthSocialButton, TextField } from "../ui";
 import API, { URL_PATH } from "src/common/API";
 import { colors } from "src/common/Colors";
+import Navbar from "src/ui/components/Navbar";
+import Footer from "../ui/components/Footer";
+
 
 function SignUp() {
   const navigate = useNavigate();
@@ -110,6 +113,9 @@ const handleSubmit = async (e: any) => {
 
 
 return (
+  <>
+  <Navbar />
+
   <div className="min-h-screen w-full flex items-center justify-center px-4 relative">
 
    {/* 🎨 Linear gradient background - fixed behind everything */}
@@ -370,6 +376,10 @@ return (
         </div>
       </div>
     </div>
+     <div>
+          <Footer />
+        </div>
+        </>
   );
 }
 

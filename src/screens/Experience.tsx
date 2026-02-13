@@ -1205,23 +1205,23 @@ export default function Experience() {
                   {/* ✅ Yes - same shape */}
                   <Button
                     style={{
-                      backgroundColor: colors.primary,
+                      backgroundColor: colors.red,
                       color: colors.white,
                     }}
                     className="flex-1 rounded-3xl transition"
                     onMouseEnter={(e) => {
                       if (!isSubmitting)
                         e.currentTarget.style.backgroundColor =
-                          colors.secondary;
+                          colors.red;
                     }}
                     onMouseLeave={(e) => {
                       if (!isSubmitting)
-                        e.currentTarget.style.backgroundColor = colors.primary;
+                        e.currentTarget.style.backgroundColor = colors.red;
                     }}
                     onClick={handleRemove}
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? "Deleting..." : "Yes"}
+                    {isSubmitting ? "Deleting..." : "Delete"}
                   </Button>
                 </div>
               </div>

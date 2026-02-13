@@ -6,6 +6,9 @@ import { Button } from "../ui/components/Button";
 import { FeatherCheck, FeatherStar } from "@subframe/core";
 import API, { URL_PATH } from "src/common/API";
 import { colors } from "src/common/Colors";
+import Navbar from "src/ui/components/Navbar";
+import Footer from "../ui/components/Footer";
+
 
 // Type definitions
 interface SubscriptionPlan {
@@ -232,6 +235,9 @@ function Paywall() {
   }
 
   return (
+    <>
+    <Navbar />
+
     <div className="min-h-screen w-full flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 py-10 relative">
         {/* 🎨 Linear gradient background - fixed behind everything */}
     <div 
@@ -454,6 +460,11 @@ function Paywall() {
         </button>
       </div>
     </div>
+    
+  <div>
+        <Footer />
+      </div>
+      </>
   );
 }
 

@@ -11,6 +11,8 @@ import API, { URL_PATH } from "src/common/API";
 import { useAppDispatch } from "src/store/hooks";
 import { setNavigation } from "src/store/slices/onboardingSlice";
 import { colors } from "src/common/Colors";
+import Navbar from "src/ui/components/Navbar";
+
 import Footer from "../ui/components/Footer";
 
 
@@ -214,7 +216,7 @@ function JobDomain() {
   // -------------------- UI --------------------
   return (
     <>
-      <HeaderLogo />
+<Navbar />
 {/* 🎨 Linear gradient background - fixed behind everything */}
     <div 
       className="pointer-events-none fixed inset-0 -z-10"

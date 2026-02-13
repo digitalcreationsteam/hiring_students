@@ -28,12 +28,20 @@ import { FeatherTwitter } from "@subframe/core";
 import { FeatherUsers } from "@subframe/core";
 import { useNavigate } from "react-router-dom";
 import { colors } from "src/common/Colors";
+import Navbar from "src/ui/components/Navbar";
+import Footer from "../ui/components/Footer";
+
+
 
 function TalentRankingPlatform() {
   const navigate = useNavigate();
   
   return (
+    <>
+     <Navbar />
     <div className="flex min-h-screen w-full flex-col items-center overflow-x-hidden relative">
+     
+
       {/* 🎨 Linear gradient background - fixed behind everything */}
       <div 
         className="pointer-events-none fixed inset-0 -z-10"
@@ -1075,153 +1083,12 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
           </Button>
         </div>
       </div>
-
-      {/* Footer - Keep white background */}
-      <div
-        className="w-full px-6 py-12 relative z-10"
-        style={{
-          borderTop: `1px solid ${colors.neutral[200]}`,
-          backgroundColor: colors.white,
-        }}
-      >
-        <div className="mx-auto grid w-full max-w-[1024px] grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
-          {/* ... Footer content remains exactly the same ... */}
-          {/* Brand */}
-          <div className="flex w-full flex-col gap-4 items-center sm:items-start">
-            <div className="flex items-center gap-3">
-              <img
-                className="h-10 w-32 object-contain"
-                src="/hiringLogo2.png"
-                alt="hiringLogo"
-              />
-            </div>
-
-            <div className="flex items-center gap-3 justify-center sm:justify-start">
-              <IconButton
-                icon={<FeatherTwitter />}
-                style={{ color: colors.neutral[600] }}
-                onClick={() =>
-                  window.open("https://twitter.com/your_handle", "_blank")
-                }
-              />
-              <IconButton
-                icon={<FeatherLinkedin />}
-                style={{ color: colors.neutral[600] }}
-                onClick={() =>
-                  window.open(
-                    "https://www.linkedin.com/company/your-company",
-                    "_blank",
-                  )
-                }
-              />
-              <IconButton
-                icon={<FeatherInstagram />}
-                style={{ color: colors.neutral[600] }}
-                onClick={() =>
-                  window.open("https://www.instagram.com/your_handle", "_blank")
-                }
-              />
-            </div>
-          </div>
-
-          {/* For Candidates */}
-          <div className="flex flex-col gap-4 items-center sm:items-start">
-            <span
-              className="text-[14px] font-[600]"
-              style={{ color: colors.accent }}
-            >
-              For Candidates
-            </span>
-            <span
-              style={{ color: colors.neutral[600] }}
-              className="text-[13px]"
-            >
-              How It Works
-            </span>
-            <span
-              style={{ color: colors.neutral[600] }}
-              className="text-[13px]"
-            >
-              Job Tracks
-            </span>
-            <span
-              style={{ color: colors.neutral[600] }}
-              className="text-[13px]"
-            >
-              Rankings
-            </span>
-            <span
-              style={{ color: colors.neutral[600] }}
-              className="text-[13px]"
-            >
-              Resources
-            </span>
-          </div>
-
-          {/* For Recruiters */}
-          <div className="flex flex-col gap-4 items-center sm:items-start">
-            <span
-              className="text-[14px] font-[600]"
-              style={{ color: colors.accent }}
-            >
-              For Recruiters
-            </span>
-            <span
-              style={{ color: colors.neutral[600] }}
-              className="text-[13px]"
-            >
-              Find Talent
-            </span>
-            <span
-              style={{ color: colors.neutral[600] }}
-              className="text-[13px]"
-            >
-              Post Jobs
-            </span>
-            <span
-              style={{ color: colors.neutral[600] }}
-              className="text-[13px]"
-            >
-              Pricing
-            </span>
-          </div>
-
-          {/* Company */}
-          <div className="flex flex-col gap-4 items-center sm:items-start">
-            <span
-              className="text-[14px] font-[600]"
-              style={{ color: colors.accent }}
-            >
-              Company
-            </span>
-            <span
-              style={{ color: colors.neutral[600] }}
-              className="text-[13px]"
-            >
-              About
-            </span>
-            <span
-              style={{ color: colors.neutral[600] }}
-              className="text-[13px]"
-            >
-              Blog
-            </span>
-            <span
-              style={{ color: colors.neutral[600] }}
-              className="text-[13px]"
-            >
-              Contact
-            </span>
-            <span
-              style={{ color: colors.neutral[600] }}
-              className="text-[13px]"
-            >
-              Privacy
-            </span>
-          </div>
-        </div>
-      </div>
     </div>
+    
+  <div>
+        <Footer />
+      </div>
+    </>
   );
 }
 
