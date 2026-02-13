@@ -427,62 +427,118 @@ export default function Dashboard() {
     }
   };
 
+  // const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   console.log("", e);
+  //   const file = e.target.files?.[0];
+  //   if (!file) return;
+
+  //   // Validate file size (e.g., max 5MB)
+  //   if (file.size > 5 * 1024 * 1024) {
+  //     toast.error("File size should be less than 5MB");
+  //     return;
+  //   }
+
+  //   // Validate file type
+  //   const validTypes = ["image/jpeg", "image/png", "image/webp"];
+  //   if (!validTypes.includes(file.type)) {
+  //     toast.error("Please select a valid image (JPEG, PNG, or WebP)");
+  //     return;
+  //   }
+
+  //   // Cleanup old preview
+  //   if (avatar && avatar.startsWith("blob:")) {
+  //     URL.revokeObjectURL(avatar);
+  //   }
+
+  //   // Create preview
+  //   const previewUrl = URL.createObjectURL(file);
+  //   setAvatar(previewUrl);
+
+  //   try {
+  //     setIsSavingAvatar(true);
+
+  //     // Upload to server
+  //     const formData = new FormData();
+  //     formData.append("avatar", file);
+
+  //     await API("POST", URL_PATH.uploadProfile, formData);
+
+  //     // Refresh from server (dashboard includes documents.profileUrl)
+  //     await fetchDashboardData();
+
+  //     // Revoke preview after successful upload
+  //     setTimeout(() => {
+  //       if (previewUrl.startsWith("blob:")) {
+  //         URL.revokeObjectURL(previewUrl);
+  //       }
+  //     }, 1000);
+  //   } catch (error) {
+  //     console.error("Upload failed:", error);
+  //     toast.error("Failed to upload profile picture");
+  //     // Revert to old avatar if available
+  //     // if (user?.avatarUrl) {
+  //     //   setAvatar(user.avatarUrl);
+  //     // }
+  //   } finally {
+  //     setIsSavingAvatar(false);
+  //   }
+  // };
+
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("", e);
-    const file = e.target.files?.[0];
-    if (!file) return;
+  console.log("", e);
+  const file = e.target.files?.[0];
+  if (!file) return;
 
-    // Validate file size (e.g., max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("File size should be less than 5MB");
-      return;
-    }
+  // Validate file size (e.g., max 5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    toast.error("File size should be less than 5MB");
+    return;
+  }
 
-    // Validate file type
-    const validTypes = ["image/jpeg", "image/png", "image/webp"];
-    if (!validTypes.includes(file.type)) {
-      toast.error("Please select a valid image (JPEG, PNG, or WebP)");
-      return;
-    }
+  // Validate file type
+  const validTypes = ["image/jpeg", "image/png", "image/webp"];
+  if (!validTypes.includes(file.type)) {
+    toast.error("Please select a valid image (JPEG, PNG, or WebP)");
+    return;
+  }
 
-    // Cleanup old preview
-    if (avatar && avatar.startsWith("blob:")) {
-      URL.revokeObjectURL(avatar);
-    }
+  // Cleanup old preview
+  if (avatar && avatar.startsWith("blob:")) {
+    URL.revokeObjectURL(avatar);
+  }
 
-    // Create preview
-    const previewUrl = URL.createObjectURL(file);
-    setAvatar(previewUrl);
+  // Create preview
+  const previewUrl = URL.createObjectURL(file);
+  setAvatar(previewUrl);
 
-    try {
-      setIsSavingAvatar(true);
+  try {
+    setIsSavingAvatar(true);
 
-      // Upload to server
-      const formData = new FormData();
-      formData.append("avatar", file);
+    // Upload to server
+    const formData = new FormData();
+    formData.append("avatar", file);
 
-      await API("POST", URL_PATH.uploadProfile, formData);
+    await API("POST", URL_PATH.uploadProfile, formData);
 
-      // Refresh from server (dashboard includes documents.profileUrl)
-      await fetchDashboardData();
+    // Refresh from server (dashboard includes documents.profileUrl)
+    await fetchDashboardData();
 
-      // Revoke preview after successful upload
-      setTimeout(() => {
-        if (previewUrl.startsWith("blob:")) {
-          URL.revokeObjectURL(previewUrl);
-        }
-      }, 1000);
-    } catch (error) {
-      console.error("Upload failed:", error);
-      toast.error("Failed to upload profile picture");
-      // Revert to old avatar if available
-      // if (user?.avatarUrl) {
-      //   setAvatar(user.avatarUrl);
-      // }
-    } finally {
-      setIsSavingAvatar(false);
-    }
-  };
+    // Dispatch custom event to notify Navbar about avatar update
+    window.dispatchEvent(new Event('avatar-updated'));
+
+    // Revoke preview after successful upload
+    setTimeout(() => {
+      if (previewUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    }, 1000);
+  } catch (error) {
+    console.error("Upload failed:", error);
+    toast.error("Failed to upload profile picture");
+  } finally {
+    setIsSavingAvatar(false);
+  }
+};
 
   const handleLogout = () => {
     localStorage.clear();
@@ -560,11 +616,12 @@ export default function Dashboard() {
                       size="x-large"
                       image={avatar}
                       style={{ boxShadow: `0 0 0 4px ${colors.primaryGlow}` }}
+                      className="rounded-xl"
                     >
                       PP
                     </Avatar>
 
-                    <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+                    <div className="absolute inset-0 rounded-xl bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
                       <span className="text-white text-xs font-bold uppercase">
                         Change
                       </span>
