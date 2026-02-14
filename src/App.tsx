@@ -46,6 +46,7 @@ import PaymentProcessing from "./ui/components/PaymentProcessing";
 
 import "./App.css";
 import NotFound from "./screens/NotFound";
+import ProfilePage from "./screens/ProfilePage";
 
 const router = createBrowserRouter([
   {
@@ -314,6 +315,15 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute requireIncomplete={true}>
         <CaseAssessmentRevel />
+      </ProtectedRoute>
+    ),
+  },
+
+  {
+    path: "/profile",
+    element: (
+      <ProtectedRoute requireIncomplete={true}>
+        <ProfilePage />
       </ProtectedRoute>
     ),
   },

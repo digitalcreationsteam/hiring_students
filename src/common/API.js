@@ -134,7 +134,9 @@ getunivercitylist: "/user/universities",
   getCurrentQuestion: (attemptId) => `/cases/attempt/${attemptId}/question`,
   submitAnswer: (attemptId) => `/cases/attempt/${attemptId}/answer`,
   submitAttempt: (attemptId) => `cases/attempt/${attemptId}/submit`,
-  getCaseReveal: (caseId) => `/cases/${caseId}/reveal`
+  getCaseReveal: (caseId) => `/cases/${caseId}/reveal`,
+
+  getStudentsBySchool: "/user/students"
 };
 
 
