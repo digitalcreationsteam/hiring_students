@@ -55,6 +55,7 @@ import CaseAssessmentScore from "./screens/CaseAssessmentScore";
 import CaseAssessmentRevel from "./screens/CaseAssessmentRevel";
 import PaymentProcessing from "./ui/components/PaymentProcessing";
 import NotFound from "./screens/NotFound";
+import MyProfile from "./screens/my-profile";
 
 import "./App.css";
 
