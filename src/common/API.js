@@ -99,6 +99,9 @@ getunivercitylist: "/user/universities",
   getSubDomain: "/user/by-domain/694e588f2af883559ebe9540",
   getUserDomainSkills: "/user/getUserDomainSkills",
 
+  /*----------User MY Profile----------*/
+  getUserProfile: "/user/my-profile",
+ 
   /* ---------- SKILL ASSESSMENT ---------- */
   startAssessment: "/user/assessment/start",
   getAttemptQuestions: "/user/assessment/getAttemptQuestions",

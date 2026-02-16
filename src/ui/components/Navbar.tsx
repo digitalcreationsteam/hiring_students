@@ -138,7 +138,7 @@ const Navbar = () => {
               >
                 <span className="relative z-10">{item}</span>
                 <span
-                  style={{ backgroundColor: uniTalentColors.primary }}
+                  style={{ backgroundColor: uniTalentColors.white }}
                   className="absolute left-0 -bottom-1 h-[2px] w-0 group-hover:w-full transition-all duration-300"
                 />
               </button>
@@ -153,7 +153,7 @@ const Navbar = () => {
               <Link
                 to="/login"
                 style={{backgroundColor: uniTalentColors.lightGray, color: uniTalentColors.primary }}
-                className="px-6 py-2 rounded-lg font-semibold transition-all duration-300 hover:scale-105"
+                className={`px-6 py-2 rounded-lg font-semibold transition-all duration-300 hover:scale-105 hover:bg-primary hover:text-white`}
               >
                 Login
               </Link>
