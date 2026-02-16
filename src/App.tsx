@@ -43,6 +43,7 @@ import CaseAssessmentQuestions from "./screens/CaseAssessmentQuestions";
 import CaseAssessmentScore from "./screens/CaseAssessmentScore";
 import CaseAssessmentRevel from "./screens/CaseAssessmentRevel";
 import PaymentProcessing from "./ui/components/PaymentProcessing";
+import MyProfile from "./screens/my-profile";
 
 import "./App.css";
 import NotFound from "./screens/NotFound";
@@ -101,6 +102,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <Chat />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/my-profile",
+    element: (
+      <ProtectedRoute>
+        <MyProfile />
       </ProtectedRoute>
     ),
   },
