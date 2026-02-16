@@ -23,6 +23,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { colors } from "../common/Colors";
 import Navbar from "src/ui/components/Navbar";
 import Footer from "../ui/components/Footer";
+import { useAppDispatch } from "../store/hooks";
+import { setNavigation } from "src/store/slices/onboardingSlice";
 
 type ProjectEntry = {
   id: string;
@@ -61,6 +63,7 @@ export default function Projects() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const MAX_PROJECTS = 5;
+  const dispatch = useAppDispatch();
 
   // form state
   const [name, setName] = useState("");
@@ -232,7 +235,7 @@ const isEditing = !!editingId;
     try {
       setIsSubmitting(true);
 
-      await API(
+     const res = await API(
         "POST",
         URL_PATH.projects,
         {
@@ -256,7 +259,9 @@ const isEditing = !!editingId;
         { "user-id": userId },
       );
       toast.success("Project added successfully");
-
+      if (res?.navigation) {
+        dispatch(setNavigation(res.navigation));
+      }
       await fetchProjects();
       await fetchExperienceIndex();
       resetForm();

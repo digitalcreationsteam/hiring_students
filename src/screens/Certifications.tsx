@@ -27,7 +27,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { colors } from "src/common/Colors";
 import Navbar from "src/ui/components/Navbar";
 import Footer from "../ui/components/Footer";
-
+// RIGHT
+import { useAppDispatch } from "../store/hooks";
+import { setNavigation } from "src/store/slices/onboardingSlice";
 type CertEntry = {
   id: string;
   name: string;
@@ -252,6 +254,7 @@ export default function Certifications() {
   const [selectedCert, setSelectedCert] = useState<CertEntry | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const isEditing = !!editingId;
+  const dispatch = useAppDispatch();
 
   const displayedIndex =
     (experiencePoints?.demographics ?? 0) +
@@ -345,20 +348,20 @@ export default function Certifications() {
       return false;
     }
 
-    if (!isValidText(name)) {
-      notify("Certification name contains invalid characters.");
-      return false;
-    }
+    // if (!isValidText(name)) {
+    //   notify("Certification name contains invalid characters.");
+    //   return false;
+    // }
 
     if (!issuer.trim()) {
       notify("Issuer is required.");
       return false;
     }
 
-    if (!isValidText(issuer)) {
-      notify("Issuer name contains invalid characters.");
-      return false;
-    }
+    // if (!isValidText(issuer)) {
+    //   notify("Issuer name contains invalid characters.");
+    //   return false;
+    // }
 
     // ✅ Date validation (fixed)
     if (!issueDate.trim()) {
@@ -472,12 +475,15 @@ export default function Certifications() {
     }
 
     try {
-      await API("POST", URL_PATH.certification, formData, {
+      const res  = await API("POST", URL_PATH.certification, formData, {
         "user-id": userId,
       });
 
       toast.success("Certification added successfully");
-
+// RIGHT
+if (res?.navigation) {
+  dispatch(setNavigation(res.navigation));
+}
       // safest pattern (same as Experience)
       await fetchCertifications();
       await fetchExperienceIndex();
@@ -911,7 +917,7 @@ export default function Certifications() {
                     placeholder="e.g., Certified Product Manager"
                     value={name}
                     onChange={(e) =>
-                      setName(e.target.value.replace(/[^A-Za-z\s.&-]/g, ""))
+                      setName(e.target.value)
                     }
                     onBlur={() => setName(toTitleCase(name))}
                     className={scInputClass}
@@ -930,7 +936,7 @@ export default function Certifications() {
                     placeholder="Issuing organization"
                     value={issuer}
                     onChange={(e) =>
-                      setIssuer(e.target.value.replace(/[^A-Za-z\s.&-]/g, ""))
+                      setIssuer(e.target.value)
                     }
                     onBlur={() => setIssuer(toTitleCase(issuer))}
                     className={scInputClass}

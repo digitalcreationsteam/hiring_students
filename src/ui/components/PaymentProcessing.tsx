@@ -67,7 +67,7 @@ function PaymentProcessing() {
             
             // Redirect to upload-resume after 1.5 seconds
             setTimeout(() => {
-              navigate("/upload-resume");
+              navigate("/job-domain");
             }, 1500);
             
           } else if (isFailed) {

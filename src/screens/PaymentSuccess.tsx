@@ -2,11 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { FeatherCheck, FeatherArrowRight } from "@subframe/core";
 import API, { URL_PATH } from "src/common/API";
+import { useAppDispatch } from "src/store/hooks";
+import { setNavigation } from "src/store/slices/onboardingSlice";
 
-interface PaymentSuccessProps { }
+interface PaymentSuccessProps {}
 
-export default function PaymentSuccess({ }: PaymentSuccessProps) {
+export default function PaymentSuccess({}: PaymentSuccessProps) {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
     const [searchParams] = useSearchParams();
     const [isLoading, setIsLoading] = useState(true);
     const [paymentStatus, setPaymentStatus] = useState<string>("verifying");
@@ -39,17 +42,28 @@ export default function PaymentSuccess({ }: PaymentSuccessProps) {
                 if (statusResponse?.success) {
                     const { paymentStatus: subPaymentStatus } = statusResponse.data;
 
-                    // If payment is still pending in test mode, mark it as paid
                     if (subPaymentStatus === "pending") {
                         console.log("⏳ Payment pending - marking as paid in test mode...");
-
-
-                        
+                        // You can add test mode payment marking logic here if needed
                     } else if (subPaymentStatus === "success") {
                         console.log("✅ Payment already marked as success");
                         setPaymentStatus("success");
-                        // Clear localStorage after successful payment
+                        
+                        // ✅ Clear localStorage after successful payment
                         localStorage.removeItem("pendingSubscriptionId");
+
+                        // ✅ Get updated navigation after payment
+                        const token = localStorage.getItem("token");
+                        if (token) {
+                            const navResponse = await API("GET", URL_PATH.getUserStatus, undefined, {
+                                Authorization: `Bearer ${token}`,
+                            });
+
+                            if (navResponse?.success) {
+                                console.log("📊 Updated navigation:", navResponse.navigation);
+                                dispatch(setNavigation(navResponse.navigation));
+                            }
+                        }
                     } else {
                         setPaymentStatus("failed");
                     }
@@ -70,18 +84,15 @@ export default function PaymentSuccess({ }: PaymentSuccessProps) {
         const timer = setTimeout(verifyPayment, 1500);
 
         return () => clearTimeout(timer);
-    }, [subscriptionId]);
+    }, [subscriptionId, dispatch]);
+
+    // ✅ Navigate to job-domain after payment success
+    const handleContinue = () => {
+        navigate("/job-domain");
+    };
 
     const handleDashboard = () => {
         navigate("/dashboard");
-    };
-
-    const handleExploreSkills = () => {
-        navigate("/skill-index");
-    };
-
-    const handleViewProfile = () => {
-        navigate("/complete-profile");
     };
 
     if (isLoading || paymentStatus === "verifying") {
@@ -182,7 +193,7 @@ export default function PaymentSuccess({ }: PaymentSuccessProps) {
                 </p>
 
                 <p className="text-sm text-gray-500 text-center mb-8">
-                    Your subscription is now active and you can access all premium features.
+                    Your subscription is now active. Let's continue setting up your profile.
                 </p>
 
                 {/* Subscription ID (if available) */}
@@ -197,30 +208,22 @@ export default function PaymentSuccess({ }: PaymentSuccessProps) {
                     </div>
                 )}
 
-                {/* CTA Buttons */}
-                <div className="space-y-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* ✅ PRIMARY CTA: Continue to Job Domain */}
+                <div className="space-y-3">
+                    <button
+                        onClick={handleContinue}
+                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-4 rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg"
+                    >
+                        Continue Profile Setup
+                        <FeatherArrowRight className="w-5 h-5" />
+                    </button>
+
+                    {/* Secondary option */}
                     <button
                         onClick={handleDashboard}
-                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 rounded-lg transition-all flex items-center justify-center gap-2"
+                        className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 rounded-lg transition-all"
                     >
-                        <FeatherArrowRight className="w-4 h-4" />
-                        Dashboard
-                    </button>
-
-                    <button
-                        onClick={handleExploreSkills}
-                        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 rounded-lg transition-all flex items-center justify-center gap-2"
-                    >
-                        <FeatherArrowRight className="w-4 h-4" />
-                        Explore Skills
-                    </button>
-
-                    <button
-                        onClick={handleViewProfile}
-                        className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold py-3 rounded-lg transition-all flex items-center justify-center gap-2 md:col-span-2"
-                    >
-                        <FeatherArrowRight className="w-4 h-4" />
-                        Complete Profile
+                        Go to Dashboard
                     </button>
                 </div>
 
@@ -230,7 +233,7 @@ export default function PaymentSuccess({ }: PaymentSuccessProps) {
                         ✓ Invoice has been sent to your email
                     </p>
                     <p className="text-xs text-gray-500 text-center mt-2">
-                        ✓ You can manage your subscription anytime
+                        ✓ You can manage your subscription anytime in settings
                     </p>
                 </div>
             </div>

@@ -3,13 +3,26 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Avatar } from "./Avatar";
 import { FeatherLogOut, FeatherSettings, FeatherUser } from "@subframe/core";
+import { clearUserData } from "src/utils/authUtils";
+import { resetOnboarding } from "src/store/slices/onboardingSlice";
+import { useAppDispatch } from "src/store/hooks";
 
 export default function HeaderLogo() {
   const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+  
   const [open, setOpen] = useState(false);
   const handleLogout = () => {
-    localStorage.clear();
+    // Clear localStorage
+    clearUserData();
+  
+    // ✅ Reset Redux state
+    dispatch(resetOnboarding());
+  
+    // Navigate to login
     navigate("/login");
+  
+    // toast.success("Logged out successfully");
   };
 
   return (

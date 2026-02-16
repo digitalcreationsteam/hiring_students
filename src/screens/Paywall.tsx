@@ -449,7 +449,7 @@ function Paywall() {
 
 
         {/* Back Button */}
-        <button
+        {/* <button
           onClick={() => navigate(-1)}
           className="text-sm transition"
           style={{ color: colors.primaryGlow }}
@@ -457,7 +457,7 @@ function Paywall() {
           onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
         >
           ← Go back
-        </button>
+        </button> */}
       </div>
     </div>
     

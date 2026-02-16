@@ -28,8 +28,8 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 const fetchStatusWithRetry = async (
   token: string,
-  retries = 10,
-  delay = 150
+  retries = 15,  // ✅ Increase retries
+  delay = 300    // ✅ Increase delay
 ) => {
   for (let i = 0; i < retries; i++) {
     const res = await API("GET", URL_PATH.getUserStatus, undefined, {
@@ -47,7 +47,12 @@ const fetchStatusWithRetry = async (
     await new Promise((resolve) => setTimeout(resolve, delay));
   }
 
-  throw new Error("User status not updated yet");
+  // ✅ Better error handling - return what we have
+  const finalRes = await API("GET", URL_PATH.getUserStatus, undefined, {
+    Authorization: `Bearer ${token}`,
+  });
+  
+  return finalRes?.navigation || finalRes?.data?.navigation;
 };
 
 
@@ -241,25 +246,33 @@ const uploadResume = async () => {
   if (uploading) return;
 
   // ✅ CASE 1: resume already exists → just continue
-if (!file && existingResume) {
-  toast.success("Resume already uploaded");
+  if (!file && existingResume) {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Session expired. Please login again.");
+        return;
+      }
 
-  const token = localStorage.getItem("token");
-  if (!token) return;
+      setUploading(true);
+      const navigation = await fetchStatusWithRetry(token);
 
-  const navigation = await fetchStatusWithRetry(token);
-
-  setTimeout(() => {
-    dispatch(setNavigation(navigation));
-    navigate(navigation.nextRoute);
-  }, 1500);
-
-  return;
-}
-
+      dispatch(setNavigation(navigation));
+      navigate(navigation.nextRoute);
+    } catch (error) {
+      console.error(error);
+      toast.error("Navigation failed. Please refresh.");
+    } finally {
+      setUploading(false);
+    }
+    return;
+  }
 
   // ❌ no file & no existing resume
-  if (!file) return;
+  if (!file) {
+    toast.error("Please select a resume to upload");
+    return;
+  }
 
   // ✅ CASE 2: new upload
   try {
@@ -268,25 +281,31 @@ if (!file && existingResume) {
     const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
 
-    if (!token) return;
+    if (!token) {
+      toast.error("Session expired. Please login again.");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("resume", file);
 
+    // Upload resume
     await API("POST", URL_PATH.uploadResume, formData, {
       "user-id": userId,
       Authorization: `Bearer ${token}`,
     });
+    
     toast.success("Resume uploaded successfully");
 
+    // Wait for backend to update status
     const navigation = await fetchStatusWithRetry(token);
-    setTimeout(() => {
-  dispatch(setNavigation(navigation));
-  navigate(navigation.nextRoute);
-}, 1500);
+    
+    dispatch(setNavigation(navigation));
+    navigate(navigation.nextRoute);
 
-  } catch (error) {
-    toast.error("Something went wrong. Please try again.");
+  } catch (error: any) {
+    console.error(error);
+    toast.error(error?.response?.data?.message || "Upload failed. Please try again.");
   } finally {
     setUploading(false);
   }

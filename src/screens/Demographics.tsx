@@ -49,7 +49,6 @@ interface StepItem {
 
 export default function Demographics() {
   const navigate = useNavigate();
-  const [navReady, setNavReady] = useState(false);
 
   const dispatch = useAppDispatch();
   const [isManualCity, setIsManualCity] = useState<boolean>(false);
@@ -103,36 +102,7 @@ export default function Demographics() {
 
 
   
-  useEffect(() => {
-    const hydrateNavigation = async () => {
-      if (currentStep) {
-        setNavReady(true);
-        return;
-      }
 
-      try {
-        const res = await API("GET", URL_PATH.getUserStatus);
-
-        if (res?.navigation) {
-          dispatch(
-            setNavigation({
-              nextRoute: res.navigation.nextRoute,
-              currentStep: res.navigation.currentStep,
-              completedSteps: res.navigation.completedSteps,
-              isOnboardingComplete: res.navigation.isOnboardingComplete,
-              hasPayment: res.navigation.hasPayment,
-            }),
-          );
-        }
-      } catch (e) {
-        console.error("Failed to hydrate onboarding", e);
-      } finally {
-        setNavReady(true);
-      }
-    };
-
-    hydrateNavigation();
-  }, [currentStep, dispatch]);
 
   const [form, setForm] = useState<DemographicsData>({
     fullName: "",
@@ -247,10 +217,10 @@ export default function Demographics() {
       toast.error(validationError);
       return;
     }
-
+  
     setError("");
     setIsSubmitting(true);
-
+  
     const payload = {
       fullName: normalizeText(form.fullName),
       email: form.email.trim(),
@@ -260,47 +230,32 @@ export default function Demographics() {
       country: normalizeText(form.country),
       phoneVisibleToRecruiters: phoneVisible,
     };
-
+  
     try {
-      // ✅ Step 1: Save demographics to backend
+      // ✅ SINGLE API CALL - Backend returns navigation in response
       const saveResponse = await API("POST", URL_PATH.demographics, payload);
-
-      if (!saveResponse?.data) {
-        setError(saveResponse?.message || "Failed to save demographics");
-        setIsSubmitting(false);
-        return;
+  
+      if (!saveResponse?.success) {
+        throw new Error(
+          saveResponse?.message || "Failed to save demographics"
+        );
       }
-
-      // ✅ Step 2: Get updated navigation status
-      const statusResponse = await API("GET", URL_PATH.getUserStatus);
-
-      if (!statusResponse?.success) {
-        setError("Failed to get next step");
-        setIsSubmitting(false);
-        return;
+  
+      // ✅ Update Redux with navigation from response
+      if (saveResponse?.navigation) {
+        dispatch(setNavigation(saveResponse.navigation));
       }
-
-      // ✅ Step 3: Update Redux with new navigation
-      dispatch(
-        setNavigation({
-          nextRoute: statusResponse.navigation.nextRoute,
-          currentStep: statusResponse.navigation.currentStep,
-          completedSteps: statusResponse.navigation.completedSteps,
-          isOnboardingComplete: statusResponse.navigation.isOnboardingComplete,
-          hasPayment: statusResponse.navigation.hasPayment,
-        }),
-      );
-      toast.success("Demographics added successfully");
-
+  
+      toast.success("Demographics saved successfully");
+  
+      // ✅ Navigate to next step
       setTimeout(() => {
-        navigate(statusResponse.navigation.nextRoute);
-      }, 3000);
-
-      // ✅ Step 4: Navigate to next step
+        navigate(saveResponse.navigation.nextRoute);
+      }, 1500);
     } catch (err: unknown) {
       const apiError = err as ApiError;
       const message = apiError?.message || "Failed to submit demographics";
-
+  
       console.error("❌ Error saving demographics:", err);
       setError(message);
       toast.error(message);

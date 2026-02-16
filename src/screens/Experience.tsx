@@ -30,7 +30,8 @@ import { FeatherChevronDown } from "@subframe/core";
 import { colors } from "src/common/Colors";
 import Navbar from "src/ui/components/Navbar";
 import Footer from "../ui/components/Footer";
-
+import { useAppDispatch } from "../store/hooks";
+import { setNavigation } from "../store/slices/onboardingSlice";
 
 const ROLE_TITLES = [
   { label: "Internship", value: "internship" },
@@ -210,7 +211,9 @@ function MonthYearPicker({
 
 export default function Experience() {
   const navigate = useNavigate();
-
+  
+  // ✅ STEP 2: Add dispatch
+  const dispatch = useAppDispatch();
   const userId = localStorage.getItem("userId");
   const location = useLocation();
   const source = location.state?.source; // "dashboard" | undefined
@@ -473,7 +476,10 @@ const isEditing = !!editingId;
       });
 
       toast.success("Experience added successfully");
-
+      if (res?.navigation) {
+        dispatch(setNavigation(res.navigation));
+      }
+      
       const created = res.data[0]; // backend returns array
 
       // setExperiences((prev) => [

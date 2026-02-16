@@ -78,32 +78,30 @@ function Login() {
         return;
       }
 
-      if (response?.success) {
-        dispatch(setToken(response.token));
-        dispatch(setUserProfile(response.user));
-        // Backend login now includes navigation object
-        if (response.navigation) {
-          dispatch(
-            setNavigation({
-              nextRoute: response.navigation.nextRoute,
-              currentStep: response.navigation.currentStep,
-              completedSteps: response.navigation.completedSteps,
-              isOnboardingComplete: response.navigation.isOnboardingComplete,
-              hasPayment: response.navigation.hasPayment,
-            }),
-          );
-
-          const completedSteps = response.navigation.completedSteps || [];
-          const isFirstLogin = completedSteps.length === 0;
-
-          if (isFirstLogin) {
-            navigate("/talent-ranking");
-          } else {
-            navigate(response.navigation.nextRoute);
-          }
-        } else {
-          navigate("/talent-ranking");
+      if (response.success && response.token) {
+        // ✅ Store auth data
+        localStorage.setItem("token", response.token);
+        localStorage.setItem("userId", response.user._id || response.user.id);
+        localStorage.setItem("userEmail", response.user.email);
+        localStorage.setItem(
+          "userName",
+          `${response.user.firstname} ${response.user.lastname}`
+        );
+      
+        // toast.success("Login successful!");
+      
+        // ✅ Update Redux with navigation
+        if (response?.navigation) {
+          dispatch(setNavigation(response.navigation));
         }
+      
+        // ✅ Navigate based on backend response
+        setTimeout(() => {
+          const redirectRoute = response.navigation?.nextRoute || "/dashboard";
+          navigate(redirectRoute);
+        }, 1000);
+      } else {
+        setError(response?.message || "Login failed");
       }
     } catch (err: any) {
       setError(err?.message || "Invalid credentials. Please try again.");

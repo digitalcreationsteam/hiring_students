@@ -176,7 +176,7 @@ function SkillIndexIntro() {
 >
   <Button
     size="large"
-    onClick={() => navigate("/job-domain")}
+    onClick={() => navigate("/paywall")}
     className="
       w-full
       h-10 sm:h-11

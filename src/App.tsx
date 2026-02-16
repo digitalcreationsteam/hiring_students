@@ -1,9 +1,20 @@
-import React from "react";
+// src/App.tsx
+import React, { useEffect } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import { isAuthenticated } from "./utils/authUtils";
+
+// ✅ ADD THESE IMPORTS
+import { useAppDispatch, useAppSelector } from "./store/hooks";
+import {
+  hydrateNavigation,
+  selectIsHydrated,
+  selectIsLoading,
+} from "./store/slices/onboardingSlice";
+
+// ... all your existing imports
 import Chat from "./ui/components/chat/Chat";
-import LandingPage from './screens/LandingPage'
+import LandingPage from "./screens/LandingPage";
 import RecruiterChats from "./screens/RecruiterChats";
 import SignUp from "./screens/SignUp";
 import LogIn from "./screens/Login";
@@ -43,17 +54,26 @@ import CaseAssessmentQuestions from "./screens/CaseAssessmentQuestions";
 import CaseAssessmentScore from "./screens/CaseAssessmentScore";
 import CaseAssessmentRevel from "./screens/CaseAssessmentRevel";
 import PaymentProcessing from "./ui/components/PaymentProcessing";
-
-import "./App.css";
 import NotFound from "./screens/NotFound";
 
+import "./App.css";
+
+// ============================================
+// ROUTER DEFINITION
+// ============================================
 const router = createBrowserRouter([
   {
     index: true,
-    element: isAuthenticated()
-      ? <Navigate to="/dashboard" replace />
-      : <LandingPage />,
+    element: isAuthenticated() ? (
+      <Navigate to="/dashboard" replace />
+    ) : (
+      <LandingPage />
+    ),
   },
+
+  // ============================================
+  // PUBLIC ROUTES
+  // ============================================
   { path: "/signup", element: <SignUp /> },
   { path: "/login", element: <LogIn /> },
   { path: "/login-success", element: <LoginSuccess /> },
@@ -66,49 +86,89 @@ const router = createBrowserRouter([
   { path: "/verify-email/:token", element: <EmailVerification /> },
   { path: "/email-verified", element: <EmailVerifiedSuccess /> },
 
-  // ✅ PAYMENT PROCESSING ROUTE (After Dodo redirect)
+  // ============================================
+  // SECTION 1: RESUME UPLOAD
+  // ============================================
   {
-    path: "/payment-processing",
+    path: "/upload-resume",
     element: (
       <ProtectedRoute>
-        <PaymentProcessing />
+        <UploadResume />
       </ProtectedRoute>
     ),
   },
 
-  // ✅ PROTECTED ROUTES (Authentication required)
-  {
-    path: "/recruiter-chats",
-    element: (
-      <ProtectedRoute>
-        <RecruiterChats />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/chat",
-    element: (
-      <ProtectedRoute>
-        <Chat />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/chat/:otherUserId",
-    element: (
-      <ProtectedRoute>
-        <Chat />
-      </ProtectedRoute>
-    ),
-  },
+  // ============================================
+  // SECTION 2: EXPERIENCE INDEX (Free Navigation)
+  // ============================================
   {
     path: "/complete-profile",
     element: (
-      <ProtectedRoute requireIncomplete={true}>
+      <ProtectedRoute>
         <CompleteProfile />
       </ProtectedRoute>
     ),
   },
+  {
+    path: "/demographics",
+    element: (
+      <ProtectedRoute>
+        <Demographics />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/education",
+    element: (
+      <ProtectedRoute>
+        <Education />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/experience",
+    element: (
+      <ProtectedRoute>
+        <Experience />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/certifications",
+    element: (
+      <ProtectedRoute>
+        <Certifications />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/awards",
+    element: (
+      <ProtectedRoute>
+        <Awards />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/projects",
+    element: (
+      <ProtectedRoute>
+        <Projects />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/skill-index-intro",
+    element: (
+      <ProtectedRoute>
+        <SkillIndexIntro />
+      </ProtectedRoute>
+    ),
+  },
+
+  // ============================================
+  // SECTION 3: PAYWALL (Hard Gate)
+  // ============================================
   {
     path: "/paywall",
     element: (
@@ -118,105 +178,21 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/talent-ranking",
+    path: "/payment-processing",
     element: (
       <ProtectedRoute>
-        <TalentRankingPlatform />
+        <PaymentProcessing />
       </ProtectedRoute>
     ),
   },
-  {
-    path: "/experience-index",
-    element: (
-      <ProtectedRoute>
-        <ExperienceIndex />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/skill-index",
-    element: (
-      <ProtectedRoute>
-        <SkillIndex />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/hireability-index",
-    element: (
-      <ProtectedRoute>
-        <HireabilityIndex />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/upload-resume",
-    element: (
-      <ProtectedRoute requireIncomplete={true}>
-        <UploadResume />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/demographics",
-    element: (
-      <ProtectedRoute requireIncomplete={true}>
-        <Demographics />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/education",
-    element: (
-      <ProtectedRoute requireIncomplete={true}>
-        <Education />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/experience",
-    element: (
-      <ProtectedRoute requireIncomplete={true}>
-        <Experience />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/certifications",
-    element: (
-      <ProtectedRoute requireIncomplete={true}>
-        <Certifications />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/awards",
-    element: (
-      <ProtectedRoute requireIncomplete={true}>
-        <Awards />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/projects",
-    element: (
-      <ProtectedRoute requireIncomplete={true}>
-        <Projects />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/skill-index-intro",
-    element: (
-      <ProtectedRoute requireIncomplete={true}>
-        <SkillIndexIntro />
-      </ProtectedRoute>
-    ),
-  },
+
+  // ============================================
+  // SECTION 4: SKILL ASSESSMENT (Requires Payment)
+  // ============================================
   {
     path: "/job-domain",
     element: (
-      <ProtectedRoute requireIncomplete={true}>
+      <ProtectedRoute requirePayment>
         <JobDomain />
       </ProtectedRoute>
     ),
@@ -224,7 +200,7 @@ const router = createBrowserRouter([
   {
     path: "/skills",
     element: (
-      <ProtectedRoute requireIncomplete={true}>
+      <ProtectedRoute requirePayment>
         <Skills />
       </ProtectedRoute>
     ),
@@ -232,7 +208,7 @@ const router = createBrowserRouter([
   {
     path: "/assessment-intro",
     element: (
-      <ProtectedRoute requireIncomplete={true}>
+      <ProtectedRoute requirePayment>
         <AssessmentIntro />
       </ProtectedRoute>
     ),
@@ -240,7 +216,7 @@ const router = createBrowserRouter([
   {
     path: "/assessment",
     element: (
-      <ProtectedRoute requireIncomplete={true}>
+      <ProtectedRoute requirePayment>
         <AssessmentPage />
       </ProtectedRoute>
     ),
@@ -248,39 +224,91 @@ const router = createBrowserRouter([
   {
     path: "/assessment-results",
     element: (
-      <ProtectedRoute requireIncomplete={true}>
+      <ProtectedRoute requirePayment>
         <AssessmentResult />
       </ProtectedRoute>
     ),
   },
+
+  // ============================================
+  // APP ROUTES (Requires Onboarding Complete)
+  // ============================================
   {
-    path: "/assessment-results",
+    path: "/dashboard",
     element: (
-      <ProtectedRoute>
-        <AssessmentResult />
+      <ProtectedRoute requireComplete>
+        <Dashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/recruiter-chats",
+    element: (
+      <ProtectedRoute requireComplete>
+        <RecruiterChats />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/chat",
+    element: (
+      <ProtectedRoute requireComplete>
+        <Chat />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/chat/:otherUserId",
+    element: (
+      <ProtectedRoute requireComplete>
+        <Chat />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/talent-ranking",
+    element: (
+      <ProtectedRoute requireComplete>
+        <TalentRankingPlatform />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/experience-index",
+    element: (
+      <ProtectedRoute requireComplete>
+        <ExperienceIndex />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/skill-index",
+    element: (
+      <ProtectedRoute requireComplete>
+        <SkillIndex />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/hireability-index",
+    element: (
+      <ProtectedRoute requireComplete>
+        <HireabilityIndex />
       </ProtectedRoute>
     ),
   },
   {
     path: "/skill-assessment",
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute requireComplete>
         <SkillAssessmentCard />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/dashboard",
-    element: (
-      <ProtectedRoute>
-        <Dashboard />
       </ProtectedRoute>
     ),
   },
   {
     path: "/case-assessments",
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute requireComplete>
         <CaseAssessmentsPage />
       </ProtectedRoute>
     ),
@@ -288,7 +316,7 @@ const router = createBrowserRouter([
   {
     path: "/case-assessment-opening",
     element: (
-      <ProtectedRoute requireIncomplete={true}>
+      <ProtectedRoute requireComplete>
         <CaseAssessmentOpening />
       </ProtectedRoute>
     ),
@@ -296,7 +324,7 @@ const router = createBrowserRouter([
   {
     path: "/case-assessment-questions",
     element: (
-      <ProtectedRoute requireIncomplete={true}>
+      <ProtectedRoute requireComplete>
         <CaseAssessmentQuestions />
       </ProtectedRoute>
     ),
@@ -304,7 +332,7 @@ const router = createBrowserRouter([
   {
     path: "/case-assessment-score",
     element: (
-      <ProtectedRoute requireIncomplete={true}>
+      <ProtectedRoute requireComplete>
         <CaseAssessmentScore />
       </ProtectedRoute>
     ),
@@ -312,19 +340,52 @@ const router = createBrowserRouter([
   {
     path: "/case-assessment-revel/:caseId",
     element: (
-      <ProtectedRoute requireIncomplete={true}>
+      <ProtectedRoute requireComplete>
         <CaseAssessmentRevel />
       </ProtectedRoute>
     ),
   },
 
+  // ============================================
+  // 404
+  // ============================================
   {
-  path: "*",
-  element: <NotFound />,
-}
-
+    path: "*",
+    element: <NotFound />,
+  },
 ]);
 
+// ============================================
+// APP COMPONENT WITH HYDRATION
+// ============================================
 export default function App() {
+  const dispatch = useAppDispatch();
+  const isHydrated = useAppSelector(selectIsHydrated);
+  const isLoading = useAppSelector(selectIsLoading);
+  const isAuth = isAuthenticated();
+
+  // ✅ HYDRATE NAVIGATION ON MOUNT
+  useEffect(() => {
+    if (isAuth && !isHydrated) {
+      console.log("🔄 Hydrating navigation from API...");
+      dispatch(hydrateNavigation());
+    }
+  }, [isAuth, isHydrated, dispatch]);
+
+  // ✅ SHOW LOADING SCREEN WHILE HYDRATING
+  if (isAuth && !isHydrated && isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-violet-600 mx-auto mb-4"></div>
+          <p className="text-lg text-gray-700 font-medium">
+            Loading your profile...
+          </p>
+          <p className="text-sm text-gray-500 mt-2">Please wait</p>
+        </div>
+      </div>
+    );
+  }
+
   return <RouterProvider router={router} />;
 }

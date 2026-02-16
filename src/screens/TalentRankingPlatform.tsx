@@ -1065,7 +1065,7 @@ Just genuine, deserving, hardworking talent rising to the top — exactly where 
           </div>
           <Button
             size="large"
-            onClick={() => navigate("/paywall")}
+            onClick={() => navigate("/upload-resume")}
             className="w-full h-11 sm:h-12 rounded-3xl text-[15px] sm:text-[16px] font-semibold transition active:scale-[0.99] shadow-lg"
             style={{
               backgroundColor: colors.primary,

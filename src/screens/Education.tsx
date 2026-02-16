@@ -3,7 +3,8 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-
+import { useAppDispatch } from "../store/hooks"; // ✅ ADD THIS
+import { setNavigation } from "../store/slices/onboardingSlice"; // ✅ ADD THIS
 import { Avatar } from "../ui/components/Avatar";
 import { Button } from "../ui/components/Button";
 import HeaderLogo from "../ui/components/HeaderLogo";
@@ -400,7 +401,8 @@ function SchoolNameDropdown({
 export default function Education() {
   const navigate = useNavigate();
   const location = useLocation();
-  const source = location.state?.source; // "dashboard" | undefined
+  const source = location.state?.source;
+  const dispatch = useAppDispatch(); // ✅ ADD THIS LINE // "dashboard" | undefined
   console.log("EDUCATION source:", source);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -588,14 +590,20 @@ export default function Education() {
 
     try {
       setIsSubmitting(true);
-
+    
       const res = await API("POST", URL_PATH.education, payload, {
         "user-id": userId,
       });
+    
+      // ✅ CHECK IF BACKEND RETURNED NAVIGATION
+      if (res?.navigation) {
+        dispatch(setNavigation(res.navigation));
+      }
+    
       toast.success("Education added successfully");
-
+    
       const created = res.data[0];
-
+    
       setEducations((prev) => [
         {
           id: created._id,
@@ -612,7 +620,7 @@ export default function Education() {
         },
         ...prev,
       ]);
-
+    
       await fetchExperienceIndex();
       resetForm();
     } catch (err: any) {
@@ -652,20 +660,24 @@ export default function Education() {
 
     try {
       setIsSubmitting(true);
-
-      await API(
+    
+      const res = await API(
         "PUT",
-        `${URL_PATH.education}/${editingId}`, // 🔴 confirm endpoint
+        `${URL_PATH.education}/${editingId}`,
         payload,
         { "user-id": userId },
       );
-
+    
+      // ✅ UPDATE REDUX IF NAVIGATION RETURNED
+      if (res?.navigation) {
+        dispatch(setNavigation(res.navigation));
+      }
+    
       toast.success("Education updated");
-
+    
       setEducations((prev) =>
         prev.map((e) => {
           if (e.id !== editingId) return e;
-
           return {
             ...e,
             degree: payload.degree,
@@ -681,7 +693,7 @@ export default function Education() {
           };
         }),
       );
-
+    
       await fetchExperienceIndex();
       resetForm();
     } catch (err: any) {
@@ -703,14 +715,20 @@ export default function Education() {
 
     try {
       setIsSubmitting(true);
-
-      await API(
+    
+      const res = await API(
         "DELETE",
         `${URL_PATH.deleteEducation}/${deleteId}`,
         undefined,
         { "user-id": userId },
       );
-
+    
+      // ✅ UPDATE REDUX IF NAVIGATION RETURNED
+      if (res?.navigation) {
+        dispatch(setNavigation(res.navigation));
+      }
+    
+      toast.success("Education deleted successfully");
       setEducations((prev) => prev.filter((e) => e.id !== deleteId));
       await fetchExperienceIndex();
       setDeleteId(null);

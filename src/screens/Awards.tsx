@@ -24,7 +24,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { colors } from "../common/Colors";
 import Navbar from "src/ui/components/Navbar";
 import Footer from "../ui/components/Footer";
-
+import { useAppDispatch } from "../store/hooks";
+import { setNavigation } from "../store/slices/onboardingSlice";
 
 
 type AwardEntry = {
@@ -137,7 +138,9 @@ export default function Awards() {
   const navigate = useNavigate();
   const location = useLocation();
   const source = location.state?.source;
-
+  
+  // ✅ STEP 2: Add dispatch
+  const dispatch = useAppDispatch();
   console.log("AWARDS source:", source);
   const userId = localStorage.getItem("userId");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -292,7 +295,7 @@ const isEditing = !!editingId;
 
       const yearNum = Number(endYear);
 
-      await API(
+      const res =  await API(
         "POST",
         URL_PATH.awards,
         {
@@ -309,7 +312,9 @@ const isEditing = !!editingId;
       );
 
       toast.success("Award added successfully");
-
+      if (res?.navigation) {
+        dispatch(setNavigation(res.navigation));
+      }
       await fetchAwards();
       await fetchExperienceIndex();
 
