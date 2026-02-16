@@ -947,262 +947,458 @@
 //   );
 // }
 
+// "use client";
+
+// import React, { useEffect, useState } from "react";
+// import { useLocation, useNavigate, useParams } from "react-router-dom";
+// import API, { URL_PATH } from "src/common/API";
+// import { Button } from "../ui/components/Button";
+// import { IconWithBackground } from "../ui/components/IconWithBackground";
+// import HeaderLogo from "src/ui/components/HeaderLogo";
+// import {
+//   FeatherArrowLeft,
+//   FeatherAlertCircle,
+//   FeatherAward,
+//   FeatherTrendingUp,
+//   FeatherInfo,
+//   FeatherClock,
+//   FeatherTarget,
+//   FeatherUser,
+//   FeatherEye,
+//   FeatherHome,
+//   FeatherFileText,
+//   FeatherArrowRight,
+// } from "@subframe/core";
+// import { colors } from "src/common/Colors";
+
+// type Reveal = {
+//   instructions?: string;
+//   solution?: string;
+//   [key: string]: any;
+// };
+
+// // Hide any key that looks like an ID
+// const isIdKey = (key: string) => key.toLowerCase().includes("id");
+
+// export default function CaseAssessmentReveal() {
+//   const navigate = useNavigate();
+//   const { caseId } = useParams();
+
+//   const [score, setScore] = useState<number | null>(null);
+//   const [reveal, setReveal] = useState<Reveal | null>(null);
+//   const [loading, setLoading] = useState(true);
+//   const [maxScore, setMaxScore] = useState(100);
+
+//   useEffect(() => {
+//     const fetchReveal = async () => {
+//       try {
+//         setLoading(true);
+//         const res = await API("GET", URL_PATH.getCaseReveal(caseId));
+//         setScore(res.score);
+//         setReveal(res.reveal);
+//         setMaxScore(res.maxScore || 100);
+//       } catch (err) {
+//         console.error("Reveal fetch failed", err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+//     fetchReveal();
+//   }, [caseId]);
+
+//   if (loading) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center">
+//         Loading reveal...
+//       </div>
+//     );
+//   }
+
+//   if (!reveal) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center">
+//         <div className="bg-white p-6 rounded-xl text-center">
+//           <FeatherAlertCircle className="w-10 h-10 text-red-500 mx-auto mb-3" />
+//           <p className="font-semibold text-red-500">Reveal not available</p>
+//           <Button className="mt-4" onClick={() => navigate("/case-assessments")}>
+//             Back
+//           </Button>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   const percentage = score ? Math.round((score / maxScore) * 100) : 0;
+
+//   return (
+//     <div className="min-h-screen bg-neutral-50 relative overflow-hidden">
+//       <div className="relative z-10">
+//         <HeaderLogo />
+
+//         <div className="max-w-[1400px] mx-auto px-4 py-4 flex gap-6">
+//           {/* LEFT */}
+//           <div className="w-3/5">
+//             {/* <Button
+//               variant="neutral-tertiary"
+//               icon={<FeatherArrowLeft />}
+//               onClick={() => navigate(-1)}
+//             >
+//               Back
+//             </Button> */}
+
+//             {/* MAIN CARD */}
+//             <div className="bg-white rounded-2xl border border-neutral-200 mt-4 overflow-hidden">
+//               {/* Header */}
+//               <div
+//                 className="px-6 py-4 border-b"
+//                 style={{
+//                   backgroundColor: colors.primary + "08",
+//                   borderColor: colors.primary + "20",
+//                 }}
+//               >
+//                 <h2 className="text-lg font-semibold">Case Study Reveal</h2>
+//               </div>
+
+//               {/* SCROLLABLE CONTENT */}
+//               <div className="px-6 py-6 max-h-[70vh] overflow-y-auto">
+//                 {/* Instructions */}
+//                 {reveal.instructions && (
+//                   <div className="mb-6">
+//                     <h3 className="flex items-center gap-2 font-semibold mb-2">
+//                       <FeatherInfo /> Instructions
+//                     </h3>
+//                     <div className="bg-blue-50 p-4 rounded-xl">
+//                       {reveal.instructions}
+//                     </div>
+//                   </div>
+//                 )}
+
+//                 {/* Solution */}
+//                 {reveal.solution && (
+//                   <div className="mb-6">
+//                     <h3 className="font-semibold mb-2">Expert Solution</h3>
+//                     <div className="bg-green-50 p-4 rounded-xl whitespace-pre-line">
+//                       {reveal.solution}
+//                     </div>
+//                   </div>
+//                 )}
+
+//                 {/* Dynamic Sections */}
+//                 {Object.keys(reveal).map((key) => {
+//                   if (
+//                     key === "instructions" ||
+//                     key === "solution" ||
+//                     isIdKey(key)
+//                   )
+//                     return null;
+
+//                   const value = reveal[key];
+
+//                   return (
+//                     <div key={key} className="mb-6">
+//                       <h4 className="font-semibold mb-3 capitalize">
+//                         {key.replace(/([A-Z])/g, " $1")}
+//                       </h4>
+
+//                       {Array.isArray(value) ? (
+//                         value.map((item, idx) => (
+//                           <div
+//                             key={idx}
+//                             className="bg-white border p-4 rounded-lg mb-3"
+//                           >
+//                             {Object.entries(item)
+//                               .filter(([k]) => !isIdKey(k))
+//                               .map(([k, v]) => (
+//                                 <div key={k} className="text-sm mb-1">
+//                                   <span className="font-medium">
+//                                     {k.replace(/([A-Z])/g, " $1")}:
+//                                   </span>{" "}
+//                                   {String(v)}
+//                                 </div>
+//                               ))}
+//                           </div>
+//                         ))
+//                       ) : typeof value === "object" ? (
+//                         <pre className="bg-gray-50 p-4 rounded-lg text-sm">
+//                           {JSON.stringify(
+//                             Object.fromEntries(
+//                               Object.entries(value).filter(
+//                                 ([k]) => !isIdKey(k)
+//                               )
+//                             ),
+//                             null,
+//                             2
+//                           )}
+//                         </pre>
+//                       ) : (
+//                         <p>{String(value)}</p>
+//                       )}
+//                     </div>
+//                   );
+//                 })}
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* RIGHT */}
+//           <div className="w-2/5 space-y-6">
+//             <div className="bg-white rounded-2xl border p-6 text-center">
+//               {/* <IconWithBackground
+//                 icon={<FeatherAward />}
+//                 size="large"
+//                 square
+//               /> */}
+//               <h2 className="mt-3 font-bold text-xl">Your Score</h2>
+//               <p className="text-5xl font-bold mt-2">{score}</p>
+//               <p className="text-sm text-gray-500">out of {maxScore}</p>
+
+//               <div className="mt-4">
+//                 <div className="w-full bg-gray-200 h-2 rounded-full">
+//                   <div
+//                     className="h-2 rounded-full"
+//                     style={{
+//                       width: `${percentage}%`,
+//                       backgroundColor: colors.primary,
+//                     }}
+//                   />
+//                 </div>
+//                 <p className="text-sm mt-1">{percentage}%</p>
+//               </div>
+//             </div>
+
+//             <Button
+//               className="w-full h-12"
+//               icon={<FeatherEye />}
+//               onClick={() => navigate("/case-assessments")}
+//             >
+//               Explore More Cases
+//             </Button>
+
+//             <Button
+//             style={{backgroundColor: colors.primaryGlow, color: colors.white}}
+//               variant="neutral-secondary"
+//               className="w-full h-12 text-white"
+//               icon={<FeatherHome />}
+//               onClick={() => navigate("/dashboard")}
+//             >
+//               Back to Dashboard
+//             </Button>
+
+//             {/* <Button
+//               style={{backgroundColor: colors.accent, color: "white"}}
+//               variant="neutral-tertiary"
+//               className="w-full h-12 text-white"
+//               icon={<FeatherArrowRight />}
+//               onClick={() => navigate("/assessment")}
+//             >
+//               Take Regular Assessment
+//             </Button> */}
+//             <Button
+//             style={{ backgroundColor: colors.primary }}
+//             className="w-full h-12 !text-white"
+//             icon={<FeatherArrowRight />}
+//             onClick={() => navigate("/assessment")}
+//           >
+//             Take Regular Assessment
+//           </Button>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// "use client";
+
+// import React, { useEffect, useState } from "react";
+// import { useParams, useNavigate } from "react-router-dom";
+// import API, { URL_PATH } from "src/common/API";
+// import { Button } from "../ui/components/Button";
+// import { FeatherArrowLeft, FeatherEye, FeatherHome } from "@subframe/core";
+// import { colors } from "src/common/Colors";
+
+// export default function CaseAssessmentReveal() {
+//   const navigate = useNavigate();
+//   const { caseId } = useParams();
+
+//   const [loading, setLoading] = useState(true);
+//   const [score, setScore] = useState<number | null>(null);
+//   const [revealImageUrl, setRevealImageUrl] = useState<string | null>(null);
+
+//   useEffect(() => {
+//   const fetchReveal = async () => {
+//     try {
+//       setLoading(true);
+//       const res = await API("GET", URL_PATH.getCaseReveal(caseId));
+
+//       // Check if reveal has already been viewed
+//       if (res.message === "Reveal already viewed") {
+//         setRevealImageUrl(null);
+//         alert("You have already viewed the reveal for this case.");
+//         return;
+//       }
+
+//       setScore(res.score || null);
+
+//       if (res.revealImageUrl) {
+//         const match = res.revealImageUrl.match(/\/d\/(.*?)\//);
+//         const previewUrl = match
+//           ? `https://drive.google.com/uc?export=view&id=${match[1]}`
+//           : res.revealImageUrl.replace("/view?usp=sharing", "/preview");
+//         setRevealImageUrl(previewUrl);
+//       }
+//     } catch (err) {
+//       console.error("Failed to fetch reveal:", err);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   fetchReveal();
+// }, [caseId]);
+
+//   if (loading)
+//     return (
+//       <div className="min-h-screen flex items-center justify-center">
+//         Loading reveal...
+//       </div>
+//     );
+
+//   return (
+//     <div className="min-h-screen bg-neutral-50 flex flex-col items-center px-4 py-8">
+//       {/* Score Card */}
+//       <div className="bg-white rounded-2xl border p-6 text-center mb-6 w-full max-w-[600px]">
+//         <h2 className="text-2xl font-bold">Your Score</h2>
+//         <p className="text-5xl font-bold mt-2">{score}</p>
+//       </div>
+
+//       {/* Reveal Image */}
+//       {revealImageUrl &&
+//         <iframe
+//           src={revealImageUrl.replace("/view?usp=sharing", "/preview")}
+//           width="100%"
+//           height="500"
+//           allow="autoplay"
+//           className="rounded-2xl border border-neutral-200 max-w-[800px]"
+//         />
+// }
+//       {/* Buttons */}
+//       <div className="flex flex-col gap-4 mt-6 w-full max-w-[400px]">
+//         <Button
+//           style={{ backgroundColor: colors.primaryGlow, color: colors.white }}
+//           icon={<FeatherEye />}
+//           className="w-full"
+//           onClick={() => navigate("/case-assessments")}
+//         >
+//           Explore More Cases
+//         </Button>
+
+//         <Button
+//           style={{ backgroundColor: colors.primary, color: colors.white }}
+//           icon={<FeatherHome />}
+//           className="w-full"
+//           onClick={() => navigate("/dashboard")}
+//         >
+//           Back to Dashboard
+//         </Button>
+//       </div>
+//     </div>
+//   );
+// }
+
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import API, { URL_PATH } from "src/common/API";
 import { Button } from "../ui/components/Button";
-import { IconWithBackground } from "../ui/components/IconWithBackground";
-import HeaderLogo from "src/ui/components/HeaderLogo";
-import {
-  FeatherArrowLeft,
-  FeatherAlertCircle,
-  FeatherAward,
-  FeatherTrendingUp,
-  FeatherInfo,
-  FeatherClock,
-  FeatherTarget,
-  FeatherUser,
-  FeatherEye,
-  FeatherHome,
-  FeatherFileText,
-  FeatherArrowRight,
-} from "@subframe/core";
+import { FeatherEye, FeatherHome } from "@subframe/core";
 import { colors } from "src/common/Colors";
-
-type Reveal = {
-  instructions?: string;
-  solution?: string;
-  [key: string]: any;
-};
-
-// Hide any key that looks like an ID
-const isIdKey = (key: string) => key.toLowerCase().includes("id");
 
 export default function CaseAssessmentReveal() {
   const navigate = useNavigate();
   const { caseId } = useParams();
 
-  const [score, setScore] = useState<number | null>(null);
-  const [reveal, setReveal] = useState<Reveal | null>(null);
   const [loading, setLoading] = useState(true);
-  const [maxScore, setMaxScore] = useState(100);
+  const [score, setScore] = useState<number | null>(null);
+  const [revealImageUrl, setRevealImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchReveal = async () => {
       try {
         setLoading(true);
         const res = await API("GET", URL_PATH.getCaseReveal(caseId));
-        setScore(res.score);
-        setReveal(res.reveal);
-        setMaxScore(res.maxScore || 100);
+
+        // Check if reveal has already been viewed
+        if (res.message === "Reveal already viewed") {
+          setRevealImageUrl(null);
+          alert("You have already viewed the reveal for this case.");
+          return;
+        }
+
+        setScore(res.score || null);
+
+        if (res.revealImageUrl) {
+          // Convert Google Drive share link to preview URL
+          const match = res.revealImageUrl.match(/\/d\/(.*?)\//);
+          const previewUrl = res.revealImageUrl.replace("/view?usp=sharing", "/preview");
+          setRevealImageUrl(previewUrl);
+        }
       } catch (err) {
-        console.error("Reveal fetch failed", err);
+        console.error("Failed to fetch reveal:", err);
       } finally {
         setLoading(false);
       }
     };
+
     fetchReveal();
   }, [caseId]);
 
-  if (loading) {
+  if (loading)
     return (
       <div className="min-h-screen flex items-center justify-center">
         Loading reveal...
       </div>
     );
-  }
-
-  if (!reveal) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="bg-white p-6 rounded-xl text-center">
-          <FeatherAlertCircle className="w-10 h-10 text-red-500 mx-auto mb-3" />
-          <p className="font-semibold text-red-500">Reveal not available</p>
-          <Button className="mt-4" onClick={() => navigate("/case-assessments")}>
-            Back
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  const percentage = score ? Math.round((score / maxScore) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-neutral-50 relative overflow-hidden">
-      <div className="relative z-10">
-        <HeaderLogo />
+    <div className="min-h-screen bg-neutral-50 flex flex-col items-center px-4 py-8">
+      {/* Score Card */}
+      <div className="bg-white rounded-2xl border p-6 text-center mb-6 w-full max-w-[600px]">
+        <h2 className="text-2xl font-bold">Your Score</h2>
+        <p className="text-5xl font-bold mt-2">{score}</p>
+      </div>
 
-        <div className="max-w-[1400px] mx-auto px-4 py-4 flex gap-6">
-          {/* LEFT */}
-          <div className="w-3/5">
-            {/* <Button
-              variant="neutral-tertiary"
-              icon={<FeatherArrowLeft />}
-              onClick={() => navigate(-1)}
-            >
-              Back
-            </Button> */}
+      {/* Reveal Image inside iframe */}
+      {revealImageUrl && (
+        <iframe
+          src={revealImageUrl}
+          width="100%"
+          height="500"
+          allow="autoplay"
+          className="rounded-2xl border border-neutral-200 max-w-[800px]"
+        />
+      )}
 
-            {/* MAIN CARD */}
-            <div className="bg-white rounded-2xl border border-neutral-200 mt-4 overflow-hidden">
-              {/* Header */}
-              <div
-                className="px-6 py-4 border-b"
-                style={{
-                  backgroundColor: colors.primary + "08",
-                  borderColor: colors.primary + "20",
-                }}
-              >
-                <h2 className="text-lg font-semibold">Case Study Reveal</h2>
-              </div>
+      {/* Buttons */}
+      <div className="flex flex-col gap-4 mt-6 w-full max-w-[400px]">
+        <Button
+          style={{ backgroundColor: colors.primaryGlow, color: colors.white }}
+          icon={<FeatherEye />}
+          className="w-full"
+          onClick={() => navigate("/case-assessments")}
+        >
+          Explore More Cases
+        </Button>
 
-              {/* SCROLLABLE CONTENT */}
-              <div className="px-6 py-6 max-h-[70vh] overflow-y-auto">
-                {/* Instructions */}
-                {reveal.instructions && (
-                  <div className="mb-6">
-                    <h3 className="flex items-center gap-2 font-semibold mb-2">
-                      <FeatherInfo /> Instructions
-                    </h3>
-                    <div className="bg-blue-50 p-4 rounded-xl">
-                      {reveal.instructions}
-                    </div>
-                  </div>
-                )}
-
-                {/* Solution */}
-                {reveal.solution && (
-                  <div className="mb-6">
-                    <h3 className="font-semibold mb-2">Expert Solution</h3>
-                    <div className="bg-green-50 p-4 rounded-xl whitespace-pre-line">
-                      {reveal.solution}
-                    </div>
-                  </div>
-                )}
-
-                {/* Dynamic Sections */}
-                {Object.keys(reveal).map((key) => {
-                  if (
-                    key === "instructions" ||
-                    key === "solution" ||
-                    isIdKey(key)
-                  )
-                    return null;
-
-                  const value = reveal[key];
-
-                  return (
-                    <div key={key} className="mb-6">
-                      <h4 className="font-semibold mb-3 capitalize">
-                        {key.replace(/([A-Z])/g, " $1")}
-                      </h4>
-
-                      {Array.isArray(value) ? (
-                        value.map((item, idx) => (
-                          <div
-                            key={idx}
-                            className="bg-white border p-4 rounded-lg mb-3"
-                          >
-                            {Object.entries(item)
-                              .filter(([k]) => !isIdKey(k))
-                              .map(([k, v]) => (
-                                <div key={k} className="text-sm mb-1">
-                                  <span className="font-medium">
-                                    {k.replace(/([A-Z])/g, " $1")}:
-                                  </span>{" "}
-                                  {String(v)}
-                                </div>
-                              ))}
-                          </div>
-                        ))
-                      ) : typeof value === "object" ? (
-                        <pre className="bg-gray-50 p-4 rounded-lg text-sm">
-                          {JSON.stringify(
-                            Object.fromEntries(
-                              Object.entries(value).filter(
-                                ([k]) => !isIdKey(k)
-                              )
-                            ),
-                            null,
-                            2
-                          )}
-                        </pre>
-                      ) : (
-                        <p>{String(value)}</p>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* RIGHT */}
-          <div className="w-2/5 space-y-6">
-            <div className="bg-white rounded-2xl border p-6 text-center">
-              {/* <IconWithBackground
-                icon={<FeatherAward />}
-                size="large"
-                square
-              /> */}
-              <h2 className="mt-3 font-bold text-xl">Your Score</h2>
-              <p className="text-5xl font-bold mt-2">{score}</p>
-              <p className="text-sm text-gray-500">out of {maxScore}</p>
-
-              <div className="mt-4">
-                <div className="w-full bg-gray-200 h-2 rounded-full">
-                  <div
-                    className="h-2 rounded-full"
-                    style={{
-                      width: `${percentage}%`,
-                      backgroundColor: colors.primary,
-                    }}
-                  />
-                </div>
-                <p className="text-sm mt-1">{percentage}%</p>
-              </div>
-            </div>
-
-            <Button
-              className="w-full h-12"
-              icon={<FeatherEye />}
-              onClick={() => navigate("/case-assessments")}
-            >
-              Explore More Cases
-            </Button>
-
-            <Button
-            style={{backgroundColor: colors.primaryGlow, color: colors.white}}
-              variant="neutral-secondary"
-              className="w-full h-12 text-white"
-              icon={<FeatherHome />}
-              onClick={() => navigate("/dashboard")}
-            >
-              Back to Dashboard
-            </Button>
-
-            {/* <Button
-              style={{backgroundColor: colors.accent, color: "white"}}
-              variant="neutral-tertiary"
-              className="w-full h-12 text-white"
-              icon={<FeatherArrowRight />}
-              onClick={() => navigate("/assessment")}
-            >
-              Take Regular Assessment
-            </Button> */}
-            <Button
-            style={{ backgroundColor: colors.primary }}
-            className="w-full h-12 !text-white"
-            icon={<FeatherArrowRight />}
-            onClick={() => navigate("/assessment")}
-          >
-            Take Regular Assessment
-          </Button>
-          </div>
-        </div>
+        <Button
+          style={{ backgroundColor: colors.primary, color: colors.white }}
+          icon={<FeatherHome />}
+          className="w-full"
+          onClick={() => navigate("/dashboard")}
+        >
+          Back to Dashboard
+        </Button>
       </div>
     </div>
   );

@@ -201,6 +201,8 @@ function CaseCard({
   );
 }
 
+
+
 /* ==================== MAIN COMPONENT ==================== */
 
 export default function CaseAssessmentsPage() {
@@ -259,44 +261,105 @@ const [startingCaseId, setStartingCaseId] = useState<string | null>(null);
   //     setLoadingCases(false);
   //   }
   // }, []);
+//   const fetchCases = useCallback(async () => {
+//   try {
+//     setLoadingCases(true);
+//     const res = await API("GET", URL_PATH.getAllCases, {
+//       page: 1,
+//       limit: 20
+//     });
+//     setCases(res?.data || []);
+//   } catch (err: any) {
+//     console.error("fetchCases failed:", err);
+
+//     if (err?.response?.status === 403 &&
+//         err?.response?.data?.code === "UPGRADE_REQUIRED") {
+      
+//       navigate("/pricing"); // or show modal
+//       return;
+//     }
+//   } finally {
+//     setLoadingCases(false);
+//   }
+// }, [navigate]);
+
   const fetchCases = useCallback(async () => {
   try {
     setLoadingCases(true);
-    const res = await API("GET", URL_PATH.getAllCases, {
-      page: 1,
-      limit: 20
-    });
-    setCases(res?.data || []);
+
+    const res = await API("GET", URL_PATH.getAllCases);
+
+    console.log("Cases Response:", res);
+
+    // Backend returns array directly
+    if (Array.isArray(res)) {
+      setCases(res);
+    } else {
+      setCases([]);
+    }
+
   } catch (err: any) {
     console.error("fetchCases failed:", err);
-
-    if (err?.response?.status === 403 &&
-        err?.response?.data?.code === "UPGRADE_REQUIRED") {
-      
-      navigate("/pricing"); // or show modal
-      return;
-    }
   } finally {
     setLoadingCases(false);
   }
-}, [navigate]);
+}, []);
+
+
+  // const onStart = async (caseId: string) => {
+  //   if (startingCaseId) return;
+  //   try {
+  //     const res = await API("POST", URL_PATH.startCase(caseId), {});
+  //     const { attemptId, opening } = res;
+  //     navigate("/case-assessment-opening", {
+  //       state: {
+  //         caseId,
+  //         attemptId,
+  //         opening,
+  //       },
+  //     });
+  //   } catch (err) {
+  //     console.error("Start case failed:", err);
+  //   }
+  // };
 
   const onStart = async (caseId: string) => {
-    if (startingCaseId) return;
-    try {
-      const res = await API("POST", URL_PATH.startCase(caseId), {});
-      const { attemptId, opening } = res;
-      navigate("/case-assessment-opening", {
-        state: {
-          caseId,
-          attemptId,
-          opening,
-        },
-      });
-    } catch (err) {
-      console.error("Start case failed:", err);
+  if (startingCaseId) return;
+
+  try {
+    setStartingCaseId(caseId);
+
+    // 1️⃣ Start case
+    const startRes = await API("POST", URL_PATH.startCase(caseId));
+
+    console.log("Start Response:", startRes);
+
+    // 2️⃣ Get opening data
+    const openingRes = await API("GET", URL_PATH.getOpening(caseId));
+
+    console.log("Opening Response:", openingRes);
+
+    // 3️⃣ Navigate with data
+    navigate("/case-assessment-opening", {
+      state: {
+        caseId,
+        attemptId: startRes.attemptId,
+        attemptNumber: startRes.attemptNumber,
+        opening: openingRes
+      }
+    });
+
+  } catch (err: any) {
+    console.error("Start case failed:", err);
+
+    if (err?.response?.data?.message === "Maximum attempts reached") {
+      alert("You have already used all attempts for this case.");
     }
-  };
+
+  } finally {
+    setStartingCaseId(null);
+  }
+};
 
   
 
