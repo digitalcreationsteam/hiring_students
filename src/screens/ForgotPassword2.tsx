@@ -7,7 +7,6 @@ import { colors } from "src/common/Colors";
 import Navbar from "src/ui/components/Navbar";
 import Footer from "../ui/components/Footer";
 
-
 export default function VerifyResetCode() {
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -19,7 +18,6 @@ export default function VerifyResetCode() {
   const [resendLoading, setResendLoading] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const isOtpComplete = otp.every((digit) => digit !== "");
-
 
   /* ================= REDIRECT SAFELY ================= */
   //   useEffect(() => {
@@ -36,20 +34,18 @@ export default function VerifyResetCode() {
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
- 
+
     if (value && index < 5) {
       inputsRef.current[index + 1]?.focus();
     }
   };
 
-
   const handleVerify = async () => {
-
     if (!email) {
-  toast.error("Session expired. Please try again.");
-  navigate("/forgot-password", { replace: true });
-  return;
-}
+      toast.error("Session expired. Please try again.");
+      navigate("/forgot-password", { replace: true });
+      return;
+    }
     const code = otp.join("");
     if (code.length !== 6) {
       toast.error("Enter 6 digit code");
@@ -73,68 +69,63 @@ export default function VerifyResetCode() {
   };
 
   const handleResend = async () => {
-  if (!email || resendLoading || cooldown > 0) return;
+    if (!email || resendLoading || cooldown > 0) return;
 
-  try {
-    setResendLoading(true);
+    try {
+      setResendLoading(true);
 
-    await API("post", URL_PATH.forgotPassword, { email });
+      await API("post", URL_PATH.forgotPassword, { email });
 
-    toast.success("Verification code sent");
+      toast.success("Verification code sent");
 
-    setCooldown(30); // 30 seconds cooldown
-  } catch {
-    toast.error("Unable to resend code");
-  } finally {
-    setResendLoading(false);
-  }
-};
-
-
-
-  useEffect(() => {
-  if (cooldown === 0) return;
-
-  const timer = setInterval(() => {
-    setCooldown((prev) => prev - 1);
-  }, 1000);
-
-  return () => clearInterval(timer);
-}, [cooldown]);
-
-
-// Enter Key to Verify OTP
-useEffect(() => {
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "Enter" && isOtpComplete && !loading) {
-      handleVerify();
-    }
-
-    if (e.key === "Escape") {
-      navigate(-1);
+      setCooldown(30); // 30 seconds cooldown
+    } catch {
+      toast.error("Unable to resend code");
+    } finally {
+      setResendLoading(false);
     }
   };
 
-  window.addEventListener("keydown", handleKeyDown);
+  useEffect(() => {
+    if (cooldown === 0) return;
 
-  return () => window.removeEventListener("keydown", handleKeyDown);
-}, [isOtpComplete, loading, navigate]);
+    const timer = setInterval(() => {
+      setCooldown((prev) => prev - 1);
+    }, 1000);
 
-// Paste Full OTP (Ctrl / Cmd + V)
-const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-  const pastedData = e.clipboardData.getData("Text").trim();
+    return () => clearInterval(timer);
+  }, [cooldown]);
 
-  if (!/^\d{6}$/.test(pastedData)) return;
+  // Enter Key to Verify OTP
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter" && isOtpComplete && !loading) {
+        handleVerify();
+      }
 
-  const digits = pastedData.split("");
-  setOtp(digits);
+      if (e.key === "Escape") {
+        navigate(-1);
+      }
+    };
 
-  digits.forEach((_, idx) => {
-    inputsRef.current[idx]?.focus();
-  });
-};
+    window.addEventListener("keydown", handleKeyDown);
 
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOtpComplete, loading, navigate]);
 
+  // Paste Full OTP (Ctrl / Cmd + V)
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pastedData = e.clipboardData.getData("Text").trim();
+
+    if (!/^\d{6}$/.test(pastedData)) return;
+
+    const digits = pastedData.split("");
+    setOtp(digits);
+
+    digits.forEach((_, idx) => {
+      inputsRef.current[idx]?.focus();
+    });
+  };
 
   /* ================= UI ================= */
 
@@ -142,41 +133,40 @@ const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     <>
       <ToastContainer position="top-center" autoClose={2000} />
       <Navbar />
-<div className="min-h-screen flex items-center justify-center px-4 relative">
-{/* 🎨 Linear gradient background - fixed behind everything */}
-    <div 
-      className="pointer-events-none fixed inset-0 -z-10"
-      style={{
-        background: `linear-gradient(
+      <div className="min-h-screen flex items-center justify-center px-4 relative">
+        {/* 🎨 Linear gradient background - fixed behind everything */}
+        <div
+          className="pointer-events-none fixed inset-0 -z-10"
+          style={{
+            background: `linear-gradient(
           to bottom,
           #d9d9d9 0%,
           #cfd3d6 25%,
           #9aa6b2 55%,
           #2E4056 100%
         )`,
-        width: "100%",
-      }}
-    />
+            width: "100%",
+          }}
+        />
 
-<div
-  className="w-full max-w-md rounded-3xl p-6 shadow-[0_6px_20px_rgba(15,15,15,0.06)]"
-  style={{
-    backgroundColor: colors.white,
-    border: `1px solid ${colors.neutral[200]}`,
-  }}
->
+        <div
+          className="w-full max-w-md rounded-3xl p-6 shadow-[0_6px_20px_rgba(15,15,15,0.06)]"
+          style={{
+            backgroundColor: colors.white,
+            border: `1px solid ${colors.neutral[200]}`,
+          }}
+        >
           {/* Back */}
           <button
-  onClick={() => navigate(-1)}
-  className="w-10 h-10 rounded-full flex items-center justify-center mb-6 transition"
-  style={{
-    backgroundColor: colors.neutral[100],
-    color: colors.accent,
-  }}
->
-  ←
-</button>
-
+            onClick={() => navigate(-1)}
+            className="w-10 h-10 rounded-full flex items-center justify-center mb-6 transition"
+            style={{
+              backgroundColor: colors.neutral[100],
+              color: colors.accent,
+            }}
+          >
+            ←
+          </button>
 
           <h2 className="text-[24px]  mb-4">Check your email</h2>
 
@@ -195,86 +185,85 @@ const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
           <div className="flex justify-between mb-6">
             {otp.map((digit, index) => (
               <input
-  key={index}
-  ref={(el) => {
-    inputsRef.current[index] = el;
-  }}
-  value={digit}
-  maxLength={1}
-  onPaste={handlePaste}
-  onChange={(e) => handleChange(e.target.value, index)}
-  onKeyDown={(e) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      inputsRef.current[index - 1]?.focus();
-    }
+                key={index}
+                ref={(el) => {
+                  inputsRef.current[index] = el;
+                }}
+                value={digit}
+                maxLength={1}
+                onPaste={handlePaste}
+                onChange={(e) => handleChange(e.target.value, index)}
+                onKeyDown={(e) => {
+                  if (e.key === "Backspace" && !otp[index] && index > 0) {
+                    inputsRef.current[index - 1]?.focus();
+                  }
 
-    if (e.key === "ArrowLeft" && index > 0) {
-      inputsRef.current[index - 1]?.focus();
-    }
+                  if (e.key === "ArrowLeft" && index > 0) {
+                    inputsRef.current[index - 1]?.focus();
+                  }
 
-    if (e.key === "ArrowRight" && index < 5) {
-      inputsRef.current[index + 1]?.focus();
-    }
-  }}
-className="w-12 h-12 rounded-2xl text-center text-lg font-semibold outline-none transition"
-style={{
-  backgroundColor: colors.white,
-  border: `1px solid ${colors.neutral[200]}`,
-  color: colors.accent,
-}}
-onFocus={(e) => {
-  e.currentTarget.style.border = `1px solid ${colors.primary}`;
-  e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary}22`;
-}}
-onBlur={(e) => {
-  e.currentTarget.style.border = `1px solid ${colors.neutral[200]}`;
-  e.currentTarget.style.boxShadow = "none";
-}}
-/>
-
+                  if (e.key === "ArrowRight" && index < 5) {
+                    inputsRef.current[index + 1]?.focus();
+                  }
+                }}
+                className="w-12 h-12 rounded-2xl text-center text-lg font-semibold outline-none transition"
+                style={{
+                  backgroundColor: colors.white,
+                  border: `1px solid ${colors.neutral[200]}`,
+                  color: colors.accent,
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.border = `1px solid ${colors.primary}`;
+                  e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary}22`;
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.border = `1px solid ${colors.neutral[200]}`;
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+              />
             ))}
           </div>
 
-        <button
-  onClick={handleVerify}
-  disabled={loading}
-  className="w-full h-10 rounded-3xl font-semibold transition"
-  style={{
-    backgroundColor: loading ? colors.neutral[400] : colors.primary,
-    color: colors.white,
-    cursor: loading ? "not-allowed" : "pointer",
-  }}
->
-  {loading ? "Verifying..." : "Verify Code"}
-</button>
-
-
-
+          <button
+            onClick={handleVerify}
+            disabled={loading}
+            className="w-full h-10 rounded-3xl font-semibold transition"
+            style={{
+              backgroundColor: loading ? colors.neutral[400] : colors.primary,
+              color: colors.white,
+              cursor: loading ? "not-allowed" : "pointer",
+            }}
+          >
+            {loading ? "Verifying..." : "Verify Code"}
+          </button>
 
           <p className="text-center text-sm text-gray-500 mt-4">
             Haven’t got the email?{" "}
-           <span
-  onClick={handleResend}
-  className="font-medium transition"
-  style={{
-    color:
-      resendLoading || cooldown > 0 ? colors.neutral[400] : colors.accent,
-    cursor: resendLoading || cooldown > 0 ? "not-allowed" : "pointer",
-    textDecoration: resendLoading || cooldown > 0 ? "none" : "underline",
-    textUnderlineOffset: "3px",
-  }}
->
-  {resendLoading
-    ? "Sending..."
-    : cooldown > 0
-    ? `Resend in ${cooldown}s`
-    : "Resend email"}
-</span>
-
+            <span
+              onClick={handleResend}
+              className="font-medium transition"
+              style={{
+                color:
+                  resendLoading || cooldown > 0
+                    ? colors.neutral[400]
+                    : colors.accent,
+                cursor:
+                  resendLoading || cooldown > 0 ? "not-allowed" : "pointer",
+                textDecoration:
+                  resendLoading || cooldown > 0 ? "none" : "underline",
+                textUnderlineOffset: "3px",
+              }}
+            >
+              {resendLoading
+                ? "Sending..."
+                : cooldown > 0
+                  ? `Resend in ${cooldown}s`
+                  : "Resend email"}
+            </span>
           </p>
         </div>
       </div>
-       <div>
+      <div>
         <Footer />
       </div>
     </>

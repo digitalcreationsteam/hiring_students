@@ -2911,16 +2911,21 @@ export default function Education() {
     fetchExperienceIndex();
     fetchEducations();
   }, [userId, fetchExperienceIndex, fetchEducations]);
-
   const handleContinue = () => {
     if (!educations.length) {
       toast.error("Please add at least one education to continue.");
       return;
     }
+
+    console.log("Source value:", source); // Check what source is
+    console.log(
+      "Navigating to:",
+      source === "dashboard" ? "/dashboard" : "/experience",
+    );
+
     if (source === "dashboard") {
       navigate("/dashboard");
     } else {
-      // Change this from "/demographics" to "/experience"
       navigate("/experience", { state: { source } });
     }
   };

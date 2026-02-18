@@ -1923,6 +1923,8 @@ export default function Certifications() {
       return;
     }
 
+    console.log("Source value:", source); // Add this to debug
+
     if (source === "dashboard") {
       navigate("/dashboard");
     } else {

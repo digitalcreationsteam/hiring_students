@@ -1831,13 +1831,9 @@ export default function Projects() {
       return;
     }
 
-    if (source === "dashboard") {
-      console.log("➡️ Navigating to dashboard (source === 'dashboard')");
-      navigate("/dashboard");
-    } else {
-      console.log("➡️ Navigating to skill-index-intro page");
-      navigate("/skill-index-intro", { state: { source } });
-    }
+    // Always go to skill-index-intro page
+    console.log("➡️ Navigating to skill-index-intro page");
+    navigate("/skill-index-intro", { state: { source } });
   };
 
   const fillFormForEdit = (p: ProjectEntry) => {
