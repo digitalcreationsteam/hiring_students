@@ -686,23 +686,15 @@ function Paywall() {
   };
 
   // Format price display
-  // Format price display
-  // Format price display
   const formatPrice = (plan: SubscriptionPlan | undefined): string => {
     if (!plan) return "";
+
     if (plan.price === 0) return "Free";
 
-    switch (plan.billingPeriod) {
-      case "oneTime":
-        return `INR ${plan.price} one time`;
-      case "yearly":
-        return `INR ${plan.price}/year`;
-      case "monthly":
-        return `INR ${plan.price}/month`;
-      default:
-        return `INR ${plan.price}`;
-    }
+    const period = plan.billingPeriod === "yearly" ? "year" : "month";
+    return `₹${plan.price}/${period}`;
   };
+
   // Check if plan is popular
   const isPopularPlan = (plan: SubscriptionPlan): boolean => {
     return plan?.planName?.toLowerCase() === "premium";
