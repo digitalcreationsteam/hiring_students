@@ -1366,14 +1366,6 @@ type CertEntry = {
   file?: File;
 };
 
-type ExperiencePoints = {
-  demographics?: number;
-  education?: number;
-  workExperience?: number;
-  certifications?: number;
-  total?: number;
-};
-
 const URL_REGEX = /^(https?:\/\/)([\w-]+\.)+[\w-]{2,}(\/[^\s]*)?$/i;
 
 const isValidUrl = (value: string) => {
@@ -1591,12 +1583,11 @@ export default function Certifications() {
   // stored certs
   const [certs, setCerts] = useState<CertEntry[]>([]);
 
-  // In your Certifications component, update this line:
   const displayedIndex =
     (experiencePoints?.demographics ?? 0) +
     (experiencePoints?.education ?? 0) +
     (experiencePoints?.workExperience ?? 0) +
-    (experiencePoints?.certifications ?? 0); // Add certifications here
+    (experiencePoints?.certifications ?? 0);
 
   // Minimalist field styles (matching Experience)
   const fieldClass = "w-full mb-4";
@@ -1650,45 +1641,15 @@ export default function Certifications() {
     if (!userId) return;
 
     try {
-      const res = await API("GET", URL_PATH.calculateExperience, undefined, {
-        "user-id": userId,
-      });
+      const res = await API(
+        "GET",
+        URL_PATH.calculateExperienceIndex,
+        undefined,
+        { "user-id": userId },
+      );
 
-      console.log("📊 Experience Index Response:", res); // Debug log
-
-      // Handle different response formats
-      if (res?.points) {
-        // If backend returns nested points object
-        setExperiencePoints({
-          demographics: res.points.demographics || 0,
-          education: res.points.education || 0,
-          workExperience: res.points.workExperience || 0,
-          certifications: res.points.certifications || 0,
-          total: res.points.total || 0,
-        });
-      } else if (res?.data?.breakdown) {
-        // If backend returns new format with breakdown
-        setExperiencePoints({
-          demographics: res.data.breakdown.demographics || 0,
-          education: res.data.breakdown.education || 0,
-          workExperience: res.data.breakdown.workExperience || 0,
-          certifications: res.data.breakdown.certifications || 0,
-          total: res.data.totalPoints || 0,
-        });
-      } else if (res?.total !== undefined) {
-        // Backward compatibility
-        setExperiencePoints({
-          demographics: res.demographics || 0,
-          education: res.education || 0,
-          workExperience: res.workExperience || 0,
-          certifications: res.certifications || 0,
-          total: res.total,
-        });
-      } else {
-        setExperiencePoints(null);
-      }
-    } catch (error) {
-      console.error("❌ Failed to fetch experience index:", error);
+      setExperiencePoints(res?.points ?? null);
+    } catch {
       setExperiencePoints(null);
     }
   };
@@ -2330,7 +2291,6 @@ export default function Certifications() {
             </div>
           </div>
 
-          {/* Right column - Progress Panel */}
           {/* Right column - Progress Panel */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100 sticky top-24">

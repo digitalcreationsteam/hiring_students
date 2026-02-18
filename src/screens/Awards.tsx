@@ -1529,7 +1529,7 @@ export default function Awards() {
                   <span className="text-4xl font-light text-neutral-900">
                     {displayedIndex ?? 0}
                   </span>
-                  <span className="text-xs text-neutral-400">/300</span>
+                  <span className="text-xs text-neutral-400">/100</span>
                 </div>
               </div>
 

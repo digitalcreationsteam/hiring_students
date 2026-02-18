@@ -53,7 +53,7 @@ export const URL_PATH = {
   verifyOTP: '/auth/verify-otp',
   resendOTP: '/auth/resend-otp',
 
-  calculateExperienceIndex: "/api/experience/index",
+
   /* ---------- PASSWORD RESET ---------- */
   forgotPassword: "/auth/forgot-password",
   verifyResetCode: "/auth/verify-reset-code",
@@ -67,7 +67,7 @@ export const URL_PATH = {
   uploadProfile: "/user/profile",
 
   /* ---------- EXPERIENCE INDEX ---------- */
-  calculateExperience: "/user/complete-experience-index",
+  calculateExperienceIndex: "/user/experience_index",
 
   /* ---------- DEMOGRAPHICS ---------- */
   demographics: "/user/demographics",
