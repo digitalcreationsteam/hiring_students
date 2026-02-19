@@ -14,10 +14,8 @@ const LinkedInGallery: React.FC = () => {
   ]);
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  // State to track failed images (optional, but helps debugging)
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
 
-  // Split images into two rows
   const row1Images = images.slice(0, 4);
   const row2Images = images.slice(4, 8);
 
@@ -37,22 +35,21 @@ const LinkedInGallery: React.FC = () => {
     setFailedImages(prev => new Set(prev).add(imageId.toString()));
   };
 
-  // Helper component to render image rows
   const ImageRow = ({ rowImages, isReverse }: { rowImages: typeof row1Images; isReverse: boolean }) => {
-    // Duplicate images for seamless loop
     const duplicatedImages = [...rowImages, ...rowImages, ...rowImages];
-    
+
     return (
       <div className="relative w-full h-56 sm:h-64 lg:h-72 mb-6 sm:mb-8 lg:mb-10 overflow-hidden group">
+        {/* Fade overlays - now span full width edge-to-edge */}
         <div className="absolute inset-0 z-10 pointer-events-none">
           <div
-            className="absolute left-0 top-0 bottom-0 w-20 sm:w-32 lg:w-40 bg-gradient-to-r z-20"
+            className="absolute left-0 top-0 bottom-0 w-20 sm:w-32 lg:w-40 z-20"
             style={{
               background: `linear-gradient(90deg, ${uniTalentColors.background} 0%, ${uniTalentColors.background}00 100%)`,
             }}
           />
           <div
-            className="absolute right-0 top-0 bottom-0 w-20 sm:w-32 lg:w-40 bg-gradient-to-l z-20"
+            className="absolute right-0 top-0 bottom-0 w-20 sm:w-32 lg:w-40 z-20"
             style={{
               background: `linear-gradient(270deg, ${uniTalentColors.background} 0%, ${uniTalentColors.background}00 100%)`,
             }}
@@ -100,8 +97,8 @@ const LinkedInGallery: React.FC = () => {
       className="relative w-full py-8 sm:py-12 lg:py-16 overflow-hidden"
       style={{ backgroundColor: `${uniTalentColors.primary}30` }}
     >
-      {/* Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0 mb-8 sm:mb-12">
+      {/* Header - constrained to max-w-7xl */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 sm:mb-12">
         <h1
           className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center"
           style={{ color: uniTalentColors.text }}
@@ -114,15 +111,11 @@ const LinkedInGallery: React.FC = () => {
         />
       </div>
 
-      {/* Row 1 - Left to Right */}
-      <div className="max-w-7xl mx-auto">
-        <ImageRow rowImages={row1Images} isReverse={false} />
-      </div>
+      {/* Row 1 - Full width, no max-w constraint */}
+      <ImageRow rowImages={row1Images} isReverse={false} />
 
-      {/* Row 2 - Right to Left */}
-      <div className="max-w-7xl mx-auto">
-        <ImageRow rowImages={row2Images} isReverse={true} />
-      </div>
+      {/* Row 2 - Full width, no max-w constraint */}
+      <ImageRow rowImages={row2Images} isReverse={true} />
 
       {/* Modal */}
       {selectedImage && (

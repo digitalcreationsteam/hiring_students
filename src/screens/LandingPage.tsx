@@ -19,7 +19,7 @@ const LandingPage = () => {
       <AboutSection />
       <SolutionSection />
       <LinkedInGallery />
-      <FeaturesSection />
+      {/**<FeaturesSection /> */}
       <CTASection/>
       <Footer />
     </div>
