@@ -1,7 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { colors, uniTalentColors } from "src/common/Colors";
-import { Menu, X, User, Settings, LogOut, MessageCircle } from "lucide-react";
+import {
+  Menu,
+  X,
+  User,
+  Settings,
+  LogOut,
+  MessageCircle,
+  AlertTriangle,
+} from "lucide-react";
 import { BASE_URL } from "src/common/API";
 import { clearUserData } from "src/utils/authUtils";
 
@@ -11,9 +19,11 @@ const DEFAULT_AVATAR =
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   /* -------------------- Avatar Logic -------------------- */
 
@@ -92,10 +102,22 @@ const Navbar = () => {
     setIsOpen(false);
   };
 
-  const handleLogout = () => {
-    clearUserData();
+  // Open logout confirmation modal
+  const handleLogoutClick = () => {
     setProfileOpen(false);
+    setShowLogoutModal(true);
+  };
+
+  // Confirm logout
+  const handleConfirmLogout = () => {
+    clearUserData();
+    setShowLogoutModal(false);
     navigate("/login");
+  };
+
+  // Cancel logout
+  const handleCancelLogout = () => {
+    setShowLogoutModal(false);
   };
 
   /* Close dropdown on outside click */
@@ -107,11 +129,33 @@ const Navbar = () => {
       ) {
         setProfileOpen(false);
       }
+
+      // Close modal if clicked outside
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node) &&
+        showLogoutModal
+      ) {
+        setShowLogoutModal(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [showLogoutModal]);
+
+  // Prevent scrolling when modal is open
+  useEffect(() => {
+    if (showLogoutModal) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [showLogoutModal]);
 
   const menuItems = ["Home", "Features", "Contact"];
 
@@ -218,7 +262,7 @@ const Navbar = () => {
                   <div className="border-t"></div>
 
                   <button
-                    onClick={handleLogout}
+                    onClick={handleLogoutClick}
                     className="flex items-center gap-3 w-full px-4 py-3 hover:bg-red-50 text-sm text-red-600"
                   >
                     <LogOut size={18} />
@@ -230,7 +274,7 @@ const Navbar = () => {
           ) : (
             /* Other pages → only Logout */
             <button
-              onClick={handleLogout}
+              onClick={handleLogoutClick}
               className="flex items-center gap-2 px-5 py-2 rounded-lg font-semibold transition-all duration-300 bg-red-50 text-red-600"
             >
               <LogOut size={18} />
@@ -296,13 +340,53 @@ const Navbar = () => {
                 </div>
               ) : (
                 <button
-                  onClick={handleLogout}
+                  onClick={handleLogoutClick}
                   className="flex items-center gap-2 text-red-600"
                 >
                   <LogOut size={18} />
                   Logout
                 </button>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div
+            ref={modalRef}
+            className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-300"
+          >
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                <AlertTriangle size={24} className="text-red-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900">
+                Confirm Logout
+              </h3>
+            </div>
+
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to log out? You'll need to log in again to
+              access your dashboard and messages.
+            </p>
+
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={handleCancelLogout}
+                className="px-5 py-2.5 rounded-lg font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmLogout}
+                className="px-5 py-2.5 rounded-lg font-medium text-white bg-red-600 hover:bg-red-700 transition-colors flex items-center gap-2"
+              >
+                <LogOut size={18} />
+                Logout
+              </button>
             </div>
           </div>
         </div>

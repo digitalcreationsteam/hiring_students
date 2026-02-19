@@ -71,6 +71,9 @@ export const clearUserData = (): void => {
   localStorage.removeItem("userEmail");
   localStorage.removeItem("userName");
   localStorage.removeItem("signupEmail");
+  localStorage.removeItem("assessmentCompleted");
+  localStorage.removeItem("pendingSubscriptionId");
+  localStorage.removeItem("attemptId");
   console.log("✅ User data cleared");
 };
 

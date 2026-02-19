@@ -687,9 +687,14 @@ function SignUp() {
 
     setLoading(true);
     setError("");
+    setLoading(true);
+    setError("");
 
     const formData = { email, firstname, lastname, password };
+    const formData = { email, firstname, lastname, password };
 
+    try {
+      const res = await API("POST", URL_PATH.signup, formData);
     try {
       const res = await API("POST", URL_PATH.signup, formData);
 

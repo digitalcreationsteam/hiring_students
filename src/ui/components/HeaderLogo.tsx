@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Avatar } from "./Avatar";
 import { FeatherLogOut, FeatherSettings, FeatherUser } from "@subframe/core";
 import { clearUserData } from "src/utils/authUtils";
+import { clearUserData } from "src/utils/authUtils";
 
 export default function HeaderLogo() {
   const navigate = useNavigate();
@@ -62,6 +63,8 @@ export default function HeaderLogo() {
       <div className="relative z-50">
         <div onClick={() => setOpen(!open)} className="cursor-pointer">
           <Avatar image="/profile-photo.jpg" square size="medium" />
+        <div onClick={() => setOpen(!open)} className="cursor-pointer">
+          <Avatar image="/profile-photo.jpg" square size="medium" />
         </div>
 
         {/* {open && (
@@ -90,7 +93,22 @@ export default function HeaderLogo() {
               <FeatherUser />
               My Profile
             </button>
+          <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-50 overflow-hidden">
+            <button
+              onClick={() => navigate("/my-profile")}
+              className="flex items-center gap-3 w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
+            >
+              <FeatherUser />
+              My Profile
+            </button>
 
+            <button
+              onClick={() => navigate("/settings")}
+              className="flex items-center gap-3 w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
+            >
+              <FeatherSettings />
+              Settings
+            </button>
             <button
               onClick={() => navigate("/settings")}
               className="flex items-center gap-3 w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
@@ -101,7 +119,18 @@ export default function HeaderLogo() {
 
             {/* Divider */}
             <div className="border-t my-1"></div>
+            {/* Divider */}
+            <div className="border-t my-1"></div>
 
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-3 w-full text-left px-4 py-2 hover:bg-red-50 text-sm text-red-600"
+            >
+              <FeatherLogOut />
+              Logout
+            </button>
+          </div>
+        )}
             <button
               onClick={handleLogout}
               className="flex items-center gap-3 w-full text-left px-4 py-2 hover:bg-red-50 text-sm text-red-600"
