@@ -77,7 +77,6 @@ export default function Projects() {
   const [editingId, setEditingId] = useState<string | null>(null);
 const isEditing = !!editingId;
 
-
   type ExperiencePoints = {
     demographics?: number;
     education?: number;
@@ -159,24 +158,13 @@ const isEditing = !!editingId;
     fetchExperienceIndex();
   }, []);
 
-  // SC2 small textfield classes
-  const scTextFieldClass =
-    "w-full [&>label]:text-[12px] [&>label]:font-medium " +
-    "[&>p]:text-[11px] [&>div]:rounded-full [&>div]:border " +
-    "[&>div]:border-neutral-300 [&>div]:h-9";
-
-  const scInputClass =
-    "rounded-full h-9 px-3 text-[12px] placeholder:text-[12px] " +
-    "bg-white !border-none focus:ring-0 w-full";
-
   const resetForm = () => {
     setName("");
     setRole("");
     setSummary("");
     setOutcome("");
     setLink("");
-      setEditingId(null);
-
+    setEditingId(null);
   };
 
   const handleAddProject = async () => {
@@ -196,11 +184,6 @@ const isEditing = !!editingId;
       toast.error("Role is required.");
       return false;
     }
-
-    // if (!summary.trim()) {
-    //   toast.error("Project Summary is required.");
-    //   return false;
-    // }
 
     if (!link.trim()) {
       toast.error("Project link is required.");
@@ -240,15 +223,12 @@ const isEditing = !!editingId;
             {
               projectName: toTitleCase(normalizeSpaces(name)),
               role: role ? toTitleCase(normalizeSpaces(role)) : null,
-
               summary: summary
                 ? toSentenceCase(normalizeSpaces(summary.trim()))
                 : null,
-
               outcome: outcome
                 ? toSentenceCase(normalizeSpaces(outcome.trim()))
                 : null,
-
               link: link ? normalizeSpaces(link) : null,
             },
           ],
@@ -288,7 +268,7 @@ const isEditing = !!editingId;
 
     await API(
       "PUT",
-      `${URL_PATH.projects}/${editingId}`, // ✅ update endpoint (change if your backend route differs)
+      `${URL_PATH.projects}/${editingId}`,
       {
         projectName: toTitleCase(normalizeSpaces(name)),
         role: role ? toTitleCase(normalizeSpaces(role)) : null,
@@ -311,8 +291,6 @@ const isEditing = !!editingId;
     setIsSubmitting(false);
   }
 };
-
-
 
   // -------------------- DELETE PROJECT --------------------
   const handleRemove = async () => {
@@ -371,528 +349,6 @@ const isEditing = !!editingId;
     }
   };
 
-  // return (
-  //   <>
-  //     <HeaderLogo />
-  //     <ToastContainer position="top-center" autoClose={3000} />
-
-  //     <div className="min-h-screen flex justify-center px-6 py-0">
-  //       <div className="w-full max-w-[1100px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
-  //         {/* Left card */}
-  //         <main
-  //           className="
-  //   w-full
-  //   md:max-w-[480px]
-  //   flex flex-col gap-6
-  //   rounded-[28px]
-  //   border border-neutral-300
-  //   bg-white
-  //   px-4 sm:px-6 lg:px-8
-  //   py-6
-  //   shadow-[0_10px_30px_rgba(40,0,60,0.06)]
-  // "
-  //         >
-  //           {/* top row - back + progress */}
-  //           <div className="flex items-center gap-4">
-  //             {/* <IconButton
-  //               size="small"
-  //               icon={<FeatherArrowLeft />}
-  //               onClick={() => navigate(-1)}
-  //             /> */}
-
-  //             <IconButton
-  //               size="small"
-  //               icon={<FeatherArrowLeft />}
-  //               onClick={async () => {
-  //                 try {
-  //                   // 1️⃣ If came from dashboard → always go back to dashboard
-  //                   if (source === "dashboard") {
-  //                     navigate("/dashboard");
-  //                     return;
-  //                   }
-
-  //                   // 2️⃣ Otherwise → ask backend if education is allowed
-  //                   const res = await API("POST", "/auth/verify-route", {
-  //                     route: "/certifications",
-  //                   });
-
-  //                   if (res.allowed) {
-  //                     navigate("/certifications", { state: { source } });
-  //                   }
-  //                   // ❌ else do nothing (education already completed)
-  //                 } catch {
-  //                   // silent fail
-  //                 }
-  //               }}
-  //             />
-  //             <div className="flex-1 w-full max-w-full md:max-w-[420px]">
-  //               <div className="flex items-center gap-3">
-  //                 {[...Array(6)].map((_, i) => (
-  //                   <div
-  //                     key={`p-${i}`}
-  //                     style={{ height: 6, backgroundColor: colors.primary }}
-  //                     className="flex-1 rounded-full"
-  //                   />
-  //                 ))}
-  //                 {[...Array()].map((_, i) => (
-  //                   <div
-  //                     key={`n-${i}`}
-  //                     style={{ height: 6 }}
-  //                     className="flex-1 rounded-full bg-neutral-200"
-  //                   />
-  //                 ))}
-  //               </div>
-  //             </div>
-  //           </div>
-
-  //           {/* Header */}
-  //           <header className="w-full">
-  //             <h2 className="text-[22px] text-neutral-900">
-  //               Add your projects
-  //             </h2>
-  //             <p className="text-xs text-neutral-500">Share your best work</p>
-  //           </header>
-
-  //           {/* Selected projects preview list */}
-  //           <section className="flex w-full flex-col gap-3">
-  //             {projects.map((p) => {
-  //               const isSelected = selectedProject?.id === p.id;
-
-  //               return (
-  //                 <div
-  //                   key={p.id}
-  //                   role="button"
-  //                   tabIndex={0}
-  //                   onClick={() => setSelectedProject(isSelected ? null : p)}
-  //                   onKeyDown={(e) => {
-  //                     if (e.key === "Enter" || e.key === " ") {
-  //                       e.preventDefault();
-  //                       setSelectedProject(isSelected ? null : p);
-  //                     }
-  //                   }}
-  //                   className="
-  //         rounded-3xl
-  //         border border-neutral-300
-  //         bg-white
-  //         px-4 py-3
-  //         cursor-pointer
-  //         transition
-  //         hover:bg-neutral-50
-  //         focus:outline-none
-  //         focus:ring-2
-  //         focus:ring-violet-500
-  //       "
-  //                 >
-  //                   {/* 🔹 TOP ROW */}
-  //                   <div className="flex items-center justify-between">
-  //                     <div className="flex items-center gap-3 min-w-0">
-  //                       <Avatar
-  //                         size="large"
-  //                         square
-  //                         className="!rounded-2xl bg-[#D9D9D9] text-BLACK-700 font-semibold"
-  //                       >
-  //                         {p.name
-  //                           .split(" ")
-  //                           .slice(0, 2)
-  //                           .map((s) => s[0])
-  //                           .join("")}
-  //                       </Avatar>
-
-  //                       <div className="flex flex-col min-w-0">
-  //                         <span className="text-sm font-semibold text-neutral-900 truncate">
-  //                           {p.name}
-  //                         </span>
-
-  //                         {p.role && (
-  //                           <span className="text-xs text-neutral-500 truncate">
-  //                             {p.role}
-  //                           </span>
-  //                         )}
-  //                       </div>
-  //                     </div>
-
-  //                     <IconButton
-  //                       size="small"
-  //                       icon={<FeatherX />}
-  //                       aria-label={`Delete project ${p.name}`}
-  //                       onClick={(e) => {
-  //                         e.stopPropagation();
-  //                         setDeleteProjectId(p.id);
-  //                       }}
-  //                       className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
-  //                     />
-  //                   </div>
-
-  //                   {/* 🔹 EXPANDED DETAILS */}
-  //                   {isSelected && (
-  //                     <>
-  //                       <div className="my-4 border-t border-neutral-200" />
-
-  //                       <div className="flex flex-col gap-3 text-sm text-neutral-800 px-1">
-  //                         <div>
-  //                           <span className="font-medium">Project name:</span>{" "}
-  //                           {p.name}
-  //                         </div>
-  //                         <div>
-  //                           <span className="font-medium">Your Role:</span>{" "}
-  //                           {p.role}
-  //                         </div>
-  //                         {p.summary && (
-  //                           <div>
-  //                             <span className="font-medium">Summary:</span>{" "}
-  //                             {p.summary}
-  //                           </div>
-  //                         )}
-
-  //                         {p.outcome && (
-  //                           <div>
-  //                             <span className="font-medium">Outcome:</span>{" "}
-  //                             {p.outcome}
-  //                           </div>
-  //                         )}
-
-  //                         {p.link && (
-  //                           <div>
-  //                             <span className="font-medium">Project link:</span>{" "}
-  //                             <a
-  //                               href={p.link}
-  //                               target="_blank"
-  //                               rel="noopener noreferrer"
-  //                               className="text-violet-700 underline break-all"
-  //                               onClick={(e) => e.stopPropagation()} // 🚫 don’t collapse card
-  //                             >
-  //                               {p.link}
-  //                             </a>
-  //                           </div>
-  //                         )}
-  //                       </div>
-  //                     </>
-  //                   )}
-  //                 </div>
-  //               );
-  //             })}
-  //           </section>
-
-  //           {/*
-  //         {selectedProject && (
-  //           <div className="rounded-3xl border border-neutral-300 bg-white px-6 py-5">
-  //             <div className="flex items-center justify-between mb-4">
-  //               <h3 className="text-sm font-semibold text-neutral-900">
-  //                 Project Details
-  //               </h3>
-
-  //               <IconButton
-  //                 size="small"
-  //                 icon={<FeatherX />}
-  //                 onClick={() => setSelectedProject(null)}
-  //                 className="!bg-transparent !text-neutral-500"
-  //               />
-  //             </div>
-
-  //             <div className="flex flex-col gap-3 text-sm text-neutral-800">
-  //               <div>
-  //                 <span className="font-medium">Project name:</span>{" "}
-  //                 {selectedProject.name}
-  //               </div>
-
-  //               <div>
-  //                 <span className="font-medium">Role:</span>{" "}
-  //                 {selectedProject.role}
-  //               </div>
-
-  //               <div>
-  //                 <span className="font-medium">Summary:</span>{" "}
-  //                 {selectedProject.summary}
-  //               </div>
-
-  //               <div>
-  //                 <span className="font-medium">Outcome:</span>{" "}
-  //                 {selectedProject.outcome}
-  //               </div>
-
-  //               {selectedProject.link && (
-  //                 <div>
-  //                   <span className="font-medium">Link:</span>{" "}
-  //                   <a
-  //                     href={selectedProject.link}
-  //                     target="_blank"
-  //                     rel="noopener noreferrer"
-  //                     className="text-violet-700 underline"
-  //                   >
-  //                     {selectedProject.link}
-  //                   </a>
-  //                 </div>
-  //               )}
-  //             </div>
-  //           </div>
-  //         )} */}
-
-  //           {/* Form */}
-  //           <form
-  //             onSubmit={(e) => {
-  //               e.preventDefault();
-  //               handleAddProject();
-  //             }}
-  //             className="flex flex-col gap-4"
-  //           >
-  //             <TextField
-  //               label={
-  //                 <span className="text-[12px]">
-  //                   Project name <span className="text-red-500">*</span>{" "}
-  //                 </span>
-  //               }
-  //               helpText=""
-  //               className={scTextFieldClass}
-  //             >
-  //               <TextField.Input
-  //                 placeholder="e.g., Mobile app redesign"
-  //                 value={name}
-  //                 onChange={(ev) => setName(toTitleCase(ev.target.value))}
-  //                 className={scInputClass}
-  //               />
-  //             </TextField>
-
-  //             <TextField
-  //               label={
-  //                 <span className="text-[12px]">
-  //                   Your Role <span className="text-red-500">*</span>{" "}
-  //                 </span>
-  //               }
-  //               helpText=""
-  //               className={scTextFieldClass}
-  //             >
-  //               <TextField.Input
-  //                 placeholder="e.g., Product Manager"
-  //                 value={role}
-  //                 onChange={(ev) => setRole(toTitleCase(ev.target.value))}
-  //                 className={scInputClass}
-  //               />
-  //             </TextField>
-
-  //             <TextField
-  //               label={
-  //                 <span className="text-[12px]">
-  //                   Link <span className="text-red-500">*</span>
-  //                 </span>
-  //               }
-  //               helpText=""
-  //               className={scTextFieldClass}
-  //             >
-  //               <TextField.Input
-  //                 placeholder="https://"
-  //                 value={link}
-  //                 onChange={(e) => setLink(e.target.value.replace(/\s/g, ""))}
-  //                 onBlur={() => {
-  //                   if (!link) return;
-  //                   if (!link.startsWith("http")) {
-  //                     setLink("https://" + link);
-  //                   }
-  //                 }}
-  //                 className={scInputClass}
-  //               />
-  //             </TextField>
-
-  //             <TextField
-  //               label={<span className="text-[12px]">Summary </span>}
-  //               helpText=""
-  //               className={scTextFieldClass}
-  //             >
-  //               <TextField.Input
-  //                 placeholder="What was the project about?"
-  //                 value={summary}
-  //                 onChange={(e) => setSummary(e.target.value)}
-  //                 onBlur={() => setSummary(toSentenceCase(summary))}
-  //                 className={scInputClass}
-  //               />
-  //             </TextField>
-
-  //             <TextField
-  //               label={<span className="text-[12px]">Outcome </span>}
-  //               helpText=""
-  //               className={scTextFieldClass}
-  //             >
-  //               <TextField.Input
-  //                 placeholder="What was the result or impact?"
-  //                 value={outcome}
-  //                 onChange={(ev) => setOutcome(toSentenceCase(ev.target.value))}
-  //                 className={scInputClass}
-  //               />
-  //             </TextField>
-
-  //             <div className="flex gap-3 mt-2">
-  //               <Button
-  //                 type="button"
-  //                 variant="neutral-secondary"
-  //                 icon={<FeatherPlus />}
-  //                 className="w-full rounded-full border border-neutral-300 h-10 px-4 flex items-center gap-2"
-  //                 onClick={handleAddProject}
-  //                 disabled={isSubmitting}
-  //               >
-  //                 {isSubmitting ? "Adding..." : "Add another project"}
-  //               </Button>
-
-  //               <div className="flex-1" />
-  //             </div>
-  //           </form>
-
-  //           <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
-
-  //           <footer>
-  //             <Button
-  //               onClick={handleContinue}
-  //               disabled={!canContinue || isSubmitting}
-  //               style={{backgroundColor: colors.primary, color: "black !important"}}
-  //               className={`
-  //   w-full h-10 rounded-full transition-all
-  //   ${
-  //     !canContinue || isSubmitting
-  //       ? "bg-violet-300 cursor-not-allowed"
-  //       : "bg-violet-700 shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
-  //   }
-  // `}
-  //             >
-  //               {isSubmitting ? "Saving..." : "Continue"}
-  //             </Button>
-  //           </footer>
-  //         </main>
-
-  //         {/* Right panel */}
-  //         <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
-  //           <div className="lg:sticky lg:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
-  //             <h3 className="text-[22px] text-neutral-900">
-  //               Your Experience Index
-  //             </h3>
-
-  //             <div className="flex items-center justify-center py-6">
-  //               <span
-  //                 aria-live="polite"
-  //                 className="font-['Afacad_Flux'] text-[32px] sm:text-[40px] md:text-[48px] font-[500] leading-[56px] text-neutral-300"
-  //               >
-  //                 {displayedIndex ?? 0}
-  //               </span>
-  //             </div>
-
-  //             {/* Top form horizontal line */}
-  //             <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
-
-  //             <div className="mt-4">
-  //               <div className="text-[16px] text-neutral-800 mb-3">
-  //                 Progress Steps
-  //               </div>
-
-  //               {/* Demographics — completed (green) */}
-  //               <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-  //                 <IconWithBackground
-  //                   size="small"
-  //                   icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-  //                   className="!bg-green-100 !rounded-full !p-3"
-  //                 />
-  //                 <span className="text-sm text-neutral-700">Demographics</span>
-  //               </div>
-
-  //               {/* Education — completed (green) */}
-  //               <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-  //                 <IconWithBackground
-  //                   size="small"
-  //                   icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-  //                   className="!bg-green-100 !rounded-full !p-3"
-  //                 />
-  //                 <span className="text-sm text-neutral-700">Education</span>
-  //               </div>
-
-  //               {/* Experience — completed (green) */}
-  //               <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-  //                 <IconWithBackground
-  //                   size="small"
-  //                   icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-  //                   className="!bg-green-100 !rounded-full !p-3"
-  //                 />
-  //                 <span className="text-sm text-neutral-700">Experience</span>
-  //               </div>
-
-  //               {/* Certifications — completed (green) */}
-  //               <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-  //                 <IconWithBackground
-  //                   size="small"
-  //                   icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-  //                   className="!bg-green-100 !rounded-full !p-3"
-  //                 />
-  //                 <span className="text-sm text-neutral-700">
-  //                   Certifications
-  //                 </span>
-  //               </div>
-
-  //               {/* Awards — completed (green) */}
-  //               <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-  //                 <IconWithBackground
-  //                   size="small"
-  //                   icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-  //                   className="!bg-green-100 !rounded-full !p-3"
-  //                 />
-  //                 <span className="text-sm text-neutral-700">Awards</span>
-  //               </div>
-
-  //               {/* Certifications — active (purple) */}
-  //               <div className="flex items-center gap-3 rounded-2xl border border-gray-300 px-4 py-2 mb-3" style={{background: colors.white}}>
-  //                 <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white shadow-sm">
-  //                   <IconWithBackground
-  //                     size="small"
-  //                     variant="neutral"
-  //                     className="!bg-white !text-violet-600"
-  //                     icon={<FeatherPackage />}
-  //                   />
-  //                 </div>
-  //                 <span className="text-sm font-semibold text-neutral-900">
-  //                   Projects
-  //                 </span>
-  //               </div>
-  //             </div>
-  //           </div>
-  //         </aside>
-  //       </div>
-  //       {deleteProjectId && (
-  //         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-  //           <div className="w-[360px] rounded-2xl bg-white p-6 shadow-xl">
-  //             <div className="flex justify-between items-center mb-4">
-  //               <h3 className="text-lg font-semibold text-neutral-900">
-  //                 Are you sure?
-  //               </h3>
-  //               <button
-  //                 onClick={() => setDeleteProjectId(null)}
-  //                 className="text-neutral-400 hover:text-neutral-600"
-  //               >
-  //                 ✕
-  //               </button>
-  //             </div>
-
-  //             <p className="text-sm text-neutral-600 mb-6">
-  //               Do you really want to delete this project?
-  //             </p>
-
-  //             <div className="flex gap-3">
-  //               <Button
-  //                 variant="neutral-secondary"
-  //                 className="flex-1"
-  //                 onClick={() => setDeleteProjectId(null)}
-  //               >
-  //                 Cancel
-  //               </Button>
-
-  //               <Button
-  //                 className="flex-1 rounded-3xl bg-violet-600 text-white hover:bg-violet-700"
-  //                 onClick={handleRemove}
-  //                 disabled={isSubmitting}
-  //               >
-  //                 {isSubmitting ? "Deleting..." : "Yes"}
-  //               </Button>
-  //             </div>
-  //           </div>
-  //         </div>
-  //       )}
-  //     </div>
-  //   </>
-  // );
-
 const fillFormForEdit = (p: ProjectEntry) => {
   setEditingId(p.id);
 
@@ -905,563 +361,531 @@ const fillFormForEdit = (p: ProjectEntry) => {
   setSelectedProject(p);
 };
 
-
-
   return (
-    <>
-      <Navbar />
-      <ToastContainer position="top-center" autoClose={3000} />
-
-      {/* 🎨 Linear gradient background - fixed behind everything */}
-      <div
-        className="pointer-events-none fixed inset-0 -z-10"
+    <div className="min-h-screen relative overflow-hidden">
+      {/* 🎨 Enhanced gradient background with soft blur - matching awards */}
+      <div 
+        className="fixed inset-0 -z-10"
         style={{
-          background: `linear-gradient(
-          to bottom,
-          #d9d9d9 0%,
-          #cfd3d6 25%,
-          #9aa6b2 55%,
-          #2E4056 100%
-        )`,
-          width: "100%",
+          background: `radial-gradient(circle at 20% 20%, rgba(210, 215, 220, 0.4) 0%, rgba(150, 165, 180, 0.3) 50%, rgba(40, 64, 86, 0.4) 100%)`,
         }}
-      />
-      <div className="min-h-screen flex justify-center px-6 py-0">
-        <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center py-8">
-          {/* Left card */}
-          <main
-            className="
-    w-full
-    md:max-w-[480px]
-    flex flex-col gap-6
-    rounded-[28px]
-    border border-neutral-300
-    bg-white
-    px-4 sm:px-6 lg:px-8
-    py-6
-    shadow-[0_10px_30px_rgba(40,0,60,0.06)]
-  "
-          >
-            {/* top row - back + progress */}
-            <div className="flex items-center gap-4">
-              <IconButton
-                size="small"
-                icon={<FeatherArrowLeft />}
-                onClick={() => {
-                  if (source === "dashboard") {
-                    navigate("/dashboard");
-                  } else {
-                    navigate(-1);
-                  }
-                }}
-              />
+      >
+        {/* Animated blur elements */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-white/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-gray-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
 
-              <div className="flex-1 w-full max-w-full md:max-w-[420px]">
-                <div className="flex items-center gap-3">
-                  {[...Array(6)].map((_, i) => (
-                    <div
-                      key={`p-${i}`}
-                      style={{ height: 6, backgroundColor: colors.primary }}
-                      className="flex-1 rounded-full"
-                    />
-                  ))}
-                  {[...Array()].map((_, i) => (
-                    <div
-                      key={`n-${i}`}
-                      style={{ height: 6 }}
-                      className="flex-1 rounded-full bg-neutral-200"
-                    />
-                  ))}
+      <div className="relative z-10">
+        <Navbar />
+        <ToastContainer 
+          position="top-center" 
+          autoClose={3000}
+          toastClassName="!bg-white/80 !backdrop-blur-md !text-gray-800 !shadow-lg !border !border-white/20"
+        />
+
+        <div className="flex justify-center px-4 sm:px-6 py-6">
+          <div className="w-full max-w-[1200px] mx-auto flex flex-col lg:flex-row gap-6 lg:gap-8">
+            
+            {/* Left card - Glass effect */}
+            <main className="w-full lg:flex-1 bg-white/70 backdrop-blur-xl rounded-3xl border border-white/40 shadow-2xl px-6 sm:px-8 py-8">
+              
+              {/* Top: back + progress */}
+              <div className="flex items-center gap-4 mb-8">
+                <IconButton
+                  size="small"
+                  icon={<FeatherArrowLeft className="w-4 h-4" />}
+                  onClick={() => {
+                    navigate("/awards")
+                  }}
+                  className="bg-white/50 hover:bg-white/80 backdrop-blur-sm border border-white/30"
+                />
+
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    {[...Array(6)].map((_, i) => (
+                      <div
+                        key={i}
+                        className={`flex-1 h-1.5 rounded-full transition-all duration-300 ${
+                          i <= 5 
+                            ? "bg-gradient-to-r from-gray-600 to-gray-800" 
+                            : "bg-white/30"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2 font-medium">Step 6 of 6</p>
                 </div>
               </div>
-            </div>
 
-            {/* Header */}
-            <header className="w-full">
-              <h2 className="text-[22px] text-neutral-900">
-                Add your projects
-              </h2>
-              <p className="text-xs text-neutral-500">Share your best work</p>
-            </header>
+              {/* Header with refined typography */}
+              <header className="mb-8">
+                <h2 className="text-2xl text-gray-800 font-light tracking-tight">
+                  Add your 
+                  <span className="block font-semibold text-gray-900 mt-1">Projects</span>
+                </h2>
+                <p className="text-sm text-gray-500 mt-3 leading-relaxed">
+                  Share your best work
+                </p>
+              </header>
 
-            {/* Selected projects preview list */}
-            <section className="flex w-full flex-col gap-3">
-              {projects.map((p) => {
-                const isSelected = selectedProject?.id === p.id;
+              {/* Projects List with enhanced styling */}
+              <section className="flex w-full flex-col gap-3 mb-8">
+                {projects.map((p) => {
+                  const isSelected = selectedProject?.id === p.id;
 
-                return (
-                  <div
-                    key={p.id}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => setSelectedProject(isSelected ? null : p)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        setSelectedProject(isSelected ? null : p);
-                      }
-                    }}
-                    className="rounded-3xl px-4 py-3 cursor-pointer transition-all duration-200 focus:outline-none"
-                    style={{
-                      backgroundColor: isSelected
-                        ? `${colors.primary}10`
-                        : colors.white,
-                      border: `1px solid ${
-                        isSelected ? colors.primary : colors.neutral[400]
-                      }`,
-                      boxShadow: isSelected
-                        ? `0 4px 14px ${colors.primary}22`
-                        : "0 1px 3px rgba(0,0,0,0.04)",
-                    }}
-                  >
-                    {/* 🔹 TOP ROW */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <Avatar
-                          size="large"
-                          square
-                          className="!rounded-2xl bg-[#D9D9D9] text-BLACK-700 font-semibold"
-                        >
-                          {p.name
-                            .split(" ")
-                            .slice(0, 2)
-                            .map((s) => s[0])
-                            .join("")}
-                        </Avatar>
+                  return (
+                    <div
+                      key={p.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setSelectedProject(isSelected ? null : p)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setSelectedProject(isSelected ? null : p);
+                        }
+                      }}
+                      className="rounded-2xl px-4 py-3 cursor-pointer transition-all duration-200 backdrop-blur-sm focus:outline-none"
+                      style={{
+                        backgroundColor: isSelected
+                          ? `${colors.primary}14`
+                          : "rgba(255,255,255,0.3)",
+                        border: `1px solid ${
+                          isSelected ? colors.primary : "rgba(255,255,255,0.4)"
+                        }`,
+                        boxShadow: isSelected
+                          ? `0 0 0 3px ${colors.primary}22`
+                          : "0 4px 6px rgba(0,0,0,0.02)",
+                      }}
+                    >
+                      {/* 🔹 TOP ROW */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <Avatar
+                            size="large"
+                            square
+                            className="!rounded-xl shadow-sm"
+                            style={{
+                              backgroundColor: colors.primaryGlow,
+                              color: colors.neutral[800],
+                            }}
+                          >
+                            {p.name
+                              .split(" ")
+                              .slice(0, 2)
+                              .map((s) => s[0])
+                              .join("")}
+                          </Avatar>
 
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-sm font-semibold text-neutral-900 truncate">
-                            {p.name}
-                          </span>
-
-                          {p.role && (
-                            <span className="text-xs text-neutral-500 truncate">
-                              {p.role}
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-sm font-semibold text-gray-800 truncate">
+                              {p.name}
                             </span>
-                          )}
+
+                            {p.role && (
+                              <span className="text-xs text-gray-500 truncate">
+                                {p.role}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {/* ✅ Edit */}
+                          <IconButton
+                            size="small"
+                            icon={<FeatherEdit2 className="w-3 h-3" />}
+                            aria-label={`Edit project ${p.name}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (p.isDemo) {
+                                toast.error("Demo project cannot be edited.");
+                                return;
+                              }
+                              fillFormForEdit(p);
+                            }}
+                            className="!bg-transparent !text-gray-500 hover:!text-gray-700 transition"
+                          />
+
+                          {/* ✅ Delete */}
+                          <IconButton
+                            size="small"
+                            icon={<FeatherX className="w-3 h-3" />}
+                            aria-label={`Delete project ${p.name}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteProjectId(p.id);
+                            }}
+                            className="!bg-transparent !text-gray-500 hover:!text-gray-700 transition"
+                          />
                         </div>
                       </div>
 
-                    <div className="flex items-center gap-2">
-  {/* ✅ Edit */}
-  <IconButton
-    size="small"
-    icon={<FeatherEdit2 />}
-    aria-label={`Edit project ${p.name}`}
-    onClick={(e) => {
-      e.stopPropagation();
-      if (p.isDemo) {
-        toast.error("Demo project cannot be edited.");
-        return;
-      }
-      fillFormForEdit(p);
-    }}
-    className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
-  />
+                      {/* 🔹 EXPANDED DETAILS */}
+                      {isSelected && (
+                        <>
+                          <div className="my-4 border-t border-white/30" />
 
-  {/* ✅ Delete */}
-  <IconButton
-    size="small"
-    icon={<FeatherX />}
-    aria-label={`Delete project ${p.name}`}
-    onClick={(e) => {
-      e.stopPropagation();
-      setDeleteProjectId(p.id);
-    }}
-    className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
-  />
-</div>
+                          <div className="flex flex-col gap-2 text-sm text-gray-700 px-1">
+                            <div>
+                              <span className="font-medium text-gray-600">Project name:</span>{" "}
+                              {p.name}
+                            </div>
+                            <div>
+                              <span className="font-medium text-gray-600">Your Role:</span>{" "}
+                              {p.role}
+                            </div>
+                            {p.summary && (
+                              <div>
+                                <span className="font-medium text-gray-600">Summary:</span>{" "}
+                                {p.summary}
+                              </div>
+                            )}
 
+                            {p.outcome && (
+                              <div>
+                                <span className="font-medium text-gray-600">Outcome:</span>{" "}
+                                {p.outcome}
+                              </div>
+                            )}
+
+                            {p.link && (
+                              <div>
+                                <span className="font-medium text-gray-600">Project link:</span>{" "}
+                                <a
+                                  href={p.link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="underline transition hover:text-gray-900 break-all"
+                                  style={{ color: colors.accent }}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {p.link}
+                                </a>
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
                     </div>
+                  );
+                })}
+              </section>
 
-                    {/* 🔹 EXPANDED DETAILS */}
-                    {isSelected && (
-                      <>
-                        <div className="my-4 border-t border-neutral-200" />
-
-                        <div className="flex flex-col gap-3 text-sm text-neutral-800 px-1">
-                          <div>
-                            <span className="font-medium">Project name:</span>{" "}
-                            {p.name}
-                          </div>
-                          <div>
-                            <span className="font-medium">Your Role:</span>{" "}
-                            {p.role}
-                          </div>
-                          {p.summary && (
-                            <div>
-                              <span className="font-medium">Summary:</span>{" "}
-                              {p.summary}
-                            </div>
-                          )}
-
-                          {p.outcome && (
-                            <div>
-                              <span className="font-medium">Outcome:</span>{" "}
-                              {p.outcome}
-                            </div>
-                          )}
-
-                          {p.link && (
-                            <div>
-                              <span className="font-medium">Project link:</span>{" "}
-                              <a
-                                href={p.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-violet-700 underline break-all"
-                                onClick={(e) => e.stopPropagation()} // 🚫 don't collapse card
-                              >
-                                {p.link}
-                              </a>
-                            </div>
-                          )}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                );
-              })}
-            </section>
-
-            {/* Form */}
-            <form
-  onSubmit={(e) => {
-    e.preventDefault();
-    isEditing ? handleUpdateProject() : handleAddProject();
-  }}
-              className="flex flex-col gap-4"
-            >
-              <TextField
-                label={
-                  <span className="text-[12px]">
-                    Project name <span className="text-red-500">*</span>{" "}
-                  </span>
-                }
-                helpText=""
-                className={scTextFieldClass}
+              {/* Form with enhanced styling */}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  isEditing ? handleUpdateProject() : handleAddProject();
+                }}
+                className="flex flex-col gap-5"
               >
-                <TextField.Input
-                  placeholder="e.g., Mobile app redesign"
-                  value={name}
-                  onChange={(ev) => setName(toTitleCase(ev.target.value))}
-                  className={scInputClass}
-                />
-              </TextField>
+                {/* Project Name */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Project name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    className="w-full h-10 px-4 rounded-xl border bg-white/50 backdrop-blur-sm text-sm transition-all duration-200 border-white/40 hover:border-gray-300 focus:border-gray-400 focus:outline-none"
+                    placeholder="e.g., Mobile app redesign"
+                    value={name}
+                    onChange={(ev) => setName(toTitleCase(ev.target.value))}
+                  />
+                </div>
 
-              <TextField
-                label={
-                  <span className="text-[12px]">
-                    Your Role <span className="text-red-500">*</span>{" "}
-                  </span>
-                }
-                helpText=""
-                className={scTextFieldClass}
-              >
-                <TextField.Input
-                  placeholder="e.g., Product Manager"
-                  value={role}
-                  onChange={(ev) => setRole(toTitleCase(ev.target.value))}
-                  className={scInputClass}
-                />
-              </TextField>
+                {/* Your Role */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Your Role <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    className="w-full h-10 px-4 rounded-xl border bg-white/50 backdrop-blur-sm text-sm transition-all duration-200 border-white/40 hover:border-gray-300 focus:border-gray-400 focus:outline-none"
+                    placeholder="e.g., Product Manager"
+                    value={role}
+                    onChange={(ev) => setRole(toTitleCase(ev.target.value))}
+                  />
+                </div>
 
-              <TextField
-                label={
-                  <span className="text-[12px]">
+                {/* Link */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Link <span className="text-red-500">*</span>
-                  </span>
-                }
-                helpText=""
-                className={scTextFieldClass}
-              >
-                <TextField.Input
-                  placeholder="https://"
-                  value={link}
-                  onChange={(e) => setLink(e.target.value.replace(/\s/g, ""))}
-                  onBlur={() => {
-                    if (!link) return;
-                    if (!link.startsWith("http")) {
-                      setLink("https://" + link);
-                    }
-                  }}
-                  className={scInputClass}
-                />
-              </TextField>
+                  </label>
+                  <input
+                    className="w-full h-10 px-4 rounded-xl border bg-white/50 backdrop-blur-sm text-sm transition-all duration-200 border-white/40 hover:border-gray-300 focus:border-gray-400 focus:outline-none"
+                    placeholder="https://"
+                    value={link}
+                    onChange={(e) => setLink(e.target.value.replace(/\s/g, ""))}
+                    onBlur={() => {
+                      if (!link) return;
+                      if (!link.startsWith("http")) {
+                        setLink("https://" + link);
+                      }
+                    }}
+                  />
+                </div>
 
-              <TextField
-                label={<span className="text-[12px]">Summary </span>}
-                helpText=""
-                className={scTextFieldClass}
-              >
-                <TextField.Input
-                  placeholder="What was the project about?"
-                  value={summary}
-                  onChange={(e) => setSummary(e.target.value)}
-                  onBlur={() => setSummary(toSentenceCase(summary))}
-                  className={scInputClass}
-                />
-              </TextField>
+                {/* Summary */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Summary
+                  </label>
+                  <textarea
+                    className="w-full h-20 px-4 py-3 rounded-xl border bg-white/50 backdrop-blur-sm text-sm transition-all duration-200 border-white/40 hover:border-gray-300 focus:border-gray-400 focus:outline-none resize-none"
+                    placeholder="What was the project about?"
+                    value={summary}
+                    onChange={(e) => setSummary(e.target.value)}
+                    onBlur={() => setSummary(toSentenceCase(summary))}
+                  />
+                </div>
 
-              <TextField
-                label={<span className="text-[12px]">Outcome </span>}
-                helpText=""
-                className={scTextFieldClass}
-              >
-                <TextField.Input
-                  placeholder="What was the result or impact?"
-                  value={outcome}
-                  onChange={(ev) => setOutcome(toSentenceCase(ev.target.value))}
-                  className={scInputClass}
-                />
-              </TextField>
+                {/* Outcome */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Outcome
+                  </label>
+                  <textarea
+                    className="w-full h-20 px-4 py-3 rounded-xl border bg-white/50 backdrop-blur-sm text-sm transition-all duration-200 border-white/40 hover:border-gray-300 focus:border-gray-400 focus:outline-none resize-none"
+                    placeholder="What was the result or impact?"
+                    value={outcome}
+                    onChange={(ev) => setOutcome(toSentenceCase(ev.target.value))}
+                  />
+                </div>
 
-             <div className="mt-2 flex flex-col sm:flex-row gap-3 items-center">
-  <Button
-    type="button"
-    disabled={isSubmitting}
-    variant="neutral-secondary"
-    icon={<FeatherPlus />}
-    className="w-full rounded-full border border-neutral-300 h-10 px-4 flex items-center gap-2"
-    onClick={() => (isEditing ? handleUpdateProject() : handleAddProject())}
-  >
-    {isSubmitting
-      ? isEditing
-        ? "Updating..."
-        : "Adding..."
-      : isEditing
-      ? "Update project"
-      : "Add another project"}
-  </Button>
+                <div className="flex flex-col sm:flex-row gap-3 items-center mt-2">
+                  <Button
+                    type="button"
+                    disabled={isSubmitting}
+                    variant="neutral-secondary"
+                    icon={<FeatherPlus className="w-4 h-4" />}
+                    className="w-full rounded-xl h-10 px-4 bg-white/50 backdrop-blur-sm border border-white/40 hover:bg-white/70 transition-all duration-200"
+                    onClick={() => (isEditing ? handleUpdateProject() : handleAddProject())}
+                  >
+                    {isSubmitting
+                      ? isEditing
+                        ? "Updating..."
+                        : "Adding..."
+                      : isEditing
+                      ? "Update project"
+                      : "Add another project"}
+                  </Button>
 
-  <div className="flex-1" />
+                  {/* ✅ Cancel edit */}
+                  {isEditing && (
+                    <Button
+                      onClick={resetForm}
+                      type="button"
+                      className="w-full rounded-xl h-10 bg-white/30 backdrop-blur-sm border border-white/40 hover:bg-white/50 transition-all duration-200"
+                      variant="brand-tertiary"
+                    >
+                      Cancel edit
+                    </Button>
+                  )}
+                </div>
+              </form>
 
-  {/* ✅ Cancel edit */}
-  {isEditing && (
-    <Button
-      onClick={resetForm}
-      type="button"
-      className="w-full rounded-full h-10 mt-2 sm:mt-0"
-      variant="brand-tertiary"
-      style={{ backgroundColor: colors.primaryGlow }}
-    >
-      Cancel edit
-    </Button>
-  )}
-</div>
-
-
-            </form>
-
-            <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
-
-            <footer>
-              <Button
-                onClick={handleContinue}
-                disabled={!canContinue || isSubmitting}
-                className="w-full h-10 rounded-full transition-all font-semibold"
-                style={{
-                  backgroundColor:
-                    !canContinue || isSubmitting
-                      ? `${colors.accent}66` // faded when disabled
-                      : colors.accent,
-                  color: colors.accent, // black text
-                  cursor:
-                    !canContinue || isSubmitting ? "not-allowed" : "pointer",
-                  boxShadow:
-                    !canContinue || isSubmitting
+              {/* Divider */}
+              <div className="w-full h-px bg-gradient-to-r from-transparent via-white/50 to-transparent my-6" />
+              
+              {/* Footer with Continue button */}
+              <footer>
+                <Button
+                  onClick={handleContinue}
+                  disabled={!canContinue || isSubmitting}
+                  className="w-full h-11 rounded-xl text-sm font-medium transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100"
+                  style={{
+                    background: !canContinue || isSubmitting
+                      ? "linear-gradient(135deg, #e0e0e0, #f0f0f0)"
+                      : "linear-gradient(135deg, #2c3e50, #1e2a36)",
+                    color: "#ffffff",
+                    cursor: !canContinue || isSubmitting ? "not-allowed" : "pointer",
+                    boxShadow: !canContinue || isSubmitting
                       ? "none"
-                      : "0 6px 18px rgba(99,52,237,0.18)",
+                      : "0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.02)",
+                    opacity: !canContinue || isSubmitting ? 0.6 : 1,
+                  }}
+                >
+                  {isSubmitting ? "Saving..." : "Continue →"}
+                </Button>
+              </footer>
+            </main>
+
+            {/* Right panel - Enhanced glass effect */}
+            <aside className="w-full lg:w-80 shrink-0">
+              <div className="lg:sticky lg:top-6 bg-white/60 backdrop-blur-xl rounded-2xl border border-white/40 shadow-xl p-6">
+                
+                {/* Experience Index Score */}
+                <div className="text-center mb-6">
+                  <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
+                    Experience Index
+                  </h3>
+                  <div className="relative inline-block">
+                    <span className="text-6xl font-light text-gray-800">
+                      {displayedIndex ?? 0}
+                    </span>
+                    <div className="absolute -top-1 -right-4 w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
+                  </div>
+                </div>
+
+                <div className="h-px bg-gradient-to-r from-transparent via-white/50 to-transparent my-4" />
+
+                {/* Progress Steps with refined styling */}
+                <h4 className="text-sm font-medium text-gray-600 mb-4">Progress steps</h4>
+                
+                <div className="space-y-2">
+                  {/* Completed - Demographics */}
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-3 rounded-xl px-4 py-3 bg-white/30 backdrop-blur-sm border border-white/20 hover:bg-white/40 transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-green-100">
+                      <FeatherCheck className="w-4 h-4 text-green-700" />
+                    </div>
+                    <span className="flex-1 text-sm text-gray-600">
+                      Demographics
+                    </span>
+                    <span className="text-xs text-gray-400">1/6</span>
+                  </button>
+
+                  {/* Completed - Education */}
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-3 rounded-xl px-4 py-3 bg-white/30 backdrop-blur-sm border border-white/20 hover:bg-white/40 transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-green-100">
+                      <FeatherCheck className="w-4 h-4 text-green-700" />
+                    </div>
+                    <span className="flex-1 text-sm text-gray-600">
+                      Education
+                    </span>
+                    <span className="text-xs text-gray-400">2/6</span>
+                  </button>
+
+                  {/* Completed - Experience */}
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-3 rounded-xl px-4 py-3 bg-white/30 backdrop-blur-sm border border-white/20 hover:bg-white/40 transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-green-100">
+                      <FeatherCheck className="w-4 h-4 text-green-700" />
+                    </div>
+                    <span className="flex-1 text-sm text-gray-600">
+                      Experience
+                    </span>
+                    <span className="text-xs text-gray-400">3/6</span>
+                  </button>
+
+                  {/* Completed - Certifications */}
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-3 rounded-xl px-4 py-3 bg-white/30 backdrop-blur-sm border border-white/20 hover:bg-white/40 transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-green-100">
+                      <FeatherCheck className="w-4 h-4 text-green-700" />
+                    </div>
+                    <span className="flex-1 text-sm text-gray-600">
+                      Certifications
+                    </span>
+                    <span className="text-xs text-gray-400">4/6</span>
+                  </button>
+
+                  {/* Completed - Awards */}
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-3 rounded-xl px-4 py-3 bg-white/30 backdrop-blur-sm border border-white/20 hover:bg-white/40 transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-green-100">
+                      <FeatherCheck className="w-4 h-4 text-green-700" />
+                    </div>
+                    <span className="flex-1 text-sm text-gray-600">
+                      Awards
+                    </span>
+                    <span className="text-xs text-gray-400">5/6</span>
+                  </button>
+
+                  {/* Active - Projects */}
+                  <div
+                    className="flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(44,62,80,0.1), rgba(30,42,54,0.05))",
+                      border: "1px solid rgba(255,255,255,0.3)",
+                      backdropFilter: "blur(4px)",
+                    }}
+                  >
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-white/80 shadow-sm">
+                      <FeatherPackage className="w-4 h-4 text-gray-700" />
+                    </div>
+                    <span className="flex-1 text-sm font-medium text-gray-700">
+                      Projects
+                    </span>
+                    <span className="text-xs text-gray-400">6/6</span>
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteProjectId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div
+            className="w-[360px] rounded-2xl p-6 shadow-xl bg-white/80 backdrop-blur-xl border border-white/40"
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3
+                className="text-lg font-semibold"
+                style={{ color: colors.accent }}
+              >
+                Are you sure?
+              </h3>
+              <button
+                onClick={() => setDeleteProjectId(null)}
+                className="text-gray-400 hover:text-gray-700 transition"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="text-sm mb-6 text-gray-600">
+              Do you really want to delete this project?
+            </p>
+
+            <div className="flex gap-3">
+              {/* Cancel */}
+              <Button
+                className="flex-1 rounded-xl bg-white/50 backdrop-blur-sm border border-white/40 hover:bg-white/70 transition-all duration-200"
+                onClick={() => setDeleteProjectId(null)}
+                style={{
+                  color: colors.accent,
                 }}
               >
-                {isSubmitting ? "Saving..." : "Continue"}
+                Cancel
               </Button>
-            </footer>
-          </main>
 
-          {/* Right panel */}
-          <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
-            <div className="lg:sticky lg:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
-              <h3 className="text-[22px] text-neutral-900">
-                Your Experience Index
-              </h3>
-
-              <div className="flex items-center justify-center py-6">
-                <span
-                  aria-live="polite"
-                  className="font-['Afacad_Flux'] text-[32px] sm:text-[40px] md:text-[48px] font-[500] leading-[56px] text-neutral-300"
-                >
-                  {displayedIndex ?? 0}
-                </span>
-              </div>
-
-              {/* Top form horizontal line */}
-              <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
-
-              <div className="mt-4">
-                <div className="text-[16px] text-neutral-800 mb-3">
-                  Progress Steps
-                </div>
-
-                {/* Demographics — completed (green) */}
-                <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                  <IconWithBackground
-                    size="small"
-                    icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                    className="!bg-green-100 !rounded-full !p-3"
-                  />
-                  <span className="text-sm text-neutral-700">Demographics</span>
-                </div>
-
-                {/* Education — completed (green) */}
-                <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                  <IconWithBackground
-                    size="small"
-                    icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                    className="!bg-green-100 !rounded-full !p-3"
-                  />
-                  <span className="text-sm text-neutral-700">Education</span>
-                </div>
-
-                {/* Experience — completed (green) */}
-                <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                  <IconWithBackground
-                    size="small"
-                    icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                    className="!bg-green-100 !rounded-full !p-3"
-                  />
-                  <span className="text-sm text-neutral-700">Experience</span>
-                </div>
-
-                {/* Certifications — completed (green) */}
-                <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                  <IconWithBackground
-                    size="small"
-                    icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                    className="!bg-green-100 !rounded-full !p-3"
-                  />
-                  <span className="text-sm text-neutral-700">
-                    Certifications
-                  </span>
-                </div>
-
-                {/* Awards — completed (green) */}
-                <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                  <IconWithBackground
-                    size="small"
-                    icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                    className="!bg-green-100 !rounded-full !p-3"
-                  />
-                  <span className="text-sm text-neutral-700">Awards</span>
-                </div>
-
-                {/* Certifications — active (purple) */}
-                <div
-                  className="flex items-center gap-3 rounded-2xl border border-gray-300 px-4 py-2 mb-3"
-                  style={{ background: colors.primary }}
-                >
-                  <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white shadow-sm">
-                    <IconWithBackground
-                      size="small"
-                      variant="neutral"
-                      className="!bg-white !text-violet-600"
-                      icon={<FeatherPackage />}
-                    />
-                  </div>
-                  <span
-                    className="text-sm font-medium text-neutral-900"
-                    style={{ color: colors.white }}
-                  >
-                    Projects
-                  </span>
-                </div>
-              </div>
-            </div>
-          </aside>
-        </div>
-        {deleteProjectId && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div
-              className="w-[360px] rounded-2xl p-6 shadow-xl"
-              style={{ backgroundColor: colors.white }}
-            >
-              <div className="flex justify-between items-center mb-4">
-                <h3
-                  className="text-lg font-semibold"
-                  style={{ color: colors.accent }}
-                >
-                  Are you sure?
-                </h3>
-                <button
-                  onClick={() => setDeleteProjectId(null)}
-                  className="transition"
-                  style={{ color: colors.neutral[600] }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.color = colors.accent)
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.color = colors.neutral[600])
-                  }
-                >
-                  ✕
-                </button>
-              </div>
-
-              <p
-                className="text-sm mb-6"
-                style={{ color: colors.neutral[600] }}
+              {/* Delete */}
+              <Button
+                className="flex-1 rounded-xl transition-all duration-200"
+                onClick={handleRemove}
+                disabled={isSubmitting}
+                style={{
+                  background: isSubmitting
+                    ? "linear-gradient(135deg, #ef444466, #dc262666)"
+                    : "linear-gradient(135deg, #ef4444, #dc2626)",
+                  color: "#ffffff",
+                  opacity: isSubmitting ? 0.6 : 1,
+                  cursor: isSubmitting ? "not-allowed" : "pointer",
+                }}
               >
-                Do you really want to delete this project?
-              </p>
-
-              <div className="flex gap-3">
-                {/* Cancel */}
-                <Button
-                  className="flex-1 rounded-3xl transition"
-                  onClick={() => setDeleteProjectId(null)}
-                  style={{
-                    backgroundColor: colors.primary,
-                    color: colors.accent,
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor = colors.secondary)
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor = colors.primary)
-                  }
-                >
-                  Cancel
-                </Button>
-
-                {/* Yes */}
-                <Button
-                  className="flex-1 rounded-3xl transition"
-                  onClick={handleRemove}
-                  disabled={isSubmitting}
-                  style={{
-                    backgroundColor: isSubmitting
-                      ? `${colors.red}66`
-                      : colors.red,
-                    color: colors.accent,
-                    cursor: isSubmitting ? "not-allowed" : "pointer",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isSubmitting)
-                      e.currentTarget.style.backgroundColor = colors.red;
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isSubmitting)
-                      e.currentTarget.style.backgroundColor = colors.red;
-                  }}
-                >
-                  {isSubmitting ? "Deleting..." : "Delete"}
-                </Button>
-              </div>
+                {isSubmitting ? "Deleting..." : "Delete"}
+              </Button>
             </div>
           </div>
-        )}
-      </div>
-    <Footer />
-    </>
+        </div>
+      )}
+
+      <Footer />
+    </div>
   );
 }

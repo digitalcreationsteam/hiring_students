@@ -22,10 +22,10 @@ import {
   FeatherX,
   FeatherCheck,
   FeatherEdit2,
+  FeatherChevronDown,
 } from "@subframe/core";
 import API, { URL_PATH } from "src/common/API";
 import * as SubframeCore from "@subframe/core";
-import { FeatherChevronDown } from "@subframe/core";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { colors } from "src/common/Colors";
@@ -142,32 +142,34 @@ function YearPicker({
         value={value}
         placeholder="YYYY"
         onClick={() => !disabled && setOpen((v) => !v)}
-        className={`w-full h-9 px-3 text-sm rounded-full cursor-pointer border border-neutral-300 focus:outline-none ${
-          disabled ? "bg-neutral-100 text-neutral-400" : "bg-white"
-        }`}
+        className={`w-full h-9 px-3 text-sm rounded-xl border ${
+          disabled 
+            ? "bg-white/30 border-white/20 text-gray-400 cursor-not-allowed" 
+            : "bg-white/50 border-gray-200/50 hover:border-gray-300 cursor-pointer"
+        } focus:outline-none transition-all duration-200 backdrop-blur-sm`}
       />
 
       {/* PICKER */}
       {open && (
-        <div className="absolute z-50 mt-2 w-64 rounded-2xl border border-neutral-300 bg-white shadow-lg p-3">
+        <div className="absolute z-50 mt-2 w-64 rounded-2xl bg-white/80 backdrop-blur-xl border border-white/40 shadow-xl p-3">
           {/* HEADER */}
           <div className="flex items-center justify-between mb-3">
             <button
               type="button"
               onClick={() => setDecadeStart((d) => d - 10)}
-              className="px-2 text-lg"
+              className="px-2 text-lg text-gray-600 hover:text-gray-900 transition"
             >
               «
             </button>
 
-            <span className="text-sm font-medium">
+            <span className="text-sm font-medium text-gray-700">
               {decadeStart} – {decadeStart + 9}
             </span>
 
             <button
               type="button"
               onClick={() => setDecadeStart((d) => d + 10)}
-              className="px-2 text-lg"
+              className="px-2 text-lg text-gray-600 hover:text-gray-900 transition"
             >
               »
             </button>
@@ -188,23 +190,20 @@ function YearPicker({
                     onChange(String(year));
                     setOpen(false);
                   }}
-                  className="py-2 px-3 rounded-lg transition text-sm sm:text-base"
+                  className="py-2 px-3 rounded-lg transition-all duration-200 text-sm"
                   style={{
-                    backgroundColor:
-                      value === String(year) ? colors.accent : "transparent",
-                    color:
-                      value === String(year)
-                        ? colors.background
-                        : isDisabled
-                          ? colors.neutral[400]
-                          : colors.neutral[800],
+                    backgroundColor: value === String(year) ? colors.primary : "transparent",
+                    color: value === String(year)
+                      ? colors.white
+                      : isDisabled
+                        ? colors.neutral[400]
+                        : colors.neutral[800],
                     cursor: isDisabled ? "not-allowed" : "pointer",
-                    opacity: isDisabled ? 0.7 : 1,
+                    opacity: isDisabled ? 0.5 : 1,
                   }}
                   onMouseEnter={(e) => {
                     if (!isDisabled && value !== String(year)) {
-                      e.currentTarget.style.backgroundColor =
-                        colors.primaryGlow;
+                      e.currentTarget.style.backgroundColor = colors.primaryGlow;
                     }
                   }}
                   onMouseLeave={(e) => {
@@ -314,7 +313,7 @@ function SchoolNameDropdown({
 
   return (
     <div className="relative" ref={wrapRef}>
-      <label className="text-[12px] font-medium text-neutral-900">
+      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1 block">
         School Name <span className="text-red-500">*</span>
       </label>
 
@@ -327,25 +326,26 @@ function SchoolNameDropdown({
         onChange={(e) => {
           const v = e.target.value;
           setQuery(v);
-          onChange(v); // allow manual typing also
+          onChange(v);
           if (!open) setOpen(true);
         }}
-        className={`mt-1 w-full h-10 px-4 rounded-full border border-neutral-300 bg-white text-sm focus:outline-none ${
-          disabled ? "opacity-70 cursor-not-allowed" : ""
+        className={`w-full h-10 px-4 rounded-xl border bg-white/50 backdrop-blur-sm text-sm transition-all duration-200 ${
+          disabled 
+            ? "border-white/20 text-gray-400 cursor-not-allowed" 
+            : "border-gray-200/50 hover:border-gray-300 focus:border-gray-400 focus:outline-none"
         }`}
         style={{ color: colors.accent }}
       />
 
       {open && !disabled && (
-        <div className="absolute z-50 mt-2 w-full rounded-2xl border border-neutral-300 bg-white shadow-lg overflow-hidden">
-          <div className="px-3 py-2 text-xs border-b border-neutral-200 flex items-center justify-between">
-            <span style={{ color: colors.neutral[600] }}>
+        <div className="absolute z-50 mt-2 w-full rounded-2xl bg-white/80 backdrop-blur-xl border border-white/40 shadow-xl overflow-hidden">
+          <div className="px-4 py-2 text-xs border-b border-white/30 flex items-center justify-between">
+            <span className="text-gray-500">
               {loading ? "Searching..." : "Type 2+ characters to search"}
             </span>
             <button
               type="button"
-              className="text-xs"
-              style={{ color: colors.neutral[600] }}
+              className="text-xs text-gray-500 hover:text-gray-700 transition"
               onClick={() => setOpen(false)}
             >
               Close
@@ -354,40 +354,30 @@ function SchoolNameDropdown({
 
           <div className="max-h-[240px] overflow-y-auto">
             {error && (
-              <div
-                className="px-3 py-2 text-sm"
-                style={{ color: colors.neutral[600] }}
-              >
+              <div className="px-4 py-2 text-sm text-gray-500">
                 {error}
               </div>
             )}
 
-            {!error &&
-              !loading &&
-              items.length === 0 &&
-              debouncedQuery.trim().length >= 2 && (
-                <div
-                  className="px-3 py-2 text-sm"
-                  style={{ color: colors.neutral[600] }}
-                >
-                  No matches. You can keep typing to enter custom name.
-                </div>
-              )}
+            {!error && !loading && items.length === 0 && debouncedQuery.trim().length >= 2 && (
+              <div className="px-4 py-2 text-sm text-gray-500">
+                No matches. You can keep typing to enter custom name.
+              </div>
+            )}
 
             {items.map((u) => (
               <button
                 key={u.id}
                 type="button"
-                className="w-full text-left px-4 py-2 text-sm hover:bg-neutral-100"
+                className="w-full text-left px-4 py-2 text-sm hover:bg-white/50 transition"
+                style={{ color: colors.accent }}
                 onClick={() => {
                   onChange(u.name);
                   setQuery(u.name);
                   setOpen(false);
                 }}
               >
-                <span className="truncate" style={{ color: colors.accent }}>
-                  {u.name}
-                </span>
+                <span className="truncate">{u.name}</span>
               </button>
             ))}
           </div>
@@ -418,8 +408,8 @@ export default function Education() {
   const [startYear, setStartYear] = useState("");
   const [endYear, setEndYear] = useState("");
   const [currentlyStudying, setStudying] = useState(false);
-  const [gradeType, setGradeType] = useState<"gpa" | "cgpa">("gpa"); // Dropdown selection
-  const [gradeValue, setGradeValue] = useState(""); // Single input field
+  const [gradeType, setGradeType] = useState<"gpa" | "cgpa">("gpa");
+  const [gradeValue, setGradeValue] = useState("");
 
   const [isExpIndexLoading, setIsExpIndexLoading] = useState(true);
   const [experiencePoints, setExperiencePoints] =
@@ -522,7 +512,7 @@ export default function Education() {
     // ✅ DUPLICATE CHECK (CORRECT PLACE)
     // ✅ HIERARCHICAL DUPLICATE CHECK (DEGREE → FIELD → SCHOOL)
     const normalizedNew = {
-      degree: normalize(degree).trim(), // ✅ keep slug
+      degree: normalize(degree).trim(),
       fieldOfStudy: normalize(toTitleCase(fieldOfStudy)).trim(),
       schoolName: normalize(toTitleCase(schoolName)).trim(),
       startYear,
@@ -581,7 +571,7 @@ export default function Education() {
           duration,
           gpa: gradeType === "gpa" ? Number(gradeValue) : null,
           cgpa: gradeType === "cgpa" ? Number(gradeValue) : null,
-          gradeSystem: gradeType, // Send which system was used
+          gradeSystem: gradeType,
         },
       ],
     };
@@ -655,7 +645,7 @@ export default function Education() {
 
       await API(
         "PUT",
-        `${URL_PATH.education}/${editingId}`, // 🔴 confirm endpoint
+        `${URL_PATH.education}/${editingId}`,
         payload,
         { "user-id": userId },
       );
@@ -802,7 +792,7 @@ export default function Education() {
     setStudying(checked);
 
     if (checked) {
-      setEndYear(""); // 🔥 same as Experience clearing endDate
+      setEndYear("");
     }
   };
 
@@ -811,7 +801,7 @@ export default function Education() {
     const degreeOption = DEGREE_OPTIONS.find(
       (option) => option.value === degreeValue,
     );
-    return degreeOption?.label || degreeValue; // fallback to the value if not found
+    return degreeOption?.label || degreeValue;
   };
 
   //Edit your profile
@@ -839,670 +829,76 @@ export default function Education() {
     setSelectedEducation(ed);
   };
 
-  // return (
-  //   <>
-  //     <HeaderLogo />
-  //     <ToastContainer position="top-center" autoClose={3000} />
-  //     <div className="min-h-screen flex justify-center bg-gradient-to-br from-purple-50 via-white to-neutral-50 px-4 sm:px-6 py-0 sm:py-0">
-  //       <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center">
-  //         {/* Left card */}
-  //         <main className="w-full md:max-w-[480px] bg-white rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6 ...">
-  //           {/* Top: back + progress */}
-  //           <div className="flex items-center gap-4">
-  //             {/* <IconButton
-  //               size="small"
-  //               icon={<FeatherArrowLeft />}
-  //               onClick={() => navigate(-1)}
-  //             /> */}
-  //             <IconButton
-  //               size="small"
-  //               icon={<FeatherArrowLeft />}
-  //               onClick={async () => {
-  //                 try {
-  //                   const res = await API(
-  //                     "POST",
-  //                     "/auth/verify-route",
-  //                     { route: "/demographics" }, // ⬅️ previous step
-  //                   );
-
-  //                   if (res.allowed) {
-  //                     navigate("/demographics");
-  //                   }
-  //                   // ❌ if not allowed → do nothing
-  //                 } catch {
-  //                   // fail silently
-  //                 }
-  //               }}
-  //             />
-
-  //             <div className="flex-1 w-full max-w-full md:max-w-[420px]">
-  //               <div className="flex items-center gap-3">
-  //                 {[...Array(2)].map((_, i) => (
-  //                   <div
-  //                     key={`p-${i}`}
-  //                     style={{ height: 6 }}
-  //                     className="flex-1 rounded-full bg-violet-700"
-  //                   />
-  //                 ))}
-  //                 {[...Array(4)].map((_, i) => (
-  //                   <div
-  //                     key={`n-${i}`}
-  //                     style={{ height: 6 }}
-  //                     className="flex-1 rounded-full bg-neutral-300"
-  //                   />
-  //                 ))}
-  //               </div>
-  //             </div>
-  //           </div>
-
-  //           {/* Header */}
-  //           <header className="mt-6">
-  //             <h2 className="text-[22px] text-neutral-900">
-  //               Add your education
-  //             </h2>
-  //             <p className="mt-1 text-xs text-neutral-500">
-  //               Your academic background helps shape your Experience Index
-  //             </p>
-  //           </header>
-
-  //           {/* Selected education preview list */}
-  //           <section className="mt-6 flex w-full flex-col gap-3">
-  //             {educations.map((ed) => {
-  //               const isSelected = selectedEducation?.id === ed.id;
-
-  //               return (
-  //                 <div
-  //                   key={ed.id}
-  //                   role="button"
-  //                   tabIndex={0}
-  //                   onClick={() => setSelectedEducation(isSelected ? null : ed)}
-  //                   onKeyDown={(e) => {
-  //                     if (e.key === "Enter" || e.key === " ") {
-  //                       e.preventDefault();
-  //                       setSelectedEducation(isSelected ? null : ed);
-  //                     }
-  //                   }}
-  //                   className="
-  //         rounded-3xl
-  //         border border-neutral-300
-  //         bg-white
-  //         px-4 py-3
-  //         cursor-pointer
-  //         transition
-  //         hover:bg-neutral-50
-  //         focus:outline-none
-  //         focus:ring-2
-  //         focus:ring-violet-500
-  //       "
-  //                 >
-  //                   {/* 🔹 TOP ROW */}
-  //                   <div className="flex items-center justify-between">
-  //                     {/* Left */}
-  //                     <div className="flex items-center gap-3 min-w-0">
-  //                       <Avatar
-  //                         size="large"
-  //                         square
-  //                         className="!rounded-3xl shadow-sm bg-violet-200 text-violet-700"
-  //                       >
-  //                         {ed.schoolName
-  //                           .split(" ")
-  //                           .slice(0, 2)
-  //                           .map((s) => s[0])
-  //                           .join("")}
-  //                       </Avatar>
-
-  //                       <div className="flex flex-col min-w-0">
-  //                         <span className="text-sm font-semibold text-neutral-900 truncate">
-  //                           {getDegreeLabel(ed.degree)}{" "}
-  //                         </span>
-  //                         <span className="text-xs text-neutral-500 truncate">
-  //                           {ed.schoolName}
-  //                         </span>
-  //                       </div>
-  //                     </div>
-
-  //                     {/* Right */}
-  //                     <div className="flex flex-col items-end gap-2 shrink-0">
-  //                       <IconButton
-  //                         size="small"
-  //                         icon={<FeatherX />}
-  //                         aria-label={`Delete education ${ed.degree}`}
-  //                         onClick={(e) => {
-  //                           e.stopPropagation();
-  //                           setDeleteId(ed.id);
-  //                         }}
-  //                         className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
-  //                       />
-
-  //                       <span className="text-xs text-neutral-500">
-  //                         {ed.startYear}
-  //                         {ed.currentlyStudying
-  //                           ? " - Present"
-  //                           : ed.endYear
-  //                             ? ` - ${ed.endYear}`
-  //                             : ""}
-  //                       </span>
-  //                     </div>
-  //                   </div>
-
-  //                   {/* 🔹 DETAILS (same card, same border) */}
-  //                   {isSelected && (
-  //                     <>
-  //                       <div className="my-4 border-t border-neutral-200" />
-
-  //                       <div className="flex flex-col gap-3 text-sm text-neutral-800 px-1">
-  //                         <div>
-  //                           <span className="font-medium">Degree:</span>{" "}
-  //                           {getDegreeLabel(ed.degree)}{" "}
-  //                         </div>
-
-  //                         <div>
-  //                           <span className="font-medium">Field of study:</span>{" "}
-  //                           {ed.fieldOfStudy}
-  //                         </div>
-
-  //                         <div>
-  //                           <span className="font-medium">Institution:</span>{" "}
-  //                           {ed.schoolName}
-  //                         </div>
-
-  //                         <div>
-  //                           <span className="font-medium">Duration:</span>{" "}
-  //                           {ed.startYear}
-  //                           {ed.currentlyStudying
-  //                             ? " - Present"
-  //                             : ed.endYear
-  //                               ? ` - ${ed.endYear}`
-  //                               : ""}
-  //                         </div>
-
-  //                         {ed.gpa && (
-  //                           <div>
-  //                             <span className="font-medium">GPA:</span> {ed.gpa}
-  //                           </div>
-  //                         )}
-  //                       </div>
-  //                     </>
-  //                   )}
-  //                 </div>
-  //               );
-  //             })}
-  //           </section>
-
-  //           {/* Form */}
-  //           <form
-  //             onSubmit={(e) => {
-  //               e.preventDefault();
-  //               handleAddEducation();
-  //             }}
-  //             className="mt-6 flex flex-col gap-4"
-  //           >
-  //             {/* Degree */}
-  //             <div className="flex flex-col gap-1">
-  //               {/* Degree Dropdown - Fixed */}
-  //               <div className="flex flex-col gap-1">
-  //                 <label className="text-[12px] font-medium text-neutral-900">
-  //                   Degree <span className="text-red-500">*</span>
-  //                 </label>
-
-  //                 <SubframeCore.DropdownMenu.Root>
-  //                   <SubframeCore.DropdownMenu.Trigger asChild>
-  //                     <div className="flex h-9 items-center justify-between rounded-full border border-neutral-300 bg-white px-3 cursor-pointer hover:bg-neutral-50">
-  //                       <span
-  //                         className={
-  //                           degree
-  //                             ? "text-neutral-900 text-[12px]"
-  //                             : "text-neutral-400 text-[12px]"
-  //                         }
-  //                       >
-  //                         {DEGREE_OPTIONS.find((d) => d.value === degree)
-  //                           ?.label || "Select Degree"}
-  //                       </span>
-  //                       <FeatherChevronDown className="text-neutral-500" />
-  //                     </div>
-  //                   </SubframeCore.DropdownMenu.Trigger>
-
-  //                   <SubframeCore.DropdownMenu.Portal>
-  //                     <SubframeCore.DropdownMenu.Content
-  //                       className="bg-white rounded-2xl shadow-lg py-1 max-h-[220px] overflow-y-auto border border-neutral-300 min-w-[200px]"
-  //                       sideOffset={4}
-  //                       align="start"
-  //                     >
-  //                       {DEGREE_OPTIONS.map((item) => (
-  //                         <SubframeCore.DropdownMenu.Item
-  //                           key={item.value}
-  //                           className="px-4 py-2 text-sm cursor-pointer hover:bg-neutral-100 outline-none"
-  //                           onSelect={() => setDegree(item.value)}
-  //                         >
-  //                           {item.label}
-  //                         </SubframeCore.DropdownMenu.Item>
-  //                       ))}
-  //                     </SubframeCore.DropdownMenu.Content>
-  //                   </SubframeCore.DropdownMenu.Portal>
-  //                 </SubframeCore.DropdownMenu.Root>
-  //               </div>
-  //             </div>
-
-  //             {/* Field of Study */}
-  //             <TextField
-  //               className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-  //               label={
-  //                 <span className="text-[12px]">
-  //                   Field of Study <span className="text-red-500">*</span>{" "}
-  //                 </span>
-  //               }
-  //               helpText={
-  //                 <span className="text-[12px]">
-  //                   Your major or concentration{" "}
-  //                 </span>
-  //               }
-  //             >
-  //               <TextField.Input
-  //                 className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0
-  //            text-sm placeholder:text-xs placeholder:text-neutral-400"
-  //                 placeholder="e.g., Computer Science, Business Administration"
-  //                 value={fieldOfStudy}
-  //                 onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-  //                   setFieldOfStudy(ev.target.value)
-  //                 }
-  //               />
-  //             </TextField>
-
-  //             {/* School Name */}
-  //             <TextField
-  //               className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-  //               label={
-  //                 <span className="text-[12px]">
-  //                   School Name <span className="text-red-500">*</span>{" "}
-  //                 </span>
-  //               }
-  //               helpText=""
-  //             >
-  //               <TextField.Input
-  //                 className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0
-  //            text-sm placeholder:text-xs placeholder:text-neutral-400"
-  //                 placeholder="Name of institution"
-  //                 value={schoolName}
-  //                 onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-  //                   setSchoolName(ev.target.value)
-  //                 }
-  //               />
-  //             </TextField>
-
-  //             {/* Years */}
-  //             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-  //               {/* Start Year */}
-  //               <div className="flex flex-col gap-1">
-  //                 <label className="text-[12px] font-medium">
-  //                   Start Year <span className="text-red-500">*</span>
-  //                 </label>
-
-  //                 <YearPicker
-  //                   value={startYear}
-  //                   onChange={setStartYear}
-  //                   minYear={1950}
-  //                   maxYear={new Date().getFullYear()}
-  //                 />
-  //               </div>
-
-  //               {/* End Year */}
-  //               <div className="flex flex-col gap-1">
-  //                 <label className="text-[12px] font-medium">
-  //                   End Year <span className="text-red-500">*</span>
-  //                 </label>
-  //                 <YearPicker
-  //                   value={endYear}
-  //                   onChange={setEndYear}
-  //                   disabled={currentlyStudying}
-  //                   minYear={Number(startYear) || 1950}
-  //                   maxYear={new Date().getFullYear()}
-  //                 />
-  //               </div>
-  //             </div>
-
-  //             {/* // --------------------------------------- */}
-  //             <div className="flex items-center gap-3">
-  //               <Switch
-  //                 checked={currentlyStudying}
-  //                 onCheckedChange={handleCurrentlyStudyingToggle}
-  //                 tabIndex={0}
-  //                 role="switch"
-  //                 aria-checked={currentlyStudying}
-  //                 onKeyDown={(e) => {
-  //                   if (e.key === "Enter" || e.key === " ") {
-  //                     e.preventDefault();
-  //                     handleCurrentlyStudyingToggle(!currentlyStudying);
-  //                   }
-  //                 }}
-  //                 className="
-  //   h-5 w-9
-  //   data-[state=checked]:bg-violet-700
-  //   data-[state=unchecked]:bg-neutral-300
-  //   [&>span]:h-4 [&>span]:w-3
-  //   [&>span]:data-[state=checked]:translate-x-2
-  //   [&>span]:data-[state=unchecked]:translate-x-0
-  // "
-  //               />
-
-  //               <span className="text-sm text-neutral-700">
-  //                 I am currently studying
-  //               </span>
-  //             </div>
-
-  //             {/* GPA Field - US 4-point scale */}
-  //             <TextField
-  //               className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-  //               label={<span className="text-[12px]">GPA</span>}
-  //               // helpText="Enter GPA on a 4.0 scale"
-  //             >
-  //               <TextField.Input
-  //                 className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0"
-  //                 placeholder="e.g., 3.8 (out of 4)"
-  //                 value={gpa}
-  //                 onChange={(ev: React.ChangeEvent<HTMLInputElement>) => {
-  //                   const value = ev.target.value.replace(/[^0-9.]/g, "");
-  //                   // Prevent multiple decimal points
-  //                   const decimalCount = (value.match(/\./g) || []).length;
-  //                   if (decimalCount <= 1) {
-  //                     setGpa(value);
-  //                     // Auto-clear CGPA if user starts typing GPA
-  //                     if (value && cgpa) {
-  //                       setCGpa("");
-  //                     }
-  //                   }
-  //                 }}
-  //               />
-  //             </TextField>
-
-  //             {/* CGPA Field - Indian 10-point scale */}
-  //             <TextField
-  //               className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-  //               label={<span className="text-[12px]">CGPA</span>}
-  //               // helpText="Enter CGPA on a 10.0 scale"
-  //             >
-  //               <TextField.Input
-  //                 className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0"
-  //                 placeholder="e.g., 7.8 (out of 10)"
-  //                 value={cgpa}
-  //                 onChange={(ev: React.ChangeEvent<HTMLInputElement>) => {
-  //                   const value = ev.target.value.replace(/[^0-9.]/g, "");
-  //                   // Prevent multiple decimal points
-  //                   const decimalCount = (value.match(/\./g) || []).length;
-  //                   if (decimalCount <= 1) {
-  //                     setCGpa(value);
-  //                     // Auto-clear GPA if user starts typing CGPA
-  //                     if (value && gpa) {
-  //                       setGpa("");
-  //                     }
-  //                   }
-  //                 }}
-  //               />
-  //             </TextField>
-  //             <div className="mt-2 flex flex-col sm:flex-row gap-3 items-center">
-  //               <Button
-  //                 type="button"
-  //                 disabled={isSubmitting}
-  //                 variant="neutral-secondary"
-  //                 icon={<FeatherPlus />}
-  //                 className="w-full rounded-full h-10 px-4 border-neutral-300"
-  //                 onClick={handleAddEducation}
-  //               >
-  //                 {isSubmitting ? "Adding..." : "Add another education"}
-  //               </Button>
-  //               <div className="flex-1" /> {/* pushes continue to the right */}
-  //             </div>
-  //           </form>
-  //           {/* Top form horizontal line */}
-  //           <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
-  //           <footer>
-  //             <Button
-  //               onClick={handleContinue}
-  //               disabled={!canContinue || isSubmitting}
-  //               className={`
-  //   w-full h-10 rounded-full transition-all
-  //   ${
-  //     !canContinue || isSubmitting
-  //       ? "bg-violet-300 text-white cursor-not-allowed"
-  //       : "bg-violet-700 text-white shadow-[0_6px_18px_rgba(99,52,237,0.18)]"
-  //   }
-  // `}
-  //             >
-  //               {isSubmitting ? "Saving..." : "Continue"}
-  //             </Button>
-  //           </footer>
-  //         </main>
-
-  //         {/* Right panel */}
-
-  //         <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
-  //           <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
-  //             <h3 className="text-[20px] text-neutral-900">
-  //               Your Experience Index
-  //             </h3>
-
-  //             <div className="flex items-center justify-center py-6">
-  //               <span
-  //                 aria-live="polite"
-  //                 className="font-['Afacad_Flux'] text-[32px] sm:text-[40px] md:text-[48px] font-[500] leading-[56px] text-neutral-300"
-  //               >
-  //                 {displayedIndex ?? 0}
-  //               </span>
-  //             </div>
-
-  //             {/* Top form horizontal line */}
-  //             <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
-
-  //             <div className="mt-4">
-  //               <div className="text-[16px] text-neutral-800 mb-3">
-  //                 Progress Steps
-  //               </div>
-
-  //               {/* ⚪ Completed — Demographics */}
-  //               <button
-  //                 type="button"
-  //                 className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3 hover:bg-neutral-50"
-  //               >
-  //                 <IconWithBackground
-  //                   size="small"
-  //                   icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-  //                   className="!bg-green-100 !rounded-full !p-3"
-  //                 />
-  //                 <span className="text-sm text-neutral-700">Demographics</span>
-  //               </button>
-
-  //               {/* 🟣 Active — Education */}
-  //               <button
-  //                 type="button"
-  //                 className="w-full flex items-center gap-3 rounded-2xl border border-violet-300 bg-violet-50 px-4 py-2 mb-3 hover:shadow-sm"
-  //               >
-  //                 <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white shadow-sm">
-  //                   <IconWithBackground
-  //                     size="small"
-  //                     icon={<FeatherGraduationCap />}
-  //                   />
-  //                 </div>
-  //                 <span className="text-sm font-semibold text-neutral-900">
-  //                   Education
-  //                 </span>
-  //               </button>
-
-  //               {/* Inactive steps */}
-  //               <button
-  //                 type="button"
-  //                 className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-default-background px-4 py-2 mb-3 hover:bg-neutral-50"
-  //               >
-  //                 <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white">
-  //                   <IconWithBackground
-  //                     variant="neutral"
-  //                     size="small"
-  //                     icon={<FeatherBriefcase />}
-  //                   />
-  //                 </div>
-  //                 <span className="text-sm text-neutral-500">Experience</span>
-  //               </button>
-
-  //               <button
-  //                 type="button"
-  //                 className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-default-background px-4 py-2 mb-3 hover:bg-neutral-50"
-  //               >
-  //                 <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white">
-  //                   <IconWithBackground
-  //                     variant="neutral"
-  //                     size="small"
-  //                     icon={<FeatherFileCheck />}
-  //                   />
-  //                 </div>
-  //                 <span className="text-sm text-neutral-500">
-  //                   Certifications
-  //                 </span>
-  //               </button>
-
-  //               <button
-  //                 type="button"
-  //                 className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-default-background px-4 py-2 mb-3 hover:bg-neutral-50"
-  //               >
-  //                 <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white">
-  //                   <IconWithBackground
-  //                     variant="neutral"
-  //                     size="small"
-  //                     icon={<FeatherAward />}
-  //                   />
-  //                 </div>
-  //                 <span className="text-sm text-neutral-500">Awards</span>
-  //               </button>
-
-  //               <button
-  //                 type="button"
-  //                 className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-default-background px-4 py-2 hover:bg-neutral-50"
-  //               >
-  //                 <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white">
-  //                   <IconWithBackground
-  //                     variant="neutral"
-  //                     size="small"
-  //                     icon={<FeatherPackage />}
-  //                   />
-  //                 </div>
-  //                 <span className="text-sm text-neutral-500">Projects</span>
-  //               </button>
-  //             </div>
-  //           </div>
-  //         </aside>
-  //       </div>
-  //       {/* ✅ DELETE CONFIRMATION MODAL — ADD HERE */}
-  //       {deleteId && (
-  //         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-  //           <div className="w-[360px] rounded-2xl bg-white p-6 shadow-xl">
-  //             <div className="flex justify-between items-center mb-4">
-  //               <h3 className="text-lg font-semibold text-neutral-900">
-  //                 Are you sure?
-  //               </h3>
-  //               <button
-  //                 onClick={() => setDeleteId(null)}
-  //                 className="text-neutral-400 hover:text-neutral-600"
-  //               >
-  //                 ✕
-  //               </button>
-  //             </div>
-
-  //             <p className="text-sm text-neutral-600 mb-6">
-  //               Do you really want to delete this education?
-  //             </p>
-
-  //             <div className="flex gap-3">
-  //               <Button
-  //                 variant="neutral-secondary"
-  //                 className="flex-1"
-  //                 onClick={() => setDeleteId(null)}
-  //               >
-  //                 Cancel
-  //               </Button>
-
-  //               <Button
-  //                 className="flex-1 rounded-3xl bg-violet-600 text-white hover:bg-violet-700"
-  //                 onClick={handleRemove}
-  //                 disabled={isSubmitting}
-  //               >
-  //                 {isSubmitting ? "Deleting..." : "Yes"}
-  //               </Button>
-  //             </div>
-  //           </div>
-  //         </div>
-  //       )}
-  //     </div>
-  //   </>
-  // );
-
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* 🎨 Linear gradient background - fixed behind everything */}
-      <div
-        className="pointer-events-none fixed inset-0 -z-10"
+      {/* 🎨 Enhanced gradient background with soft blur - matching demographics */}
+      <div 
+        className="fixed inset-0 -z-10"
         style={{
-          background: `linear-gradient(
-                    to bottom,
-                    #d9d9d9 0%,
-                    #cfd3d6 25%,
-                    #9aa6b2 55%,
-                    #2E4056 100%
-                )`,
-          width: "100%",
+          background: `radial-gradient(circle at 20% 20%, rgba(210, 215, 220, 0.4) 0%, rgba(150, 165, 180, 0.3) 50%, rgba(40, 64, 86, 0.4) 100%)`,
         }}
-      />
+      >
+        {/* Animated blur elements */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-white/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-gray-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
 
       {/* Header and content with z-index to stay above background */}
       <div className="relative z-10">
         <Navbar />
-        <ToastContainer position="top-center" autoClose={3000} />
-        <div className="flex justify-center px-4 sm:px-6 py-0 sm:py-0">
-          <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center py-8">
-            {/* Left card */}
-            <main className="w-full md:max-w-[480px] bg-white rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6">
+        <ToastContainer 
+          position="top-center" 
+          autoClose={3000}
+          toastClassName="!bg-white/80 !backdrop-blur-md !text-gray-800 !shadow-lg !border !border-white/20"
+        />
+        
+        <div className="flex justify-center px-4 sm:px-6 py-6">
+          <div className="w-full max-w-[1200px] mx-auto flex flex-col lg:flex-row gap-6 lg:gap-8">
+            
+            {/* Left card - Glass effect */}
+            <main className="w-full lg:flex-1 bg-white/70 backdrop-blur-xl rounded-3xl border border-white/40 shadow-2xl px-6 sm:px-8 py-8">
+              
               {/* Top: back + progress */}
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 mb-8">
                 <IconButton
                   size="small"
-                  icon={<FeatherArrowLeft />}
+                  icon={<FeatherArrowLeft className="w-4 h-4" />}
                   onClick={() => {
-                    if (source === "dashboard") {
-                      navigate("/dashboard");
-                    } else {
-                      navigate("/demographics");
-                    }
+                   navigate("/demographics");
                   }}
+                  className="bg-white/50 hover:bg-white/80 backdrop-blur-sm border border-white/30"
                 />
 
-                <div className="flex-1 w-full max-w-full md:max-w-[420px]">
-                  <div className="flex items-center gap-3">
-                    {[...Array(2)].map((_, i) => (
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    {[...Array(6)].map((_, i) => (
                       <div
-                        key={`p-${i}`}
-                        style={{ height: 6, backgroundColor: colors.primary }}
-                        className="flex-1 rounded-full"
-                      />
-                    ))}
-                    {[...Array(4)].map((_, i) => (
-                      <div
-                        key={`n-${i}`}
-                        style={{ height: 6 }}
-                        className="flex-1 rounded-full bg-neutral-300"
+                        key={i}
+                        className={`flex-1 h-1.5 rounded-full transition-all duration-300 ${
+                          i <= 1 
+                            ? "bg-gradient-to-r from-gray-600 to-gray-800" 
+                            : "bg-white/30"
+                        }`}
                       />
                     ))}
                   </div>
+                  <p className="text-xs text-gray-500 mt-2 font-medium">Step 2 of 6</p>
                 </div>
               </div>
 
-              {/* Header */}
-              <header className="mt-6">
-                <h2 className="text-[22px] text-neutral-900">
-                  Add your education
+              {/* Header with refined typography */}
+              <header className="mb-8">
+                <h2 className="text-2xl text-gray-800 font-light tracking-tight">
+                  Add your 
+                  <span className="block font-semibold text-gray-900 mt-1">Education</span>
                 </h2>
-                <p className="mt-1 text-xs text-neutral-500">
+                <p className="text-sm text-gray-500 mt-3 leading-relaxed">
                   Your academic background helps shape your Experience Index
                 </p>
               </header>
 
-              {/* Education List */}
-              <section className="mt-6 flex w-full flex-col gap-3">
+              {/* Education List with enhanced styling */}
+              <section className="flex w-full flex-col gap-3 mb-8">
                 {educations.map((ed) => {
                   const isSelected = selectedEducation?.id === ed.id;
 
@@ -1511,26 +907,24 @@ export default function Education() {
                       key={ed.id}
                       role="button"
                       tabIndex={0}
-                      onClick={() =>
-                        setSelectedEducation(isSelected ? null : ed)
-                      }
+                      onClick={() => setSelectedEducation(isSelected ? null : ed)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
                           e.preventDefault();
                           setSelectedEducation(isSelected ? null : ed);
                         }
                       }}
-                      className="rounded-3xl px-4 py-3 cursor-pointer transition-all duration-200 focus:outline-none"
+                      className="rounded-2xl px-4 py-3 cursor-pointer transition-all duration-200 backdrop-blur-sm focus:outline-none"
                       style={{
                         backgroundColor: isSelected
                           ? `${colors.primary}14`
-                          : colors.white,
+                          : "rgba(255,255,255,0.3)",
                         border: `1px solid ${
-                          isSelected ? colors.primary : colors.neutral[200]
+                          isSelected ? colors.primary : "rgba(255,255,255,0.4)"
                         }`,
                         boxShadow: isSelected
                           ? `0 0 0 3px ${colors.primary}22`
-                          : "none",
+                          : "0 4px 6px rgba(0,0,0,0.02)",
                       }}
                     >
                       {/* 🔹 TOP ROW */}
@@ -1540,7 +934,7 @@ export default function Education() {
                           <Avatar
                             size="large"
                             square
-                            className="!rounded-3xl shadow-sm"
+                            className="!rounded-xl shadow-sm"
                             style={{
                               backgroundColor: colors.primaryGlow,
                               color: colors.neutral[800],
@@ -1554,10 +948,10 @@ export default function Education() {
                           </Avatar>
 
                           <div className="flex flex-col min-w-0">
-                            <span className="text-sm font-semibold text-neutral-900 truncate">
-                              {getDegreeLabel(ed.degree)}{" "}
+                            <span className="text-sm font-semibold text-gray-800 truncate">
+                              {getDegreeLabel(ed.degree)}
                             </span>
-                            <span className="text-xs text-neutral-500 truncate">
+                            <span className="text-xs text-gray-500 truncate">
                               {ed.schoolName}
                             </span>
                           </div>
@@ -1569,27 +963,27 @@ export default function Education() {
                             {/* EDIT */}
                             <IconButton
                               size="small"
-                              icon={<FeatherEdit2 />}
+                              icon={<FeatherEdit2 className="w-3 h-3" />}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 fillFormForEdit(ed);
                               }}
-                              className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
+                              className="!bg-transparent !text-gray-500 hover:!text-gray-700 transition"
                             />
 
                             {/* DELETE */}
                             <IconButton
                               size="small"
-                              icon={<FeatherX />}
+                              icon={<FeatherX className="w-3 h-3" />}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setDeleteId(ed.id);
                               }}
-                              className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
+                              className="!bg-transparent !text-gray-500 hover:!text-gray-700 transition"
                             />
                           </div>
 
-                          <span className="text-xs text-neutral-500">
+                          <span className="text-xs text-gray-500">
                             {ed.startYear}
                             {ed.currentlyStudying
                               ? " - Present"
@@ -1603,28 +997,26 @@ export default function Education() {
                       {/* 🔹 DETAILS (same card, same border) */}
                       {isSelected && (
                         <>
-                          <div className="my-4 border-t border-neutral-200" />
+                          <div className="my-4 border-t border-white/30" />
 
-                          <div className="flex flex-col gap-3 text-sm text-neutral-800 px-1">
+                          <div className="flex flex-col gap-2 text-sm text-gray-700 px-1">
                             <div>
-                              <span className="font-medium">Degree:</span>{" "}
-                              {getDegreeLabel(ed.degree)}{" "}
+                              <span className="font-medium text-gray-600">Degree:</span>{" "}
+                              {getDegreeLabel(ed.degree)}
                             </div>
 
                             <div>
-                              <span className="font-medium">
-                                Field of study:
-                              </span>{" "}
+                              <span className="font-medium text-gray-600">Field of study:</span>{" "}
                               {ed.fieldOfStudy}
                             </div>
 
                             <div>
-                              <span className="font-medium">Institution:</span>{" "}
+                              <span className="font-medium text-gray-600">Institution:</span>{" "}
                               {ed.schoolName}
                             </div>
 
                             <div>
-                              <span className="font-medium">Duration:</span>{" "}
+                              <span className="font-medium text-gray-600">Duration:</span>{" "}
                               {ed.startYear}
                               {ed.currentlyStudying
                                 ? " - Present"
@@ -1635,14 +1027,14 @@ export default function Education() {
 
                             {ed.gpa && (
                               <div>
-                                <span className="font-medium">GPA:</span>{" "}
+                                <span className="font-medium text-gray-600">GPA:</span>{" "}
                                 {ed.gpa}
                               </div>
                             )}
 
                             {ed.cgpa && (
                               <div>
-                                <span className="font-medium">CGPA:</span>{" "}
+                                <span className="font-medium text-gray-600">CGPA:</span>{" "}
                                 {ed.cgpa}
                               </div>
                             )}
@@ -1654,36 +1046,37 @@ export default function Education() {
                 })}
               </section>
 
-              {/* Form */}
+              {/* Form with enhanced styling */}
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
                   isEditing ? handleUpdateEducation() : handleAddEducation();
                 }}
-                className="mt-6 flex flex-col gap-4"
+                className="flex flex-col gap-5"
               >
                 {/* Degree */}
                 <div className="flex flex-col gap-1">
-                  <label className="text-[12px] font-medium text-neutral-900">
+                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Degree <span className="text-red-500">*</span>
                   </label>
 
                   <SubframeCore.DropdownMenu.Root>
                     <SubframeCore.DropdownMenu.Trigger asChild>
-                      {/* ✅ Trigger must have EXACTLY ONE child element */}
                       <div
-                        className="flex h-9 items-center justify-between rounded-full border border-neutral-300 px-3 cursor-pointer hover:bg-neutral-50"
-                        style={{ backgroundColor: colors.white }}
+                        className="flex h-10 items-center justify-between rounded-xl border bg-white/50 backdrop-blur-sm px-4 cursor-pointer hover:bg-white/70 transition-all duration-200"
+                        style={{
+                          borderColor: "rgba(255,255,255,0.4)",
+                        }}
                       >
                         <span
-                          className="text-[12px]"
+                          className="text-sm"
                           style={{ color: degree ? colors.accent : "#9CA3AF" }}
                         >
                           {DEGREE_OPTIONS.find((d) => d.value === degree)
                             ?.label || "Select Degree"}
                         </span>
 
-                        <FeatherChevronDown style={{ color: "#6B7280" }} />
+                        <FeatherChevronDown className="w-4 h-4 text-gray-500" />
                       </div>
                     </SubframeCore.DropdownMenu.Trigger>
 
@@ -1691,19 +1084,13 @@ export default function Education() {
                       <SubframeCore.DropdownMenu.Content
                         sideOffset={4}
                         align="start"
-                        className="bg-white text-neutral-900 rounded-2xl shadow-lg py-1 max-h-[220px] overflow-y-auto border border-neutral-300 min-w-[200px]"
+                        className="bg-white/80 backdrop-blur-xl text-gray-900 rounded-2xl shadow-xl py-1 max-h-[220px] overflow-y-auto border border-white/40 min-w-[200px]"
                         style={{ zIndex: 999999 }}
                       >
                         {DEGREE_OPTIONS.map((item) => (
                           <SubframeCore.DropdownMenu.Item
                             key={item.value}
-                            className="
-          px-4 py-2 text-sm
-          text-neutral-900
-          cursor-pointer
-          hover:bg-neutral-100
-          outline-none
-        "
+                            className="px-4 py-2 text-sm text-gray-900 cursor-pointer hover:bg-white/50 outline-none transition"
                             onSelect={() => setDegree(item.value)}
                           >
                             {item.label}
@@ -1715,30 +1102,18 @@ export default function Education() {
                 </div>
 
                 {/* Field of Study */}
-                <TextField
-                  className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-                  label={
-                    <span className="text-[12px]">
-                      Field of Study{" "}
-                      <span className="text-red-500">*</span>{" "}
-                    </span>
-                  }
-                  helpText={
-                    <span className="text-[12px]">
-                      Your major or concentration{" "}
-                    </span>
-                  }
-                >
-                  <TextField.Input
-                    className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0
-             text-sm placeholder:text-xs placeholder:text-neutral-400"
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Field of Study <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    className="w-full h-10 px-4 rounded-xl border bg-white/50 backdrop-blur-sm text-sm transition-all duration-200 border-white/40 hover:border-gray-300 focus:border-gray-400 focus:outline-none"
                     placeholder="e.g., Computer Science, Business Administration"
                     value={fieldOfStudy}
-                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                      setFieldOfStudy(ev.target.value)
-                    }
+                    onChange={(ev) => setFieldOfStudy(ev.target.value)}
                   />
-                </TextField>
+                  <p className="text-xs text-gray-400 mt-1">Your major or concentration</p>
+                </div>
 
                 {/* School Name */}
                 <SchoolNameDropdown
@@ -1751,10 +1126,9 @@ export default function Education() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Start Year */}
                   <div className="flex flex-col gap-1">
-                    <label className="text-[12px] font-medium">
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Start Year <span className="text-red-500">*</span>
                     </label>
-
                     <YearPicker
                       value={startYear}
                       onChange={setStartYear}
@@ -1765,7 +1139,7 @@ export default function Education() {
 
                   {/* End Year */}
                   <div className="flex flex-col gap-1">
-                    <label className="text-[12px] font-medium">
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                       End Year <span className="text-red-500">*</span>
                     </label>
                     <YearPicker
@@ -1779,7 +1153,7 @@ export default function Education() {
                 </div>
 
                 {/* Currently Studying Toggle */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 p-3 bg-white/30 rounded-xl backdrop-blur-sm border border-white/20">
                   <Switch
                     checked={currentlyStudying}
                     onCheckedChange={handleCurrentlyStudyingToggle}
@@ -1795,107 +1169,101 @@ export default function Education() {
                     className="h-5 w-9 transition-colors"
                     style={{
                       backgroundColor: currentlyStudying
-                        ? colors.primary // ON color
-                        : colors.neutral?.[400] || "#374151", // OFF color fallback
+                        ? colors.primary
+                        : colors.neutral?.[400] || "#9CA3AF",
                     }}
                   />
 
-                  <span className="text-sm text-neutral-700">
+                  <span className="text-sm text-gray-600">
                     I am currently studying
                   </span>
                 </div>
 
-                {/* GPA Field - US 4-point scale */}
                 {/* Grade Type Selector Dropdown + Input Side by Side */}
-<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-  {/* Grade Type Selector Dropdown */}
-  <div className="flex flex-col gap-1">
-    <label className="text-[12px] font-medium text-neutral-900">
-      Grade System <span className="text-red-500">*</span>
-    </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Grade Type Selector Dropdown */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Grade System <span className="text-red-500">*</span>
+                    </label>
 
-    <SubframeCore.DropdownMenu.Root>
-      <SubframeCore.DropdownMenu.Trigger asChild>
-        <div
-          className="flex h-10 items-center justify-between rounded-full border border-neutral-300 px-4 cursor-pointer hover:bg-neutral-50 transition"
-          style={{ backgroundColor: colors.white }}
-        >
-          <span
-            className="text-[12px] font-medium"
-            style={{ color: colors.accent }}
-          >
-            {gradeType === "gpa" ? "GPA" : "CGPA"}
-          </span>
+                    <SubframeCore.DropdownMenu.Root>
+                      <SubframeCore.DropdownMenu.Trigger asChild>
+                        <div
+                          className="flex h-10 items-center justify-between rounded-xl border bg-white/50 backdrop-blur-sm px-4 cursor-pointer hover:bg-white/70 transition-all duration-200"
+                          style={{
+                            borderColor: "rgba(255,255,255,0.4)",
+                          }}
+                        >
+                          <span
+                            className="text-sm font-medium"
+                            style={{ color: colors.accent }}
+                          >
+                            {gradeType === "gpa" ? "GPA (4.0)" : "CGPA (10.0)"}
+                          </span>
 
-          <FeatherChevronDown style={{ color: "#6B7280" }} />
-        </div>
-      </SubframeCore.DropdownMenu.Trigger>
+                          <FeatherChevronDown className="w-4 h-4 text-gray-500" />
+                        </div>
+                      </SubframeCore.DropdownMenu.Trigger>
 
-      <SubframeCore.DropdownMenu.Portal>
-        <SubframeCore.DropdownMenu.Content
-          sideOffset={4}
-          align="start"
-          className="bg-white text-neutral-900 rounded-2xl shadow-lg py-1 border border-neutral-300 min-w-[180px]"
-          style={{ zIndex: 999999 }}
-        >
-          <SubframeCore.DropdownMenu.Item
-            className="px-4 py-2 text-sm text-neutral-900 cursor-pointer hover:bg-neutral-100 outline-none"
-            onSelect={() => {
-              setGradeType("gpa");
-              setGradeValue("");
-            }}
-          >
-            GPA (4.0)
-          </SubframeCore.DropdownMenu.Item>
+                      <SubframeCore.DropdownMenu.Portal>
+                        <SubframeCore.DropdownMenu.Content
+                          sideOffset={4}
+                          align="start"
+                          className="bg-white/80 backdrop-blur-xl text-gray-900 rounded-2xl shadow-xl py-1 border border-white/40 min-w-[180px]"
+                          style={{ zIndex: 999999 }}
+                        >
+                          <SubframeCore.DropdownMenu.Item
+                            className="px-4 py-2 text-sm text-gray-900 cursor-pointer hover:bg-white/50 outline-none transition"
+                            onSelect={() => {
+                              setGradeType("gpa");
+                              setGradeValue("");
+                            }}
+                          >
+                            GPA (4.0)
+                          </SubframeCore.DropdownMenu.Item>
 
-          <SubframeCore.DropdownMenu.Item
-            className="px-4 py-2 text-sm text-neutral-900 cursor-pointer hover:bg-neutral-100 outline-none"
-            onSelect={() => {
-              setGradeType("cgpa");
-              setGradeValue("");
-            }}
-          >
-            CGPA (10.0)
-          </SubframeCore.DropdownMenu.Item>
-        </SubframeCore.DropdownMenu.Content>
-      </SubframeCore.DropdownMenu.Portal>
-    </SubframeCore.DropdownMenu.Root>
-  </div>
+                          <SubframeCore.DropdownMenu.Item
+                            className="px-4 py-2 text-sm text-gray-900 cursor-pointer hover:bg-white/50 outline-none transition"
+                            onSelect={() => {
+                              setGradeType("cgpa");
+                              setGradeValue("");
+                            }}
+                          >
+                            CGPA (10.0)
+                          </SubframeCore.DropdownMenu.Item>
+                        </SubframeCore.DropdownMenu.Content>
+                      </SubframeCore.DropdownMenu.Portal>
+                    </SubframeCore.DropdownMenu.Root>
+                  </div>
 
-  {/* Single Grade Input Field */}
-  <TextField
-    className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-    label={
-      <span className="text-[12px]">
-        {gradeType === "gpa" ? "GPA" : "CGPA"}{" "}
-      <span className="text-red-500">*</span>
-      </span>
-    }
-  >
-    <TextField.Input
-      className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0"
-      placeholder={
-        gradeType === "gpa" ? "e.g., 3.8" : "e.g., 7.8"
-      }
-      value={gradeValue}
-      onChange={(ev: React.ChangeEvent<HTMLInputElement>) => {
-        const value = ev.target.value.replace(/[^0-9.]/g, "");
-        const decimalCount = (value.match(/\./g) || []).length;
-        if (decimalCount <= 1) {
-          setGradeValue(value);
-        }
-      }}
-    />
-  </TextField>
-  </div>
+                  {/* Single Grade Input Field */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {gradeType === "gpa" ? "GPA" : "CGPA"} <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      className="w-full h-10 px-4 rounded-xl border bg-white/50 backdrop-blur-sm text-sm transition-all duration-200 border-white/40 hover:border-gray-300 focus:border-gray-400 focus:outline-none"
+                      placeholder={gradeType === "gpa" ? "e.g., 3.8" : "e.g., 7.8"}
+                      value={gradeValue}
+                      onChange={(ev) => {
+                        const value = ev.target.value.replace(/[^0-9.]/g, "");
+                        const decimalCount = (value.match(/\./g) || []).length;
+                        if (decimalCount <= 1) {
+                          setGradeValue(value);
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
                 
-                <div className="mt-2 flex flex-col sm:flex-row gap-3 items-center">
+                <div className="flex flex-col sm:flex-row gap-3 items-center mt-2">
                   <Button
                     type="button"
                     disabled={isSubmitting}
                     variant="neutral-secondary"
-                    icon={<FeatherPlus />}
-                    className="w-full rounded-full h-10 px-4 border-neutral-300"
+                    icon={<FeatherPlus className="w-4 h-4" />}
+                    className="w-full rounded-xl h-10 px-4 bg-white/50 backdrop-blur-sm border border-white/40 hover:bg-white/70 transition-all duration-200"
                     onClick={() =>
                       isEditing ? handleUpdateEducation() : handleAddEducation()
                     }
@@ -1909,262 +1277,192 @@ export default function Education() {
                         : "Add another education"}
                   </Button>
 
-
-                  <div className="flex-1" />
-                 {/* ✅ Cancle Edit */}
-                 {isEditing && (
-                  <Button
-                    onClick={resetForm}
-                    type="button"
-                    className="w-full rounded-full h-10 mt-2"
-                    variant="brand-tertiary"
-                    style={{backgroundColor: colors.primaryGlow}}
-                  >
-                    Cancel edit
-                  </Button>
+                  {/* ✅ Cancel Edit */}
+                  {isEditing && (
+                    <Button
+                      onClick={resetForm}
+                      type="button"
+                      className="w-full rounded-xl h-10 bg-white/30 backdrop-blur-sm border border-white/40 hover:bg-white/50 transition-all duration-200"
+                      variant="brand-tertiary"
+                    >
+                      Cancel edit
+                    </Button>
                   )}
                 </div>
-                
               </form>
 
-              {/* Top form horizontal line */}
-              <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
+              {/* Divider */}
+              <div className="w-full h-px bg-gradient-to-r from-transparent via-white/50 to-transparent my-6" />
+              
+              {/* Footer with Continue button */}
               <footer>
                 <Button
                   onClick={handleContinue}
                   disabled={!canContinue || isSubmitting}
-                  className="w-full h-10 sm:h-11 rounded-full text-sm sm:text-base font-semibold transition-all active:scale-[0.99]"
+                  className="w-full h-11 rounded-xl text-sm font-medium transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100"
                   style={{
-                    backgroundColor:
-                      !canContinue || isSubmitting
-                        ? colors.neutral[200]
-                        : colors.accent,
-                    color: colors.background,
-                    cursor:
-                      !canContinue || isSubmitting ? "not-allowed" : "pointer",
-                    opacity: !canContinue || isSubmitting ? 0.75 : 1,
-                    boxShadow:
-                      !canContinue || isSubmitting
-                        ? "none"
-                        : "0 10px 24px rgba(0,0,0,0.08)",
+                    background: !canContinue || isSubmitting
+                      ? "linear-gradient(135deg, #e0e0e0, #f0f0f0)"
+                      : "linear-gradient(135deg, #2c3e50, #1e2a36)",
+                    color: "#ffffff",
+                    cursor: !canContinue || isSubmitting ? "not-allowed" : "pointer",
+                    boxShadow: !canContinue || isSubmitting
+                      ? "none"
+                      : "0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.02)",
+                    opacity: !canContinue || isSubmitting ? 0.6 : 1,
                   }}
                 >
-                  {isSubmitting ? "Saving..." : "Continue"}
+                  {isSubmitting ? "Saving..." : "Continue →"}
                 </Button>
               </footer>
             </main>
 
-            {/* Right panel */}
-            <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
-              <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
-                <h3 className="text-[20px] text-neutral-900">
-                  Your Experience Index
-                </h3>
-
-                <div className="flex items-center justify-center py-6">
-                  <span
-                    aria-live="polite"
-                    className="font-['Afacad_Flux'] text-[32px] sm:text-[40px] md:text-[48px] font-[500] leading-[56px] text-neutral-300"
-                  >
-                    {displayedIndex ?? 0}
-                  </span>
+            {/* Right panel - Enhanced glass effect */}
+            <aside className="w-full lg:w-80 shrink-0">
+              <div className="lg:sticky lg:top-6 bg-white/60 backdrop-blur-xl rounded-2xl border border-white/40 shadow-xl p-6">
+                
+                {/* Experience Index Score */}
+                <div className="text-center mb-6">
+                  <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
+                    Experience Index
+                  </h3>
+                  <div className="relative inline-block">
+                    <span className="text-6xl font-light text-gray-800">
+                      {displayedIndex ?? 0}
+                    </span>
+                    <div className="absolute -top-1 -right-4 w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
+                  </div>
                 </div>
 
-                {/* Top form horizontal line */}
-                <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
+                <div className="h-px bg-gradient-to-r from-transparent via-white/50 to-transparent my-4" />
 
-                <div className="mt-4">
-                  <div className="text-[16px] text-neutral-800 mb-3">
-                    Progress Steps
-                  </div>
-
-                  {/* ⚪ Completed — Demographics */}
+                {/* Progress Steps with refined styling */}
+                <h4 className="text-sm font-medium text-gray-600 mb-4">Progress steps</h4>
+                
+                <div className="space-y-2">
+                  {/* Completed - Demographics */}
                   <button
                     type="button"
-                    className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3 hover:bg-neutral-50"
+                    className="w-full flex items-center gap-3 rounded-xl px-4 py-3 bg-white/30 backdrop-blur-sm border border-white/20 hover:bg-white/40 transition-all duration-200"
                   >
-                    <IconWithBackground
-                      size="small"
-                      icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                      className="!bg-green-100 !rounded-full !p-3"
-                    />
-                    <span className="text-sm text-neutral-700">
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-green-100">
+                      <FeatherCheck className="w-4 h-4 text-green-700" />
+                    </div>
+                    <span className="flex-1 text-sm text-gray-600">
                       Demographics
                     </span>
+                    <span className="text-xs text-gray-400">1/6</span>
                   </button>
 
-                  {/* 🟣 Active — Education */}
-                  <button
-                    style={{ backgroundColor: colors.primary }}
-                    type="button"
-                    className="w-full flex items-center gap-3 rounded-2xl px-4 py-2 mb-3 hover:shadow-sm"
+                  {/* Active - Education */}
+                  <div
+                    className="flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(44,62,80,0.1), rgba(30,42,54,0.05))",
+                      border: "1px solid rgba(255,255,255,0.3)",
+                      backdropFilter: "blur(4px)",
+                    }}
                   >
-                    <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white shadow-sm">
-                      <IconWithBackground
-                        size="small"
-                        icon={<FeatherGraduationCap />}
-                      />
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-white/80 shadow-sm">
+                      <FeatherGraduationCap className="w-4 h-4 text-gray-700" />
                     </div>
-
-                    <span
-                      className="text-sm font-medium text-neutral-900"
-                      style={{ color: colors.white }}
-                    >
+                    <span className="flex-1 text-sm font-medium text-gray-700">
                       Education
                     </span>
-                  </button>
+                    <span className="text-xs text-gray-400">2/6</span>
+                  </div>
 
                   {/* Inactive steps */}
-                  <button
-                    type="button"
-                    className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-default-background px-4 py-2 mb-3 hover:bg-neutral-50"
-                  >
-                    <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white">
-                      <IconWithBackground
-                        variant="neutral"
-                        size="small"
-                        icon={<FeatherBriefcase />}
-                      />
-                    </div>
-                    <span className="text-sm text-neutral-500">Experience</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-default-background px-4 py-2 mb-3 hover:bg-neutral-50"
-                  >
-                    <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white">
-                      <IconWithBackground
-                        variant="neutral"
-                        size="small"
-                        icon={<FeatherFileCheck />}
-                      />
-                    </div>
-                    <span className="text-sm text-neutral-500">
-                      Certifications
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-default-background px-4 py-2 mb-3 hover:bg-neutral-50"
-                  >
-                    <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white">
-                      <IconWithBackground
-                        variant="neutral"
-                        size="small"
-                        icon={<FeatherAward />}
-                      />
-                    </div>
-                    <span className="text-sm text-neutral-500">Awards</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-default-background px-4 py-2 hover:bg-neutral-50"
-                  >
-                    <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white">
-                      <IconWithBackground
-                        variant="neutral"
-                        size="small"
-                        icon={<FeatherPackage />}
-                      />
-                    </div>
-                    <span className="text-sm text-neutral-500">Projects</span>
-                  </button>
+                  {[
+                    { label: "Experience", icon: <FeatherBriefcase /> },
+                    { label: "Certifications", icon: <FeatherFileCheck /> },
+                    { label: "Awards", icon: <FeatherAward /> },
+                    { label: "Projects", icon: <FeatherPackage /> },
+                  ].map((step, index) => (
+                    <button
+                      key={step.label}
+                      type="button"
+                      className="w-full flex items-center gap-3 rounded-xl px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/20 hover:bg-white/30 transition-all duration-200"
+                    >
+                      <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-white/60">
+                        <div className="text-gray-500">
+                          {step.icon}
+                        </div>
+                      </div>
+                      <span className="flex-1 text-sm text-gray-500">
+                        {step.label}
+                      </span>
+                      <span className="text-xs text-gray-400">
+                        {index + 3}/6
+                      </span>
+                    </button>
+                  ))}
                 </div>
               </div>
             </aside>
           </div>
-
-          {deleteId && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-              <div
-                className="w-[360px] rounded-2xl p-6 shadow-xl"
-                style={{ backgroundColor: colors.white }}
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <h3
-                    className="text-lg font-semibold"
-                    style={{ color: colors.accent }}
-                  >
-                    Are you sure?
-                  </h3>
-
-                  <button
-                    onClick={() => setDeleteId(null)}
-                    className="transition"
-                    style={{ color: colors.neutral[400] }}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.color = colors.accent)
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.color = colors.neutral[400])
-                    }
-                  >
-                    ✕
-                  </button>
-                </div>
-
-                <p
-                  className="text-sm mb-6"
-                  style={{ color: colors.neutral[600] }}
-                >
-                  Do you really want to delete this education?
-                </p>
-
-                <div className="flex gap-3">
-                  {/* Cancel */}
-                  <Button
-                    variant="brand-tertiary"
-                    className="flex-1 rounded-3xl"
-                    onClick={() => setDeleteId(null)}
-                    style={{
-                      backgroundColor: colors.primary,
-                      color: colors.white,
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isSubmitting)
-                        e.currentTarget.style.backgroundColor =
-                          colors.secondary;
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isSubmitting)
-                        e.currentTarget.style.backgroundColor = colors.primary;
-                    }}
-                  >
-                    Cancel
-                  </Button>
-
-                  {/* Confirm */}
-                  <Button
-                    className="flex-1 rounded-3xl transition"
-                    onClick={handleRemove}
-                    disabled={isSubmitting}
-                    style={{
-                      backgroundColor: isSubmitting
-                        ? `${colors.red}66`
-                        : colors.red,
-                      color: colors.accent,
-                      cursor: isSubmitting ? "not-allowed" : "pointer",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isSubmitting)
-                        e.currentTarget.style.backgroundColor = colors.red;
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isSubmitting)
-                        e.currentTarget.style.backgroundColor = colors.red;
-                    }}
-                  >
-                    {isSubmitting ? "Deleting..." : "Delete"}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div
+            className="w-[360px] rounded-2xl p-6 shadow-xl bg-white/80 backdrop-blur-xl border border-white/40"
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3
+                className="text-lg font-semibold"
+                style={{ color: colors.accent }}
+              >
+                Are you sure?
+              </h3>
+
+              <button
+                onClick={() => setDeleteId(null)}
+                className="text-gray-400 hover:text-gray-700 transition"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p
+              className="text-sm mb-6 text-gray-600"
+            >
+              Do you really want to delete this education?
+            </p>
+
+            <div className="flex gap-3">
+              {/* Cancel */}
+              <Button
+                variant="brand-tertiary"
+                className="flex-1 rounded-xl bg-white/50 backdrop-blur-sm border border-white/40 hover:bg-white/70 transition-all duration-200"
+                onClick={() => setDeleteId(null)}
+              >
+                Cancel
+              </Button>
+
+              {/* Confirm */}
+              <Button
+                className="flex-1 rounded-xl transition-all duration-200"
+                onClick={handleRemove}
+                disabled={isSubmitting}
+                style={{
+                  background: isSubmitting
+                    ? "linear-gradient(135deg, #ef444466, #dc262666)"
+                    : "linear-gradient(135deg, #ef4444, #dc2626)",
+                  color: "#ffffff",
+                  opacity: isSubmitting ? 0.6 : 1,
+                  cursor: isSubmitting ? "not-allowed" : "pointer",
+                }}
+              >
+                {isSubmitting ? "Deleting..." : "Delete"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );

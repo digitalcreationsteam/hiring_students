@@ -237,7 +237,7 @@ const Navbar = () => {
                 <div className="absolute right-0 mt-3 w-52 bg-white border rounded-xl shadow-lg overflow-hidden z-50">
                   <button
                     onClick={() => {
-                      navigate("/my-profile");
+                      navigate("/profile");
                       setProfileOpen(false);
                     }}
                     className="flex items-center gap-3 w-full px-4 py-3 hover:bg-gray-100 text-sm"

@@ -78,15 +78,17 @@ function EndYearPicker({
         readOnly
         disabled={disabled}
         value={value}
-        placeholder="End Year"
+        placeholder="Year"
         onClick={() => !disabled && setOpen((v) => !v)}
-        className={`w-full h-10 px-4 rounded-full cursor-pointer border border-neutral-300 focus:outline-none ${
-          disabled ? "bg-neutral-100 text-neutral-400" : "bg-white"
-        }`}
+        className={`w-full h-10 px-4 rounded-xl border ${
+          disabled 
+            ? "bg-white/30 border-white/20 text-gray-400 cursor-not-allowed" 
+            : "bg-white/50 border-gray-200/50 hover:border-gray-300 cursor-pointer"
+        } focus:outline-none transition-all duration-200 backdrop-blur-sm`}
       />
 
       {open && (
-        <div className="absolute z-50 mt-2 w-64 rounded-2xl border border-neutral-300 bg-white shadow-lg p-3 max-h-60 overflow-auto">
+        <div className="absolute z-50 mt-2 w-64 rounded-2xl bg-white/80 backdrop-blur-xl border border-white/40 shadow-xl p-3 max-h-60 overflow-auto">
           <div className="grid grid-cols-4 gap-2 text-sm">
             {years.map((year) => (
               <button
@@ -96,13 +98,13 @@ function EndYearPicker({
                   onChange(String(year));
                   setOpen(false);
                 }}
-                className="py-2 px-3 rounded-lg transition text-sm sm:text-base"
+                className="py-2 px-3 rounded-lg transition-all duration-200 text-sm"
                 style={{
                   backgroundColor:
-                    value === String(year) ? colors.accent : "transparent",
+                    value === String(year) ? colors.primary : "transparent",
                   color:
                     value === String(year)
-                      ? colors.background
+                      ? colors.white
                       : colors.neutral[800],
                   cursor: "pointer",
                 }}
@@ -218,11 +220,6 @@ export default function Awards() {
     fetchAwards();
     fetchExperienceIndex();
   }, [userId]);
-
-  const scTextFieldClass =
-    "w-full [&>label]:text-[12px] [&>label]:font-medium [&>p]:text-[11px] [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300 [&>div]:h-9";
-  const scInputClass =
-    "rounded-full h-9 px-3 text-[12px] placeholder:text-[12px] bg-white !border-none focus:ring-0 w-full";
 
   const resetForm = () => {
     setName("");
@@ -369,87 +366,75 @@ export default function Awards() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden">
-      {/* 🎨 Linear gradient background - fixed behind everything */}
-      <div
-        className="pointer-events-none fixed inset-0 -z-10"
+    <div className="min-h-screen relative overflow-hidden">
+      {/* 🎨 Enhanced gradient background with soft blur - matching education */}
+      <div 
+        className="fixed inset-0 -z-10"
         style={{
-          background: `linear-gradient(
-          to bottom,
-          #d9d9d9 0%,
-          #cfd3d6 25%,
-          #9aa6b2 55%,
-          #2E4056 100%
-        )`,
-          width: "100%",
+          background: `radial-gradient(circle at 20% 20%, rgba(210, 215, 220, 0.4) 0%, rgba(150, 165, 180, 0.3) 50%, rgba(40, 64, 86, 0.4) 100%)`,
         }}
-      />
+      >
+        {/* Animated blur elements */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-white/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-gray-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
 
       {/* Header and content with z-index to stay above background */}
-      <div className="relative z-10 flex flex-col flex-1">
+      <div className="relative z-10">
         <Navbar />
-        <ToastContainer position="top-center" autoClose={3000} />
+        <ToastContainer 
+          position="top-center" 
+          autoClose={3000}
+          toastClassName="!bg-white/80 !backdrop-blur-md !text-gray-800 !shadow-lg !border !border-white/20"
+        />
 
-        <div className="flex-1 flex justify-center px-4 sm:px-6 py-0 sm:py-0">
-          <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center py-8">
-            {/* Left card */}
-            <main className="w-full md:max-w-[448px] flex flex-col gap-6 rounded-[28px] border border-neutral-300 bg-white px-4 sm:px-6 md:px-8 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.06)]">
-              {/* top row - back + progress */}
-              <div className="flex items-center gap-4">
+        <div className="flex justify-center px-4 sm:px-6 py-6">
+          <div className="w-full max-w-[1200px] mx-auto flex flex-col lg:flex-row gap-6 lg:gap-8">
+            
+            {/* Left card - Glass effect */}
+            <main className="w-full lg:flex-1 bg-white/70 backdrop-blur-xl rounded-3xl border border-white/40 shadow-2xl px-6 sm:px-8 py-8">
+              
+              {/* Top: back + progress */}
+              <div className="flex items-center gap-4 mb-8">
                 <IconButton
                   size="small"
-                  icon={<FeatherArrowLeft />}
+                  icon={<FeatherArrowLeft className="w-4 h-4" />}
                   onClick={async () => {
-                    try {
-                      if (source === "dashboard") {
-                        navigate("/dashboard");
-                        return;
-                      }
-
-                      const res = await API("POST", "/auth/verify-route", {
-                        route: "/certifications",
-                      });
-
-                      if (res.allowed) {
-                        navigate("/certifications", { state: { source } });
-                      }
-                    } catch {
-                      // silent fail
-                    }
+                    navigate("/certifications");
                   }}
+                  className="bg-white/50 hover:bg-white/80 backdrop-blur-sm border border-white/30"
                 />
-                <div className="flex-1 w-full max-w-full md:max-w-[420px]">
-                  <div className="flex items-center gap-3">
-                    {[...Array(5)].map((_, i) => (
+
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    {[...Array(6)].map((_, i) => (
                       <div
-                        key={`p-${i}`}
-                        style={{ height: 6, backgroundColor: colors.primary }}
-                        className="flex-1 rounded-full"
-                      />
-                    ))}
-                    {[...Array(1)].map((_, i) => (
-                      <div
-                        key={`n-${i}`}
-                        style={{ height: 6 }}
-                        className="flex-1 rounded-full bg-neutral-300"
+                        key={i}
+                        className={`flex-1 h-1.5 rounded-full transition-all duration-300 ${
+                          i <= 4 
+                            ? "bg-gradient-to-r from-gray-600 to-gray-800" 
+                            : "bg-white/30"
+                        }`}
                       />
                     ))}
                   </div>
+                  <p className="text-xs text-gray-500 mt-2 font-medium">Step 5 of 6</p>
                 </div>
               </div>
 
-              {/* Header */}
-              <header className=" w-full">
-                <h2 className="text-[22px] text-neutral-900">
-                  Add awards and extracurriculars
+              {/* Header with refined typography */}
+              <header className="mb-8">
+                <h2 className="text-2xl text-gray-800 font-light tracking-tight">
+                  Add awards and 
+                  <span className="block font-semibold text-gray-900 mt-1">Extracurriculars</span>
                 </h2>
-                <p className="text-xs text-neutral-500">
-                  These help recruiters understand your interests and
-                  achievements
+                <p className="text-sm text-gray-500 mt-3 leading-relaxed">
+                  These help recruiters understand your interests and achievements
                 </p>
               </header>
 
-              <section className="flex w-full flex-col gap-3">
+              {/* Awards List with enhanced styling */}
+              <section className="flex w-full flex-col gap-3 mb-8">
                 {awards.map((a) => {
                   const isSelected = selectedAward?.id === a.id;
 
@@ -465,17 +450,17 @@ export default function Awards() {
                           setSelectedAward(isSelected ? null : a);
                         }
                       }}
-                      className="rounded-3xl px-4 py-3 cursor-pointer transition-all duration-200 focus:outline-none"
+                      className="rounded-2xl px-4 py-3 cursor-pointer transition-all duration-200 backdrop-blur-sm focus:outline-none"
                       style={{
                         backgroundColor: isSelected
-                          ? `${colors.primary}10`
-                          : colors.white,
+                          ? `${colors.primary}14`
+                          : "rgba(255,255,255,0.3)",
                         border: `1px solid ${
-                          isSelected ? colors.primary : colors.neutral[400]
+                          isSelected ? colors.primary : "rgba(255,255,255,0.4)"
                         }`,
                         boxShadow: isSelected
-                          ? `0 4px 14px ${colors.primary}22`
-                          : "0 1px 3px rgba(0,0,0,0.04)",
+                          ? `0 0 0 3px ${colors.primary}22`
+                          : "0 4px 6px rgba(0,0,0,0.02)",
                       }}
                     >
                       <div className="flex items-center justify-between">
@@ -483,10 +468,10 @@ export default function Awards() {
                           <Avatar
                             size="large"
                             square
-                            className="!rounded-2xl font-semibold"
+                            className="!rounded-xl shadow-sm"
                             style={{
-                              backgroundColor: `${colors.primary}22`,
-                              color: colors.primary,
+                              backgroundColor: colors.primaryGlow,
+                              color: colors.neutral[800],
                             }}
                           >
                             {a.name
@@ -497,12 +482,12 @@ export default function Awards() {
                           </Avatar>
 
                           <div className="flex flex-col min-w-0">
-                            <span className="text-sm font-semibold text-neutral-900 truncate">
+                            <span className="text-sm font-semibold text-gray-800 truncate">
                               {a.name}
                             </span>
 
                             {a.description && (
-                              <span className="text-xs text-neutral-500 line-clamp-1">
+                              <span className="text-xs text-gray-500 line-clamp-1">
                                 {a.description}
                               </span>
                             )}
@@ -510,18 +495,33 @@ export default function Awards() {
                         </div>
 
                         <div className="flex flex-col items-end gap-2 shrink-0">
-                          <IconButton
-                            size="small"
-                            icon={<FeatherX />}
-                            aria-label={`Delete award ${a.name}`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setDeleteAwardId(a.id);
-                            }}
-                            className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
-                          />
+                          <div className="flex items-center gap-1">
+                            {/* ✅ Edit */}
+                            <IconButton
+                              size="small"
+                              icon={<FeatherEdit2 className="w-3 h-3" />}
+                              aria-label={`Edit award ${a.name}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                fillFormForEdit(a);
+                              }}
+                              className="!bg-transparent !text-gray-500 hover:!text-gray-700 transition"
+                            />
 
-                          <span className="text-xs text-neutral-500">
+                            {/* ✅ Delete */}
+                            <IconButton
+                              size="small"
+                              icon={<FeatherX className="w-3 h-3" />}
+                              aria-label={`Delete award ${a.name}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeleteAwardId(a.id);
+                              }}
+                              className="!bg-transparent !text-gray-500 hover:!text-gray-700 transition"
+                            />
+                          </div>
+
+                          <span className="text-xs text-gray-500">
                             {a.year}
                           </span>
                         </div>
@@ -529,26 +529,24 @@ export default function Awards() {
 
                       {isSelected && (
                         <>
-                          <div className="my-4 border-t border-neutral-200" />
+                          <div className="my-4 border-t border-white/30" />
 
-                          <div className="flex flex-col gap-3 text-sm text-neutral-800 px-1">
+                          <div className="flex flex-col gap-2 text-sm text-gray-700 px-1">
                             <div>
-                              <span className="font-medium">Award name:</span>{" "}
+                              <span className="font-medium text-gray-600">Award name:</span>{" "}
                               {a.name}
                             </div>
 
                             {a.description && (
                               <div>
-                                <span className="font-medium">
-                                  Description:
-                                </span>{" "}
+                                <span className="font-medium text-gray-600">Description:</span>{" "}
                                 {a.description}
                               </div>
                             )}
 
                             {a.year && (
                               <div>
-                                <span className="font-medium">Year:</span>{" "}
+                                <span className="font-medium text-gray-600">Year:</span>{" "}
                                 {a.year}
                               </div>
                             )}
@@ -560,34 +558,30 @@ export default function Awards() {
                 })}
               </section>
 
-              {/* Form */}
+              {/* Form with enhanced styling */}
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
                   handleAddAward();
                 }}
-                className="flex flex-col gap-4 mt-2"
+                className="flex flex-col gap-5"
               >
-                <TextField
-                  label={
-                    <span className="text-[12px]">
-                      Award or Activity Name{" "}
-                      <span className="text-red-500">*</span>{" "}
-                    </span>
-                  }
-                  helpText=""
-                  className={scTextFieldClass}
-                >
-                  <TextField.Input
+                {/* Award Name */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Award or Activity Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    className="w-full h-10 px-4 rounded-xl border bg-white/50 backdrop-blur-sm text-sm transition-all duration-200 border-white/40 hover:border-gray-300 focus:border-gray-400 focus:outline-none"
                     placeholder="e.g., Hackathon Winner"
                     value={name}
                     onChange={(e) => setName(toTitleCase(e.target.value))}
-                    className={scInputClass}
                   />
-                </TextField>
+                </div>
 
+                {/* Year */}
                 <div className="flex flex-col gap-1">
-                  <label className="text-[12px] font-medium">
+                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Year <span className="text-red-500">*</span>
                   </label>
                   <EndYearPicker
@@ -598,29 +592,28 @@ export default function Awards() {
                   />
                 </div>
 
-                <TextField
-                  label={<span className="text-[12px]">Description</span>}
-                  helpText=""
-                  className={scTextFieldClass}
-                >
-                  <TextField.Input
+                {/* Description */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Description
+                  </label>
+                  <textarea
+                    className="w-full h-24 px-4 py-3 rounded-xl border bg-white/50 backdrop-blur-sm text-sm transition-all duration-200 border-white/40 hover:border-gray-300 focus:border-gray-400 focus:outline-none resize-none"
                     placeholder="Brief description of the achievement or role"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     onBlur={() => setDescription(toSentenceCase(description))}
-                    className={scInputClass}
                   />
-                </TextField>
+                </div>
 
-                <div className="mt-2 flex flex-col sm:flex-row gap-3 items-center">
+                <div className="flex flex-col sm:flex-row gap-3 items-center mt-2">
                   <Button
                     type="button"
                     disabled={isSubmitting}
                     variant="neutral-secondary"
-                    icon={<FeatherPlus />}
-                    className="w-full rounded-full border border-neutral-300 h-10 px-4 flex items-center gap-2"
-      onClick={handleAddAward}
-
+                    icon={<FeatherPlus className="w-4 h-4" />}
+                    className="w-full rounded-xl h-10 px-4 bg-white/50 backdrop-blur-sm border border-white/40 hover:bg-white/70 transition-all duration-200"
+                    onClick={handleAddAward}
                   >
                     {isSubmitting
                       ? isEditing
@@ -631,16 +624,13 @@ export default function Awards() {
                         : "Add another award"}
                   </Button>
 
-                  <div className="flex-1" />
-
                   {/* ✅ Cancel edit */}
                   {isEditing && (
                     <Button
                       onClick={resetForm}
                       type="button"
-                      className="w-full rounded-full h-10 mt-2 sm:mt-0"
+                      className="w-full rounded-xl h-10 bg-white/30 backdrop-blur-sm border border-white/40 hover:bg-white/50 transition-all duration-200"
                       variant="brand-tertiary"
-                      style={{ backgroundColor: colors.primaryGlow }}
                     >
                       Cancel edit
                     </Button>
@@ -648,217 +638,208 @@ export default function Awards() {
                 </div>
               </form>
 
-              <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
-
+              {/* Divider */}
+              <div className="w-full h-px bg-gradient-to-r from-transparent via-white/50 to-transparent my-6" />
+              
+              {/* Footer with Continue button */}
               <footer>
                 <Button
                   onClick={handleContinue}
                   disabled={!canContinue || isSubmitting}
-                  className="w-full h-10 rounded-full text-background transition-all"
+                  className="w-full h-11 rounded-xl text-sm font-medium transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100"
                   style={{
-                    backgroundColor:
-                      !canContinue || isSubmitting
-                        ? `${colors.accent}66`
-                        : colors.accent,
-                    cursor:
-                      !canContinue || isSubmitting ? "not-allowed" : "pointer",
-                    boxShadow:
-                      !canContinue || isSubmitting
-                        ? "none"
-                        : "0 6px 18px rgba(99,52,237,0.18)",
+                    background: !canContinue || isSubmitting
+                      ? "linear-gradient(135deg, #e0e0e0, #f0f0f0)"
+                      : "linear-gradient(135deg, #2c3e50, #1e2a36)",
+                    color: "#ffffff",
+                    cursor: !canContinue || isSubmitting ? "not-allowed" : "pointer",
+                    boxShadow: !canContinue || isSubmitting
+                      ? "none"
+                      : "0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.02)",
+                    opacity: !canContinue || isSubmitting ? 0.6 : 1,
                   }}
                 >
-                  {isSubmitting ? "Saving..." : "Continue"}
+                  {isSubmitting ? "Saving..." : "Continue →"}
                 </Button>
               </footer>
             </main>
 
-            {/* Right panel */}
-            <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
-              <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
-                <h3 className="text-[22px] text-neutral-900">
-                  Your Experience Index
-                </h3>
-
-                <div className="flex items-center justify-center py-6">
-                  <span
-                    aria-live="polite"
-                    className="font-['Afacad_Flux'] text-[32px] sm:text-[40px] md:text-[48px] font-[500] leading-[56px] text-neutral-300"
-                  >
-                    {displayedIndex ?? 0}
-                  </span>
+            {/* Right panel - Enhanced glass effect */}
+            <aside className="w-full lg:w-80 shrink-0">
+              <div className="lg:sticky lg:top-6 bg-white/60 backdrop-blur-xl rounded-2xl border border-white/40 shadow-xl p-6">
+                
+                {/* Experience Index Score */}
+                <div className="text-center mb-6">
+                  <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
+                    Experience Index
+                  </h3>
+                  <div className="relative inline-block">
+                    <span className="text-6xl font-light text-gray-800">
+                      {displayedIndex ?? 0}
+                    </span>
+                    <div className="absolute -top-1 -right-4 w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
+                  </div>
                 </div>
 
-                <div className="h-px bg-neutral-300" />
+                <div className="h-px bg-gradient-to-r from-transparent via-white/50 to-transparent my-4" />
 
-                <div className="mt-4">
-                  <div className="text-[16px] text-neutral-800 mb-3">
-                    Progress Steps
-                  </div>
-
+                {/* Progress Steps with refined styling */}
+                <h4 className="text-sm font-medium text-gray-600 mb-4">Progress steps</h4>
+                
+                <div className="space-y-2">
+                  {/* Completed - Demographics */}
                   <button
                     type="button"
-                    className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3 hover:bg-neutral-50"
+                    className="w-full flex items-center gap-3 rounded-xl px-4 py-3 bg-white/30 backdrop-blur-sm border border-white/20 hover:bg-white/40 transition-all duration-200"
                   >
-                    <IconWithBackground
-                      size="small"
-                      icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                      className="!bg-green-100 !rounded-full !p-3"
-                    />
-                    <span className="text-sm text-neutral-700">
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-green-100">
+                      <FeatherCheck className="w-4 h-4 text-green-700" />
+                    </div>
+                    <span className="flex-1 text-sm text-gray-600">
                       Demographics
                     </span>
+                    <span className="text-xs text-gray-400">1/6</span>
                   </button>
 
-                  <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                    <IconWithBackground
-                      size="small"
-                      icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                      className="!bg-green-100 !rounded-full !p-3"
-                    />
-                    <span className="text-sm text-neutral-700">Education</span>
-                  </div>
+                  {/* Completed - Education */}
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-3 rounded-xl px-4 py-3 bg-white/30 backdrop-blur-sm border border-white/20 hover:bg-white/40 transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-green-100">
+                      <FeatherCheck className="w-4 h-4 text-green-700" />
+                    </div>
+                    <span className="flex-1 text-sm text-gray-600">
+                      Education
+                    </span>
+                    <span className="text-xs text-gray-400">2/6</span>
+                  </button>
 
-                  <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                    <IconWithBackground
-                      size="small"
-                      icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                      className="!bg-green-100 !rounded-full !p-3"
-                    />
-                    <span className="text-sm text-neutral-700">Experience</span>
-                  </div>
+                  {/* Completed - Experience */}
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-3 rounded-xl px-4 py-3 bg-white/30 backdrop-blur-sm border border-white/20 hover:bg-white/40 transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-green-100">
+                      <FeatherCheck className="w-4 h-4 text-green-700" />
+                    </div>
+                    <span className="flex-1 text-sm text-gray-600">
+                      Experience
+                    </span>
+                    <span className="text-xs text-gray-400">3/6</span>
+                  </button>
 
-                  <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                    <IconWithBackground
-                      size="small"
-                      icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                      className="!bg-green-100 !rounded-full !p-3"
-                    />
-                    <span className="text-sm text-neutral-700">
+                  {/* Completed - Certifications */}
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-3 rounded-xl px-4 py-3 bg-white/30 backdrop-blur-sm border border-white/20 hover:bg-white/40 transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-green-100">
+                      <FeatherCheck className="w-4 h-4 text-green-700" />
+                    </div>
+                    <span className="flex-1 text-sm text-gray-600">
                       Certifications
                     </span>
-                  </div>
+                    <span className="text-xs text-gray-400">4/6</span>
+                  </button>
 
+                  {/* Active - Awards */}
                   <div
-                    style={{ backgroundColor: colors.primary }}
-                    className="flex items-center gap-3 rounded-2xl px-4 py-2 mb-3"
+                    className="flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(44,62,80,0.1), rgba(30,42,54,0.05))",
+                      border: "1px solid rgba(255,255,255,0.3)",
+                      backdropFilter: "blur(4px)",
+                    }}
                   >
-                    <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white shadow-sm">
-                      <IconWithBackground
-                        size="small"
-                        variant="neutral"
-                        className="!bg-white"
-                        icon={<FeatherAward />}
-                      />
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-white/80 shadow-sm">
+                      <FeatherAward className="w-4 h-4 text-gray-700" />
                     </div>
-                    <span
-                      className="text-sm font-medium text-neutral-900"
-                      style={{ color: colors.white }}
-                    >
+                    <span className="flex-1 text-sm font-medium text-gray-700">
                       Awards
                     </span>
+                    <span className="text-xs text-gray-400">5/6</span>
                   </div>
 
-                  <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2">
-                    <IconWithBackground
-                      variant="neutral"
-                      size="small"
-                      className="!bg-white !text-neutral-600"
-                      icon={<FeatherPackage />}
-                    />
-                    <span className="text-sm text-neutral-500">Projects</span>
-                  </div>
+                  {/* Inactive - Projects */}
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-3 rounded-xl px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/20 hover:bg-white/30 transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-white/60">
+                      <FeatherPackage className="w-4 h-4 text-gray-500" />
+                    </div>
+                    <span className="flex-1 text-sm text-gray-500">
+                      Projects
+                    </span>
+                    <span className="text-xs text-gray-400">6/6</span>
+                  </button>
                 </div>
               </div>
             </aside>
           </div>
-
-          {deleteAwardId && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-              <div
-                className="w-[360px] rounded-2xl p-6 shadow-xl"
-                style={{ backgroundColor: colors.white }}
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <h3
-                    className="text-lg font-semibold"
-                    style={{ color: colors.accent }}
-                  >
-                    Are you sure?
-                  </h3>
-
-                  <button
-                    onClick={() => setDeleteAwardId(null)}
-                    className="transition"
-                    style={{ color: colors.neutral[600] }}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.color = colors.accent)
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.color = colors.neutral[600])
-                    }
-                  >
-                    ✕
-                  </button>
-                </div>
-
-                <p
-                  className="text-sm mb-6"
-                  style={{ color: colors.neutral[600] }}
-                >
-                  Do you really want to delete this award?
-                </p>
-
-                <div className="flex gap-3">
-                  <Button
-                    variant="brand-tertiary"
-                    className="flex-1 !rounded-3xl"
-                    onClick={() => setDeleteAwardId(null)}
-                    style={{
-                      backgroundColor: colors.primary,
-                      color: colors.white,
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isSubmitting)
-                        e.currentTarget.style.backgroundColor =
-                          colors.secondary;
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isSubmitting)
-                        e.currentTarget.style.backgroundColor = colors.primary;
-                    }}
-                  >
-                    Cancel
-                  </Button>
-
-                  <Button
-                    className="flex-1 !rounded-3xl transition"
-                    onClick={handleRemove}
-                    disabled={isSubmitting}
-                    style={{
-                      backgroundColor: isSubmitting
-                        ? `${colors.red}55`
-                        : colors.red,
-                      color: colors.white,
-                      cursor: isSubmitting ? "not-allowed" : "pointer",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isSubmitting)
-                        e.currentTarget.style.backgroundColor = colors.red;
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isSubmitting)
-                        e.currentTarget.style.backgroundColor = colors.red;
-                    }}
-                  >
-                    {isSubmitting ? "Deleting..." : "Delete"}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteAwardId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div
+            className="w-[360px] rounded-2xl p-6 shadow-xl bg-white/80 backdrop-blur-xl border border-white/40"
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3
+                className="text-lg font-semibold"
+                style={{ color: colors.accent }}
+              >
+                Are you sure?
+              </h3>
+
+              <button
+                onClick={() => setDeleteAwardId(null)}
+                className="text-gray-400 hover:text-gray-700 transition"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="text-sm mb-6 text-gray-600">
+              Do you really want to delete this award?
+            </p>
+
+            <div className="flex gap-3">
+              {/* Cancel */}
+              <Button
+                className="flex-1 rounded-xl bg-white/50 backdrop-blur-sm border border-white/40 hover:bg-white/70 transition-all duration-200"
+                onClick={() => setDeleteAwardId(null)}
+                style={{
+                  color: colors.accent,
+                }}
+              >
+                Cancel
+              </Button>
+
+              {/* Delete */}
+              <Button
+                className="flex-1 rounded-xl transition-all duration-200"
+                onClick={handleRemove}
+                disabled={isSubmitting}
+                style={{
+                  background: isSubmitting
+                    ? "linear-gradient(135deg, #ef444466, #dc262666)"
+                    : "linear-gradient(135deg, #ef4444, #dc2626)",
+                  color: "#ffffff",
+                  opacity: isSubmitting ? 0.6 : 1,
+                  cursor: isSubmitting ? "not-allowed" : "pointer",
+                }}
+              >
+                {isSubmitting ? "Deleting..." : "Delete"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );

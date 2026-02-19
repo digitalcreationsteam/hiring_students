@@ -17,6 +17,7 @@ import {
   FeatherFileCheck,
   FeatherAward,
   FeatherPackage,
+  FeatherCheckCircle,
 } from "@subframe/core";
 import API, { URL_PATH } from "src/common/API";
 import { toast, ToastContainer } from "react-toastify";
@@ -25,7 +26,6 @@ import { Country, State, City } from "country-state-city";
 import { colors } from "src/common/Colors";
 import Navbar from "src/ui/components/Navbar";
 import Footer from "../ui/components/Footer";
-
 
 interface DemographicsData {
   fullName: string;
@@ -45,6 +45,7 @@ interface ApiError {
 interface StepItem {
   label: string;
   icon: React.ReactNode;
+  isCompleted?: boolean;
 }
 
 export default function Demographics() {
@@ -66,33 +67,6 @@ export default function Demographics() {
   );
 
   /* ============================================
-     GUARD: Redirect if not on demographics step
-  ============================================ */
-  // useEffect(() => {
-  //   if (currentStep && currentStep !== "demographics") {
-  //     console.warn("User tried to access demographics but on", currentStep);
-  //     navigate(nextRoute || "/demographics");
-  //   }
-  // }, [currentStep, nextRoute, navigate]);
-
-  // useEffect(() => {
-  //   if (!currentStep) return;
-  //   if (currentStep === "demographics") return;
-  //   navigate(nextRoute || "/");
-  // }, [currentStep, nextRoute, navigate]);
-
-  //   useEffect(() => {
-  //   if (!navReady) return;
-
-  //   // allow browser back navigation
-  //   if (window.history.state?.idx > 0) return;
-
-  //   if (currentStep === "demographics") return;
-
-  //   navigate(nextRoute || "/");
-  // }, [navReady, currentStep, nextRoute, navigate]);
-
-  /* ============================================
      LOCAL STATE
   ============================================ */
   const [phoneVisible, setPhoneVisible] = useState<boolean>(false);
@@ -100,8 +74,6 @@ export default function Demographics() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [experienceIndex, setExperienceIndex] = useState<number | null>(null);
-
-
   
   useEffect(() => {
     const hydrateNavigation = async () => {
@@ -195,7 +167,6 @@ export default function Demographics() {
       return "Please enter a valid email address.";
     }
 
-    // ✅ FIX: Check if phoneNumber exists AND is not empty before testing regex
     const phoneValue = form.phoneNumber ? form.phoneNumber.trim() : "";
 
     if (!phoneValue) {
@@ -219,7 +190,7 @@ export default function Demographics() {
 
     return null;
   };
-    // ✅ Controls when Continue button becomes enabled
+
   const canContinue =
     form.fullName.trim() !== "" &&
     form.email.trim() !== "" &&
@@ -227,7 +198,6 @@ export default function Demographics() {
     form.country.trim() !== "" &&
     form.state.trim() !== "" &&
     form.city.trim() !== "";
-
 
   /* ============================================
      FORM HANDLERS
@@ -240,7 +210,6 @@ export default function Demographics() {
   };
 
   const handleContinue = async (): Promise<void> => {
-    // Validate
     const validationError = validateForm();
     if (validationError) {
       setError(validationError);
@@ -262,7 +231,6 @@ export default function Demographics() {
     };
 
     try {
-      // ✅ Step 1: Save demographics to backend
       const saveResponse = await API("POST", URL_PATH.demographics, payload);
 
       if (!saveResponse?.data) {
@@ -271,7 +239,6 @@ export default function Demographics() {
         return;
       }
 
-      // ✅ Step 2: Get updated navigation status
       const statusResponse = await API("GET", URL_PATH.getUserStatus);
 
       if (!statusResponse?.success) {
@@ -280,7 +247,6 @@ export default function Demographics() {
         return;
       }
 
-      // ✅ Step 3: Update Redux with new navigation
       dispatch(
         setNavigation({
           nextRoute: statusResponse.navigation.nextRoute,
@@ -295,8 +261,6 @@ export default function Demographics() {
       setTimeout(() => {
         navigate(statusResponse.navigation.nextRoute);
       }, 3000);
-
-      // ✅ Step 4: Navigate to next step
     } catch (err: unknown) {
       const apiError = err as ApiError;
       const message = apiError?.message || "Failed to submit demographics";
@@ -314,16 +278,14 @@ export default function Demographics() {
       try {
         let demographicsRes = null;
 
-        // ✅ 404 is NORMAL for first-time users
         try {
           demographicsRes = await API("GET", URL_PATH.getDemographics);
         } catch (err: any) {
           if (err?.response?.status !== 404) {
-            throw err; // real error
+            throw err;
           }
         }
 
-        // Populate form ONLY if data exists
         const data = demographicsRes?.data;
 
         if (data?.fullName) {
@@ -338,7 +300,6 @@ export default function Demographics() {
           setPhoneVisible(!!data.phoneVisibleToRecruiters);
         }
 
-        // Experience index is safe
         const expRes = await API("GET", URL_PATH.calculateExperienceIndex);
         setExperienceIndex(expRes?.points?.demographics || 0);
       } catch (err) {
@@ -383,106 +344,105 @@ export default function Demographics() {
       setSelectedCity(city);
       setIsManualCity(false);
     } else {
-      // 👇 THIS IS THE FIX
       setSelectedCity(null);
       setIsManualCity(true);
     }
   }, [selectedCountry, selectedState, form.city]);
 
   /* ============================================
-     RENDER
+     RENDER - UPDATED UI DESIGN
   ============================================ */
-  const fieldClass =
-    "w-full [&>label]:text-[8px] [&>label]:font-small [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300 [&>div]:h-8 focus:border-black";
-
-  const inputClass =
-    "w-full h-7 rounded-full px-2 text-[12px] leading-none bg-transparent focus:bg-transparent focus:outline-none focus:ring-0";
+  const fieldClass = "w-full";
+  
+  const inputClass = "w-full h-9 rounded-xl px-3 text-sm bg-white/50 border border-gray-200/50 focus:border-gray-400 focus:ring-0 transition-all duration-200 hover:border-gray-300";
 
   const steps: StepItem[] = [
-    { label: "Education", icon: <FeatherGraduationCap key="edu" /> },
-    { label: "Experience", icon: <FeatherBriefcase key="exp" /> },
-    { label: "Certifications", icon: <FeatherFileCheck key="cert" /> },
-    { label: "Awards", icon: <FeatherAward key="award" /> },
-    { label: "Projects", icon: <FeatherPackage key="proj" /> },
+    { label: "Education", icon: <FeatherGraduationCap />, isCompleted: false },
+    { label: "Experience", icon: <FeatherBriefcase />, isCompleted: false },
+    { label: "Certifications", icon: <FeatherFileCheck />, isCompleted: false },
+    { label: "Awards", icon: <FeatherAward />, isCompleted: false },
+    { label: "Projects", icon: <FeatherPackage />, isCompleted: false },
   ];
-
-
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-       {/* 🎨 Linear gradient background - fixed behind everything */}
-    <div 
-      className="pointer-events-none fixed inset-0 -z-10"
-      style={{
-        background: `linear-gradient(
-          to bottom,
-          #d9d9d9 0%,
-          #cfd3d6 25%,
-          #9aa6b2 55%,
-          #2E4056 100%
-        )`,
-        width: "100%",
-      }}
-    />
+      {/* Enhanced gradient background with soft blur */}
+      <div 
+        className="fixed inset-0 -z-10"
+        style={{
+          background: `radial-gradient(circle at 20% 20%, rgba(210, 215, 220, 0.4) 0%, rgba(150, 165, 180, 0.3) 50%, rgba(40, 64, 86, 0.4) 100%)`,
+        }}
+      >
+        {/* Animated blur elements */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-white/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-gray-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
 
-      {/* Header and content with z-index to stay above background */}
+      {/* Main content with glass morphism */}
       <div className="relative z-10">
-        <ToastContainer position="top-center" autoClose={2000} />
+        <ToastContainer 
+          position="top-center" 
+          autoClose={2000}
+          toastClassName="!bg-white/80 !backdrop-blur-md !text-gray-800 !shadow-lg !border !border-white/20"
+        />
         <Navbar />
-        <div className="flex justify-center px-4 sm:px-6 py-0 sm:py-0">
-          <div className="w-full max-w-[1000px] mx-auto flex flex-col md:flex-row gap-6 md:gap-8 justify-center py-8">
-            {/* LEFT CARD */}
-            <main className="w-full md:max-w-[480px] bg-white rounded-3xl border border-neutral-300 px-4 sm:px-6 md:px-8 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.06)]">
-              {/* Header */}
-              <div className="flex items-center gap-4 mb-6">
+        
+        <div className="flex justify-center px-4 sm:px-6 py-6">
+          <div className="w-full max-w-[1200px] mx-auto flex flex-col lg:flex-row gap-6 lg:gap-8">
+            
+            {/* LEFT CARD - Glass effect */}
+            <main className="w-full lg:flex-1 bg-white/70 backdrop-blur-xl rounded-3xl border border-white/40 shadow-2xl px-6 sm:px-8 py-8">
+              
+              {/* Header with progress */}
+              <div className="flex items-center gap-4 mb-8">
                 <IconButton
                   size="small"
-                  icon={<FeatherArrowLeft />}
+                  icon={<FeatherArrowLeft className="w-4 h-4" />}
                   onClick={() => navigate("/upload-resume")}
+                  className="bg-white/50 hover:bg-white/80 backdrop-blur-sm border border-white/30"
                 />
 
                 <div className="flex-1">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="flex-1 h-[5px] rounded-full"
-                      style={{ backgroundColor: colors.primary }}
-                    />
-                    {[...Array(5)].map((_, i) => (
+                  <div className="flex items-center gap-2">
+                    {[...Array(6)].map((_, i) => (
                       <div
                         key={i}
-                        className="flex-1 h-[5px] rounded-full bg-neutral-300"
+                        className={`flex-1 h-1.5 rounded-full transition-all duration-300 ${
+                          i === 0 
+                            ? "bg-gradient-to-r from-gray-600 to-gray-800" 
+                            : "bg-white/30"
+                        }`}
                       />
                     ))}
                   </div>
+                  <p className="text-xs text-gray-500 mt-2 font-medium">Step 1 of 6</p>
                 </div>
               </div>
 
-              {/* Title */}
-              <div className="mb-6">
-                <h2 className="text-[22px] text-neutral-900 font-semibold">
-                  Let's Calculate Your Experience Index
+              {/* Title with refined typography */}
+              <div className="mb-8">
+                <h2 className="text-2xl text-gray-800 font-light tracking-tight">
+                  Let's calculate your 
+                  <span className="block font-semibold text-gray-900 mt-1">Experience Index</span>
                 </h2>
-                <p className="text-xs text-neutral-500 mt-2">
-                  This information helps us create rankings and connect you with
-                  relevant recruiters
+                <p className="text-sm text-gray-500 mt-3 leading-relaxed">
+                  This information helps us create rankings and connect you with relevant recruiters
                 </p>
               </div>
 
-              {/* Form */}
-              <div className="flex flex-col gap-4 mb-6">
-                <TextField label="Name *" className={fieldClass}>
+              {/* Form with enhanced styling */}
+              <div className="space-y-5 mb-8">
+                <TextField label="Full name *" className={fieldClass}>
                   <TextField.Input
                     value={form.fullName}
-                    onChange={(e) =>
-                      handleInputChange("fullName", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange("fullName", e.target.value)}
                     placeholder="John Smith"
                     className={inputClass}
                   />
                 </TextField>
 
                 <TextField
-                  label="Email *"
+                  label="Email address *"
                   helpText={
                     <span className="text-xs text-gray-400">
                       Used for account access and recruiter outreach
@@ -499,7 +459,7 @@ export default function Demographics() {
                 </TextField>
 
                 <TextField
-                  label="Phone Number"
+                  label="Phone number"
                   helpText={
                     <span className="text-gray-400 text-xs">
                       Optional for recruiter contact
@@ -509,43 +469,36 @@ export default function Demographics() {
                 >
                   <TextField.Input
                     value={form.phoneNumber}
-                    onChange={(e) =>
-                      handleInputChange("phoneNumber", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
                     placeholder="+1 (555) 123-4567"
                     className={inputClass}
                   />
                 </TextField>
 
-                <div className="flex items-center gap-3">
+                {/* Switch with refined styling */}
+                <div className="flex items-center gap-3 p-3 bg-white/30 rounded-xl backdrop-blur-sm border border-white/20">
                   <Switch
                     checked={phoneVisible}
                     onCheckedChange={setPhoneVisible}
-                    className="h-5 w-9 data-[state=checked]:bg-violet-700 data-[state=unchecked]:bg-neutral-300"
-                    style={{
-                      backgroundColor: phoneVisible
-                        ? colors.primary
-                        : undefined,
-                    }}
+                    className="h-5 w-9 data-[state=checked]:bg-gray-700 data-[state=unchecked]:bg-white/50"
                   />
-                  <span className="text-sm text-neutral-700">
+                  <span className="text-sm text-gray-600">
                     Make phone number visible to recruiters
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <TextField label="Country *" className={fieldClass}>
+                {/* Location fields grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Country *</label>
                     <select
                       className={inputClass}
                       value={selectedCountry?.isoCode || ""}
                       onChange={(e) => {
-                        const country = Country.getCountryByCode(
-                          e.target.value,
-                        );
+                        const country = Country.getCountryByCode(e.target.value);
                         setSelectedCountry(country);
                         setSelectedState(null);
                         setSelectedCity(null);
-
                         setForm((prev) => ({
                           ...prev,
                           country: country?.name || "",
@@ -554,28 +507,26 @@ export default function Demographics() {
                         }));
                       }}
                     >
-                      <option value="">Select Country</option>
+                      <option value="">Select country</option>
                       {countries.map((c) => (
                         <option key={c.isoCode} value={c.isoCode}>
                           {c.name}
                         </option>
                       ))}
                     </select>
-                  </TextField>
+                  </div>
 
-                  <TextField label="State *" className={fieldClass}>
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">State *</label>
                     <select
                       className={inputClass}
                       disabled={!selectedCountry}
                       value={selectedState?.isoCode || ""}
                       onChange={(e) => {
-                        const state = states.find(
-                          (s) => s.isoCode === e.target.value,
-                        );
+                        const state = states.find((s) => s.isoCode === e.target.value);
                         setSelectedState(state);
                         setSelectedCity(null);
                         setIsManualCity(false);
-
                         setForm((prev) => ({
                           ...prev,
                           state: state?.name || "",
@@ -583,16 +534,17 @@ export default function Demographics() {
                         }));
                       }}
                     >
-                      <option value="">Select State</option>
+                      <option value="">Select state</option>
                       {states.map((s) => (
                         <option key={s.isoCode} value={s.isoCode}>
                           {s.name}
                         </option>
                       ))}
                     </select>
-                  </TextField>
+                  </div>
 
-                  <TextField label="City *" className={fieldClass}>
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">City *</label>
                     {!isManualCity ? (
                       <select
                         className={inputClass}
@@ -601,7 +553,6 @@ export default function Demographics() {
                         onChange={(e) => {
                           const value = e.target.value;
 
-                          // Explicit intent → manual entry
                           if (value === OTHER_CITY_VALUE) {
                             setIsManualCity(true);
                             setSelectedCity(null);
@@ -617,14 +568,12 @@ export default function Demographics() {
                           }));
                         }}
                       >
-                        <option value="">Select City</option>
-
+                        <option value="">Select city</option>
                         {cities.map((c) => (
                           <option key={c.name} value={c.name}>
                             {c.name}
                           </option>
                         ))}
-
                         <option value={OTHER_CITY_VALUE}>Other</option>
                       </select>
                     ) : (
@@ -634,7 +583,6 @@ export default function Demographics() {
                           const value = e.target.value;
                           setForm((prev) => ({ ...prev, city: value }));
 
-                          // 👇 Only switch back when user clears text
                           if (value.trim() === "") {
                             setIsManualCity(false);
                             setSelectedCity(null);
@@ -645,115 +593,104 @@ export default function Demographics() {
                         autoFocus
                       />
                     )}
-                  </TextField>
+                  </div>
                 </div>
               </div>
 
-              <div className="w-full h-px bg-neutral-200 my-5" />
+              <div className="w-full h-px bg-gradient-to-r from-transparent via-white/50 to-transparent my-6" />
 
-              {/* Submit Button */}
-<Button
-  onClick={handleContinue}
-  disabled={!canContinue || isSubmitting || isLoading}
-  className="w-full h-10 sm:h-11 rounded-full text-sm sm:text-base font-semibold transition-all duration-200"
-  style={{
-    backgroundColor:
-      !canContinue || isSubmitting || isLoading
-        ? colors.neutral[200]   // faded background
-        : colors.accent,
-
-    color:
-      !canContinue || isSubmitting || isLoading
-        ? colors.neutral[400]   // faded text instead of full color
-        : colors.background,
-
-    cursor:
-      !canContinue || isSubmitting || isLoading
-        ? "not-allowed"
-        : "pointer",
-
-    boxShadow:
-      !canContinue || isSubmitting || isLoading
-        ? "none"
-        : "0 6px 16px rgba(0,0,0,0.10)",
-
-    transform:
-      !canContinue || isSubmitting || isLoading
-        ? "none"
-        : "translateY(0)",
-
-    opacity:
-      !canContinue || isSubmitting || isLoading ? 0.7 : 1,
-  }}
->
-  {!canContinue
-    ? " continue"
-    : isLoading
-    ? "Loading..."
-    : isSubmitting
-    ? "Submitting..."
-    : "Continue"}
-</Button>
-
-
+              {/* Submit Button with refined styling */}
+              <Button
+                onClick={handleContinue}
+                disabled={!canContinue || isSubmitting || isLoading}
+                className="w-full h-11 rounded-xl text-sm font-medium transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100"
+                style={{
+                  background: !canContinue || isSubmitting || isLoading
+                    ? "linear-gradient(135deg, #e0e0e0, #f0f0f0)"
+                    : "linear-gradient(135deg, #2c3e50, #1e2a36)",
+                  color: !canContinue || isSubmitting || isLoading
+                    ? "#999"
+                    : "#ffffff",
+                  cursor: !canContinue || isSubmitting || isLoading
+                    ? "not-allowed"
+                    : "pointer",
+                  boxShadow: !canContinue || isSubmitting || isLoading
+                    ? "none"
+                    : "0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.02)",
+                  opacity: !canContinue || isSubmitting || isLoading ? 0.6 : 1,
+                }}
+              >
+                {!canContinue
+                  ? "Complete all fields to continue"
+                  : isLoading
+                  ? "Loading..."
+                  : isSubmitting
+                  ? "Submitting..."
+                  : "Continue →"}
+              </Button>
             </main>
 
-            {/* RIGHT PANEL */}
-            <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
-              <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-lg border border-neutral-300">
-                <h3 className="text-[20px] font-semibold text-neutral-900">
-                  Your Experience Index
-                </h3>
-
-                <div className="flex items-center justify-center py-8">
-                  <span className="text-[48px] font-medium text-neutral-300">
-                    {experienceIndex ?? 0}
-                  </span>
-                </div>
-
-                <div className="h-px bg-neutral-300 mb-4" />
-
-                <div className="text-[16px] font-semibold text-neutral-800 mb-3">
-                  Progress Steps
-                </div>
-
-                {/* Current Step */}
-                <button
-                  style={{ backgroundColor: colors.primary }}
-                  type="button"
-                  className="w-full flex items-center gap-3 rounded-2xl px-4 py-2 mb-3 hover:shadow-sm"
-                >
-                  <div className="flex items-center justify-center h-8 w-8 rounded-2xl bg-white shadow-sm">
-                    <IconWithBackground
-                      size="small"
-                      icon={<FeatherGraduationCap />}
-                    />
-                  </div>
-
-                  <span
-                    className="text-sm font-medium text-neutral-900"
-                    style={{ color: colors.white }}
-                  >
-                    Demographics
-                  </span>
-                </button>
-
-                {/* Other Steps */}
-                {steps.map((step) => (
-                  <div
-                    key={step.label}
-                    className="flex items-center gap-3 rounded-2xl border border-neutral-300 px-4 py-2 mb-3"
-                  >
-                    <IconWithBackground
-                      size="small"
-                      variant="neutral"
-                      icon={step.icon}
-                    />
-                    <span className="text-sm text-neutral-500">
-                      {step.label}
+            {/* RIGHT PANEL - Enhanced glass effect */}
+            <aside className="w-full lg:w-80 shrink-0">
+              <div className="lg:sticky lg:top-6 bg-white/60 backdrop-blur-xl rounded-2xl border border-white/40 shadow-xl p-6">
+                
+                {/* Experience Index Score */}
+                <div className="text-center mb-6">
+                  <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
+                    Experience Index
+                  </h3>
+                  <div className="relative inline-block">
+                    <span className="text-6xl font-light text-gray-800">
+                      {experienceIndex ?? 0}
                     </span>
+                    <div className="absolute -top-1 -right-4 w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
                   </div>
-                ))}
+                </div>
+
+                <div className="h-px bg-gradient-to-r from-transparent via-white/50 to-transparent my-4" />
+
+                {/* Progress Steps with refined styling */}
+                <h4 className="text-sm font-medium text-gray-600 mb-4">Progress steps</h4>
+                
+                <div className="space-y-2">
+                  {/* Current Step - Demographics */}
+                  <div
+                    className="flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(44,62,80,0.1), rgba(30,42,54,0.05))",
+                      border: "1px solid rgba(255,255,255,0.3)",
+                      backdropFilter: "blur(4px)",
+                    }}
+                  >
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-white/80 shadow-sm">
+                      <FeatherUser className="w-4 h-4 text-gray-700" />
+                    </div>
+                    <span className="flex-1 text-sm font-medium text-gray-700">
+                      Demographics
+                    </span>
+                    <FeatherCheckCircle className="w-4 h-4 text-gray-400" />
+                  </div>
+
+                  {/* Other Steps */}
+                  {steps.map((step, index) => (
+                    <div
+                      key={step.label}
+                      className="flex items-center gap-3 rounded-xl px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/20 hover:bg-white/30 transition-all duration-200"
+                    >
+                      <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-white/60">
+                        <div className="text-gray-500">
+                          {step.icon}
+                        </div>
+                      </div>
+                      <span className="flex-1 text-sm text-gray-500">
+                        {step.label}
+                      </span>
+                      <span className="text-xs text-gray-400">
+                        {index + 2}/6
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </aside>
           </div>

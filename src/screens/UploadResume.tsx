@@ -3,6 +3,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { useAppDispatch } from "src/store/hooks";
 import { setNavigation } from "src/store/slices/onboardingSlice";
 
@@ -14,6 +15,9 @@ import {
   FeatherFileText,
   FeatherUpload,
   FeatherX,
+  FeatherCheckCircle,
+  FeatherClock,
+  FeatherBriefcase,
 } from "@subframe/core";
 import API, { URL_PATH } from "src/common/API";
 import { toast, ToastContainer } from "react-toastify";
@@ -22,14 +26,495 @@ import { colors } from "src/common/Colors";
 import Navbar from "src/ui/components/Navbar";
 import Footer from "../ui/components/Footer";
 
-
-
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
+// ============================================
+// ILLUSTRATION COMPONENTS
+// ============================================
+const ResumeIllustration = () => (
+  <motion.div
+    className="w-full h-full flex items-center justify-center"
+    initial={{ opacity: 0, scale: 0.9 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 0.8 }}
+    style={{
+      marginLeft: "-80px",
+      paddingLeft: "0px",
+      overflow: "visible",
+    }}
+  >
+    <motion.svg
+      width="100%"
+      height="100%"
+      viewBox="0 0 500 500"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ maxWidth: "480px", minWidth: "400px" }}
+      animate={{
+        y: [0, -20, 0],
+      }}
+      transition={{
+        duration: 5,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }}
+    >
+      {/* Define gradients for neon effects */}
+      <defs>
+        <linearGradient
+          id="neonBlueGradient"
+          x1="0%"
+          y1="0%"
+          x2="100%"
+          y2="100%"
+        >
+          <stop offset="0%" stopColor="#00FFFF" stopOpacity="0.9" />
+          <stop offset="50%" stopColor="#1E90FF" stopOpacity="0.7" />
+          <stop offset="100%" stopColor="#4169E1" stopOpacity="0.9" />
+        </linearGradient>
+
+        <linearGradient
+          id="electricBlueGradient"
+          x1="0%"
+          y1="0%"
+          x2="100%"
+          y2="100%"
+        >
+          <stop offset="0%" stopColor="#00BFFF" stopOpacity="0.8" />
+          <stop offset="50%" stopColor="#1E90FF" stopOpacity="0.6" />
+          <stop offset="100%" stopColor="#00BFFF" stopOpacity="0.8" />
+        </linearGradient>
+
+        <filter id="neonGlow">
+          <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+          <feMerge>
+            <feMergeNode in="coloredBlur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+
+        <filter id="strongNeonGlow">
+          <feGaussianBlur stdDeviation="6" result="coloredBlur" />
+          <feMerge>
+            <feMergeNode in="coloredBlur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      {/* Background glow circles */}
+      <motion.circle
+        cx="250"
+        cy="250"
+        r="200"
+        fill="url(#neonBlueGradient)"
+        opacity="0.08"
+        animate={{
+          r: [200, 215, 200],
+          opacity: [0.08, 0.15, 0.08],
+        }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+
+      <motion.circle
+        cx="250"
+        cy="250"
+        r="180"
+        fill="url(#electricBlueGradient)"
+        opacity="0.05"
+        animate={{
+          r: [180, 190, 180],
+          opacity: [0.05, 0.1, 0.05],
+        }}
+        transition={{
+          duration: 5,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 0.5,
+        }}
+      />
+
+      {/* Document base */}
+      <motion.rect
+        x="120"
+        y="60"
+        width="260"
+        height="360"
+        rx="16"
+        fill="white"
+        stroke="url(#neonBlueGradient)"
+        strokeWidth="3"
+        strokeOpacity="0.5"
+        filter="url(#neonGlow)"
+        animate={{
+          y: [0, -5, 0],
+          strokeOpacity: [0.5, 0.8, 0.5],
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 0.2,
+        }}
+      />
+
+      {/* RESUME HEADER SECTION */}
+      {/* Name */}
+      <motion.text
+        x="140"
+        y="100"
+        fontSize="16"
+        fontWeight="bold"
+        fill="#1E90FF"
+        filter="url(#neonGlow)"
+        animate={{
+          opacity: [0.8, 1, 0.8],
+        }}
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      >
+        ALEX RIVERA
+      </motion.text>
+
+      {/* Title */}
+      <motion.text x="140" y="120" fontSize="10" fill="#666666">
+        Product Designer
+      </motion.text>
+
+      {/* Contact line */}
+      <motion.text x="140" y="135" fontSize="7" fill="#999999">
+        alex.rivera@email.com | (415) 555-0123
+      </motion.text>
+
+      {/* Divider line */}
+      <motion.line
+        x1="140"
+        y1="145"
+        x2="360"
+        y2="145"
+        stroke="#E0E0E0"
+        strokeWidth="1"
+        strokeDasharray="4 4"
+      />
+
+      {/* EXPERIENCE SECTION */}
+      <motion.text
+        x="140"
+        y="165"
+        fontSize="10"
+        fontWeight="bold"
+        fill="#00BFFF"
+        filter="url(#neonGlow)"
+        animate={{
+          opacity: [0.7, 1, 0.7],
+        }}
+        transition={{
+          duration: 2.5,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 0.1,
+        }}
+      >
+        EXPERIENCE
+      </motion.text>
+
+      {/* Job 1 */}
+      <motion.text
+        x="140"
+        y="185"
+        fontSize="9"
+        fontWeight="bold"
+        fill="#333333"
+      >
+        Senior Product Designer
+      </motion.text>
+      <motion.text x="280" y="185" fontSize="7" fill="#999999">
+        2022-Present
+      </motion.text>
+      <motion.text x="140" y="200" fontSize="7" fill="#666666">
+        • Led product redesign, increasing engagement by 45%
+      </motion.text>
+
+      {/* Job 2 */}
+      <motion.text
+        x="140"
+        y="220"
+        fontSize="9"
+        fontWeight="bold"
+        fill="#333333"
+      >
+        UI/UX Designer
+      </motion.text>
+      <motion.text x="280" y="220" fontSize="7" fill="#999999">
+        2020-2022
+      </motion.text>
+      <motion.text x="140" y="235" fontSize="7" fill="#666666">
+        • Designed 20+ user interfaces for mobile applications
+      </motion.text>
+
+      {/* Job 3 */}
+      <motion.text
+        x="140"
+        y="255"
+        fontSize="9"
+        fontWeight="bold"
+        fill="#333333"
+      >
+        Junior Designer
+      </motion.text>
+      <motion.text x="280" y="255" fontSize="7" fill="#999999">
+        2019-2020
+      </motion.text>
+      <motion.text x="140" y="270" fontSize="7" fill="#666666">
+        • Created wireframes and prototypes for client projects
+      </motion.text>
+
+      {/* Divider line */}
+      <motion.line
+        x1="140"
+        y1="285"
+        x2="360"
+        y2="285"
+        stroke="#E0E0E0"
+        strokeWidth="1"
+        strokeDasharray="4 4"
+      />
+
+      {/* EDUCATION SECTION */}
+      <motion.text
+        x="140"
+        y="305"
+        fontSize="10"
+        fontWeight="bold"
+        fill="#4169E1"
+        filter="url(#neonGlow)"
+        animate={{
+          opacity: [0.7, 1, 0.7],
+        }}
+        transition={{
+          duration: 2.3,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 0.2,
+        }}
+      >
+        EDUCATION
+      </motion.text>
+
+      <motion.text
+        x="140"
+        y="325"
+        fontSize="9"
+        fontWeight="bold"
+        fill="#333333"
+      >
+        BFA in Digital Design
+      </motion.text>
+      <motion.text x="140" y="340" fontSize="7" fill="#666666">
+        Stanford University · 2020
+      </motion.text>
+
+      {/* Divider line */}
+      <motion.line
+        x1="140"
+        y1="355"
+        x2="360"
+        y2="355"
+        stroke="#E0E0E0"
+        strokeWidth="1"
+        strokeDasharray="4 4"
+      />
+
+      {/* SKILLS SECTION */}
+      <motion.text
+        x="140"
+        y="375"
+        fontSize="10"
+        fontWeight="bold"
+        fill="#00CED1"
+        filter="url(#neonGlow)"
+        animate={{
+          opacity: [0.7, 1, 0.7],
+        }}
+        transition={{
+          duration: 2.7,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 0.3,
+        }}
+      >
+        SKILLS
+      </motion.text>
+
+      {/* First row of skill tags */}
+      <motion.rect
+        x="140"
+        y="390"
+        width="55"
+        height="18"
+        rx="9"
+        fill="#1E90FF"
+        fillOpacity="0.1"
+        stroke="#1E90FF"
+        strokeWidth="0.5"
+        strokeOpacity="0.4"
+      />
+      <motion.text x="153" y="403" fontSize="8" fill="#1E90FF">
+        Figma
+      </motion.text>
+
+      <motion.rect
+        x="205"
+        y="390"
+        width="60"
+        height="18"
+        rx="9"
+        fill="#00BFFF"
+        fillOpacity="0.1"
+        stroke="#00BFFF"
+        strokeWidth="0.5"
+        strokeOpacity="0.4"
+      />
+      <motion.text x="218" y="403" fontSize="8" fill="#00BFFF">
+        Sketch
+      </motion.text>
+
+      <motion.rect
+        x="275"
+        y="390"
+        width="65"
+        height="18"
+        rx="9"
+        fill="#4169E1"
+        fillOpacity="0.1"
+        stroke="#4169E1"
+        strokeWidth="0.5"
+        strokeOpacity="0.4"
+      />
+      <motion.text x="288" y="403" fontSize="8" fill="#4169E1">
+        InVision
+      </motion.text>
+
+      {/* Upload icon with neon blue */}
+      <motion.g
+        animate={{
+          y: [0, -8, 0],
+        }}
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      >
+        <circle
+          cx="250"
+          cy="480"
+          r="24"
+          fill="url(#neonBlueGradient)"
+          fillOpacity="0.15"
+          filter="url(#strongNeonGlow)"
+        />
+        <circle
+          cx="250"
+          cy="480"
+          r="20"
+          fill="white"
+          fillOpacity="0.1"
+          stroke="url(#neonBlueGradient)"
+          strokeWidth="2"
+          strokeOpacity="0.6"
+        />
+        <path
+          d="M250 465L250 480M250 465L245 470M250 465L255 470"
+          stroke="#1E90FF"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          filter="url(#neonGlow)"
+        />
+        <text
+          x="230"
+          y="510"
+          fontSize="7"
+          fill="#1E90FF"
+          filter="url(#neonGlow)"
+        >
+          UPLOAD RESUME
+        </text>
+      </motion.g>
+
+      {/* Floating particles */}
+      <motion.circle
+        cx="90"
+        cy="120"
+        r="6"
+        fill="#1E90FF"
+        opacity="0.15"
+        filter="url(#neonGlow)"
+        animate={{
+          y: [0, -15, 0],
+          x: [0, 10, 0],
+          opacity: [0.15, 0.3, 0.15],
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+
+      <motion.circle
+        cx="410"
+        cy="300"
+        r="8"
+        fill="#00BFFF"
+        opacity="0.15"
+        filter="url(#neonGlow)"
+        animate={{
+          y: [0, 15, 0],
+          x: [0, -10, 0],
+          opacity: [0.15, 0.3, 0.15],
+        }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 0.5,
+        }}
+      />
+
+      {/* Decorative corner elements */}
+      <motion.path
+        d="M130 70 L145 85"
+        stroke="#1E90FF"
+        strokeWidth="1.5"
+        strokeOpacity="0.3"
+        strokeLinecap="round"
+        filter="url(#neonGlow)"
+      />
+
+      <motion.path
+        d="M370 70 L355 85"
+        stroke="#00BFFF"
+        strokeWidth="1.5"
+        strokeOpacity="0.3"
+        strokeLinecap="round"
+        filter="url(#neonGlow)"
+      />
+    </motion.svg>
+  </motion.div>
+);
 
 const fetchStatusWithRetry = async (
   token: string,
-  retries = 10,
-  delay = 150
+  retries = 15,
+  delay = 300,
 ) => {
   for (let i = 0; i < retries; i++) {
     const res = await API("GET", URL_PATH.getUserStatus, undefined, {
@@ -38,41 +523,39 @@ const fetchStatusWithRetry = async (
 
     const navigation = res?.navigation || res?.data?.navigation;
 
-    // ✅ wait until resume is reflected in DB
     if (navigation?.completedSteps?.includes("resume")) {
       return navigation;
     }
 
-    // ⏳ wait before next attempt
     await new Promise((resolve) => setTimeout(resolve, delay));
   }
 
-  throw new Error("User status not updated yet");
-};
+  const finalRes = await API("GET", URL_PATH.getUserStatus, undefined, {
+    Authorization: `Bearer ${token}`,
+  });
 
+  return finalRes?.navigation || finalRes?.data?.navigation;
+};
 
 function UploadResume() {
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
   const [existingResume, setExistingResume] = useState<{
-  name: string;
-  url: string;
-} | null>(null);
+    name: string;
+    url: string;
+  } | null>(null);
+  const [focused, setFocused] = useState(false);
 
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
-  // Trigger hidden file input
   const handleBrowseFile = () => fileInputRef.current?.click();
 
-  //Back
-  const navigate = useNavigate();
-
-  // On file select
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const uploaded = e.target.files[0];
 
-    // Validate file type
     if (
       uploaded.type !== "application/pdf" &&
       !uploaded.name.toLowerCase().endsWith(".pdf")
@@ -82,7 +565,6 @@ function UploadResume() {
       return;
     }
 
-    // Validate file size (5MB)
     if (uploaded.size > MAX_FILE_SIZE) {
       toast.error("File size must be 5MB or less.");
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -90,18 +572,16 @@ function UploadResume() {
     }
 
     setFile(uploaded);
-    // clear the input value so selecting the same file again will trigger onChange
     if (e.currentTarget) e.currentTarget.value = "";
   };
 
-  // Drag & drop handlers
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    setFocused(false);
 
     if (!e.dataTransfer.files || e.dataTransfer.files.length === 0) return;
     const uploaded = e.dataTransfer.files[0];
 
-    
     if (
       uploaded.type !== "application/pdf" &&
       !uploaded.name.toLowerCase().endsWith(".pdf")
@@ -116,388 +596,520 @@ function UploadResume() {
     }
 
     setFile(uploaded);
-    // also clear hidden input so future selection of same file triggers change
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    setFocused(true);
+  };
+
+  const handleDragLeave = () => {
+    setFocused(false);
   };
 
   const removeFile = () => {
     setFile(null);
-    // clear the hidden input so user can reselect the same file
+    setExistingResume(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  // Keyboard handler for drop zone:
-  // Enter / Space -> open file picker
-  // Escape -> remove file (if any)
   const handleDropZoneKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       handleBrowseFile();
     } else if (e.key === "Escape") {
-      if (file) {
+      if (file || existingResume) {
         e.preventDefault();
         removeFile();
       }
     }
   };
 
-  
+  useEffect(() => {
+    const fetchResume = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const userId = localStorage.getItem("userId");
 
- 
-  const dispatch = useAppDispatch();
+        if (!token || !userId) return;
 
-  // const uploadResume = async () => {
-  //   if (!file || uploading) return;
+        const res = await API("GET", URL_PATH.getResume, undefined, {
+          "user-id": userId,
+          Authorization: `Bearer ${token}`,
+        });
 
-  //   try {
-  //     setUploading(true);
+        const resumeUrl = res?.data?.resumeUrl;
+        const resumeName = res?.data?.resumeOriginalName;
 
-  //     const userId = localStorage.getItem("userId");
-  //     const token = localStorage.getItem("token");
+        if (resumeUrl) {
+          setExistingResume({
+            name: resumeName || "resume.pdf",
+            url: resumeUrl,
+          });
+        }
+      } catch (err) {
+        console.error("Resume fetch failed", err);
+      }
+    };
 
-  //     if (!token) {
-  //       toast.error("Session expired. Please login again.");
-  //       setUploading(false);
-  //       return;
-  //     }
+    fetchResume();
+  }, []);
 
-  //     const formData = new FormData();
-  //     formData.append("resume", file);
+  // Add this at the top of your UploadResume component
+  useEffect(() => {
+    console.log("📋 UploadResume mounted - checking localStorage:");
+    console.log(
+      "   - token:",
+      localStorage.getItem("token") ? "✅ Present" : "❌ Missing",
+    );
+    console.log("   - userId:", localStorage.getItem("userId") || "❌ Missing");
+    console.log(
+      "   - userEmail:",
+      localStorage.getItem("userEmail") || "❌ Missing",
+    );
+    console.log(
+      "   - signupEmail:",
+      localStorage.getItem("signupEmail") || "❌ Missing",
+    );
 
-  //     // 1️⃣ Upload resume
-  //     await API("POST", URL_PATH.uploadResume, formData, {
-  //       "user-id": userId,
-  //       Authorization: `Bearer ${token}`,
-  //     });
-  //     toast.success("Resume uploaded successfully");
-
-
-  //     // 2️⃣ Ask backend where to go next
-  //     const statusRes = await API("GET", URL_PATH.getUserStatus, undefined, {
-  //       Authorization: `Bearer ${token}`,
-  //     });
-
-  //     const navigation = statusRes?.navigation || statusRes?.data?.navigation;
-
-  //     if (navigation?.nextRoute) {
-  //        setTimeout(() => {
-  //   dispatch(setNavigation(navigation));
-  //   navigate(navigation.nextRoute);
-  // }, 2000);
-  //     } else {
-  //       console.error("Navigation missing", statusRes);
-  //     }
-  //   } catch (error: any) {
-  //     console.error("UPLOAD ERROR:", error);
-  //     toast.error(error?.response?.data?.message || "Resume upload failed");
-  //   } finally {
-  //     setUploading(false);
-  //   }
-  // };
-// const uploadResume = async () => {
-//   if (!file || uploading) return;
-
-//   try {
-//     setUploading(true);
-
-//     const token = localStorage.getItem("token");
-//     const userId = localStorage.getItem("userId");
-
-//     if (!token) {
-//       toast.error("Session expired. Please login again.");
-//       return;
-//     }
-
-//     const formData = new FormData();
-//     formData.append("resume", file);
-
-//     // 1️⃣ upload resume
-//     await API("POST", URL_PATH.uploadResume, formData, {
-//       "user-id": userId,
-//       Authorization: `Bearer ${token}`,
-//     });
-
-//     toast.success("Resume uploaded successfully");
-
-//     // 2️⃣ WAIT until Mongo shows resume=true
-//     const navigation = await fetchStatusWithRetry(token);
-
-//     setTimeout(() => {
-//       dispatch(setNavigation(navigation));
-//       navigate(navigation.nextRoute);
-//     }, 2000);
-//   } catch (error) {
-//     console.error(error);
-//     toast.error("Something went wrong. Please try again.");
-//   } finally {
-//     setUploading(false);
-//   }
-// };
-const uploadResume = async () => {
-  if (uploading) return;
-
-  // ✅ CASE 1: resume already exists → just continue
-if (!file && existingResume) {
-  toast.success("Resume already uploaded");
-
-  const token = localStorage.getItem("token");
-  if (!token) return;
-
-  const navigation = await fetchStatusWithRetry(token);
-
-  setTimeout(() => {
-    dispatch(setNavigation(navigation));
-    navigate(navigation.nextRoute);
-  }, 1500);
-
-  return;
-}
-
-
-  // ❌ no file & no existing resume
-  if (!file) return;
-
-  // ✅ CASE 2: new upload
-  try {
-    setUploading(true);
-
+    // If userId is missing but we have token, try to recover
     const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
 
-    if (!token) return;
+    if (token && !userId) {
+      console.log(
+        "⚠️ Token exists but userId missing! Attempting to recover...",
+      );
 
-    const formData = new FormData();
-    formData.append("resume", file);
+      try {
+        // Try to decode JWT token
+        const base64Url = token.split(".")[1];
+        if (base64Url) {
+          const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+          const payload = JSON.parse(window.atob(base64));
+          const extractedUserId = payload.userId || payload.sub || payload.id;
 
-    await API("POST", URL_PATH.uploadResume, formData, {
-      "user-id": userId,
-      Authorization: `Bearer ${token}`,
-    });
-    toast.success("Resume uploaded successfully");
+          if (extractedUserId) {
+            localStorage.setItem("userId", extractedUserId);
+            console.log("✅ Recovered userId from token:", extractedUserId);
+          }
+        }
+      } catch (e) {
+        console.error("❌ Failed to extract userId from token:", e);
+      }
+    }
+  }, []);
 
-    const navigation = await fetchStatusWithRetry(token);
-    setTimeout(() => {
-  dispatch(setNavigation(navigation));
-  navigate(navigation.nextRoute);
-}, 1500);
+  const uploadResume = async () => {
+    if (uploading) return;
 
-  } catch (error) {
-    toast.error("Something went wrong. Please try again.");
-  } finally {
-    setUploading(false);
-  }
-};
+    // ✅ CASE 1: resume already exists → just continue
+    if (!file && existingResume) {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          toast.error("Session expired. Please login again.");
+          return;
+        }
 
+        setUploading(true);
+        const navigation = await fetchStatusWithRetry(token);
 
-useEffect(() => {
-  const fetchResume = async () => {
+        dispatch(setNavigation(navigation));
+        navigate(navigation.nextRoute);
+      } catch (error) {
+        console.error(error);
+        toast.error("Navigation failed. Please refresh.");
+      } finally {
+        setUploading(false);
+      }
+      return;
+    }
+
+    // ❌ no file & no existing resume
+    if (!file) {
+      toast.error("Please select a resume to upload");
+      return;
+    }
+
+    // ✅ CASE 2: new upload
     try {
+      setUploading(true);
+
       const token = localStorage.getItem("token");
       const userId = localStorage.getItem("userId");
 
-      if (!token || !userId) return;
+      if (!token) {
+        toast.error("Session expired. Please login again.");
+        return;
+      }
 
-      const res = await API("GET", URL_PATH.getResume, undefined, {
+      const formData = new FormData();
+      formData.append("resume", file);
+
+      // Upload resume
+      await API("POST", URL_PATH.uploadResume, formData, {
         "user-id": userId,
         Authorization: `Bearer ${token}`,
       });
 
-      const resumeUrl = res?.data?.resumeUrl;
-      const resumeName = res?.data?.resumeOriginalName;
+      toast.success("Resume uploaded successfully");
 
-      if (resumeUrl) {
-        setExistingResume({
-          name: resumeName || "resume.pdf", 
-          url: resumeUrl,
-        });
-      }
-    } catch (err) {
-      console.error("Resume fetch failed", err);
+      // Wait for backend to update status
+      const navigation = await fetchStatusWithRetry(token);
+
+      dispatch(setNavigation(navigation));
+      navigate(navigation.nextRoute);
+    } catch (error: any) {
+      console.error(error);
+      toast.error(
+        error?.response?.data?.message || "Upload failed. Please try again.",
+      );
+    } finally {
+      setUploading(false);
     }
   };
 
-  fetchResume();
-}, []);
-
-
   return (
     <>
-    <ToastContainer position="top-center" autoClose={2000} />
-    <Navbar />
+      <ToastContainer position="top-center" autoClose={2000} />
+      <Navbar />
 
+      <div className="min-h-screen w-full flex items-center justify-center px-4 py-12 relative overflow-hidden">
+        {/* Minimalistic gradient background */}
+        <div
+          className="pointer-events-none fixed inset-0 -z-10"
+          style={{
+            background: `linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.95) 0%,
+            rgba(${parseInt(colors.primary.slice(1, 3), 16)}, ${parseInt(colors.primary.slice(3, 5), 16)}, ${parseInt(colors.primary.slice(5, 7), 16)}, 0.03) 100%
+          )`,
+          }}
+        />
 
-<div className="min-h-screen w-full flex items-center justify-center px-4 sm:px-6 py-6 sm:py-8 relative overflow-hidden">
-  
-   {/* 🎨 Linear gradient background - fixed behind everything */}
-    <div 
-      className="pointer-events-none fixed inset-0 -z-10"
-      style={{
-        background: `linear-gradient(
-          to bottom,
-          #d9d9d9 0%,
-          #cfd3d6 25%,
-          #9aa6b2 55%,
-          #2E4056 100%
-        )`,
-        width: "100%",
-      }}
-    />
+        {/* Decorative circles */}
+        <motion.div
+          className="absolute top-20 left-10 w-32 h-32 rounded-full opacity-5"
+          style={{ backgroundColor: colors.primary }}
+          animate={{ y: [0, -30, 0] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-20 right-10 w-40 h-40 rounded-full opacity-5"
+          style={{ backgroundColor: colors.accent }}
+          animate={{ y: [0, 30, 0] }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1,
+          }}
+        />
 
-      <div className="w-full max-w-[576px] flex flex-col items-start gap-6 rounded-3xl border border-gray-400 bg-white px-4 sm:px-6 md:px-8 py-6 sm:py-8 shadow-[0_12px_30px_rgba(15,15,15,0.06)]">
-        {/* Back + Progress Bar */}
-        <div className="flex w-full items-center gap-3 sm:gap-4">
-          <IconButton
-            size="small"
-            icon={<FeatherArrowLeft />}
-            onClick={() =>
-              window.history.length > 1 ? navigate(-1) : navigate("/")
-            }
-            className="!bg-transparent !text-neutral-600"
-            aria-label="Back"
-          />
-        </div>
-
-        {/* Title */}
-<div className="flex w-full flex-col items-start gap-2">
-  <span
-    className="text-base sm:text-lg font-medium"
-    style={{ color: colors.accent }}
-  >
-    Upload your Resume
-  </span>
-
-  <span
-    className="text-xs sm:text-sm"
-    style={{ color: colors.neutral[600] }}
-  >
-    Upload your most recent resume (PDF only)
-  </span>
-</div>
-
-
-        {/* Resume Upload Section */}
-        <div className="flex w-full flex-col items-start gap-4">
-          <span className="text-sm font-semibold text-neutral-900">
-            Resume / CV
-          </span>
-
-          {/* Upload Drop Zone */}
-          <div
-            role="button"
-            tabIndex={0}
-            aria-label="Upload resume. Click or press Enter to browse files. Or drag and drop a file here. Press Escape to remove the selected file."
-            className="w-full flex flex-col items-center justify-center gap-3 rounded-3xl border-2 border-dashed border-neutral-300 bg-neutral-50 px-4 sm:px-6 py-4 sm:py-6 cursor-pointer"
-            onClick={handleBrowseFile}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            onKeyDown={handleDropZoneKeyDown}
+        <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+          {/* LEFT - Illustration & Benefits */}
+          <motion.div
+            className="hidden lg:flex flex-col gap-12"
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
           >
-            <IconWithBackground
-              variant="neutral"
-              size="large"
-              icon={<FeatherUpload className="w-5 h-5" />}
-              className="!p-3 !bg-neutral-100"
-            />
+            {/* Illustration */}
+            <div className="w-full aspect-square max-w-sm mx-auto">
+              <ResumeIllustration />
+            </div>
 
-            <div className="flex flex-col items-center justify-center gap-1">
-              <span className="text-sm text-neutral-1000 text-center">
-                Click to select file or drag to upload
+            {/* Benefits */}
+            <div className="space-y-6">
+              {[
+                {
+                  icon: FeatherCheckCircle,
+                  title: "AI-Powered Analysis",
+                  desc: "Our system extracts key skills and experience from your resume",
+                },
+                {
+                  icon: FeatherClock,
+                  title: "Save Time",
+                  desc: "Skip manual data entry - we'll populate your profile automatically",
+                },
+                {
+                  icon: FeatherBriefcase,
+                  title: "Better Matches",
+                  desc: "Get more relevant job recommendations based on your resume",
+                },
+              ].map((benefit, i) => (
+                <motion.div
+                  key={i}
+                  className="flex gap-4 items-start"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 + i * 0.1 }}
+                >
+                  <div className="flex-shrink-0 mt-1">
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        fill={colors.primary}
+                        opacity="0.15"
+                      />
+                      <path
+                        d="M16 10L11 15L8 12"
+                        stroke={colors.primary}
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3
+                      className="font-medium text-sm"
+                      style={{ color: colors.accent }}
+                    >
+                      {benefit.title}
+                    </h3>
+                    <p
+                      className="text-xs mt-1"
+                      style={{ color: colors.neutral[600] }}
+                    >
+                      {benefit.desc}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* RIGHT - Upload Form */}
+          <motion.div
+            className="w-full"
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            {/* Back + Progress Bar */}
+            <div className="flex w-full items-center gap-3 sm:gap-4 mb-6">
+              <IconButton
+                size="small"
+                icon={<FeatherArrowLeft />}
+                onClick={() =>
+                  window.history.length > 1 ? navigate(-1) : navigate("/")
+                }
+                className="!bg-transparent !text-neutral-600"
+                aria-label="Back"
+              />
+            </div>
+
+            {/* Title */}
+            <div className="flex w-full flex-col items-start gap-2 mb-6">
+              <span
+                className="text-base sm:text-lg font-medium"
+                style={{ color: colors.accent }}
+              >
+                Upload your Resume
               </span>
-              <span className="text-xs text-neutral-500 text-center">
-                PDF (max 5MB)
+
+              <span
+                className="text-xs sm:text-sm"
+                style={{ color: colors.neutral[600] }}
+              >
+                Upload your most recent resume to help us understand your skills
               </span>
             </div>
 
-            {/* hidden input */}
-            <input
-              type="file"
-              accept="application/pdf,.pdf"
-              className="hidden"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-            />
-          </div>
+            {/* Resume Upload Section */}
+            <div className="flex w-full flex-col items-start gap-4">
+              <span className="text-sm font-semibold text-neutral-900">
+                Resume / CV
+              </span>
 
-          {/* Uploaded File Preview */}
-          {(file || existingResume) && (
-  <div className="w-full flex items-center gap-3 sm:gap-4 rounded-2xl border border-neutral-border bg-neutral-50 px-3 sm:px-4 py-3">
-    <IconWithBackground
-      variant="neutral"
-      size="medium"
-      icon={<FeatherFileText className="w-4 h-4 text-neutral-700" />}
-      className="!p-2 !bg-neutral-100"
-    />
+              {/* Upload Drop Zone */}
+              <motion.div
+                role="button"
+                tabIndex={0}
+                aria-label="Upload resume. Click or press Enter to browse files. Or drag and drop a file here. Press Escape to remove the selected file."
+                className="w-full flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed bg-white px-4 sm:px-6 py-4 sm:py-6 cursor-pointer transition-all"
+                style={{
+                  borderColor: focused ? colors.primary : colors.neutral[600],
+                  backgroundColor: focused
+                    ? `rgba(${parseInt(colors.primary.slice(1, 3), 16)}, ${parseInt(colors.primary.slice(3, 5), 16)}, ${parseInt(colors.primary.slice(5, 7), 16)}, 0.02)`
+                    : "white",
+                }}
+                onClick={handleBrowseFile}
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onKeyDown={handleDropZoneKeyDown}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                animate={{
+                  borderColor: focused ? colors.primary : colors.neutral[600],
+                }}
+                transition={{ duration: 0.2 }}
+              >
+                <motion.div
+                  animate={{
+                    y: focused ? [-2, 2, -2] : 0,
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: focused ? Infinity : 0,
+                    ease: "easeInOut",
+                  }}
+                >
+                  <IconWithBackground
+                    variant="neutral"
+                    size="large"
+                    icon={<FeatherUpload className="w-5 h-5" />}
+                    className="!p-3 !bg-neutral-100"
+                    style={{
+                      backgroundColor: `rgba(${parseInt(colors.primary.slice(1, 3), 16)}, ${parseInt(colors.primary.slice(3, 5), 16)}, ${parseInt(colors.primary.slice(5, 7), 16)}, 0.1)`,
+                    }}
+                  />
+                </motion.div>
 
-    <div className="flex grow flex-col">
-      <span className="text-sm text-neutral-900 truncate">
-        {file?.name || existingResume?.name}
-      </span>
+                <div className="flex flex-col items-center justify-center gap-1">
+                  <span
+                    className="text-sm font-medium"
+                    style={{ color: colors.accent }}
+                  >
+                    Click to select file or drag to upload
+                  </span>
+                  <span
+                    className="text-xs"
+                    style={{ color: colors.neutral[600] }}
+                  >
+                    PDF (max 5MB)
+                  </span>
+                </div>
 
-      {!file && existingResume && (
-        <a
-          href={existingResume.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-violet-600 underline"
-        >
-          View 
-        </a>
-      )}
-    </div>
+                {/* hidden input */}
+                <input
+                  type="file"
+                  accept="application/pdf,.pdf"
+                  className="hidden"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                />
+              </motion.div>
 
-    <IconButton
-      size="small"
-      icon={<FeatherX />}
-      onClick={() => {
-        setFile(null);
-        setExistingResume(null);
-        if (fileInputRef.current) fileInputRef.current.value = "";
-      }}
-      className="!bg-transparent !text-neutral-500"
-    />
-  </div>
-)}
+              {/* Uploaded File Preview */}
+              {(file || existingResume) && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="w-full flex items-center gap-3 sm:gap-4 rounded-lg border p-3"
+                  style={{ borderColor: colors.neutral[200] }}
+                >
+                  <IconWithBackground
+                    variant="neutral"
+                    size="medium"
+                    icon={
+                      <FeatherFileText className="w-4 h-4 text-neutral-700" />
+                    }
+                    className="!p-2 !bg-neutral-100"
+                    style={{
+                      backgroundColor: `rgba(${parseInt(colors.primary.slice(1, 3), 16)}, ${parseInt(colors.primary.slice(3, 5), 16)}, ${parseInt(colors.primary.slice(5, 7), 16)}, 0.1)`,
+                    }}
+                  />
 
+                  <div className="flex grow flex-col">
+                    <span className="text-sm text-neutral-900 truncate">
+                      {file?.name || existingResume?.name}
+                    </span>
+
+                    {!file && existingResume && (
+                      <a
+                        href={existingResume.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs hover:underline"
+                        style={{ color: colors.primary }}
+                      >
+                        View resume
+                      </a>
+                    )}
+
+                    {file && (
+                      <span
+                        className="text-xs"
+                        style={{ color: colors.neutral[600] }}
+                      >
+                        {(file.size / 1024 / 1024).toFixed(2)} MB
+                      </span>
+                    )}
+                  </div>
+
+                  <IconButton
+                    size="small"
+                    icon={<FeatherX />}
+                    onClick={removeFile}
+                    className="!bg-transparent !text-neutral-500"
+                  />
+                </motion.div>
+              )}
+            </div>
+
+            {/* Continue Button */}
+            <div className="flex w-full justify-center sm:justify-end border-t border-neutral-border pt-6 mt-6">
+              <button
+                className={`h-10 w-full sm:max-w-[520px] rounded-full font-semibold shadow-md transition ${
+                  uploading ? "pointer-events-none opacity-70" : ""
+                }`}
+                style={{
+                  backgroundColor:
+                    (!file && !existingResume) || uploading
+                      ? colors.neutral[200]
+                      : colors.primary,
+                  color: colors.white,
+                  border: "none",
+                  outline: "none",
+                }}
+                onMouseEnter={(e) => {
+                  if ((!file && !existingResume) || uploading) return;
+                  e.currentTarget.style.backgroundColor = colors.secondary;
+                  e.currentTarget.style.color = colors.white;
+                }}
+                onMouseLeave={(e) => {
+                  if ((!file && !existingResume) || uploading) return;
+                  e.currentTarget.style.backgroundColor = colors.primary;
+                  e.currentTarget.style.color = colors.white;
+                }}
+                onClick={uploadResume}
+                disabled={(!file && !existingResume) || uploading}
+              >
+                {uploading ? "Uploading..." : "Continue"}
+              </button>
+
+              {/* Skip option - if allowed */}
+              {!existingResume && !file && (
+                <p className="text-center mt-4">
+                  <button
+                    onClick={() => navigate("/dashboard")}
+                    className="text-xs transition hover:opacity-70"
+                    style={{ color: colors.neutral[600] }}
+                  >
+                    Skip for now
+                  </button>
+                </p>
+              )}
+            </div>
+          </motion.div>
         </div>
-
-      {/* Continue Button */}
-<div className="flex w-full justify-center sm:justify-end border-t border-neutral-border pt-4">
-  <button
-    className={`h-10 w-full sm:max-w-[520px] rounded-full font-semibold shadow-md transition ${
-      uploading ? "pointer-events-none opacity-70" : ""
-    }`}
-    style={{
-      backgroundColor: (!file && !existingResume) || uploading ? colors.neutral[200] : colors.primary,
-      color: colors.white, // ✅ text color accent
-      border: "none",
-      outline: "none",
-    }}
-    onMouseEnter={(e) => {
-      if ((!file && !existingResume) || uploading) return;
-      e.currentTarget.style.backgroundColor = colors.secondary;
-      e.currentTarget.style.color = colors.white;
-    }}
-    onMouseLeave={(e) => {
-      if ((!file && !existingResume) || uploading) return;
-      e.currentTarget.style.backgroundColor = colors.primary;
-      e.currentTarget.style.color = colors.white;
-    }}
-    onClick={uploadResume}
-    disabled={(!file && !existingResume) || uploading}
-  >
-    {uploading ? "Uploading..." : "Continue"}
-  </button>
-</div>
-
-
       </div>
-    </div>
-    <Footer />
-  </>
+      <Footer />
+    </>
   );
 }
 

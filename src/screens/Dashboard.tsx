@@ -26,6 +26,25 @@ import {
   CardTitle,
 } from "../ui/components/Card";
 
+import { 
+  FiGlobe, // for global
+  FiMapPin, // for state
+  FiHome, // for city
+  FiBookOpen // for university
+} from "react-icons/fi";
+
+import { 
+  IoGlobeOutline, // alternative for global
+  IoLocationOutline, // alternative for state/city
+  IoSchoolOutline // for university
+} from "react-icons/io5";
+
+import {
+  MdPublic, // alternative for global
+  MdLocationOn, // alternative for location
+  MdSchool // for university
+} from "react-icons/md";
+
 // import Chat from "../ui/components/chat/Chat";
 
 import {
@@ -746,289 +765,283 @@ export default function Dashboard() {
           <div className="flex flex-col gap-8 lg:flex-row">
             {/* --- LEFT SIDEBAR --- */}
             <div className="flex w-full flex-col gap-6 lg:w-[340px] lg:flex-none">
-              <Card
-                className="w-full rounded-[2rem] shadow-sm"
+  <Card
+    className="w-full rounded-[2rem] shadow-sm"
+    style={{
+      backgroundColor: colors.white,
+      border: `1.5px solid ${colors.primaryGlow}`,
+    }}
+  >
+    <CardContent className="p-6">
+      {/* Header with Avatar and User Info */}
+      <div className="flex items-start gap-4 mb-6">
+        {/* Avatar Section */}
+        <div
+          className="relative cursor-pointer group flex-shrink-0"
+          onClick={() => {
+            console.log("Avatar clicked, triggering file input");
+            fileRef.current?.click();
+          }}
+        >
+          <Avatar
+            size="x-large"
+            image={avatar}
+            style={{ boxShadow: `0 0 0 4px ${colors.primaryGlow}` }}
+            className="rounded-xl w-16 h-16"
+          >
+            PP
+          </Avatar>
+
+          <div className="absolute inset-0 rounded-xl bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+            <span className="text-white text-xs font-bold uppercase">
+              Change
+            </span>
+          </div>
+
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            onChange={handleAvatarChange}
+            className="hidden"
+          />
+        </div>
+
+        {/* User Name and Location */}
+        <div className="flex-1">
+          <h2
+            className="text-xl font-semibold"
+            style={{ color: colors.accent }}
+          >
+            {user.name}
+          </h2>
+          <div className="flex items-center gap-2 mt-1">
+            <span
+              className="text-sm"
+              style={{ color: colors.secondary }}
+            >
+              {user.domain}
+            </span>
+            <span
+              className="text-xs"
+              style={{ color: colors.neutral[400] }}
+            >
+              {user.location}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Resume Content - NO SCROLL */}
+      <div className="space-y-6 mb-6">
+        {/* Experience */}
+        <div className="space-y-4">
+          <p
+            className="text-[10px] font-black uppercase tracking-widest"
+            style={{ color: colors.accent }}
+          >
+            Experience
+          </p>
+
+          <div
+            className="space-y-4 border-l-2 ml-1"
+            style={{ borderColor: colors.accent }}
+          >
+            {workExperience?.slice(0, 2).map((exp, i) => (
+              <div key={i} className="pl-4 relative">
+                <div
+                  className="absolute w-2 h-2 rounded-full -left-[5px] top-1 ring-2 ring-white"
+                  style={{ backgroundColor: colors.accent }}
+                />
+
+                <h4
+                  className="text-xs leading-tight"
+                  style={{ color: colors.accent }}
+                >
+                  {exp.jobTitle}
+                </h4>
+
+                <p
+                  className="text-[10px]"
+                  style={{ color: colors.accent }}
+                >
+                  {exp.companyName}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Projects */}
+        <div className="space-y-3">
+          <p
+            className="text-[10px] font-black uppercase tracking-widest"
+            style={{ color: colors.accent }}
+          >
+            Projects
+          </p>
+
+          {projects?.slice(0, 2).map((proj, i) => (
+            <div
+              key={i}
+              className="relative pl-4 pr-3 py-3 rounded-xl border transition hover:shadow-md"
+              style={{
+                backgroundColor: colors.background,
+              }}
+            >
+              <span
+                className="absolute left-0 top-3 bottom-3 w-1 rounded-full"
+                style={{ backgroundColor: colors.accent }}
+              />
+
+              <span
+                className="text-[9px] mb-1 inline-block"
+                style={{ color: colors.accent }}
+              >
+                Project {i + 1}
+              </span>
+
+              <h4
+                className="text-[12px] font-bold leading-tight truncate"
+                style={{ color: colors.primary }}
+              >
+                {proj.title}
+              </h4>
+
+              <p
+                className="text-[10px] mt-1 leading-snug line-clamp-2"
+                style={{ color: colors.secondary }}
+              >
+                {proj.summary}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Certifications */}
+        <div className="space-y-3">
+          <p
+            className="text-[10px] font-black uppercase tracking-widest"
+            style={{ color: colors.accent }}
+          >
+            Certifications
+          </p>
+
+          {certifications?.slice(0, 2).map((cert, i) => (
+            <div
+              key={i}
+              className="flex items-start gap-3 p-3 rounded-xl border shadow-sm"
+              style={{
+                backgroundColor: colors.background,
+              }}
+            >
+              <div className="mt-0.5">
+                <FeatherAward
+                  className="w-4 h-4"
+                  style={{ color: colors.accent }}
+                />
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <p
+                  className="text-[11px] truncate"
+                  style={{ color: colors.primary }}
+                >
+                  {cert.name}
+                </p>
+
+                <p
+                  className="text-[9px] mt-0.5 truncate"
+                  style={{ color: colors.secondary }}
+                >
+                  Issued by {cert.issuedBy}
+                </p>
+              </div>
+
+              <p
+                className="text-[10px] whitespace-nowrap"
+                style={{ color: colors.primary }}
+              >
+                {cert.issueYear}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Education */}
+        <div className="space-y-3 pt-2">
+          <div className="flex items-center justify-between">
+            <p
+              className="text-[10px] font-black uppercase tracking-widest"
+              style={{ color: colors.accent }}
+            >
+              Education
+            </p>
+
+            <div className="flex gap-1">
+              {certifications?.slice(0, 3).map((_, i) => (
+                <FeatherCheckCircle
+                  key={i}
+                  className="w-3 h-3 text-green-500"
+                />
+              ))}
+            </div>
+          </div>
+
+          {education?.map((edu, i) => (
+            <div key={i} className="text-[11px] space-y-0.5">
+              <p className="text-neutral-800 leading-tight">
+                {edu.schoolName}
+              </p>
+              <p className="text-neutral-500">{edu.degree}</p>
+              <p className="text-[10px] text-neutral-400 whitespace-nowrap">
+                {edu.startYear}
+                {edu.endYear ? ` – ${edu.endYear}` : " – Present"}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Skills */}
+        <div className="space-y-2">
+          <p
+            className="text-[10px] font-black uppercase tracking-widest"
+            style={{ color: colors.accent }}
+          >
+            Skills
+          </p>
+
+          <div className="flex flex-wrap gap-1.5">
+            {skills?.slice(0, 6).map((skill, i) => (
+              <span
+                key={i}
+                className="px-2 py-1 border rounded-md text-[9px] uppercase"
                 style={{
-                  backgroundColor: colors.white,
-                  border: `1.5px solid ${colors.primaryGlow}`,
+                  backgroundColor: colors.background,
+                  color: colors.accent,
                 }}
               >
-                <CardContent className="p-6">
-                  {/* Header with Avatar and User Info */}
-                  <div className="flex items-start gap-4 mb-6">
-                    {/* Avatar Section */}
-                    <div
-                      className="relative cursor-pointer group flex-shrink-0"
-                      onClick={() => {
-                        console.log("Avatar clicked, triggering file input");
-                        fileRef.current?.click();
-                      }}
-                    >
-                      <Avatar
-                        size="x-large"
-                        image={avatar}
-                        style={{ boxShadow: `0 0 0 4px ${colors.primaryGlow}` }}
-                        className="rounded-xl w-16 h-16"
-                      >
-                        PP
-                      </Avatar>
+                {typeof skill === "string" ? skill : skill.name}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
 
-                      <div className="absolute inset-0 rounded-xl bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
-                        <span className="text-white text-xs font-bold uppercase">
-                          Change
-                        </span>
-                      </div>
-
-                      <input
-                        ref={fileRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleAvatarChange}
-                        className="hidden"
-                      />
-                    </div>
-
-                    {/* User Name and Location */}
-                    <div className="flex-1">
-                      <h2
-                        className="text-xl font-semibold"
-                        style={{ color: colors.accent }}
-                      >
-                        {user.name}
-                      </h2>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span
-                          className="text-sm"
-                          style={{ color: colors.secondary }}
-                        >
-                          {user.domain}
-                        </span>
-                        <span
-                          className="text-xs"
-                          style={{ color: colors.neutral[400] }}
-                        >
-                          {user.location}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Resume Content - Scrollable Area */}
-                  <div
-                    className="space-y-6 max-h-[500px] overflow-y-auto pr-2 scrollbar-hide mb-6"
-                    style={{
-                      scrollbarWidth: "none" /* Firefox */,
-                      msOverflowStyle: "none" /* IE and Edge */,
-                    }}
-                  >
-                    {/* Experience */}
-                    <div className="space-y-4">
-                      <p
-                        className="text-[10px] font-black uppercase tracking-widest"
-                        style={{ color: colors.accent }}
-                      >
-                        Experience
-                      </p>
-
-                      <div
-                        className="space-y-4 border-l-2 ml-1"
-                        style={{ borderColor: colors.accent }}
-                      >
-                        {workExperience?.slice(0, 2).map((exp, i) => (
-                          <div key={i} className="pl-4 relative">
-                            <div
-                              className="absolute w-2 h-2 rounded-full -left-[5px] top-1 ring-2 ring-white"
-                              style={{ backgroundColor: colors.accent }}
-                            />
-
-                            <h4
-                              className="text-xs leading-tight"
-                              style={{ color: colors.accent }}
-                            >
-                              {exp.jobTitle}
-                            </h4>
-
-                            <p
-                              className="text-[10px]"
-                              style={{ color: colors.accent }}
-                            >
-                              {exp.companyName}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Projects */}
-                    <div className="space-y-3">
-                      <p
-                        className="text-[10px] font-black uppercase tracking-widest"
-                        style={{ color: colors.accent }}
-                      >
-                        Projects
-                      </p>
-
-                      {projects?.slice(0, 2).map((proj, i) => (
-                        <div
-                          key={i}
-                          className="relative pl-4 pr-3 py-3 rounded-xl border transition hover:shadow-md"
-                          style={{
-                            backgroundColor: colors.background,
-                          }}
-                        >
-                          <span
-                            className="absolute left-0 top-3 bottom-3 w-1 rounded-full"
-                            style={{ backgroundColor: colors.accent }}
-                          />
-
-                          <span
-                            className="text-[9px] mb-1 inline-block"
-                            style={{ color: colors.accent }}
-                          >
-                            Project {i + 1}
-                          </span>
-
-                          <h4
-                            className="text-[12px] font-bold leading-tight truncate"
-                            style={{ color: colors.primary }}
-                          >
-                            {proj.title}
-                          </h4>
-
-                          <p
-                            className="text-[10px] mt-1 leading-snug line-clamp-2"
-                            style={{ color: colors.secondary }}
-                          >
-                            {proj.summary}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Certifications */}
-                    <div className="space-y-3">
-                      <p
-                        className="text-[10px] font-black uppercase tracking-widest"
-                        style={{ color: colors.accent }}
-                      >
-                        Certifications
-                      </p>
-
-                      {certifications?.slice(0, 2).map((cert, i) => (
-                        <div
-                          key={i}
-                          className="flex items-start gap-3 p-3 rounded-xl border shadow-sm"
-                          style={{
-                            backgroundColor: colors.background,
-                          }}
-                        >
-                          <div className="mt-0.5">
-                            <FeatherAward
-                              className="w-4 h-4"
-                              style={{ color: colors.accent }}
-                            />
-                          </div>
-
-                          <div className="flex-1 min-w-0">
-                            <p
-                              className="text-[11px] truncate"
-                              style={{ color: colors.primary }}
-                            >
-                              {cert.name}
-                            </p>
-
-                            <p
-                              className="text-[9px] mt-0.5 truncate"
-                              style={{ color: colors.secondary }}
-                            >
-                              Issued by {cert.issuedBy}
-                            </p>
-                          </div>
-
-                          <p
-                            className="text-[10px] whitespace-nowrap"
-                            style={{ color: colors.primary }}
-                          >
-                            {cert.issueYear}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Education */}
-                    <div className="space-y-3 pt-2">
-                      <div className="flex items-center justify-between">
-                        <p
-                          className="text-[10px] font-black uppercase tracking-widest"
-                          style={{ color: colors.accent }}
-                        >
-                          Education
-                        </p>
-
-                        <div className="flex gap-1">
-                          {certifications?.slice(0, 3).map((_, i) => (
-                            <FeatherCheckCircle
-                              key={i}
-                              className="w-3 h-3 text-green-500"
-                            />
-                          ))}
-                        </div>
-                      </div>
-
-                      {education?.map((edu, i) => (
-                        <div key={i} className="text-[11px] space-y-0.5">
-                          <p className="text-neutral-800 leading-tight">
-                            {edu.schoolName}
-                          </p>
-                          <p className="text-neutral-500">{edu.degree}</p>
-                          <p className="text-[10px] text-neutral-400 whitespace-nowrap">
-                            {edu.startYear}
-                            {edu.endYear ? ` – ${edu.endYear}` : " – Present"}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Skills */}
-                    <div className="space-y-2">
-                      <p
-                        className="text-[10px] font-black uppercase tracking-widest"
-                        style={{ color: colors.accent }}
-                      >
-                        Skills
-                      </p>
-
-                      <div className="flex flex-wrap gap-1.5">
-                        {skills?.slice(0, 6).map((skill, i) => (
-                          <span
-                            key={i}
-                            className="px-2 py-1 border rounded-md text-[9px] uppercase"
-                            style={{
-                              backgroundColor: colors.background,
-                              color: colors.accent,
-                            }}
-                          >
-                            {typeof skill === "string" ? skill : skill.name}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Edit Button */}
-                  <Button
-                    onClick={() => {
-                      console.log("Edit Profile button clicked");
-                      navigate("/profile");
-                    }}
-                    style={{ backgroundColor: colors.primary }}
-                    className="w-full"
-                  >
-                    Edit Profile
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+      {/* Edit Button */}
+      <Button
+        onClick={() => {
+          console.log("Edit Profile button clicked");
+          navigate("/profile");
+        }}
+        style={{ backgroundColor: colors.primary }}
+        className="w-full"
+      >
+        Edit Profile
+      </Button>
+    </CardContent>
+  </Card>
+</div>
 
             {/* --- CENTER DASHBOARD --- */}
             <div className="flex w-full flex-col gap-8 lg:max-w-[800px]">
@@ -1059,7 +1072,7 @@ export default function Dashboard() {
                     label: userUniversityName || "University",
                     val: rankData.university,
                     pct: rankData.university.percentile,
-                    icon: "/university.jpg",
+                    icon: "/university.svg",
                     theme: colors.accent,
                   },
                 ].map((rank, i) => {

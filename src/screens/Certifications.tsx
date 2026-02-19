@@ -76,7 +76,7 @@ const toTitleCase = (value: string) =>
     .join(" ");
 
 const notify = (msg: string) => {
-  toast.error(msg); // replace with toast later
+  toast.error(msg);
 };
 
 // -----------------Month And Year Picker----------
@@ -148,32 +148,34 @@ function MonthYearPicker({
         value={value || ""}
         placeholder="MM / YYYY"
         onClick={() => !disabled && setOpen((o) => !o)}
-        className={`w-full h-10 px-4 rounded-full cursor-pointer border border-neutral-300
-          focus:outline-none text-sm placeholder:text-xs
-          ${disabled ? "bg-neutral-100 text-neutral-400" : "bg-white"}`}
+        className={`w-full h-10 px-4 rounded-xl border ${
+          disabled 
+            ? "bg-white/30 border-white/20 text-gray-400 cursor-not-allowed" 
+            : "bg-white/50 border-gray-200/50 hover:border-gray-300 cursor-pointer"
+        } focus:outline-none transition-all duration-200 backdrop-blur-sm text-sm placeholder:text-xs`}
       />
 
       {/* PICKER */}
       {open && (
-        <div className="absolute z-50 mt-2 w-64 rounded-2xl border border-neutral-300 bg-white shadow-lg p-3">
+        <div className="absolute z-50 mt-2 w-64 rounded-2xl bg-white/80 backdrop-blur-xl border border-white/40 shadow-xl p-3">
           {/* HEADER */}
           <div className="flex items-center justify-between mb-3">
             <button
               type="button"
               disabled={year <= minYear}
               onClick={() => setYear((y) => y - 1)}
-              className="px-2 text-lg disabled:text-neutral-300"
+              className="px-2 text-lg disabled:text-neutral-300 text-gray-600 hover:text-gray-900 transition"
             >
               «
             </button>
 
-            <span className="text-sm font-medium">{year}</span>
+            <span className="text-sm font-medium text-gray-700">{year}</span>
 
             <button
               type="button"
               disabled={year >= maxYear}
               onClick={() => setYear((y) => y + 1)}
-              className="px-2 text-lg disabled:text-neutral-300"
+              className="px-2 text-lg disabled:text-neutral-300 text-gray-600 hover:text-gray-900 transition"
             >
               »
             </button>
@@ -194,23 +196,22 @@ function MonthYearPicker({
                     onChange(formatted);
                     setOpen(false);
                   }}
-                  className="py-2 px-3 rounded-lg transition text-sm sm:text-base"
+                  className="py-2 px-3 rounded-lg transition-all duration-200 text-sm"
                   style={{
                     backgroundColor:
-                      value === formatted ? colors.accent : "transparent",
+                      value === formatted ? colors.primary : "transparent",
                     color:
                       value === formatted
-                        ? colors.background
+                        ? colors.white
                         : disabledMonth
                           ? colors.neutral[400]
                           : colors.neutral[800],
                     cursor: disabledMonth ? "not-allowed" : "pointer",
-                    opacity: disabledMonth ? 0.7 : 1,
+                    opacity: disabledMonth ? 0.5 : 1,
                   }}
                   onMouseEnter={(e) => {
                     if (!disabledMonth && value !== formatted) {
-                      e.currentTarget.style.backgroundColor =
-                        colors.primaryGlow;
+                      e.currentTarget.style.backgroundColor = colors.primaryGlow;
                     }
                   }}
                   onMouseLeave={(e) => {
@@ -271,11 +272,7 @@ export default function Certifications() {
         { "user-id": userId },
       );
 
-      // console.log("FULL API RESPONSE:", res);
-
       const apiCerts = Array.isArray(res?.data) ? res.data : [];
-
-      // console.log("CERT ARRAY:", apiCerts);
 
       setCerts(
         apiCerts.map((c: any) => {
@@ -331,14 +328,8 @@ export default function Certifications() {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // SC2-style TextField classes (single-line friendly)
-  const scTextFieldClass =
-    "w-full [&>label]:text-[12px] [&>label]:font-medium [&>p]:text-[11px] [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300 [&>div]:h-9";
-  const scInputClass =
-    "rounded-full h-9 px-3 text-[15px] placeholder:text-[15px] bg-white !border-none focus:ring-0 w-full";
-
   const isAddable = () => {
-    const trimmedIssueDate = issueDate?.trim(); // ✅ KEY FIX
+    const trimmedIssueDate = issueDate?.trim();
 
     if (!name.trim()) {
       notify("Certification name is required.");
@@ -360,21 +351,10 @@ export default function Certifications() {
       return false;
     }
 
-    // ✅ Date validation (fixed)
     if (!issueDate.trim()) {
       notify("Date is required.");
       return false;
     }
-
-    // if (!isValidPastOrCurrentDate(trimmedIssueDate)) {
-    //   notify("Issue date must be in MM/YYYY format and not in the future.");
-    //   return false;
-    // }
-
-    // if (!isValidPastOrCurrentDate(issueDate)) {
-    //   notify("Issue date cannot be in the future.");
-    //   return false;
-    // }
 
     if (!isValidPastOrCurrentDate(issueDate.trim())) {
       notify("Issue date must be in MM/YYYY format and not in the future.");
@@ -391,29 +371,6 @@ export default function Certifications() {
       return false;
     }
 
-    // if (!credentialLink.trim()) {
-    //     notify("Certification Link is required.");
-    //     return false;
-    //   }
-
-    //   if (!file) {
-    //     notify("Please upload the certification PDF.");
-    //     return false;
-    //   }
-
-    return true;
-  };
-
-  const isAddableSilent = () => {
-    if (!name.trim()) return false;
-    if (!isValidText(name)) return false;
-    if (!issuer.trim()) return false;
-    if (!isValidText(issuer)) return false;
-    if (!isValidMonthYear(issueDate)) return false;
-    if (!isValidPastOrCurrentDate(issueDate)) return false;
-    if (!credentialLink.trim() && !file) return false;
-    if (credentialLink.trim() && !isValidUrl(credentialLink)) return false;
-    // if (!file) return false;
     return true;
   };
 
@@ -467,7 +424,6 @@ export default function Certifications() {
     }
 
     if (file) {
-      // 🔥 MUST be plural to go into req.files[]
       formData.append("certificateFiles", file);
     }
 
@@ -478,7 +434,6 @@ export default function Certifications() {
 
       toast.success("Certification added successfully");
 
-      // safest pattern (same as Experience)
       await fetchCertifications();
       await fetchExperienceIndex();
 
@@ -510,7 +465,6 @@ export default function Certifications() {
       formData.append("credentialLink", credentialLink.trim());
     }
 
-    // optional file replace
     if (file) {
       formData.append("certificateFiles", file);
     }
@@ -518,7 +472,7 @@ export default function Certifications() {
     try {
       await API(
         "PUT",
-        `${URL_PATH.certification}/${editingId}`, // ✅ confirm your backend route
+        `${URL_PATH.certification}/${editingId}`,
         formData,
         { "user-id": userId },
       );
@@ -613,17 +567,6 @@ export default function Certifications() {
 
   const canContinue = certs.length > 0;
 
-  // const handleContinue = () => {
-  //   if (!canContinue) {
-  //     notify("Please add at least one certification.");
-  //     return;
-  //   }
-
-  //   navigate("/awards", {
-  //     state: { source },
-  //   });
-  // };
-
   const handleContinue = () => {
     if (!certs.length) {
       toast.error("Please add at least one certification to continue.");
@@ -665,76 +608,74 @@ export default function Certifications() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* 🎨 Linear gradient background - fixed behind everything */}
-      <div
-        className="pointer-events-none fixed inset-0 -z-10"
+      {/* 🎨 Enhanced gradient background with soft blur - matching education */}
+      <div 
+        className="fixed inset-0 -z-10"
         style={{
-          background: `linear-gradient(
-          to bottom,
-          #d9d9d9 0%,
-          #cfd3d6 25%,
-          #9aa6b2 55%,
-          #2E4056 100%
-        )`,
-          width: "100%",
+          background: `radial-gradient(circle at 20% 20%, rgba(210, 215, 220, 0.4) 0%, rgba(150, 165, 180, 0.3) 50%, rgba(40, 64, 86, 0.4) 100%)`,
         }}
-      />
+      >
+        {/* Animated blur elements */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-white/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-gray-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
 
       {/* Header and content with z-index to stay above background */}
       <div className="relative z-10">
         <Navbar />
-        <ToastContainer position="top-center" autoClose={3000} />
+        <ToastContainer 
+          position="top-center" 
+          autoClose={3000}
+          toastClassName="!bg-white/80 !backdrop-blur-md !text-gray-800 !shadow-lg !border !border-white/20"
+        />
 
-        <div className="flex justify-center sm:px-6 py-0 sm:py-0">
-          <div className="w-full max-w-[1000px] flex flex-col md:flex-row gap-6 md:gap-8 justify-center py-8">
-            {/* Left card */}
-            <main className="w-full md:max-w-[448px] flex flex-col gap-6 rounded-3xl border border-neutral-300 bg-white px-4 sm:px-6 md:px-8 py-6 sm:py-8">
-              {/* top - back + progress */}
-              <div className="flex w-full items-center justify-center gap-4">
+        <div className="flex justify-center px-4 sm:px-6 py-6">
+          <div className="w-full max-w-[1200px] mx-auto flex flex-col lg:flex-row gap-6 lg:gap-8">
+            
+            {/* Left card - Glass effect */}
+            <main className="w-full lg:flex-1 bg-white/70 backdrop-blur-xl rounded-3xl border border-white/40 shadow-2xl px-6 sm:px-8 py-8">
+              
+              {/* Top: back + progress */}
+              <div className="flex items-center gap-4 mb-8">
                 <IconButton
                   size="small"
-                  icon={<FeatherArrowLeft />}
+                  icon={<FeatherArrowLeft className="w-4 h-4" />}
                   onClick={() => {
-                    if (source === "dashboard") {
-                      navigate("/dashboard");
-                    } else {
-                      navigate(-1);
-                    }
+                    navigate("/experience");
                   }}
+                  className="bg-white/50 hover:bg-white/80 backdrop-blur-sm border border-white/30"
                 />
 
-                <div className="flex-1 w-full max-w-full md:max-w-[420px]">
-                  <div className="flex items-center gap-3">
-                    {[...Array(4)].map((_, i) => (
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    {[...Array(6)].map((_, i) => (
                       <div
-                        key={`p-${i}`}
-                        style={{ height: 6, backgroundColor: colors.primary }}
-                        className="flex-1 rounded-full"
-                      />
-                    ))}
-                    {[...Array(2)].map((_, i) => (
-                      <div
-                        key={`n-${i}`}
-                        style={{ height: 6 }}
-                        className="flex-1 rounded-full bg-neutral-300"
+                        key={i}
+                        className={`flex-1 h-1.5 rounded-full transition-all duration-300 ${
+                          i <= 3 
+                            ? "bg-gradient-to-r from-gray-600 to-gray-800" 
+                            : "bg-white/30"
+                        }`}
                       />
                     ))}
                   </div>
+                  <p className="text-xs text-gray-500 mt-2 font-medium">Step 4 of 6</p>
                 </div>
               </div>
 
-              {/* Header */}
-              <header className="mt-1 w-full">
-                <h2 className="text-[22px] text-neutral-900">
-                  Add your certifications
+              {/* Header with refined typography */}
+              <header className="mb-8">
+                <h2 className="text-2xl text-gray-800 font-light tracking-tight">
+                  Add your 
+                  <span className="block font-semibold text-gray-900 mt-1">Certifications</span>
                 </h2>
-                <p className="mt-1 text-xs text-neutral-500">
+                <p className="text-sm text-gray-500 mt-3 leading-relaxed">
                   Professional certifications help boost your Experience Index
                 </p>
               </header>
 
-              {/* selected cert preview list */}
-              <section className="flex w-full flex-col gap-3">
+              {/* Certifications List with enhanced styling */}
+              <section className="flex w-full flex-col gap-3 mb-8">
                 {certs.map((c) => {
                   const isSelected = selectedCert?.id === c.id;
 
@@ -750,17 +691,17 @@ export default function Certifications() {
                           setSelectedCert(isSelected ? null : c);
                         }
                       }}
-                      className="rounded-3xl px-4 py-3 cursor-pointer transition-all duration-200 focus:outline-none"
+                      className="rounded-2xl px-4 py-3 cursor-pointer transition-all duration-200 backdrop-blur-sm focus:outline-none"
                       style={{
                         backgroundColor: isSelected
-                          ? `${colors.primary}10`
-                          : colors.white,
+                          ? `${colors.primary}14`
+                          : "rgba(255,255,255,0.3)",
                         border: `1px solid ${
-                          isSelected ? colors.primary : colors.neutral[400]
+                          isSelected ? colors.primary : "rgba(255,255,255,0.4)"
                         }`,
                         boxShadow: isSelected
-                          ? `0 4px 14px ${colors.primary}22`
-                          : "0 1px 3px rgba(0,0,0,0.04)",
+                          ? `0 0 0 3px ${colors.primary}22`
+                          : "0 4px 6px rgba(0,0,0,0.02)",
                       }}
                     >
                       {/* 🔹 TOP ROW */}
@@ -770,7 +711,7 @@ export default function Certifications() {
                           <Avatar
                             size="large"
                             square
-                            className="!rounded-3xl shadow-sm"
+                            className="!rounded-xl shadow-sm"
                             style={{
                               backgroundColor: colors.primaryGlow,
                               color: colors.neutral[800],
@@ -786,10 +727,10 @@ export default function Certifications() {
                           </Avatar>
 
                           <div className="flex flex-col min-w-0">
-                            <span className="text-sm font-semibold text-neutral-900 truncate">
+                            <span className="text-sm font-semibold text-gray-800 truncate">
                               {c.name}
                             </span>
-                            <span className="text-xs text-neutral-500 truncate">
+                            <span className="text-xs text-gray-500 truncate">
                               {c.issuer}
                             </span>
                           </div>
@@ -801,29 +742,29 @@ export default function Certifications() {
                             {/* ✅ Edit */}
                             <IconButton
                               size="small"
-                              icon={<FeatherEdit2 />}
+                              icon={<FeatherEdit2 className="w-3 h-3" />}
                               aria-label={`Edit certificate ${c.name}`}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 fillFormForEdit(c);
                               }}
-                              className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
+                              className="!bg-transparent !text-gray-500 hover:!text-gray-700 transition"
                             />
 
                             {/* ✅ Delete */}
                             <IconButton
                               size="small"
-                              icon={<FeatherX />}
+                              icon={<FeatherX className="w-3 h-3" />}
                               aria-label={`Delete certificate ${c.name}`}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setDeleteId(c.id);
                               }}
-                              className="!bg-transparent !text-neutral-500 hover:!text-neutral-700"
+                              className="!bg-transparent !text-gray-500 hover:!text-gray-700 transition"
                             />
                           </div>
 
-                          <span className="text-xs text-neutral-500">
+                          <span className="text-xs text-gray-500">
                             {c.issueDate}
                           </span>
                         </div>
@@ -832,51 +773,38 @@ export default function Certifications() {
                       {/* 🔹 DETAILS (INSIDE SAME BORDER) */}
                       {isSelected && (
                         <>
-                          <div className="my-4 border-t border-neutral-200" />
+                          <div className="my-4 border-t border-white/30" />
 
-                          <div className="flex flex-col gap-3 text-sm text-neutral-800 px-1">
+                          <div className="flex flex-col gap-2 text-sm text-gray-700 px-1">
                             <div>
-                              <span className="font-medium">Name:</span>{" "}
+                              <span className="font-medium text-gray-600">Name:</span>{" "}
                               {c.name}
                             </div>
 
                             {c.issuer && (
                               <div>
-                                <span className="font-medium">Issuer:</span>{" "}
+                                <span className="font-medium text-gray-600">Issuer:</span>{" "}
                                 {c.issuer}
                               </div>
                             )}
 
                             {c.issueDate && (
                               <div>
-                                <span className="font-medium">Issue date:</span>{" "}
+                                <span className="font-medium text-gray-600">Issue date:</span>{" "}
                                 {c.issueDate}
                               </div>
                             )}
 
                             {c.credentialLink && (
                               <div>
-                                <span
-                                  style={{ color: colors.neutral[800] }}
-                                  className="font-medium"
-                                >
-                                  Credential:
-                                </span>{" "}
+                                <span className="font-medium text-gray-600">Credential:</span>{" "}
                                 <a
                                   href={c.credentialLink}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   onClick={(e) => e.stopPropagation()}
-                                  className="underline transition"
+                                  className="underline transition hover:text-gray-900"
                                   style={{ color: colors.accent }}
-                                  onMouseEnter={(e) =>
-                                    (e.currentTarget.style.color =
-                                      colors.neutral[800])
-                                  }
-                                  onMouseLeave={(e) =>
-                                    (e.currentTarget.style.color =
-                                      colors.accent)
-                                  }
                                 >
                                   View
                                 </a>
@@ -890,80 +818,64 @@ export default function Certifications() {
                 })}
               </section>
 
-              {/* form */}
+              {/* Form with enhanced styling */}
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
                   handleAdd();
                 }}
-                className="flex w-full flex-col gap-4"
+                className="flex w-full flex-col gap-5"
               >
-                <TextField
-                  label={
-                    <span className="text-[12px]">
-                      Certification Name <span className="text-red-500">*</span>
-                    </span>
-                  }
-                  helpText=""
-                  className={scTextFieldClass}
-                >
-                  <TextField.Input
+                {/* Certification Name */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Certification Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    className="w-full h-10 px-4 rounded-xl border bg-white/50 backdrop-blur-sm text-sm transition-all duration-200 border-white/40 hover:border-gray-300 focus:border-gray-400 focus:outline-none"
                     placeholder="e.g., Certified Product Manager"
                     value={name}
                     onChange={(e) =>
                       setName(e.target.value.replace(/[^A-Za-z\s.&-]/g, ""))
                     }
                     onBlur={() => setName(toTitleCase(name))}
-                    className={scInputClass}
                   />
-                </TextField>
+                </div>
 
-                <TextField
-                  label={
-                    <span className="text-[12px]">
-                      Issuer <span className="text-red-500">*</span>{" "}
-                    </span>
-                  }
-                  className={scTextFieldClass}
-                >
-                  <TextField.Input
+                {/* Issuer */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Issuer <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    className="w-full h-10 px-4 rounded-xl border bg-white/50 backdrop-blur-sm text-sm transition-all duration-200 border-white/40 hover:border-gray-300 focus:border-gray-400 focus:outline-none"
                     placeholder="Issuing organization"
                     value={issuer}
                     onChange={(e) =>
                       setIssuer(e.target.value.replace(/[^A-Za-z\s.&-]/g, ""))
                     }
                     onBlur={() => setIssuer(toTitleCase(issuer))}
-                    className={scInputClass}
                   />
-                </TextField>
-                {/* ------------Date------------------ */}
-
-                {/* // date------------------------- */}
-                <div className="flex flex-col gap-6 max-w-lg">
-                  {/* Issue Month & Year */}
-                  <div className="flex flex-col gap-1">
-                    <label
-                      htmlFor="issueDate"
-                      className="text-[12px] font-medium text-neutral-700"
-                    >
-                      Issue Month & Year <span className="text-red-500">*</span>
-                    </label>
-
-                    <MonthYearPicker
-                      value={issueDate}
-                      onChange={setIssueDate}
-                    />
-                  </div>
                 </div>
 
-                {/* ---------------End Date-------------- */}
+                {/* Issue Month & Year */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Issue Month & Year <span className="text-red-500">*</span>
+                  </label>
+                  <MonthYearPicker
+                    value={issueDate}
+                    onChange={setIssueDate}
+                  />
+                </div>
 
-                <TextField
-                  label={<span className="text-[12px]">Credential Link </span>}
-                  helpText=""
-                  className={scTextFieldClass}
-                >
-                  <TextField.Input
+                {/* Credential Link */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Credential Link
+                  </label>
+                  <input
+                    className="w-full h-10 px-4 rounded-xl border bg-white/50 backdrop-blur-sm text-sm transition-all duration-200 border-white/40 hover:border-gray-300 focus:border-gray-400 focus:outline-none"
                     placeholder="https://"
                     value={credentialLink}
                     onChange={(e) =>
@@ -975,22 +887,19 @@ export default function Certifications() {
                         setCredentialLink("https://" + credentialLink);
                       }
                     }}
-                    className={scInputClass}
                   />
-                </TextField>
-
-                {/* ✅ OR Divider (ADD THIS) */}
-                <div className="flex items-center gap-3 my-1">
-                  <div className="flex-1 h-px bg-neutral-300" />
-                  <span className="text-[11px] text-neutral-500 font-medium tracking-wide">
-                    OR
-                  </span>
-                  <div className="flex-1 h-px bg-neutral-300" />
                 </div>
 
-                {/* Upload */}
+                {/* OR Divider */}
+                <div className="flex items-center gap-3 my-1">
+                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
+                  <span className="text-xs text-gray-400 font-medium tracking-wide">OR</span>
+                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
+                </div>
+
+                {/* Upload Section with enhanced styling */}
                 <div className="w-full">
-                  <div className="text-[12px] text-neutral-800 mb-2">
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
                     Upload Certificate
                   </div>
 
@@ -1002,20 +911,16 @@ export default function Certifications() {
                     onKeyDown={handleUploadKeyDown}
                     onDrop={handleDrop}
                     onDragOver={handleDragOver}
-                    className="w-full rounded-2xl border-2 border-dashed border-neutral-300 bg-gray-50 px-6 py-4 flex flex-col items-center justify-center cursor-pointer"
+                    className="w-full rounded-xl border-2 border-dashed border-white/40 bg-white/30 backdrop-blur-sm px-6 py-5 flex flex-col items-center justify-center cursor-pointer hover:bg-white/40 transition-all duration-200"
                   >
-                    <IconWithBackground
-                      size="large"
-                      icon={
-                        <FeatherUpload className="w-5 h-5 text-neutral-600" />
-                      }
-                      className="!bg-neutral-200 !rounded-full !p-3 shadow-s"
-                    />
+                    <div className="flex items-center justify-center h-12 w-12 rounded-full bg-white/50 mb-3">
+                      <FeatherUpload className="w-5 h-5 text-gray-600" />
+                    </div>
 
-                    <div className="mt-3 text-xm text-neutral-600 text-center">
+                    <div className="text-sm text-gray-600 text-center">
                       Click to select file or drag to upload
                     </div>
-                    <div className="text-xs text-neutral-400 mt-1 text-center">
+                    <div className="text-xs text-gray-400 mt-1 text-center">
                       PDF format only, max file size 5MB
                     </div>
                     <input
@@ -1027,43 +932,39 @@ export default function Certifications() {
                     />
                   </div>
 
-                  {/* file preview */}
+                  {/* file preview with enhanced styling */}
                   {file && (
-                    <div className="mt-4 rounded-2xl border border-neutral-300 bg-gray-50 px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:justify-between">
+                    <div className="mt-4 rounded-xl border border-white/30 bg-white/30 backdrop-blur-sm px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:justify-between">
                       <div className="flex items-center gap-3">
-                        <IconWithBackground
-                          size="medium"
-                          icon={
-                            <FeatherFileText className="w-4 h-4 text-red-800" />
-                          }
-                          className="!bg-red-100 !rounded-full !p-3"
-                        />
+                        <div className="flex items-center justify-center h-10 w-10 rounded-full bg-red-100">
+                          <FeatherFileText className="w-4 h-4 text-red-600" />
+                        </div>
                         <div className="flex flex-col">
-                          <span className="text-sm text-neutral-900">
+                          <span className="text-sm text-gray-800">
                             {file.name}
                           </span>
-                          <span className="text-xs text-neutral-500">
+                          <span className="text-xs text-gray-500">
                             {(file.size / (1024 * 1024)).toFixed(1)} MB
                           </span>
                         </div>
                       </div>
                       <IconButton
                         size="small"
-                        icon={<FeatherX />}
+                        icon={<FeatherX className="w-3 h-3" />}
                         onClick={removeFile}
-                        className="!bg-transparent !text-neutral-500"
+                        className="!bg-transparent !text-gray-500 hover:!text-gray-700 transition"
                       />
                     </div>
                   )}
                 </div>
 
-                <div className="mt-2 flex flex-col sm:flex-row gap-3 items-center">
+                <div className="flex flex-col sm:flex-row gap-3 items-center mt-2">
                   <Button
                     type="button"
                     disabled={isSubmitting}
                     variant="neutral-secondary"
-                    icon={<FeatherPlus />}
-                    className="w-full rounded-full h-10 px-4 border-neutral-300"
+                    icon={<FeatherPlus className="w-4 h-4" />}
+                    className="w-full rounded-xl h-10 px-4 bg-white/50 backdrop-blur-sm border border-white/40 hover:bg-white/70 transition-all duration-200"
                     onClick={() => (isEditing ? handleUpdate() : handleAdd())}
                   >
                     {isSubmitting
@@ -1071,253 +972,222 @@ export default function Certifications() {
                         ? "Updating..."
                         : "Adding..."
                       : isEditing
-                        ? "Update education"
-                        : "Add another education"}
+                        ? "Update certification"
+                        : "Add another certification"}
                   </Button>
 
-
-                  <div className="flex-1" />
-                 {/* ✅ Cancle Edit */}
-                 {isEditing && (
-                  <Button
-                    onClick={resetForm}
-                    type="button"
-                    className="w-full rounded-full h-10 mt-2"
-                    variant="brand-tertiary"
-                    style={{backgroundColor: colors.primaryGlow}}
-                  >
-                    Cancel edit
-                  </Button>
+                  {/* ✅ Cancel Edit */}
+                  {isEditing && (
+                    <Button
+                      onClick={resetForm}
+                      type="button"
+                      className="w-full rounded-xl h-10 bg-white/30 backdrop-blur-sm border border-white/40 hover:bg-white/50 transition-all duration-200"
+                      variant="brand-tertiary"
+                    >
+                      Cancel edit
+                    </Button>
                   )}
                 </div>
-
-
               </form>
 
-              {/* divider */}
-              <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
-
+              {/* Divider */}
+              <div className="w-full h-px bg-gradient-to-r from-transparent via-white/50 to-transparent my-6" />
+              
+              {/* Footer with Continue button */}
               <footer>
                 <Button
                   onClick={handleContinue}
                   disabled={!canContinue || isSubmitting}
-                  className="w-full h-10 rounded-full transition-all duration-200"
+                  className="w-full h-11 rounded-xl text-sm font-medium transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100"
                   style={{
-                    backgroundColor:
-                      !canContinue || isSubmitting
-                        ? `${colors.accent}55` // faded primary when disabled
-                        : colors.accent,
-                    color:
-                      !canContinue || isSubmitting
-                        ? `${colors.background}AA` // soft white text
-                        : colors.background,
-                    boxShadow:
-                      !canContinue || isSubmitting
-                        ? "none"
-                        : "0 6px 18px rgba(99,52,237,0.18)",
-                    cursor:
-                      !canContinue || isSubmitting ? "not-allowed" : "pointer",
+                    background: !canContinue || isSubmitting
+                      ? "linear-gradient(135deg, #e0e0e0, #f0f0f0)"
+                      : "linear-gradient(135deg, #2c3e50, #1e2a36)",
+                    color: "#ffffff",
+                    cursor: !canContinue || isSubmitting ? "not-allowed" : "pointer",
+                    boxShadow: !canContinue || isSubmitting
+                      ? "none"
+                      : "0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.02)",
+                    opacity: !canContinue || isSubmitting ? 0.6 : 1,
                   }}
                 >
-                  {isSubmitting ? "Saving..." : "Continue"}
+                  {isSubmitting ? "Saving..." : "Continue →"}
                 </Button>
               </footer>
             </main>
 
-            {/* Right panel */}
-            <aside className="w-full md:w-72 shrink-0 mt-6 md:mt-0">
-              <div className="md:sticky md:top-6 bg-white rounded-[20px] px-6 py-6 shadow-[0_10px_30px_rgba(40,0,60,0.04)] border border-neutral-300">
-                <h3 className="text-[22px] text-neutral-900">
-                  Your Experience Index
-                </h3>
-
-                <div className="flex items-center justify-center py-6">
-                  <span
-                    aria-live="polite"
-                    className="font-['Afacad_Flux'] text-[32px] sm:text-[40px] md:text-[48px] font-[500] leading-[56px] text-neutral-300"
-                  >
-                    {displayedIndex ?? 0}
-                  </span>
+            {/* Right panel - Enhanced glass effect */}
+            <aside className="w-full lg:w-80 shrink-0">
+              <div className="lg:sticky lg:top-6 bg-white/60 backdrop-blur-xl rounded-2xl border border-white/40 shadow-xl p-6">
+                
+                {/* Experience Index Score */}
+                <div className="text-center mb-6">
+                  <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
+                    Experience Index
+                  </h3>
+                  <div className="relative inline-block">
+                    <span className="text-6xl font-light text-gray-800">
+                      {displayedIndex ?? 0}
+                    </span>
+                    <div className="absolute -top-1 -right-4 w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
+                  </div>
                 </div>
 
-                {/* Top form horizontal line */}
-                <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
+                <div className="h-px bg-gradient-to-r from-transparent via-white/50 to-transparent my-4" />
 
-                <div className="mt-4">
-                  <div className="text-[16px] text-neutral-800 mb-3">
-                    Progress Steps
-                  </div>
-
-                  {/* ⚪ Completed — Demographics */}
+                {/* Progress Steps with refined styling */}
+                <h4 className="text-sm font-medium text-gray-600 mb-4">Progress steps</h4>
+                
+                <div className="space-y-2">
+                  {/* Completed - Demographics */}
                   <button
                     type="button"
-                    className="w-full flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3 hover:bg-neutral-50"
+                    className="w-full flex items-center gap-3 rounded-xl px-4 py-3 bg-white/30 backdrop-blur-sm border border-white/20 hover:bg-white/40 transition-all duration-200"
                   >
-                    <IconWithBackground
-                      size="small"
-                      icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                      className="!bg-green-100 !rounded-full !p-3"
-                    />
-                    <span className="text-sm text-neutral-700">
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-green-100">
+                      <FeatherCheck className="w-4 h-4 text-green-700" />
+                    </div>
+                    <span className="flex-1 text-sm text-gray-600">
                       Demographics
                     </span>
+                    <span className="text-xs text-gray-400">1/6</span>
                   </button>
 
-                  {/* ⚪ Completed — Education */}
-                  <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                    <IconWithBackground
-                      size="small"
-                      icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                      className="!bg-green-100 !rounded-full !p-3"
-                    />
-                    <span className="text-sm text-neutral-700">Education</span>
-                  </div>
-
-                  {/* Experience — completed (green) */}
-                  <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                    <IconWithBackground
-                      size="small"
-                      icon={<FeatherCheck className="w-4 h-4 text-green-900" />}
-                      className="!bg-green-100 !rounded-full !p-3"
-                    />
-                    <span className="text-sm text-neutral-700">Experience</span>
-                  </div>
-
-                  {/* Certifications — active (purple) */}
-                  <div
-                    style={{ backgroundColor: colors.primary }}
-                    className="flex items-center gap-3 rounded-2xl px-4 py-2 mb-3"
+                  {/* Completed - Education */}
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-3 rounded-xl px-4 py-3 bg-white/30 backdrop-blur-sm border border-white/20 hover:bg-white/40 transition-all duration-200"
                   >
-                    <div
-                      className="flex items-center justify-center h-8 w-8 rounded-2xl shadow-sm"
-                      style={{ backgroundColor: colors.white }}
-                    >
-                      <IconWithBackground
-                        size="small"
-                        variant="neutral"
-                        className="!bg-transparent"
-                        style={{ color: colors.accent }}
-                        icon={<FeatherFileCheck />}
-                      />
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-green-100">
+                      <FeatherCheck className="w-4 h-4 text-green-700" />
                     </div>
+                    <span className="flex-1 text-sm text-gray-600">
+                      Education
+                    </span>
+                    <span className="text-xs text-gray-400">2/6</span>
+                  </button>
 
-                    <span
-                      className="text-sm font-medium"
-                      style={{ color: colors.white }}
-                    >
+                  {/* Completed - Experience */}
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-3 rounded-xl px-4 py-3 bg-white/30 backdrop-blur-sm border border-white/20 hover:bg-white/40 transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-green-100">
+                      <FeatherCheck className="w-4 h-4 text-green-700" />
+                    </div>
+                    <span className="flex-1 text-sm text-gray-600">
+                      Experience
+                    </span>
+                    <span className="text-xs text-gray-400">3/6</span>
+                  </button>
+
+                  {/* Active - Certifications */}
+                  <div
+                    className="flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(44,62,80,0.1), rgba(30,42,54,0.05))",
+                      border: "1px solid rgba(255,255,255,0.3)",
+                      backdropFilter: "blur(4px)",
+                    }}
+                  >
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-white/80 shadow-sm">
+                      <FeatherFileCheck className="w-4 h-4 text-gray-700" />
+                    </div>
+                    <span className="flex-1 text-sm font-medium text-gray-700">
                       Certifications
                     </span>
+                    <span className="text-xs text-gray-400">4/6</span>
                   </div>
 
-                  {/* Awards — Inactive */}
-                  <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2 mb-3">
-                    <IconWithBackground
-                      size="small"
-                      variant="neutral"
-                      className="!bg-grey !text-neutral-600"
-                      icon={<FeatherAward />}
-                    />
-                    <span className="text-sm text-neutral-500">Awards</span>
-                  </div>
-
-                  {/* Projects — Inactive */}
-                  <div className="flex items-center gap-3 rounded-2xl border border-neutral-300 bg-white px-4 py-2">
-                    <IconWithBackground
-                      size="small"
-                      variant="neutral"
-                      className="!bg-grey !text-neutral-600"
-                      icon={<FeatherPackage />}
-                    />
-                    <span className="text-sm text-neutral-500">Projects</span>
-                  </div>
+                  {/* Inactive steps */}
+                  {[
+                    { label: "Awards", icon: <FeatherAward /> },
+                    { label: "Projects", icon: <FeatherPackage /> },
+                  ].map((step, index) => (
+                    <button
+                      key={step.label}
+                      type="button"
+                      className="w-full flex items-center gap-3 rounded-xl px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/20 hover:bg-white/30 transition-all duration-200"
+                    >
+                      <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-white/60">
+                        <div className="text-gray-500">
+                          {step.icon}
+                        </div>
+                      </div>
+                      <span className="flex-1 text-sm text-gray-500">
+                        {step.label}
+                      </span>
+                      <span className="text-xs text-gray-400">
+                        {index + 5}/6
+                      </span>
+                    </button>
+                  ))}
                 </div>
               </div>
             </aside>
           </div>
-          {deleteId && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-              <div
-                className="w-[360px] rounded-2xl p-6 shadow-xl"
-                style={{ backgroundColor: colors.white }}
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <h3
-                    className="text-lg font-semibold"
-                    style={{ color: colors.accent }}
-                  >
-                    Are you sure?
-                  </h3>
-
-                  <button
-                    onClick={() => setDeleteId(null)}
-                    className="transition"
-                    style={{ color: colors.neutral[600] }}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.color = colors.accent)
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.color = colors.neutral[600])
-                    }
-                  >
-                    ✕
-                  </button>
-                </div>
-
-                <p
-                  className="text-sm mb-6"
-                  style={{ color: colors.neutral[600] }}
-                >
-                  Do you really want to delete this certification?
-                </p>
-
-                <div className="flex gap-3">
-                  {/* Cancel */}
-                  <Button
-                    className="flex-1 rounded-3xl transition"
-                    onClick={() => setDeleteId(null)}
-                    style={{
-                      backgroundColor: colors.primary,
-                      color: colors.accent,
-                    }}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.backgroundColor = colors.secondary)
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.backgroundColor = colors.primary)
-                    }
-                  >
-                    Cancel
-                  </Button>
-
-                  {/* Yes */}
-                  <Button
-                    className="flex-1 rounded-3xl transition"
-                    onClick={handleRemove}
-                    disabled={isSubmitting}
-                    style={{
-                      backgroundColor: isSubmitting
-                        ? `${colors.red}55`
-                        : colors.red,
-                      color: colors.accent,
-                      cursor: isSubmitting ? "not-allowed" : "pointer",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isSubmitting)
-                        e.currentTarget.style.backgroundColor = colors.red;
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isSubmitting)
-                        e.currentTarget.style.backgroundColor = colors.red;
-                    }}
-                  >
-                    {isSubmitting ? "Deleting..." : "Delete"}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div
+            className="w-[360px] rounded-2xl p-6 shadow-xl bg-white/80 backdrop-blur-xl border border-white/40"
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3
+                className="text-lg font-semibold"
+                style={{ color: colors.accent }}
+              >
+                Are you sure?
+              </h3>
+
+              <button
+                onClick={() => setDeleteId(null)}
+                className="text-gray-400 hover:text-gray-700 transition"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="text-sm mb-6 text-gray-600">
+              Do you really want to delete this certification?
+            </p>
+
+            <div className="flex gap-3">
+              {/* Cancel */}
+              <Button
+                className="flex-1 rounded-xl bg-white/50 backdrop-blur-sm border border-white/40 hover:bg-white/70 transition-all duration-200"
+                onClick={() => setDeleteId(null)}
+                style={{
+                  color: colors.accent,
+                }}
+              >
+                Cancel
+              </Button>
+
+              {/* Delete */}
+              <Button
+                className="flex-1 rounded-xl transition-all duration-200"
+                onClick={handleRemove}
+                disabled={isSubmitting}
+                style={{
+                  background: isSubmitting
+                    ? "linear-gradient(135deg, #ef444466, #dc262666)"
+                    : "linear-gradient(135deg, #ef4444, #dc2626)",
+                  color: "#ffffff",
+                  opacity: isSubmitting ? 0.6 : 1,
+                  cursor: isSubmitting ? "not-allowed" : "pointer",
+                }}
+              >
+                {isSubmitting ? "Deleting..." : "Delete"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );
