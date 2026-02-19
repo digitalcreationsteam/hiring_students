@@ -26,27 +26,6 @@ import {
   CardTitle,
 } from "../ui/components/Card";
 
-import { 
-  FiGlobe, // for global
-  FiMapPin, // for state
-  FiHome, // for city
-  FiBookOpen // for university
-} from "react-icons/fi";
-
-import { 
-  IoGlobeOutline, // alternative for global
-  IoLocationOutline, // alternative for state/city
-  IoSchoolOutline // for university
-} from "react-icons/io5";
-
-import {
-  MdPublic, // alternative for global
-  MdLocationOn, // alternative for location
-  MdSchool // for university
-} from "react-icons/md";
-
-// import Chat from "../ui/components/chat/Chat";
-
 import {
   FeatherArrowRight,
   FeatherAward,
@@ -80,7 +59,6 @@ import Navbar from "src/ui/components/Navbar";
 import Footer from "src/ui/components/Footer";
 import { Eye } from "lucide-react";
 import { clearUserData } from "src/utils/authUtils";
-// import HeaderLogo from "@/ui/components/HeaderLogo";
 
 /* ==================== TYPES ==================== */
 
@@ -129,6 +107,7 @@ type RankItem = {
   rank: number | string;
   percentile: string;
 };
+
 type Hireability = {
   totalScore: number;
   weeklyChange: number;
@@ -143,6 +122,21 @@ type Hireability = {
   };
 };
 
+type DomainRank = {
+  domainId: string;
+  domainName: string;
+  subDomainName?: string;
+  skills: string[];
+  score: number;
+  domainRank: number | null;
+  domainCohortRank: number | null;
+};
+
+type ExperienceInfo = {
+  years: number;
+  cohort: string;
+};
+
 /* ==================== CONSTANTS ==================== */
 
 const DEFAULT_AVATAR =
@@ -153,17 +147,159 @@ const DEFAULT_AVATAR =
 const formatLocation = (city?: string, state?: string): string =>
   `${city || ""}, ${state || ""}`.trim().replace(/^,\s*|,\s*$/g, "");
 
-/**
- * ✅ FIXED
- * Always returns STRING
- */
 const calculatePercentile = (rank?: number): string => {
-  console.log("calculatePercentile called with rank:", rank);
   if (!rank || rank <= 0) return "-";
   if (rank === 1) return "1";
   if (rank <= 5) return "5";
   if (rank <= 10) return "10";
   return "25";
+};
+
+/* ==================== COMPONENTS ==================== */
+
+const DomainRankingsCard = ({
+  domains,
+  primaryDomain,
+}: {
+  domains: DomainRank[];
+  primaryDomain: any;
+}) => {
+  if (!domains || domains.length === 0) return null;
+
+  return (
+    <Card
+      style={{ border: `1.5px solid ${colors.primaryGlow}` }}
+      className="bg-white rounded-[2rem] border shadow-sm"
+    >
+      <CardHeader>
+        <CardTitle
+          className="text-sm font-bold flex items-center gap-2"
+          style={{ color: colors.accent }}
+        >
+          <FeatherTarget className="w-4 h-4" />
+          Domain Rankings
+        </CardTitle>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        {domains.map((domain, idx) => (
+          <div key={idx} className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span
+                  className="text-xs font-semibold"
+                  style={{
+                    color:
+                      domain.domainId === primaryDomain?.id
+                        ? colors.primary
+                        : colors.accent,
+                  }}
+                >
+                  {domain.domainName}
+                  {domain.domainId === primaryDomain?.id && " (Primary)"}
+                </span>
+                {domain.subDomainName && (
+                  <Badge
+                    className="text-[8px]"
+                    style={{ backgroundColor: colors.background }}
+                  >
+                    {domain.subDomainName}
+                  </Badge>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span
+                  className="text-xs font-bold"
+                  style={{ color: colors.primary }}
+                >
+                  #{domain.domainRank || "-"}
+                </span>
+                <span className="text-[8px] text-neutral-400">
+                  (Cohort: #{domain.domainCohortRank || "-"})
+                </span>
+              </div>
+            </div>
+
+            {/* Skills preview */}
+            <div className="flex flex-wrap gap-1">
+              {domain.skills?.slice(0, 3).map((skill, i) => (
+                <span
+                  key={i}
+                  className="px-2 py-0.5 bg-neutral-100 rounded-full text-[8px]"
+                  style={{ color: colors.accent }}
+                >
+                  {skill}
+                </span>
+              ))}
+              {domain.skills?.length > 3 && (
+                <span className="text-[8px] text-neutral-400">
+                  +{domain.skills.length - 3} more
+                </span>
+              )}
+            </div>
+
+            {/* Domain score progress */}
+            {domain.score > 0 && (
+              <div className="space-y-1">
+                <div className="flex justify-between text-[8px]">
+                  <span>Domain Score</span>
+                  <span>{domain.score}</span>
+                </div>
+                <div className="h-1 bg-neutral-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full"
+                    style={{
+                      width: `${Math.min((domain.score / 100) * 100, 100)}%`,
+                      backgroundColor:
+                        domain.domainId === primaryDomain?.id
+                          ? colors.primary
+                          : colors.secondary,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {idx < domains.length - 1 && (
+              <hr className="my-3 border-neutral-100" />
+            )}
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+};
+
+const ExperienceBadge = ({
+  years,
+  cohort,
+}: {
+  years: number;
+  cohort: string;
+}) => {
+  return (
+    <div className="flex items-center gap-2 mb-4">
+      <Badge
+        className="px-3 py-1 rounded-full text-xs"
+        style={{
+          backgroundColor: colors.primary,
+          color: "white",
+        }}
+      >
+        {years} YOE
+      </Badge>
+      <Badge
+        className="px-3 py-1 rounded-full text-xs"
+        style={{
+          backgroundColor: colors.background,
+          color: colors.accent,
+        }}
+      >
+        Cohort {cohort}
+      </Badge>
+    </div>
+  );
 };
 
 /* ==================== MAIN COMPONENT ==================== */
@@ -172,38 +308,9 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const fileRef = useRef<HTMLInputElement>(null);
 
-  console.log("Dashboard component rendering");
-
   /* ==================== STATE ==================== */
 
-  const [avatar, setAvatar] = useState<string>(() => {
-    console.log("Initializing avatar state from localStorage");
-    try {
-      const u = localStorage.getItem("user");
-      if (u) {
-        const parsed = JSON.parse(u);
-        console.log("User from localStorage:", parsed);
-        // normalize stored URL if needed
-        const raw = parsed?.profileUrl;
-        if (raw) {
-          try {
-            const origin = BASE_URL.replace(/\/api\/?$/, "");
-            console.log("Avatar origin:", origin);
-            if (/^https?:\/\//.test(raw)) return raw;
-            if (raw.startsWith("/")) return origin + raw;
-            return origin + "/" + raw;
-          } catch (e) {
-            console.error("Error normalizing avatar URL:", e);
-            return raw || DEFAULT_AVATAR;
-          }
-        }
-        return DEFAULT_AVATAR;
-      }
-    } catch (e) {
-      console.error("Error parsing user from localStorage:", e);
-    }
-    return DEFAULT_AVATAR;
-  });
+  const [avatar, setAvatar] = useState<string>(DEFAULT_AVATAR);
   const [isSavingAvatar, setIsSavingAvatar] = useState(false);
   const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(
     null,
@@ -223,6 +330,7 @@ export default function Dashboard() {
   const [userCity, setUserCity] = useState("");
   const [userState, setUserState] = useState("");
   const [userUniversityName, setUserUniversityName] = useState("");
+
   const [rankData, setRankData] = useState<{
     global: RankItem;
     country: RankItem;
@@ -245,11 +353,18 @@ export default function Dashboard() {
     experience: { score: 0, max: 0 },
   });
 
+  // New states for domains and experience
+  const [domains, setDomains] = useState<DomainRank[]>([]);
+  const [primaryDomain, setPrimaryDomain] = useState<any>(null);
+  const [experienceInfo, setExperienceInfo] = useState<ExperienceInfo>({
+    years: 0,
+    cohort: "0-1",
+  });
+
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
   const [recruiterVisibility, setRecruiterVisibility] = useState(0);
-
   const [chatUserId, setChatUserId] = useState("");
   const [testOtherUserId, setTestOtherUserId] = useState("");
   const [domain, setDomain] = useState("");
@@ -267,17 +382,28 @@ export default function Dashboard() {
   });
 
   useEffect(() => {
-    console.log("useEffect: Getting current user ID from localStorage");
     const user = localStorage.getItem("user");
     if (user) {
       const parsed = JSON.parse(user);
-      console.log("Current user from localStorage:", parsed);
       setCurrentUserId(parsed?._id || null);
+
+      // Initialize avatar from localStorage
+      if (parsed?.profileUrl) {
+        const origin = BASE_URL.replace(/\/api\/?$/, "");
+        let normalizedProfile = parsed.profileUrl;
+        if (/^https?:\/\//.test(parsed.profileUrl)) {
+          normalizedProfile = parsed.profileUrl;
+        } else if (parsed.profileUrl.startsWith("/")) {
+          normalizedProfile = origin + parsed.profileUrl;
+        } else {
+          normalizedProfile = origin + "/" + parsed.profileUrl;
+        }
+        setAvatar(normalizedProfile);
+      }
     }
   }, []);
 
   const openChat = () => {
-    console.log("openChat called with userId:", chatUserId);
     if (!chatUserId.trim()) return;
     navigate(`/chat/${chatUserId.trim()}`);
   };
@@ -285,12 +411,9 @@ export default function Dashboard() {
   /* ==================== API CALLS ==================== */
 
   const fetchDashboardData = useCallback(async () => {
-    console.log("fetchDashboardData called");
     try {
-      console.log("Making API call to:", URL_PATH.calculateExperienceIndex);
       const res = await API("GET", URL_PATH.calculateExperienceIndex);
 
-      console.log("fetchDashboardData response:", res);
       if (!res) {
         console.warn("No response from API");
         return;
@@ -298,7 +421,6 @@ export default function Dashboard() {
 
       /* DEMOGRAPHICS */
       const demo = res?.data?.demographics?.[0];
-      console.log("Demographics data:", demo);
 
       setUser({
         name: demo?.fullName || "",
@@ -306,45 +428,36 @@ export default function Dashboard() {
         location: formatLocation(demo?.city, demo?.state),
       });
 
-      console.log("Setting user city/state:", demo?.city, demo?.state);
       setUserCity(demo?.city || "City");
       setUserState(demo?.state || "State");
 
       /* AVATAR */
       const profileFromServer = res?.documents?.profileUrl;
-      console.log("Profile from server:", profileFromServer);
-      let normalizedProfile: string | null = null;
-
       if (profileFromServer) {
         const origin = BASE_URL.replace(/\/api\/?$/, "");
-        console.log("Origin for avatar:", origin);
-        if (/^https?:\/\//.test(profileFromServer))
+        let normalizedProfile = profileFromServer;
+        if (/^https?:\/\//.test(profileFromServer)) {
           normalizedProfile = profileFromServer;
-        else if (profileFromServer.startsWith("/"))
+        } else if (profileFromServer.startsWith("/")) {
           normalizedProfile = origin + profileFromServer;
-        else normalizedProfile = origin + "/" + profileFromServer;
+        } else {
+          normalizedProfile = origin + "/" + profileFromServer;
+        }
+        setAvatar(normalizedProfile);
 
-        console.log("Normalized profile URL:", normalizedProfile);
-      }
-
-      setAvatar(normalizedProfile || DEFAULT_AVATAR);
-
-      // save in localStorage safely
-      try {
-        if (normalizedProfile) {
+        // Save to localStorage
+        try {
           const u = localStorage.getItem("user");
           const parsed = u ? JSON.parse(u) : {};
           parsed.profileUrl = normalizedProfile;
           localStorage.setItem("user", JSON.stringify(parsed));
-          console.log("Saved normalized profile to localStorage");
+        } catch (e) {
+          console.error("Error saving to localStorage:", e);
         }
-      } catch (e) {
-        console.error("Error saving to localStorage:", e);
       }
 
       /* RANK */
       const rank = res?.rank;
-      console.log("Rank data from API:", rank);
 
       const newRankData = {
         global: {
@@ -369,12 +482,23 @@ export default function Dashboard() {
         },
       };
 
-      console.log("Setting rankData:", newRankData);
       setRankData(newRankData);
+
+      /* NEW: Domain and Experience Data */
+      if (res?.domains) {
+        setDomains(res.domains);
+      }
+
+      if (res?.primaryDomain) {
+        setPrimaryDomain(res.primaryDomain);
+      }
+
+      if (res?.experience) {
+        setExperienceInfo(res.experience);
+      }
 
       /* HIREABILITY */
       const hireabilityIndex = res?.hireabilityIndex;
-      console.log("Hireability index from API:", hireabilityIndex);
 
       const newHireability = {
         totalScore: hireabilityIndex?.hireabilityIndex ?? 0,
@@ -392,21 +516,15 @@ export default function Dashboard() {
         },
       };
 
-      console.log("Setting hireability:", newHireability);
       setHireability(newHireability);
 
       /* LISTS */
-      console.log(
-        "Setting work experience:",
-        res?.data?.workExperience?.length || 0,
-      );
       setWorkExperience(res?.data?.workExperience || []);
 
       const mappedProjects = (res?.data?.projects || []).map((p: any) => ({
         title: p.projectName,
         summary: p.summary,
       }));
-      console.log("Setting projects:", mappedProjects.length);
       setProjects(mappedProjects);
 
       const mappedCertifications = (res?.data?.certifications || []).map(
@@ -416,35 +534,27 @@ export default function Dashboard() {
           issueYear: c.issueDate,
         }),
       );
-      console.log("Setting certifications:", mappedCertifications.length);
       setCertifications(mappedCertifications);
 
       const educationList = res?.data?.education || [];
-      console.log("Setting education:", educationList.length);
       setEducation(educationList);
 
       const skillsList = (res?.skills?.list || []).map((s: string) => ({
         name: s,
       }));
-      console.log("Setting skills:", skillsList.length);
       setSkills(skillsList);
 
       /* JOB DOMAIN */
       const jobDomain = res?.jobdomain?.domain || "Professional";
-      console.log("Setting domain:", jobDomain);
       setDomain(jobDomain);
 
       /* UNIVERSITY NAME + LEADERBOARD */
       const userUniversity = educationList?.[0]?.schoolName;
-      console.log("User university:", userUniversity);
 
       if (userUniversity) {
-        // ✅ Set university name so leaderboard title shows it dynamically
         setUserUniversityName(userUniversity);
-        console.log("userUniversityName set to:", userUniversity);
 
         try {
-          console.log("Fetching university leaderboard for:", userUniversity);
           const leaderboardRes = await API(
             "GET",
             `${URL_PATH.getStudentsBySchool}?schoolName=${encodeURIComponent(
@@ -453,24 +563,17 @@ export default function Dashboard() {
           );
 
           const students = leaderboardRes?.data || [];
-          console.log("University leaderboard students:", students.length);
           setUniversityLeaderboard(students);
         } catch (error) {
           console.error("University leaderboard fetch failed:", error);
         }
-      } else {
-        console.warn(
-          "No university found in education list — skipping leaderboard fetch",
-        );
       }
 
       /* FETCH CASE STUDY ATTEMPTS THIS WEEK */
       const demoId = demo?.id || demo?._id;
-      console.log("demoId for weekly case studies:", demoId);
 
       if (demoId) {
         try {
-          console.log("Fetching weekly case study attempts for user:", demoId);
           const caseStudyRes = await API(
             "GET",
             `/api/user-case-attempts/${demoId}/weekly`,
@@ -479,13 +582,6 @@ export default function Dashboard() {
           const weeklyAttempts = caseStudyRes?.totalAttempts ?? 0;
           const totalCaseStudies = 5;
           const pct = Math.round((weeklyAttempts / totalCaseStudies) * 100);
-
-          console.log(
-            "Weekly case study attempts:",
-            weeklyAttempts,
-            "percentage:",
-            pct,
-          );
 
           setWeeklyActivity({
             caseStudies: {
@@ -500,34 +596,24 @@ export default function Dashboard() {
         } catch (error) {
           console.error("Weekly case study fetch failed:", error);
         }
-      } else {
-        console.warn("No demoId found — skipping weekly case study fetch");
       }
-
-      console.log("fetchDashboardData complete ✅");
     } catch (err: any) {
       console.error("fetchDashboardData FAILED:", err);
-      console.error("message:", err?.message);
-      console.error("response:", err?.response?.data);
       setAvatar(DEFAULT_AVATAR);
     }
   }, []);
 
   /* ==================== EFFECTS ==================== */
   useEffect(() => {
-    console.log("useEffect: Checking assessment completion status");
     const completed = localStorage.getItem("assessmentCompleted") === "true";
-    console.log("Assessment completed:", completed);
     setIsAssessmentCompleted(completed);
   }, []);
 
   useEffect(() => {
-    console.log("useEffect: Calling fetchDashboardData");
-    fetchDashboardData(); // 👈 ONLY ONE CALL
+    fetchDashboardData();
   }, [fetchDashboardData]);
 
   useEffect(() => {
-    console.log("useEffect: Setting up click outside handler for profile menu");
     const handleClickOutside = (e: MouseEvent) => {
       if (
         profileMenuRef.current &&
@@ -543,30 +629,21 @@ export default function Dashboard() {
 
   /* ==================== HANDLERS ==================== */
   const openMyChat = () => {
-    console.log("openMyChat called");
     const studentId = localStorage.getItem("userId");
     if (!studentId) {
-      console.warn("User ID not found in localStorage");
       toast.error("User ID not found. Please login again.");
       return;
     }
-    console.log("Navigating to chat with studentId:", studentId);
     navigate(`/chat/${studentId}`);
   };
 
-  // const handleNavigate = (path: string) => navigate(path);
   const handleNavigate = (path: string) => {
-    console.log("handleNavigate called with path:", path);
     navigate(path, {
       state: { source: "dashboard" },
     });
   };
 
   const handleAssessmentClick = () => {
-    console.log(
-      "handleAssessmentClick called, completed:",
-      isAssessmentCompleted,
-    );
     if (isAssessmentCompleted) {
       toast.success("Assessment already completed");
       return;
@@ -577,107 +654,42 @@ export default function Dashboard() {
     });
   };
 
-  // POST API for the profile
-  const handleSaveProfile = async () => {
-    console.log("handleSaveProfile called");
-    if (!selectedAvatarFile) {
-      console.warn("No avatar file selected");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("avatar", selectedAvatarFile);
-
-    try {
-      setIsSavingAvatar(true);
-      console.log("Saving profile with file:", selectedAvatarFile.name);
-
-      await API(
-        "POST", // or "PUT" based on backend
-        URL_PATH.uploadProfile, // "user/profile"
-        formData,
-        // ❌ DO NOT pass headers here
-      );
-
-      console.log("Profile saved successfully");
-      // Refresh profile image from server (dashboard includes documents.profileUrl)
-      await fetchDashboardData();
-
-      // Cleanup
-      setSelectedAvatarFile(null);
-    } catch (error) {
-      console.error("Failed to save profile image", error);
-      toast.error("Failed to save profile image");
-    } finally {
-      setIsSavingAvatar(false);
-    }
-  };
-
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("handleAvatarChange called with event:", e);
     const file = e.target.files?.[0];
-    if (!file) {
-      console.warn("No file selected");
-      return;
-    }
+    if (!file) return;
 
-    console.log(
-      "Selected file:",
-      file.name,
-      "size:",
-      file.size,
-      "type:",
-      file.type,
-    );
-
-    // Validate file size (e.g., max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      console.warn("File size too large:", file.size);
       toast.error("File size should be less than 5MB");
       return;
     }
 
-    // Validate file type
     const validTypes = ["image/jpeg", "image/png", "image/webp"];
     if (!validTypes.includes(file.type)) {
-      console.warn("Invalid file type:", file.type);
       toast.error("Please select a valid image (JPEG, PNG, or WebP)");
       return;
     }
 
-    // Cleanup old preview
     if (avatar && avatar.startsWith("blob:")) {
-      console.log("Revoking old blob URL:", avatar);
       URL.revokeObjectURL(avatar);
     }
 
-    // Create preview
     const previewUrl = URL.createObjectURL(file);
-    console.log("Created preview URL:", previewUrl);
     setAvatar(previewUrl);
 
     try {
       setIsSavingAvatar(true);
 
-      // Upload to server
       const formData = new FormData();
       formData.append("avatar", file);
 
-      console.log("Uploading avatar to server");
       await API("POST", URL_PATH.uploadProfile, formData);
 
-      console.log("Avatar uploaded successfully");
-      // Refresh from server (dashboard includes documents.profileUrl)
       await fetchDashboardData();
 
-      // Dispatch custom event to notify Navbar about avatar update
       window.dispatchEvent(new Event("avatar-updated"));
-      console.log("Dispatched avatar-updated event");
 
-      // Revoke preview after successful upload
       setTimeout(() => {
         if (previewUrl.startsWith("blob:")) {
-          console.log("Revoking preview URL after timeout");
           URL.revokeObjectURL(previewUrl);
         }
       }, 1000);
@@ -690,7 +702,6 @@ export default function Dashboard() {
   };
 
   const handleLogout = () => {
-    console.log("handleLogout called");
     clearUserData();
     navigate("/login");
   };
@@ -698,41 +709,25 @@ export default function Dashboard() {
   /* ==================== MEMOS ==================== */
 
   const skillProgress = useMemo(() => {
-    const progress =
-      hireability.skill.max > 0
-        ? (hireability.skill.score / hireability.skill.max) * 100
-        : 0;
-    console.log("skillProgress calculated:", progress);
-    return progress;
+    return hireability.skill.max > 0
+      ? (hireability.skill.score / hireability.skill.max) * 100
+      : 0;
   }, [hireability.skill]);
 
   const experienceProgress = useMemo(() => {
-    const progress =
-      hireability.experience.max > 0
-        ? (hireability.experience.score / hireability.experience.max) * 100
-        : 0;
-    console.log("experienceProgress calculated:", progress);
-    return progress;
+    return hireability.experience.max > 0
+      ? (hireability.experience.score / hireability.experience.max) * 100
+      : 0;
   }, [hireability.experience]);
 
   const circleOffset = useMemo(() => {
     const CIRCUMFERENCE = 452.4;
     const MAX_SCORE = 1000;
-
-    const offset =
-      CIRCUMFERENCE - (CIRCUMFERENCE * hireability.totalScore) / MAX_SCORE;
-    console.log(
-      "circleOffset calculated:",
-      offset,
-      "totalScore:",
-      hireability.totalScore,
-    );
-    return offset;
+    return CIRCUMFERENCE - (CIRCUMFERENCE * hireability.totalScore) / MAX_SCORE;
   }, [hireability.totalScore]);
 
   /* ==================== UI ==================== */
   return (
-    // <DefaultPageLayout>
     <>
       <ToastContainer position="top-center" autoClose={3000} />
       <div
@@ -760,288 +755,292 @@ export default function Dashboard() {
           <Navbar />
         </div>
 
-        {/* Main Content - Flex grow to push footer down */}
+        {/* Main Content */}
         <div className="flex-grow max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mt-10 mb-10">
           <div className="flex flex-col gap-8 lg:flex-row">
             {/* --- LEFT SIDEBAR --- */}
             <div className="flex w-full flex-col gap-6 lg:w-[340px] lg:flex-none">
-  <Card
-    className="w-full rounded-[2rem] shadow-sm"
-    style={{
-      backgroundColor: colors.white,
-      border: `1.5px solid ${colors.primaryGlow}`,
-    }}
-  >
-    <CardContent className="p-6">
-      {/* Header with Avatar and User Info */}
-      <div className="flex items-start gap-4 mb-6">
-        {/* Avatar Section */}
-        <div
-          className="relative cursor-pointer group flex-shrink-0"
-          onClick={() => {
-            console.log("Avatar clicked, triggering file input");
-            fileRef.current?.click();
-          }}
-        >
-          <Avatar
-            size="x-large"
-            image={avatar}
-            style={{ boxShadow: `0 0 0 4px ${colors.primaryGlow}` }}
-            className="rounded-xl w-16 h-16"
-          >
-            PP
-          </Avatar>
-
-          <div className="absolute inset-0 rounded-xl bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
-            <span className="text-white text-xs font-bold uppercase">
-              Change
-            </span>
-          </div>
-
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*"
-            onChange={handleAvatarChange}
-            className="hidden"
-          />
-        </div>
-
-        {/* User Name and Location */}
-        <div className="flex-1">
-          <h2
-            className="text-xl font-semibold"
-            style={{ color: colors.accent }}
-          >
-            {user.name}
-          </h2>
-          <div className="flex items-center gap-2 mt-1">
-            <span
-              className="text-sm"
-              style={{ color: colors.secondary }}
-            >
-              {user.domain}
-            </span>
-            <span
-              className="text-xs"
-              style={{ color: colors.neutral[400] }}
-            >
-              {user.location}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Resume Content - NO SCROLL */}
-      <div className="space-y-6 mb-6">
-        {/* Experience */}
-        <div className="space-y-4">
-          <p
-            className="text-[10px] font-black uppercase tracking-widest"
-            style={{ color: colors.accent }}
-          >
-            Experience
-          </p>
-
-          <div
-            className="space-y-4 border-l-2 ml-1"
-            style={{ borderColor: colors.accent }}
-          >
-            {workExperience?.slice(0, 2).map((exp, i) => (
-              <div key={i} className="pl-4 relative">
-                <div
-                  className="absolute w-2 h-2 rounded-full -left-[5px] top-1 ring-2 ring-white"
-                  style={{ backgroundColor: colors.accent }}
-                />
-
-                <h4
-                  className="text-xs leading-tight"
-                  style={{ color: colors.accent }}
-                >
-                  {exp.jobTitle}
-                </h4>
-
-                <p
-                  className="text-[10px]"
-                  style={{ color: colors.accent }}
-                >
-                  {exp.companyName}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Projects */}
-        <div className="space-y-3">
-          <p
-            className="text-[10px] font-black uppercase tracking-widest"
-            style={{ color: colors.accent }}
-          >
-            Projects
-          </p>
-
-          {projects?.slice(0, 2).map((proj, i) => (
-            <div
-              key={i}
-              className="relative pl-4 pr-3 py-3 rounded-xl border transition hover:shadow-md"
-              style={{
-                backgroundColor: colors.background,
-              }}
-            >
-              <span
-                className="absolute left-0 top-3 bottom-3 w-1 rounded-full"
-                style={{ backgroundColor: colors.accent }}
+              {/* Experience Badge - New */}
+              <ExperienceBadge
+                years={experienceInfo.years}
+                cohort={experienceInfo.cohort}
               />
 
-              <span
-                className="text-[9px] mb-1 inline-block"
-                style={{ color: colors.accent }}
-              >
-                Project {i + 1}
-              </span>
-
-              <h4
-                className="text-[12px] font-bold leading-tight truncate"
-                style={{ color: colors.primary }}
-              >
-                {proj.title}
-              </h4>
-
-              <p
-                className="text-[10px] mt-1 leading-snug line-clamp-2"
-                style={{ color: colors.secondary }}
-              >
-                {proj.summary}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* Certifications */}
-        <div className="space-y-3">
-          <p
-            className="text-[10px] font-black uppercase tracking-widest"
-            style={{ color: colors.accent }}
-          >
-            Certifications
-          </p>
-
-          {certifications?.slice(0, 2).map((cert, i) => (
-            <div
-              key={i}
-              className="flex items-start gap-3 p-3 rounded-xl border shadow-sm"
-              style={{
-                backgroundColor: colors.background,
-              }}
-            >
-              <div className="mt-0.5">
-                <FeatherAward
-                  className="w-4 h-4"
-                  style={{ color: colors.accent }}
-                />
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <p
-                  className="text-[11px] truncate"
-                  style={{ color: colors.primary }}
-                >
-                  {cert.name}
-                </p>
-
-                <p
-                  className="text-[9px] mt-0.5 truncate"
-                  style={{ color: colors.secondary }}
-                >
-                  Issued by {cert.issuedBy}
-                </p>
-              </div>
-
-              <p
-                className="text-[10px] whitespace-nowrap"
-                style={{ color: colors.primary }}
-              >
-                {cert.issueYear}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* Education */}
-        <div className="space-y-3 pt-2">
-          <div className="flex items-center justify-between">
-            <p
-              className="text-[10px] font-black uppercase tracking-widest"
-              style={{ color: colors.accent }}
-            >
-              Education
-            </p>
-
-            <div className="flex gap-1">
-              {certifications?.slice(0, 3).map((_, i) => (
-                <FeatherCheckCircle
-                  key={i}
-                  className="w-3 h-3 text-green-500"
-                />
-              ))}
-            </div>
-          </div>
-
-          {education?.map((edu, i) => (
-            <div key={i} className="text-[11px] space-y-0.5">
-              <p className="text-neutral-800 leading-tight">
-                {edu.schoolName}
-              </p>
-              <p className="text-neutral-500">{edu.degree}</p>
-              <p className="text-[10px] text-neutral-400 whitespace-nowrap">
-                {edu.startYear}
-                {edu.endYear ? ` – ${edu.endYear}` : " – Present"}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* Skills */}
-        <div className="space-y-2">
-          <p
-            className="text-[10px] font-black uppercase tracking-widest"
-            style={{ color: colors.accent }}
-          >
-            Skills
-          </p>
-
-          <div className="flex flex-wrap gap-1.5">
-            {skills?.slice(0, 6).map((skill, i) => (
-              <span
-                key={i}
-                className="px-2 py-1 border rounded-md text-[9px] uppercase"
+              <Card
+                className="w-full rounded-[2rem] shadow-sm"
                 style={{
-                  backgroundColor: colors.background,
-                  color: colors.accent,
+                  backgroundColor: colors.white,
+                  border: `1.5px solid ${colors.primaryGlow}`,
                 }}
               >
-                {typeof skill === "string" ? skill : skill.name}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
+                <CardContent className="p-6">
+                  {/* Header with Avatar and User Info */}
+                  <div className="flex items-start gap-4 mb-6">
+                    <div
+                      className="relative cursor-pointer group flex-shrink-0"
+                      onClick={() => fileRef.current?.click()}
+                    >
+                      <Avatar
+                        size="x-large"
+                        image={avatar}
+                        style={{ boxShadow: `0 0 0 4px ${colors.primaryGlow}` }}
+                        className="rounded-xl w-16 h-16"
+                      >
+                        PP
+                      </Avatar>
 
-      {/* Edit Button */}
-      <Button
-        onClick={() => {
-          console.log("Edit Profile button clicked");
-          navigate("/profile");
-        }}
-        style={{ backgroundColor: colors.primary }}
-        className="w-full"
-      >
-        Edit Profile
-      </Button>
-    </CardContent>
-  </Card>
-</div>
+                      <div className="absolute inset-0 rounded-xl bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+                        <span className="text-white text-xs font-bold uppercase">
+                          Change
+                        </span>
+                      </div>
+
+                      <input
+                        ref={fileRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleAvatarChange}
+                        className="hidden"
+                      />
+                    </div>
+
+                    <div className="flex-1">
+                      <h2
+                        className="text-xl font-semibold"
+                        style={{ color: colors.accent }}
+                      >
+                        {user.name}
+                      </h2>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span
+                          className="text-sm"
+                          style={{ color: colors.secondary }}
+                        >
+                          {user.domain}
+                        </span>
+                        <span
+                          className="text-xs"
+                          style={{ color: colors.neutral[400] }}
+                        >
+                          {user.location}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Resume Content */}
+                  <div
+                    className="space-y-6 max-h-[500px] overflow-y-auto pr-2 scrollbar-hide mb-6"
+                    style={{
+                      scrollbarWidth: "none",
+                      msOverflowStyle: "none",
+                    }}
+                  >
+                    {/* Experience */}
+                    <div className="space-y-4">
+                      <p
+                        className="text-[10px] font-black uppercase tracking-widest"
+                        style={{ color: colors.accent }}
+                      >
+                        Experience
+                      </p>
+
+                      <div
+                        className="space-y-4 border-l-2 ml-1"
+                        style={{ borderColor: colors.accent }}
+                      >
+                        {workExperience?.slice(0, 2).map((exp, i) => (
+                          <div key={i} className="pl-4 relative">
+                            <div
+                              className="absolute w-2 h-2 rounded-full -left-[5px] top-1 ring-2 ring-white"
+                              style={{ backgroundColor: colors.accent }}
+                            />
+
+                            <h4
+                              className="text-xs leading-tight"
+                              style={{ color: colors.accent }}
+                            >
+                              {exp.jobTitle}
+                            </h4>
+
+                            <p
+                              className="text-[10px]"
+                              style={{ color: colors.accent }}
+                            >
+                              {exp.companyName}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Projects */}
+                    <div className="space-y-3">
+                      <p
+                        className="text-[10px] font-black uppercase tracking-widest"
+                        style={{ color: colors.accent }}
+                      >
+                        Projects
+                      </p>
+
+                      {projects?.slice(0, 2).map((proj, i) => (
+                        <div
+                          key={i}
+                          className="relative pl-4 pr-3 py-3 rounded-xl border transition hover:shadow-md"
+                          style={{
+                            backgroundColor: colors.background,
+                          }}
+                        >
+                          <span
+                            className="absolute left-0 top-3 bottom-3 w-1 rounded-full"
+                            style={{ backgroundColor: colors.accent }}
+                          />
+
+                          <span
+                            className="text-[9px] mb-1 inline-block"
+                            style={{ color: colors.accent }}
+                          >
+                            Project {i + 1}
+                          </span>
+
+                          <h4
+                            className="text-[12px] font-bold leading-tight truncate"
+                            style={{ color: colors.primary }}
+                          >
+                            {proj.title}
+                          </h4>
+
+                          <p
+                            className="text-[10px] mt-1 leading-snug line-clamp-2"
+                            style={{ color: colors.secondary }}
+                          >
+                            {proj.summary}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Certifications */}
+                    <div className="space-y-3">
+                      <p
+                        className="text-[10px] font-black uppercase tracking-widest"
+                        style={{ color: colors.accent }}
+                      >
+                        Certifications
+                      </p>
+
+                      {certifications?.slice(0, 2).map((cert, i) => (
+                        <div
+                          key={i}
+                          className="flex items-start gap-3 p-3 rounded-xl border shadow-sm"
+                          style={{
+                            backgroundColor: colors.background,
+                          }}
+                        >
+                          <div className="mt-0.5">
+                            <FeatherAward
+                              className="w-4 h-4"
+                              style={{ color: colors.accent }}
+                            />
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <p
+                              className="text-[11px] truncate"
+                              style={{ color: colors.primary }}
+                            >
+                              {cert.name}
+                            </p>
+
+                            <p
+                              className="text-[9px] mt-0.5 truncate"
+                              style={{ color: colors.secondary }}
+                            >
+                              Issued by {cert.issuedBy}
+                            </p>
+                          </div>
+
+                          <p
+                            className="text-[10px] whitespace-nowrap"
+                            style={{ color: colors.primary }}
+                          >
+                            {cert.issueYear}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Education */}
+                    <div className="space-y-3 pt-2">
+                      <div className="flex items-center justify-between">
+                        <p
+                          className="text-[10px] font-black uppercase tracking-widest"
+                          style={{ color: colors.accent }}
+                        >
+                          Education
+                        </p>
+
+                        <div className="flex gap-1">
+                          {certifications?.slice(0, 3).map((_, i) => (
+                            <FeatherCheckCircle
+                              key={i}
+                              className="w-3 h-3 text-green-500"
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      {education?.map((edu, i) => (
+                        <div key={i} className="text-[11px] space-y-0.5">
+                          <p className="text-neutral-800 leading-tight">
+                            {edu.schoolName}
+                          </p>
+                          <p className="text-neutral-500">{edu.degree}</p>
+                          <p className="text-[10px] text-neutral-400 whitespace-nowrap">
+                            {edu.startYear}
+                            {edu.endYear ? ` – ${edu.endYear}` : " – Present"}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Skills */}
+                    <div className="space-y-2">
+                      <p
+                        className="text-[10px] font-black uppercase tracking-widest"
+                        style={{ color: colors.accent }}
+                      >
+                        Skills
+                      </p>
+
+                      <div className="flex flex-wrap gap-1.5">
+                        {skills?.slice(0, 6).map((skill, i) => (
+                          <span
+                            key={i}
+                            className="px-2 py-1 border rounded-md text-[9px] uppercase"
+                            style={{
+                              backgroundColor: colors.background,
+                              color: colors.accent,
+                            }}
+                          >
+                            {typeof skill === "string" ? skill : skill.name}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Edit Button */}
+                  <Button
+                    onClick={() => navigate("/profile")}
+                    style={{ backgroundColor: colors.primary }}
+                    className="w-full"
+                  >
+                    Edit Profile
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
 
             {/* --- CENTER DASHBOARD --- */}
             <div className="flex w-full flex-col gap-8 lg:max-w-[800px]">
@@ -1075,61 +1074,54 @@ export default function Dashboard() {
                     icon: "/university.svg",
                     theme: colors.accent,
                   },
-                ].map((rank, i) => {
-                  console.log(
-                    `Rendering rank card ${i}:`,
-                    rank.label,
-                    rank.val,
-                  );
-                  return (
-                    <Card
-                      key={i}
-                      className="rounded-3xl shadow-sm border"
-                      style={{
-                        backgroundColor: colors.white,
-                        border: `1.5px solid ${colors.primaryGlow}`,
-                      }}
-                    >
-                      <CardContent className="flex flex-col items-center gap-2 p-6 text-center">
-                        <div className="h-10 w-10 flex items-center justify-center rounded-full">
-                          {typeof rank.icon === "string" ? (
-                            <img
-                              src={rank.icon}
-                              alt={rank.label}
-                              className="h-7 w-7 object-contain"
-                            />
-                          ) : (
-                            rank.icon
-                          )}
-                        </div>
+                ].map((rank, i) => (
+                  <Card
+                    key={i}
+                    className="rounded-3xl shadow-sm border"
+                    style={{
+                      backgroundColor: colors.white,
+                      border: `1.5px solid ${colors.primaryGlow}`,
+                    }}
+                  >
+                    <CardContent className="flex flex-col items-center gap-2 p-6 text-center">
+                      <div className="h-10 w-10 flex items-center justify-center rounded-full">
+                        {typeof rank.icon === "string" ? (
+                          <img
+                            src={rank.icon}
+                            alt={rank.label}
+                            className="h-7 w-7 object-contain"
+                          />
+                        ) : (
+                          rank.icon
+                        )}
+                      </div>
 
-                        <span
-                          style={{ color: "black" }}
-                          className="text-[10px] uppercase tracking-widest"
-                        >
-                          {rank.label}
-                        </span>
+                      <span
+                        style={{ color: "black" }}
+                        className="text-[10px] uppercase tracking-widest"
+                      >
+                        {rank.label}
+                      </span>
 
-                        <span
-                          className="text-3xl font-black"
-                          style={{ color: rank.theme }}
-                        >
-                          {rank.val.rank}
-                        </span>
+                      <span
+                        className="text-3xl font-black"
+                        style={{ color: rank.theme }}
+                      >
+                        {rank.val.rank}
+                      </span>
 
-                        <Badge
-                          className="border-none text-[10px]"
-                          style={{
-                            backgroundColor: colors.background,
-                            color: colors.accent,
-                          }}
-                        >
-                          Top {rank.pct}%
-                        </Badge>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+                      <Badge
+                        className="border-none text-[10px]"
+                        style={{
+                          backgroundColor: colors.background,
+                          color: colors.accent,
+                        }}
+                      >
+                        Top {rank.pct}%
+                      </Badge>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
 
               <Card
@@ -1182,7 +1174,6 @@ export default function Dashboard() {
 
                     {/* Right Side Content */}
                     <div className="flex-1 space-y-6">
-                      {/* Header */}
                       <div className="flex items-center justify-between gap-3">
                         <h3
                           className="text-lg sm:text-xl font-bold"
@@ -1205,9 +1196,7 @@ export default function Dashboard() {
                         </div>
                       </div>
 
-                      {/* Skill + Experience Bars */}
                       <div className="grid grid-cols-2 gap-4">
-                        {/* Skill */}
                         <div className="space-y-1">
                           <div className="flex justify-between text-[10px] uppercase tracking-widest opacity-70">
                             <span>Skill Index</span>
@@ -1227,7 +1216,6 @@ export default function Dashboard() {
                           </div>
                         </div>
 
-                        {/* Experience */}
                         <div className="space-y-1">
                           <div className="flex justify-between text-[10px] uppercase tracking-widest opacity-70">
                             <span>Experience</span>
@@ -1249,7 +1237,6 @@ export default function Dashboard() {
                         </div>
                       </div>
 
-                      {/* Button */}
                       <Button
                         variant="neutral-primary"
                         className="text-black border-none px-8 rounded-2xl h-12 transition-transform hover:scale-105"
@@ -1266,9 +1253,7 @@ export default function Dashboard() {
               </Card>
 
               <div className="space-y-4">
-                {/* Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 items-start">
-                  {/* Assessment */}
                   <Card
                     style={{ border: `1.5px solid ${colors.primaryGlow}` }}
                     className="border p-3 border-neutral-200 rounded-3xl sm:rounded-[2rem] shadow-sm bg-white transition-all"
@@ -1311,7 +1296,6 @@ export default function Dashboard() {
                     </CardContent>
                   </Card>
 
-                  {/* Case Studies */}
                   <Card
                     style={{ border: `1.5px solid ${colors.primaryGlow}` }}
                     className="border p-3 border-neutral-200 rounded-3xl sm:rounded-[2rem] shadow-sm bg-white transition-all"
@@ -1334,10 +1318,7 @@ export default function Dashboard() {
                         <Button
                           className="w-full sm:w-auto rounded-2xl px-5 sm:px-6"
                           style={{ backgroundColor: colors.secondary }}
-                          onClick={() => {
-                            console.log("Navigate to case assessments");
-                            handleNavigate("/case-assessments");
-                          }}
+                          onClick={() => handleNavigate("/case-assessments")}
                         >
                           Start Now
                         </Button>
@@ -1350,6 +1331,12 @@ export default function Dashboard() {
 
             {/* --- RIGHT SIDEBAR --- */}
             <div className="flex w-full flex-col gap-6 lg:w-[340px] lg:flex-none">
+              {/* New Domain Rankings Card */}
+              <DomainRankingsCard
+                domains={domains}
+                primaryDomain={primaryDomain}
+              />
+
               <Card
                 style={{ border: `1.5px solid ${colors.primaryGlow}` }}
                 className="bg-white rounded-[2rem] border shadow-sm"
@@ -1403,7 +1390,6 @@ export default function Dashboard() {
                                 : colors.background,
                             }}
                           >
-                            {/* Rank */}
                             <div
                               className="w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black"
                               style={{
@@ -1414,7 +1400,6 @@ export default function Dashboard() {
                               #{index + 1}
                             </div>
 
-                            {/* Name + Score */}
                             <div className="flex-1 min-w-0">
                               <p
                                 className="text-xs truncate font-semibold"
@@ -1533,13 +1518,13 @@ export default function Dashboard() {
                   </div>
                 </CardContent>
               </Card>
+
               <Card
                 style={{ border: `1.5px solid ${colors.primaryGlow}` }}
                 className="bg-white rounded-[2rem] border shadow-sm overflow-hidden"
               >
                 <CardContent className="p-6">
                   <div className="flex flex-col items-center text-center gap-4">
-                    {/* Text Content */}
                     <div className="space-y-2">
                       <h3
                         className="text-lg font-semibold"
@@ -1556,12 +1541,8 @@ export default function Dashboard() {
                       </p>
                     </div>
 
-                    {/* Message Button */}
                     <Button
-                      onClick={() => {
-                        console.log("Navigate to chat");
-                        navigate("/chat");
-                      }}
+                      onClick={() => navigate("/chat")}
                       className="w-full rounded-2xl h-12 transition-transform hover:scale-105 mt-2"
                       style={{
                         backgroundColor: colors.primary,
@@ -1580,10 +1561,8 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Footer - Sticks to bottom */}
         <Footer />
       </div>
     </>
-    // </DefaultPageLayout>
   );
 }
