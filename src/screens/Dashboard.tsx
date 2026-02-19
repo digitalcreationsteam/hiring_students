@@ -139,6 +139,7 @@ const formatLocation = (city?: string, state?: string): string =>
  * Always returns STRING
  */
 const calculatePercentile = (rank?: number): string => {
+  console.log("calculatePercentile called with rank:", rank);
   if (!rank || rank <= 0) return "-";
   if (rank === 1) return "1";
   if (rank <= 5) return "5";
@@ -152,29 +153,35 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const fileRef = useRef<HTMLInputElement>(null);
 
+  console.log("Dashboard component rendering");
+
   /* ==================== STATE ==================== */
 
   const [avatar, setAvatar] = useState<string>(() => {
+    console.log("Initializing avatar state from localStorage");
     try {
       const u = localStorage.getItem("user");
       if (u) {
         const parsed = JSON.parse(u);
+        console.log("User from localStorage:", parsed);
         // normalize stored URL if needed
         const raw = parsed?.profileUrl;
         if (raw) {
           try {
             const origin = BASE_URL.replace(/\/api\/?$/, "");
+            console.log("Avatar origin:", origin);
             if (/^https?:\/\//.test(raw)) return raw;
             if (raw.startsWith("/")) return origin + raw;
             return origin + "/" + raw;
           } catch (e) {
+            console.error("Error normalizing avatar URL:", e);
             return raw || DEFAULT_AVATAR;
           }
         }
         return DEFAULT_AVATAR;
       }
     } catch (e) {
-      // ignore
+      console.error("Error parsing user from localStorage:", e);
     }
     return DEFAULT_AVATAR;
   });
@@ -194,7 +201,9 @@ export default function Dashboard() {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [certifications, setCertifications] = useState<Certification[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
-
+  const [userCity, setUserCity] = useState("");
+  const [userState, setUserState] = useState("");
+  const [userUniversityName, setUserUniversityName] = useState("");
   const [rankData, setRankData] = useState<{
     global: RankItem;
     country: RankItem;
@@ -228,7 +237,8 @@ export default function Dashboard() {
   const [isAssessmentCompleted, setIsAssessmentCompleted] = useState(false);
 
   const [universityLeaderboard, setUniversityLeaderboard] = useState<any[]>([]);
-  const universityName = education?.[0]?.schoolName || "Your University";
+  const universityName =
+    userUniversityName || education?.[0]?.schoolName || "Your University";
 
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
@@ -238,198 +248,86 @@ export default function Dashboard() {
   });
 
   useEffect(() => {
+    console.log("useEffect: Getting current user ID from localStorage");
     const user = localStorage.getItem("user");
     if (user) {
       const parsed = JSON.parse(user);
+      console.log("Current user from localStorage:", parsed);
       setCurrentUserId(parsed?._id || null);
     }
   }, []);
 
   const openChat = () => {
+    console.log("openChat called with userId:", chatUserId);
     if (!chatUserId.trim()) return;
     navigate(`/chat/${chatUserId.trim()}`);
   };
 
   /* ==================== API CALLS ==================== */
 
-  //   const fetchDashboardData = useCallback(async () => {
-  //     try {
-  //       const res = await API("GET", URL_PATH.calculateExperienceIndex);
-
-  //       console.log("fetchDashboardData response:", res);
-  //       if (!res) return;
-
-  //       /* DEMOGRAPHICS */
-  //       const demo = res?.data?.demographics?.[0];
-  //       setUser({
-  //         name: demo?.fullName || "",
-  //         domain: "",
-  //         location: formatLocation(demo?.city, demo?.state),
-  //       });
-
-  //       /* AVATAR */
-  //       const profileFromServer = res?.documents?.profileUrl;
-  //       let normalizedProfile: string | null = null;
-
-  //       if (profileFromServer) {
-  //         const origin = BASE_URL.replace(/\/api\/?$/, "");
-  //         if (/^https?:\/\//.test(profileFromServer))
-  //           normalizedProfile = profileFromServer;
-  //         else if (profileFromServer.startsWith("/"))
-  //           normalizedProfile = origin + profileFromServer;
-  //         else normalizedProfile = origin + "/" + profileFromServer;
-  //       }
-
-  //       setAvatar(normalizedProfile || DEFAULT_AVATAR);
-
-  //       // save in localStorage safely
-  //       try {
-  //         if (normalizedProfile) {
-  //           const u = localStorage.getItem("user");
-  //           const parsed = u ? JSON.parse(u) : {};
-  //           parsed.profileUrl = normalizedProfile;
-  //           localStorage.setItem("user", JSON.stringify(parsed));
-  //         }
-  //       } catch {}
-
-  //       /* RANK */
-  //       const rank = res?.rank;
-  //       setRankData({
-  //         global: {
-  //           rank: rank?.globalRank ?? "-",
-  //           percentile: calculatePercentile(rank?.globalRank),
-  //         },
-  //         country: {
-  //           rank: rank?.countryRank ?? "-",
-  //           percentile: calculatePercentile(rank?.countryRank),
-  //         },
-  //         state: {
-  //           rank: rank?.stateRank ?? "-",
-  //           percentile: calculatePercentile(rank?.stateRank),
-  //         },
-  //         city: {
-  //           rank: rank?.cityRank ?? "-",
-  //           percentile: calculatePercentile(rank?.cityRank),
-  //         },
-  //         university: {
-  //           // ✅ FIX KEY (your response is universityRank, not universityrank)
-  //           rank: rank?.universityRank ?? "-",
-  //           percentile: calculatePercentile(rank?.universityRank),
-  //         },
-  //       });
-
-  //       /* HIREABILITY */
-  //       const hireabilityIndex = res?.hireabilityIndex;
-  //       setHireability({
-  //         totalScore: hireabilityIndex?.hireabilityIndex ?? 0,
-  //         weeklyChange: 0,
-  //         nextRankPoints:
-  //           (hireabilityIndex?.experienceIndexTotal ?? 0) -
-  //           (hireabilityIndex?.experienceIndexScore ?? 0),
-  //         skill: {
-  //           score: hireabilityIndex?.skillIndexScore ?? 0,
-  //           max: hireabilityIndex?.skillIndexTotal ?? 0,
-  //         },
-  //         experience: {
-  //           score: hireabilityIndex?.experienceIndexScore ?? 0,
-  //           max: hireabilityIndex?.experienceIndexTotal ?? 0,
-  //         },
-  //       });
-
-  //       /* LISTS */
-  //       setWorkExperience(res?.data?.workExperience || []);
-  //       setProjects(
-  //         (res?.data?.projects || []).map((p: any) => ({
-  //           title: p.projectName,
-  //           summary: p.summary,
-  //         })),
-  //       );
-  //       setCertifications(
-  //         (res?.data?.certifications || []).map((c: any) => ({
-  //           name: c.certificationName,
-  //           issuedBy: c.issuer,
-  //           issueYear: c.issueDate,
-  //         })),
-  //       );
-  //       setEducation(res?.data?.education || []);
-  //       setSkills((res?.skills?.list || []).map((s: string) => ({ name: s })));
-
-  //       /* JOB DOMAIN */
-  //       setDomain(res?.jobdomain || "");
-
-  //       const educationList = res?.data?.education || [];
-  // setEducation(educationList);
-
-  // /* GET UNIVERSITY NAME */
-  // const userUniversity = educationList?.[0]?.schoolName;
-
-  // if (userUniversity) {
-  //   try {
-  //     const leaderboardRes = await API(
-  //       "GET",
-  //       `${URL_PATH.getStudentsBySchool}?schoolName=${encodeURIComponent(userUniversity)}`
-  //     );
-
-  //     const students = leaderboardRes?.data || [];
-
-  //     setUniversityLeaderboard(students);
-
-  //   } catch (error) {
-  //     console.error("University leaderboard fetch failed:", error);
-  //   }
-  // }
-  //     } catch (err: any) {
-  //       console.error("fetchDashboardData FAILED:", err);
-  //       console.error("message:", err?.message);
-  //       console.error("response:", err?.response?.data);
-
-  //       // fallback - avoid crash
-  //       setAvatar(DEFAULT_AVATAR);
-  //     }
-  //   }, []);
-
   const fetchDashboardData = useCallback(async () => {
+    console.log("fetchDashboardData called");
     try {
+      console.log("Making API call to:", URL_PATH.calculateExperienceIndex);
       const res = await API("GET", URL_PATH.calculateExperienceIndex);
 
       console.log("fetchDashboardData response:", res);
-      if (!res) return;
+      if (!res) {
+        console.warn("No response from API");
+        return;
+      }
 
       /* DEMOGRAPHICS */
       const demo = res?.data?.demographics?.[0];
+      console.log("Demographics data:", demo);
+
       setUser({
         name: demo?.fullName || "",
-        domain: "",
+        domain: res?.jobdomain?.domain || "",
         location: formatLocation(demo?.city, demo?.state),
       });
 
+      console.log("Setting user city/state:", demo?.city, demo?.state);
+      setUserCity(demo?.city || "City");
+      setUserState(demo?.state || "State");
+
       /* AVATAR */
       const profileFromServer = res?.documents?.profileUrl;
+      console.log("Profile from server:", profileFromServer);
       let normalizedProfile: string | null = null;
 
       if (profileFromServer) {
         const origin = BASE_URL.replace(/\/api\/?$/, "");
+        console.log("Origin for avatar:", origin);
         if (/^https?:\/\//.test(profileFromServer))
           normalizedProfile = profileFromServer;
         else if (profileFromServer.startsWith("/"))
           normalizedProfile = origin + profileFromServer;
         else normalizedProfile = origin + "/" + profileFromServer;
+
+        console.log("Normalized profile URL:", normalizedProfile);
       }
 
       setAvatar(normalizedProfile || DEFAULT_AVATAR);
 
+      // save in localStorage safely
       try {
         if (normalizedProfile) {
           const u = localStorage.getItem("user");
           const parsed = u ? JSON.parse(u) : {};
           parsed.profileUrl = normalizedProfile;
           localStorage.setItem("user", JSON.stringify(parsed));
+          console.log("Saved normalized profile to localStorage");
         }
-      } catch {}
+      } catch (e) {
+        console.error("Error saving to localStorage:", e);
+      }
 
       /* RANK */
       const rank = res?.rank;
-      setRankData({
+      console.log("Rank data from API:", rank);
+
+      const newRankData = {
         global: {
           rank: rank?.globalRank ?? "-",
           percentile: calculatePercentile(rank?.globalRank),
@@ -450,11 +348,16 @@ export default function Dashboard() {
           rank: rank?.universityRank ?? "-",
           percentile: calculatePercentile(rank?.universityRank),
         },
-      });
+      };
+
+      console.log("Setting rankData:", newRankData);
+      setRankData(newRankData);
 
       /* HIREABILITY */
       const hireabilityIndex = res?.hireabilityIndex;
-      setHireability({
+      console.log("Hireability index from API:", hireabilityIndex);
+
+      const newHireability = {
         totalScore: hireabilityIndex?.hireabilityIndex ?? 0,
         weeklyChange: 0,
         nextRankPoints:
@@ -468,38 +371,61 @@ export default function Dashboard() {
           score: hireabilityIndex?.experienceIndexScore ?? 0,
           max: hireabilityIndex?.experienceIndexTotal ?? 0,
         },
-      });
+      };
+
+      console.log("Setting hireability:", newHireability);
+      setHireability(newHireability);
 
       /* LISTS */
-      setWorkExperience(res?.data?.workExperience || []);
-      setProjects(
-        (res?.data?.projects || []).map((p: any) => ({
-          title: p.projectName,
-          summary: p.summary,
-        })),
+      console.log(
+        "Setting work experience:",
+        res?.data?.workExperience?.length || 0,
       );
-      setCertifications(
-        (res?.data?.certifications || []).map((c: any) => ({
+      setWorkExperience(res?.data?.workExperience || []);
+
+      const mappedProjects = (res?.data?.projects || []).map((p: any) => ({
+        title: p.projectName,
+        summary: p.summary,
+      }));
+      console.log("Setting projects:", mappedProjects.length);
+      setProjects(mappedProjects);
+
+      const mappedCertifications = (res?.data?.certifications || []).map(
+        (c: any) => ({
           name: c.certificationName,
           issuedBy: c.issuer,
           issueYear: c.issueDate,
-        })),
+        }),
       );
-      setEducation(res?.data?.education || []);
-      setSkills((res?.skills?.list || []).map((s: string) => ({ name: s })));
+      console.log("Setting certifications:", mappedCertifications.length);
+      setCertifications(mappedCertifications);
 
-      /* JOB DOMAIN */
-      setDomain(res?.jobdomain || "");
-
-      /* EDUCATION */
       const educationList = res?.data?.education || [];
+      console.log("Setting education:", educationList.length);
       setEducation(educationList);
 
-      /* GET UNIVERSITY NAME */
+      const skillsList = (res?.skills?.list || []).map((s: string) => ({
+        name: s,
+      }));
+      console.log("Setting skills:", skillsList.length);
+      setSkills(skillsList);
+
+      /* JOB DOMAIN */
+      const jobDomain = res?.jobdomain?.domain || "Professional";
+      console.log("Setting domain:", jobDomain);
+      setDomain(jobDomain);
+
+      /* UNIVERSITY NAME + LEADERBOARD */
       const userUniversity = educationList?.[0]?.schoolName;
+      console.log("User university:", userUniversity);
 
       if (userUniversity) {
+        // ✅ Set university name so leaderboard title shows it dynamically
+        setUserUniversityName(userUniversity);
+        console.log("userUniversityName set to:", userUniversity);
+
         try {
+          console.log("Fetching university leaderboard for:", userUniversity);
           const leaderboardRes = await API(
             "GET",
             `${URL_PATH.getStudentsBySchool}?schoolName=${encodeURIComponent(
@@ -508,31 +434,45 @@ export default function Dashboard() {
           );
 
           const students = leaderboardRes?.data || [];
+          console.log("University leaderboard students:", students.length);
           setUniversityLeaderboard(students);
         } catch (error) {
           console.error("University leaderboard fetch failed:", error);
         }
+      } else {
+        console.warn(
+          "No university found in education list — skipping leaderboard fetch",
+        );
       }
 
-      /* 🔥 FETCH CASE STUDY ATTEMPTS THIS WEEK */
-      if (demo?.id) {
+      /* FETCH CASE STUDY ATTEMPTS THIS WEEK */
+      const demoId = demo?.id || demo?._id;
+      console.log("demoId for weekly case studies:", demoId);
+
+      if (demoId) {
         try {
+          console.log("Fetching weekly case study attempts for user:", demoId);
           const caseStudyRes = await API(
             "GET",
-            `/api/user-case-attempts/${demo.id}/weekly`, // your API path
+            `/api/user-case-attempts/${demoId}/weekly`,
           );
 
           const weeklyAttempts = caseStudyRes?.totalAttempts ?? 0;
-          const totalCaseStudies = 5; // replace with dynamic if available
+          const totalCaseStudies = 5;
           const pct = Math.round((weeklyAttempts / totalCaseStudies) * 100);
 
-          // Save in state for your card
+          console.log(
+            "Weekly case study attempts:",
+            weeklyAttempts,
+            "percentage:",
+            pct,
+          );
+
           setWeeklyActivity({
             caseStudies: {
               val: `${weeklyAttempts}/${totalCaseStudies}`,
               pct: `${pct}%`,
             },
-            // Add hackathons later if you have API
             hackathons: {
               val: `1/2`,
               pct: `50%`,
@@ -541,28 +481,34 @@ export default function Dashboard() {
         } catch (error) {
           console.error("Weekly case study fetch failed:", error);
         }
+      } else {
+        console.warn("No demoId found — skipping weekly case study fetch");
       }
+
+      console.log("fetchDashboardData complete ✅");
     } catch (err: any) {
       console.error("fetchDashboardData FAILED:", err);
       console.error("message:", err?.message);
       console.error("response:", err?.response?.data);
-
-      // fallback - avoid crash
       setAvatar(DEFAULT_AVATAR);
     }
   }, []);
 
   /* ==================== EFFECTS ==================== */
   useEffect(() => {
+    console.log("useEffect: Checking assessment completion status");
     const completed = localStorage.getItem("assessmentCompleted") === "true";
+    console.log("Assessment completed:", completed);
     setIsAssessmentCompleted(completed);
   }, []);
 
   useEffect(() => {
+    console.log("useEffect: Calling fetchDashboardData");
     fetchDashboardData(); // 👈 ONLY ONE CALL
   }, [fetchDashboardData]);
 
   useEffect(() => {
+    console.log("useEffect: Setting up click outside handler for profile menu");
     const handleClickOutside = (e: MouseEvent) => {
       if (
         profileMenuRef.current &&
@@ -578,22 +524,30 @@ export default function Dashboard() {
 
   /* ==================== HANDLERS ==================== */
   const openMyChat = () => {
+    console.log("openMyChat called");
     const studentId = localStorage.getItem("userId");
     if (!studentId) {
+      console.warn("User ID not found in localStorage");
       toast.error("User ID not found. Please login again.");
       return;
     }
+    console.log("Navigating to chat with studentId:", studentId);
     navigate(`/chat/${studentId}`);
   };
 
   // const handleNavigate = (path: string) => navigate(path);
   const handleNavigate = (path: string) => {
+    console.log("handleNavigate called with path:", path);
     navigate(path, {
       state: { source: "dashboard" },
     });
   };
 
   const handleAssessmentClick = () => {
+    console.log(
+      "handleAssessmentClick called, completed:",
+      isAssessmentCompleted,
+    );
     if (isAssessmentCompleted) {
       toast.success("Assessment already completed");
       return;
@@ -606,13 +560,18 @@ export default function Dashboard() {
 
   // POST API for the profile
   const handleSaveProfile = async () => {
-    if (!selectedAvatarFile) return;
+    console.log("handleSaveProfile called");
+    if (!selectedAvatarFile) {
+      console.warn("No avatar file selected");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("avatar", selectedAvatarFile);
 
     try {
       setIsSavingAvatar(true);
+      console.log("Saving profile with file:", selectedAvatarFile.name);
 
       await API(
         "POST", // or "PUT" based on backend
@@ -621,6 +580,7 @@ export default function Dashboard() {
         // ❌ DO NOT pass headers here
       );
 
+      console.log("Profile saved successfully");
       // Refresh profile image from server (dashboard includes documents.profileUrl)
       await fetchDashboardData();
 
@@ -634,70 +594,26 @@ export default function Dashboard() {
     }
   };
 
-  // const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   console.log("", e);
-  //   const file = e.target.files?.[0];
-  //   if (!file) return;
-
-  //   // Validate file size (e.g., max 5MB)
-  //   if (file.size > 5 * 1024 * 1024) {
-  //     toast.error("File size should be less than 5MB");
-  //     return;
-  //   }
-
-  //   // Validate file type
-  //   const validTypes = ["image/jpeg", "image/png", "image/webp"];
-  //   if (!validTypes.includes(file.type)) {
-  //     toast.error("Please select a valid image (JPEG, PNG, or WebP)");
-  //     return;
-  //   }
-
-  //   // Cleanup old preview
-  //   if (avatar && avatar.startsWith("blob:")) {
-  //     URL.revokeObjectURL(avatar);
-  //   }
-
-  //   // Create preview
-  //   const previewUrl = URL.createObjectURL(file);
-  //   setAvatar(previewUrl);
-
-  //   try {
-  //     setIsSavingAvatar(true);
-
-  //     // Upload to server
-  //     const formData = new FormData();
-  //     formData.append("avatar", file);
-
-  //     await API("POST", URL_PATH.uploadProfile, formData);
-
-  //     // Refresh from server (dashboard includes documents.profileUrl)
-  //     await fetchDashboardData();
-
-  //     // Revoke preview after successful upload
-  //     setTimeout(() => {
-  //       if (previewUrl.startsWith("blob:")) {
-  //         URL.revokeObjectURL(previewUrl);
-  //       }
-  //     }, 1000);
-  //   } catch (error) {
-  //     console.error("Upload failed:", error);
-  //     toast.error("Failed to upload profile picture");
-  //     // Revert to old avatar if available
-  //     // if (user?.avatarUrl) {
-  //     //   setAvatar(user.avatarUrl);
-  //     // }
-  //   } finally {
-  //     setIsSavingAvatar(false);
-  //   }
-  // };
-
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("", e);
+    console.log("handleAvatarChange called with event:", e);
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      console.warn("No file selected");
+      return;
+    }
+
+    console.log(
+      "Selected file:",
+      file.name,
+      "size:",
+      file.size,
+      "type:",
+      file.type,
+    );
 
     // Validate file size (e.g., max 5MB)
     if (file.size > 5 * 1024 * 1024) {
+      console.warn("File size too large:", file.size);
       toast.error("File size should be less than 5MB");
       return;
     }
@@ -705,17 +621,20 @@ export default function Dashboard() {
     // Validate file type
     const validTypes = ["image/jpeg", "image/png", "image/webp"];
     if (!validTypes.includes(file.type)) {
+      console.warn("Invalid file type:", file.type);
       toast.error("Please select a valid image (JPEG, PNG, or WebP)");
       return;
     }
 
     // Cleanup old preview
     if (avatar && avatar.startsWith("blob:")) {
+      console.log("Revoking old blob URL:", avatar);
       URL.revokeObjectURL(avatar);
     }
 
     // Create preview
     const previewUrl = URL.createObjectURL(file);
+    console.log("Created preview URL:", previewUrl);
     setAvatar(previewUrl);
 
     try {
@@ -725,17 +644,21 @@ export default function Dashboard() {
       const formData = new FormData();
       formData.append("avatar", file);
 
+      console.log("Uploading avatar to server");
       await API("POST", URL_PATH.uploadProfile, formData);
 
+      console.log("Avatar uploaded successfully");
       // Refresh from server (dashboard includes documents.profileUrl)
       await fetchDashboardData();
 
       // Dispatch custom event to notify Navbar about avatar update
       window.dispatchEvent(new Event("avatar-updated"));
+      console.log("Dispatched avatar-updated event");
 
       // Revoke preview after successful upload
       setTimeout(() => {
         if (previewUrl.startsWith("blob:")) {
+          console.log("Revoking preview URL after timeout");
           URL.revokeObjectURL(previewUrl);
         }
       }, 1000);
@@ -748,6 +671,7 @@ export default function Dashboard() {
   };
 
   const handleLogout = () => {
+    console.log("handleLogout called");
     clearUserData();
     navigate("/login");
   };
@@ -755,22 +679,36 @@ export default function Dashboard() {
   /* ==================== MEMOS ==================== */
 
   const skillProgress = useMemo(() => {
-    return hireability.skill.max > 0
-      ? (hireability.skill.score / hireability.skill.max) * 100
-      : 0;
+    const progress =
+      hireability.skill.max > 0
+        ? (hireability.skill.score / hireability.skill.max) * 100
+        : 0;
+    console.log("skillProgress calculated:", progress);
+    return progress;
   }, [hireability.skill]);
 
   const experienceProgress = useMemo(() => {
-    return hireability.experience.max > 0
-      ? (hireability.experience.score / hireability.experience.max) * 100
-      : 0;
+    const progress =
+      hireability.experience.max > 0
+        ? (hireability.experience.score / hireability.experience.max) * 100
+        : 0;
+    console.log("experienceProgress calculated:", progress);
+    return progress;
   }, [hireability.experience]);
 
   const circleOffset = useMemo(() => {
     const CIRCUMFERENCE = 452.4;
     const MAX_SCORE = 1000;
 
-    return CIRCUMFERENCE - (CIRCUMFERENCE * hireability.totalScore) / MAX_SCORE;
+    const offset =
+      CIRCUMFERENCE - (CIRCUMFERENCE * hireability.totalScore) / MAX_SCORE;
+    console.log(
+      "circleOffset calculated:",
+      offset,
+      "totalScore:",
+      hireability.totalScore,
+    );
+    return offset;
   }, [hireability.totalScore]);
 
   /* ==================== UI ==================== */
@@ -821,7 +759,10 @@ export default function Dashboard() {
                     {/* Avatar Section */}
                     <div
                       className="relative cursor-pointer group flex-shrink-0"
-                      onClick={() => fileRef.current?.click()}
+                      onClick={() => {
+                        console.log("Avatar clicked, triggering file input");
+                        fileRef.current?.click();
+                      }}
                     >
                       <Avatar
                         size="x-large"
@@ -1076,7 +1017,10 @@ export default function Dashboard() {
 
                   {/* Edit Button */}
                   <Button
-                    onClick={() => navigate("/profile")}
+                    onClick={() => {
+                      console.log("Edit Profile button clicked");
+                      navigate("/profile");
+                    }}
                     style={{ backgroundColor: colors.primary }}
                     className="w-full"
                   >
@@ -1088,7 +1032,7 @@ export default function Dashboard() {
 
             {/* --- CENTER DASHBOARD --- */}
             <div className="flex w-full flex-col gap-8 lg:max-w-[800px]">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {[
                   {
                     label: "Global Rank",
@@ -1098,67 +1042,81 @@ export default function Dashboard() {
                     theme: colors.accent,
                   },
                   {
-                    label: "California",
+                    label: userState || "State",
                     val: rankData.state,
                     pct: rankData.state.percentile,
                     icon: "/state.png",
                     theme: colors.secondary,
                   },
                   {
-                    label: "San Francisco",
+                    label: userCity || "City",
                     val: rankData.city,
                     pct: rankData.city.percentile,
                     icon: "/city.png",
                     theme: colors.primary,
                   },
-                ].map((rank, i) => (
-                  <Card
-                    key={i}
-                    className="rounded-3xl shadow-sm border"
-                    style={{
-                      backgroundColor: colors.white,
-                      border: `1.5px solid ${colors.primaryGlow}`,
-                    }}
-                  >
-                    <CardContent className="flex flex-col items-center gap-2 p-6 text-center">
-                      <div className="h-10 w-10 flex items-center justify-center rounded-full">
-                        {typeof rank.icon === "string" ? (
-                          <img
-                            src={rank.icon}
-                            alt={rank.label}
-                            className="h-7 w-7 object-contain"
-                          />
-                        ) : (
-                          rank.icon
-                        )}
-                      </div>
+                  {
+                    label: userUniversityName || "University",
+                    val: rankData.university,
+                    pct: rankData.university.percentile,
+                    icon: "/university.jpg",
+                    theme: colors.accent,
+                  },
+                ].map((rank, i) => {
+                  console.log(
+                    `Rendering rank card ${i}:`,
+                    rank.label,
+                    rank.val,
+                  );
+                  return (
+                    <Card
+                      key={i}
+                      className="rounded-3xl shadow-sm border"
+                      style={{
+                        backgroundColor: colors.white,
+                        border: `1.5px solid ${colors.primaryGlow}`,
+                      }}
+                    >
+                      <CardContent className="flex flex-col items-center gap-2 p-6 text-center">
+                        <div className="h-10 w-10 flex items-center justify-center rounded-full">
+                          {typeof rank.icon === "string" ? (
+                            <img
+                              src={rank.icon}
+                              alt={rank.label}
+                              className="h-7 w-7 object-contain"
+                            />
+                          ) : (
+                            rank.icon
+                          )}
+                        </div>
 
-                      <span
-                        style={{ color: "black" }}
-                        className="text-[10px] uppercase tracking-widest"
-                      >
-                        {rank.label}
-                      </span>
+                        <span
+                          style={{ color: "black" }}
+                          className="text-[10px] uppercase tracking-widest"
+                        >
+                          {rank.label}
+                        </span>
 
-                      <span
-                        className="text-3xl font-black"
-                        style={{ color: rank.theme }}
-                      >
-                        {rank.val.rank}
-                      </span>
+                        <span
+                          className="text-3xl font-black"
+                          style={{ color: rank.theme }}
+                        >
+                          {rank.val.rank}
+                        </span>
 
-                      <Badge
-                        className="border-none text-[10px]"
-                        style={{
-                          backgroundColor: colors.background,
-                          color: colors.accent,
-                        }}
-                      >
-                        Top {rank.pct}%
-                      </Badge>
-                    </CardContent>
-                  </Card>
-                ))}
+                        <Badge
+                          className="border-none text-[10px]"
+                          style={{
+                            backgroundColor: colors.background,
+                            color: colors.accent,
+                          }}
+                        >
+                          Top {rank.pct}%
+                        </Badge>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
 
               <Card
@@ -1190,9 +1148,7 @@ export default function Dashboard() {
                           strokeWidth="10"
                           fill="transparent"
                           strokeDasharray="452.4"
-                          strokeDashoffset={
-                            452.4 - 452.4 * (hireability.totalScore / 1000)
-                          }
+                          strokeDashoffset={circleOffset}
                           strokeLinecap="round"
                         />
                       </svg>
@@ -1365,7 +1321,10 @@ export default function Dashboard() {
                         <Button
                           className="w-full sm:w-auto rounded-2xl px-5 sm:px-6"
                           style={{ backgroundColor: colors.secondary }}
-                          onClick={() => handleNavigate("/case-assessments")}
+                          onClick={() => {
+                            console.log("Navigate to case assessments");
+                            handleNavigate("/case-assessments");
+                          }}
                         >
                           Start Now
                         </Button>
@@ -1470,67 +1429,6 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              {/* <Card
-                style={{ border: `1.5px solid ${colors.primaryGlow}` }}
-                className="bg-white rounded-[2rem] border shadow-sm"
-              >
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle
-                    className="text-sm font-bold"
-                    style={{ color: colors.accent }}
-                  >
-                    Profile Views
-                  </CardTitle>
-
-                  <Badge
-                    className="border-none text-[10px]"
-                    style={{
-                      backgroundColor: colors.primary,
-                      color: colors.white,
-                    }}
-                  >
-                    15
-                  </Badge>
-                </CardHeader>
-
-                <CardContent className="space-y-3">
-                  {[
-                    {
-                      name: "Sarah Kim",
-                      role: "Google",
-                      img: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=64",
-                    },
-                    {
-                      name: "Michael J.",
-                      role: "Meta",
-                      img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=64",
-                    },
-                  ].map((viewer, idx) => (
-                    <div key={idx} className="flex items-center gap-3">
-                      <Avatar
-                        size="small"
-                        image={viewer.img}
-                        style={{ boxShadow: `0 0 0 2px ${colors.cream}` }}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p
-                          className="text-xs truncate"
-                          style={{ color: colors.accent }}
-                        >
-                          {viewer.name}
-                        </p>
-                        <p
-                          className="text-[10px] truncate opacity-60"
-                          style={{ color: colors.accent }}
-                        >
-                          {viewer.role}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card> */}
-
               <Card
                 style={{ border: `1.5px solid ${colors.primaryGlow}` }}
                 className="bg-white rounded-[2rem] border shadow-sm"
@@ -1628,19 +1526,6 @@ export default function Dashboard() {
               >
                 <CardContent className="p-6">
                   <div className="flex flex-col items-center text-center gap-4">
-                    {/* Chat Icon */}
-                    {/* <div
-                      className="w-16 h-16 rounded-full flex items-center justify-center"
-                      style={{
-                        backgroundColor: colors.background2,
-                      }}
-                    >
-                      <FeatherUser2
-                        className="w-8 h-8"
-                        style={{ color: colors.primary }}
-                      />
-                    </div> */}
-
                     {/* Text Content */}
                     <div className="space-y-2">
                       <h3
@@ -1660,7 +1545,10 @@ export default function Dashboard() {
 
                     {/* Message Button */}
                     <Button
-                      onClick={() => navigate("/chat")}
+                      onClick={() => {
+                        console.log("Navigate to chat");
+                        navigate("/chat");
+                      }}
                       className="w-full rounded-2xl h-12 transition-transform hover:scale-105 mt-2"
                       style={{
                         backgroundColor: colors.primary,

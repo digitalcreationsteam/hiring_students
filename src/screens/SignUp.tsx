@@ -13,7 +13,6 @@ import { colors } from "src/common/Colors";
 import Navbar from "src/ui/components/Navbar";
 import Footer from "../ui/components/Footer";
 
-
 function SignUp() {
   const navigate = useNavigate();
 
@@ -24,15 +23,14 @@ function SignUp() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-const checkEmailVerification = async () => {
-  try {
-    const res = await API("GET", "/auth/verification-status");
-    return res?.isVerified;
-  } catch {
-    return false;
-  }
-};
-
+  const checkEmailVerification = async () => {
+    try {
+      const res = await API("GET", "/auth/verification-status");
+      return res?.isVerified;
+    } catch {
+      return false;
+    }
+  };
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -50,58 +48,57 @@ const checkEmailVerification = async () => {
     return true;
   };
 
-const handleSubmit = async (e: any) => {
-  e.preventDefault();
-  if (loading) return;
-  if (!validate()) return;
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    if (loading) return;
+    if (!validate()) return;
 
-  setLoading(true);
-  setError("");
+    setLoading(true);
+    setError("");
 
-  const formData = { email, firstname, lastname, password };
+    const formData = { email, firstname, lastname, password };
 
-  try {
-    const res = await API("POST", URL_PATH.signup, formData);
+    try {
+      const res = await API("POST", URL_PATH.signup, formData);
 
-    if (res?.success) {
-      // ✅ store token
-      localStorage.setItem("token", res.token);
-      localStorage.setItem("signupEmail", email);
+      if (res?.success) {
+        // ✅ store token
+        localStorage.setItem("token", res.token);
+        localStorage.setItem("signupEmail", email);
 
-      // Redirect immediately to verify-email page
-      navigate("/verify-email");
+        // Redirect immediately to verify-email page
+        navigate("/verify-email");
+      }
+    } catch (err: any) {
+      setError(err?.message || "Unable to create account. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  } catch (err: any) {
-    setError(err?.message || "Unable to create account. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
+  // // ✅ Polling helper function
+  // const pollEmailVerification = async (interval: number, timeout: number) => {
+  //   const start = Date.now();
 
-// // ✅ Polling helper function
-// const pollEmailVerification = async (interval: number, timeout: number) => {
-//   const start = Date.now();
-
-//   return new Promise<boolean>(async (resolve) => {
-//     const check = async () => {
-//       try {
-//         const verified = await checkEmailVerification();
-//         if (verified) return resolve(true);
-//         if (Date.now() - start > timeout) return resolve(false); // stop after timeout
-//         setTimeout(check, interval); // try again after interval
-//       } catch {
-//         if (Date.now() - start > timeout) return resolve(false);
-//         setTimeout(check, interval);
-//       }
-//     };
-//     check();
-//   });
-// };
-
+  //   return new Promise<boolean>(async (resolve) => {
+  //     const check = async () => {
+  //       try {
+  //         const verified = await checkEmailVerification();
+  //         if (verified) return resolve(true);
+  //         if (Date.now() - start > timeout) return resolve(false); // stop after timeout
+  //         setTimeout(check, interval); // try again after interval
+  //       } catch {
+  //         if (Date.now() - start > timeout) return resolve(false);
+  //         setTimeout(check, interval);
+  //       }
+  //     };
+  //     check();
+  //   });
+  // };
 
   const handleOAuth = (provider: any) => {
-    const baseURL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+    const baseURL =
+      process.env.REACT_APP_API_URL || "http://localhost:5000/api";
     if (provider === "google") {
       window.location.href = `${baseURL}/auth/google`;
     }
@@ -110,230 +107,247 @@ const handleSubmit = async (e: any) => {
     }
   };
 
+  return (
+    <>
+      {/* <Navbar /> */}
 
-
-return (
-  <>
-  <Navbar />
-
-  <div className="min-h-screen w-full flex items-center justify-center px-4 relative">
-
-   {/* 🎨 Linear gradient background - fixed behind everything */}
-    <div 
-      className="pointer-events-none fixed inset-0 -z-10"
-      style={{
-        background: `linear-gradient(
+      <div className="min-h-screen w-full flex items-center justify-center px-4 relative">
+        {/* 🎨 Linear gradient background - fixed behind everything */}
+        <div
+          className="pointer-events-none fixed inset-0 -z-10"
+          style={{
+            background: `linear-gradient(
           to bottom,
           #d9d9d9 0%,
           #cfd3d6 25%,
           #9aa6b2 55%,
           #2E4056 100%
         )`,
-        width: "100%",
-      }}
-    />
-    
-      <div className="w-full max-w-[870px] rounded-xl border border-neutral-border bg-white shadow-md overflow-hidden">
-        <div className="flex flex-col lg:flex-row w-full relative">
-          {/* LEFT */}
-          <div className="lg:w-[64%] bg-neutral-50 px-6 py-8 flex flex-col justify-between hidden lg:flex">
-            <div className="flex flex-col gap-4">
-              <img
-                className="h-8 w-40 object-contain"
-                src="/hiringLogo2.png"
-                alt="logo"
-              />
-              <h1 className="text-3xl leading-snug inter-font-family">
-                Everything you need to find your next role
-              </h1>
-            </div>
+            width: "100%",
+          }}
+        />
 
-            <div className="flex flex-col gap-4">
-              <div className="w-full h-[1px] bg-gray-400 my-4 flex-shrink-0" />
+        <div className="w-full max-w-[870px] rounded-xl border border-neutral-border bg-white shadow-md overflow-hidden">
+          <div className="flex flex-col lg:flex-row w-full relative">
+            {/* LEFT */}
+            <div className="lg:w-[64%] bg-neutral-50 px-6 py-8 flex flex-col justify-between hidden lg:flex">
+              <div className="flex flex-col gap-4">
+                <img
+                  className="h-8 w-40 object-contain"
+                  src="/hiringLogo2.png"
+                  alt="logo"
+                />
+                <h1 className="text-3xl leading-snug inter-font-family">
+                  Everything you need to find your next role
+                </h1>
+              </div>
 
               <div className="flex flex-col gap-4">
-                <div className="flex items-start gap-3">
-                  <div style={{backgroundColor: colors.primary, color: colors.white}} className="flex items-center justify-center w-8 h-8 rounded-full">
-                    <FeatherCheckCircle className="" />
-                  </div>
-                  <div>
-                    <p className="text-gray-900 text-sm">Verify your skills</p>
-                    <p className="text-xs text-gray-500">
-                      Complete assessments to earn capability scores that
-                      employers trust
-                    </p>
-                  </div>
-                </div>
+                <div className="w-full h-[1px] bg-gray-400 my-4 flex-shrink-0" />
 
-                <div className="flex items-start gap-3">
-                  <div style={{backgroundColor: colors.primary, color: colors.white}}  className="flex items-center justify-center w-8 h-8 rounded-full">
-                    <FeatherBriefcase className="" />
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-start gap-3">
+                    <div
+                      style={{
+                        backgroundColor: colors.primary,
+                        color: colors.white,
+                      }}
+                      className="flex items-center justify-center w-8 h-8 rounded-full"
+                    >
+                      <FeatherCheckCircle className="" />
+                    </div>
+                    <div>
+                      <p className="text-gray-900 text-sm">
+                        Verify your skills
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Complete assessments to earn capability scores that
+                        employers trust
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-gray-900 text-sm">
-                      Discover matched roles
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      Get personalized job recommendations based on your
-                      verified abilities
-                    </p>
-                  </div>
-                </div>
 
-                <div className="flex items-start gap-3">
-                  <div style={{backgroundColor: colors.primary, color: colors.white}}  className="flex items-center justify-center w-8 h-8 rounded-full">
-                    <FeatherMessageSquare className="" />
+                  <div className="flex items-start gap-3">
+                    <div
+                      style={{
+                        backgroundColor: colors.primary,
+                        color: colors.white,
+                      }}
+                      className="flex items-center justify-center w-8 h-8 rounded-full"
+                    >
+                      <FeatherBriefcase className="" />
+                    </div>
+                    <div>
+                      <p className="text-gray-900 text-sm">
+                        Discover matched roles
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Get personalized job recommendations based on your
+                        verified abilities
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-gray-900 text-sm">
-                      Connect with employers
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      Receive direct messages from companies looking for your
-                      expertise
-                    </p>
+
+                  <div className="flex items-start gap-3">
+                    <div
+                      style={{
+                        backgroundColor: colors.primary,
+                        color: colors.white,
+                      }}
+                      className="flex items-center justify-center w-8 h-8 rounded-full"
+                    >
+                      <FeatherMessageSquare className="" />
+                    </div>
+                    <div>
+                      <p className="text-gray-900 text-sm">
+                        Connect with employers
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Receive direct messages from companies looking for your
+                        expertise
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* VERTICAL LINE */}
-          <div className="hidden lg:block w-[1px] bg-gray-300" />
+            {/* VERTICAL LINE */}
+            <div className="hidden lg:block w-[1px] bg-gray-300" />
 
-          {/* RIGHT */}
-          <div className="w-full lg:w-1/2 px-6 py-8 flex flex-col gap-4 bg-white min-h-[620px] overflow-y-auto">
-            <div>
-              <h2 className="text-[22px]">Create your account</h2>
-              <p className="text-xs text-subtext-color">
-                Discover opportunities matched to your verified skills
-              </p>
-            </div>
-
-            <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
-
-            <div className="flex flex-col gap-2">
-              <OAuthSocialButton
-                className="w-full h-9 border border-gray-400 rounded-full flex items-center justify-center gap-2 hover:bg-gray-100"
-                logo="https://res.cloudinary.com/subframe/image/upload/v1711417516/shared/z0i3zyjjqkobzuaecgno.svg"
-                onClick={() => handleOAuth("google")}
-                aria-label="Sign up with Google"
-              >
-                Sign up with Google
-              </OAuthSocialButton>
-
-              <OAuthSocialButton
-                className="w-full h-9 mt-2 border border-gray-400 rounded-full flex items-center justify-center gap-2 hover:bg-gray-100"
-                logo="https://res.cloudinary.com/subframe/image/upload/v1763187518/uploads/27890/y6jwljmmuzopthb00ld5.png"
-                onClick={() => handleOAuth("linkedin")}
-                aria-label="Sign up with LinkedIn"
-              >
-                Sign up with LinkedIn
-              </OAuthSocialButton>
-            </div>
-
-            <div className="flex items-center w-full my-4">
-              <div className="flex-1 h-[1px] bg-gray-300" />
-              <span className="px-2 text-xs text-gray-500 whitespace-nowrap">
-                or continue with email
-              </span>
-              <div className="flex-1 h-[1px] bg-gray-300" />
-            </div>
-
-            <form
-              className="flex flex-col gap-3 text-sm"
-              onSubmit={handleSubmit}
-              noValidate
-            >
-              {/* Email */}
+            {/* RIGHT */}
+            <div className="w-full lg:w-1/2 px-6 py-8 flex flex-col gap-4 bg-white min-h-[620px] overflow-y-auto">
               <div>
-                <label
-                  htmlFor="signup-email"
-                  className="mb-1 block text-xs text-neutral-700"
-                >
-                  Email address
-                </label>
-                <input
-                  id="signup-email"
-                  type="email"
-                  placeholder="hello@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="h-8 w-full rounded-full border border-gray-400 px-3 outline-none focus:border-black"
-                  aria-required="true"
-                />
-              </div>
-
-              {/* First + Last name */}
-              <div className="flex gap-2">
-                <div className="w-1/2">
-                  <label
-                    htmlFor="signup-first"
-                    className="mb-1 block text-xs text-neutral-700"
-                  >
-                    First name
-                  </label>
-                  <input
-                    id="signup-first"
-                    placeholder="Alex"
-                    value={firstname}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    className="h-8 w-full rounded-full border border-gray-400 px-3 outline-none focus:border-black"
-                    aria-required="true"
-                  />
-                </div>
-
-                <div className="w-1/2">
-                  <label
-                    htmlFor="signup-last"
-                    className="mb-1 block text-xs text-neutral-700"
-                  >
-                    Last name
-                  </label>
-                  <input
-                    id="signup-last"
-                    placeholder="Rivera"
-                    value={lastname}
-                    onChange={(e) => setLastName(e.target.value)}
-                    className="h-8 w-full rounded-full border border-gray-400 px-3 outline-none focus:border-black"
-                    aria-required="true"
-                  />
-                </div>
-              </div>
-
-              {/* Password */}
-              <div>
-                <label
-                  htmlFor="signup-password"
-                  className="mb-1 block text-xs  text-neutral-700"
-                >
-                  Password
-                </label>
-                <input
-                  id="signup-password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="h-8 w-full rounded-full border border-gray-400 px-3 outline-none focus:border-black"
-                  aria-required="true"
-                />
-                {/* Supportive text (SC1 style) */}
-                <p className="ml-3 mt-1 text-xs text-gray-500">
-                  Must be at least 8 characters
+                <h2 className="text-[22px]">Create your account</h2>
+                <p className="text-xs text-subtext-color">
+                  Discover opportunities matched to your verified skills
                 </p>
               </div>
 
-              {/* Error */}
-              <div
-                aria-live="polite"
-                className="min-h-[1.25rem] text-xs text-red-600"
-              >
-                {error}
+              <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
+
+              <div className="flex flex-col gap-2">
+                <OAuthSocialButton
+                  className="w-full h-9 border border-gray-400 rounded-full flex items-center justify-center gap-2 hover:bg-gray-100"
+                  logo="https://res.cloudinary.com/subframe/image/upload/v1711417516/shared/z0i3zyjjqkobzuaecgno.svg"
+                  onClick={() => handleOAuth("google")}
+                  aria-label="Sign up with Google"
+                >
+                  Sign up with Google
+                </OAuthSocialButton>
+
+                <OAuthSocialButton
+                  className="w-full h-9 mt-2 border border-gray-400 rounded-full flex items-center justify-center gap-2 hover:bg-gray-100"
+                  logo="https://res.cloudinary.com/subframe/image/upload/v1763187518/uploads/27890/y6jwljmmuzopthb00ld5.png"
+                  onClick={() => handleOAuth("linkedin")}
+                  aria-label="Sign up with LinkedIn"
+                >
+                  Sign up with LinkedIn
+                </OAuthSocialButton>
               </div>
 
-              {/* Submit */}
-              {/* <button
+              <div className="flex items-center w-full my-4">
+                <div className="flex-1 h-[1px] bg-gray-300" />
+                <span className="px-2 text-xs text-gray-500 whitespace-nowrap">
+                  or continue with email
+                </span>
+                <div className="flex-1 h-[1px] bg-gray-300" />
+              </div>
+
+              <form
+                className="flex flex-col gap-3 text-sm"
+                onSubmit={handleSubmit}
+                noValidate
+              >
+                {/* Email */}
+                <div>
+                  <label
+                    htmlFor="signup-email"
+                    className="mb-1 block text-xs text-neutral-700"
+                  >
+                    Email address
+                  </label>
+                  <input
+                    id="signup-email"
+                    type="email"
+                    placeholder="hello@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="h-8 w-full rounded-full border border-gray-400 px-3 outline-none focus:border-black"
+                    aria-required="true"
+                  />
+                </div>
+
+                {/* First + Last name */}
+                <div className="flex gap-2">
+                  <div className="w-1/2">
+                    <label
+                      htmlFor="signup-first"
+                      className="mb-1 block text-xs text-neutral-700"
+                    >
+                      First name
+                    </label>
+                    <input
+                      id="signup-first"
+                      placeholder="Alex"
+                      value={firstname}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      className="h-8 w-full rounded-full border border-gray-400 px-3 outline-none focus:border-black"
+                      aria-required="true"
+                    />
+                  </div>
+
+                  <div className="w-1/2">
+                    <label
+                      htmlFor="signup-last"
+                      className="mb-1 block text-xs text-neutral-700"
+                    >
+                      Last name
+                    </label>
+                    <input
+                      id="signup-last"
+                      placeholder="Rivera"
+                      value={lastname}
+                      onChange={(e) => setLastName(e.target.value)}
+                      className="h-8 w-full rounded-full border border-gray-400 px-3 outline-none focus:border-black"
+                      aria-required="true"
+                    />
+                  </div>
+                </div>
+
+                {/* Password */}
+                <div>
+                  <label
+                    htmlFor="signup-password"
+                    className="mb-1 block text-xs  text-neutral-700"
+                  >
+                    Password
+                  </label>
+                  <input
+                    id="signup-password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="h-8 w-full rounded-full border border-gray-400 px-3 outline-none focus:border-black"
+                    aria-required="true"
+                  />
+                  {/* Supportive text (SC1 style) */}
+                  <p className="ml-3 mt-1 text-xs text-gray-500">
+                    Must be at least 8 characters
+                  </p>
+                </div>
+
+                {/* Error */}
+                <div
+                  aria-live="polite"
+                  className="min-h-[1.25rem] text-xs text-red-600"
+                >
+                  {error}
+                </div>
+
+                {/* Submit */}
+                {/* <button
                 type="submit"
                 disabled={loading}
                 className={`w-full h-9 text-white font-semibold rounded-full transition ${
@@ -344,42 +358,37 @@ return (
               >
                 {loading ? "Creating..." : "Create account"}
               </button> */}
-              <button
-  type="submit"
-  disabled={loading}
-  className={`w-full h-9 font-semibold rounded-full transition ${
-    loading ? "cursor-wait opacity-70" : "hover:opacity-90"
-  }`}
-  style={{
-    backgroundColor: colors.primary,
-    color: colors.white,
-  }}
->
-  {loading ? "Creating..." : "Create account"}
-</button>
-            </form>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`w-full h-9 font-semibold rounded-full transition ${
+                    loading ? "cursor-wait opacity-70" : "hover:opacity-90"
+                  }`}
+                  style={{
+                    backgroundColor: colors.primary,
+                    color: colors.white,
+                  }}
+                >
+                  {loading ? "Creating..." : "Create account"}
+                </button>
+              </form>
 
-            <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
+              <div className="w-full h-[1px] bg-gray-300 my-4 flex-shrink-0" />
 
-            <div className="flex justify-center gap-1 text-xs">
-              <span className="text-subtext-color">
-                Already have an account?
-              </span>
-              <Link
-                to="/login"
-                className=" font-semibold hover:underline"
-              >
-                Sign in
-              </Link>
+              <div className="flex justify-center gap-1 text-xs">
+                <span className="text-subtext-color">
+                  Already have an account?
+                </span>
+                <Link to="/login" className=" font-semibold hover:underline">
+                  Sign in
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-     <div>
-          <Footer />
-        </div>
-        </>
+      <div>{/* <Footer /> */}</div>
+    </>
   );
 }
 
