@@ -62,16 +62,7 @@ const SolutionSection = () => {
 
       {/* Content */}
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Label */}
-        <div className="mb-8 sm:mb-12">
-          <span
-            style={{ color: uniTalentColors.primary }}
-            className="block stagger-item text-xs sm:text-sm font-semibold uppercase tracking-widest"
-          >
-            Solution
-          </span>
-        </div>
-
+  
         {/* Main Heading */}
         <h2
           style={{ color: uniTalentColors.text }}
@@ -100,37 +91,6 @@ const SolutionSection = () => {
           </p>
         </div>
 
-        {/* Three Pillars */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className="group stagger-item"
-            >
-              {/* Feature Title */}
-              <h3
-                style={{ color: uniTalentColors.text }}
-                className="text-lg sm:text-xl lg:text-2xl font-bold mb-3 sm:mb-4 leading-tight"
-              >
-                {feature.title}
-              </h3>
-
-              {/* Feature Description */}
-              <p
-                style={{ color: uniTalentColors.text }}
-                className="text-sm sm:text-base opacity-70 leading-relaxed"
-              >
-                {feature.description}
-              </p>
-
-              {/* Animated underline */}
-              <div
-                className="mt-4 h-0.5 w-12 rounded-full transition-all duration-500 group-hover:w-8"
-                style={{ backgroundColor: uniTalentColors.primary }}
-              />
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* Stagger animation styles */}

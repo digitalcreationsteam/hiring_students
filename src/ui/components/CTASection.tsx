@@ -113,63 +113,6 @@ const CTASection = () => {
             </Link>
           </div>
 
-          {/* Stats Row (as a block) */}
-          <div className="stagger-item mt-12 sm:mt-16 lg:mt-20 flex justify-center items-center gap-6 sm:gap-8 lg:gap-12 flex-wrap">
-            <div className="flex items-center gap-2">
-              <span
-                style={{ color: uniTalentColors.primary }}
-                className="text-xl sm:text-2xl lg:text-3xl font-bold"
-              >
-                5,000+
-              </span>
-              <span
-                style={{ color: uniTalentColors.text }}
-                className="text-xs sm:text-sm opacity-70"
-              >
-                PMs Transformed
-              </span>
-            </div>
-
-            <div
-              style={{ backgroundColor: uniTalentColors.primary }}
-              className="w-px h-6 opacity-30"
-            />
-
-            <div className="flex items-center gap-2">
-              <span
-                style={{ color: uniTalentColors.primary }}
-                className="text-xl sm:text-2xl lg:text-3xl font-bold"
-              >
-                3.2x
-              </span>
-              <span
-                style={{ color: uniTalentColors.text }}
-                className="text-xs sm:text-sm opacity-70"
-              >
-                More Interviews
-              </span>
-            </div>
-
-            <div
-              style={{ backgroundColor: uniTalentColors.primary }}
-              className="w-px h-6 opacity-30"
-            />
-
-            <div className="flex items-center gap-2">
-              <span
-                style={{ color: uniTalentColors.primary }}
-                className="text-xl sm:text-2xl lg:text-3xl font-bold"
-              >
-                85%
-              </span>
-              <span
-                style={{ color: uniTalentColors.text }}
-                className="text-xs sm:text-sm opacity-70"
-              >
-                Success Rate
-              </span>
-            </div>
-          </div>
         </div>
       </div>
 

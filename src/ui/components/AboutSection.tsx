@@ -47,16 +47,6 @@ const AboutSection = () => {
 
       {/* Content */}
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Label */}
-        <div className="mb-8 sm:mb-12">
-          <span
-            style={{ color: uniTalentColors.primary }}
-            className="block stagger-item text-xs sm:text-sm font-semibold uppercase tracking-widest"
-          >
-            About
-          </span>
-        </div>
-
         {/* Main Content */}
         <div>
           {/* Heading */}
