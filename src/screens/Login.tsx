@@ -725,7 +725,7 @@ function Login() {
 
   return (
     <>
-      <Navbar />
+      {/* <Navbar /> */}
       <div className="min-h-screen w-full flex items-center justify-center px-4 py-12 relative overflow-hidden">
         {/* Minimalistic gradient background */}
         <div
@@ -1066,7 +1066,7 @@ function Login() {
         </div>
       </div>
 
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }

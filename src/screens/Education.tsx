@@ -3,8 +3,7 @@
 
 // import React, { useState, useEffect, useRef } from "react";
 // import { useNavigate, useLocation } from "react-router-dom";
-// import { useAppDispatch } from "../store/hooks"; // ✅ ADD THIS
-// import { setNavigation } from "../store/slices/onboardingSlice"; // ✅ ADD THIS
+
 // import { Avatar } from "../ui/components/Avatar";
 // import { Button } from "../ui/components/Button";
 // import HeaderLogo from "../ui/components/HeaderLogo";
@@ -401,8 +400,7 @@
 // export default function Education() {
 //   const navigate = useNavigate();
 //   const location = useLocation();
-//   const source = location.state?.source;
-//   const dispatch = useAppDispatch(); // ✅ ADD THIS LINE // "dashboard" | undefined
+//   const source = location.state?.source; // "dashboard" | undefined
 //   console.log("EDUCATION source:", source);
 
 //   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -594,12 +592,6 @@
 //       const res = await API("POST", URL_PATH.education, payload, {
 //         "user-id": userId,
 //       });
-
-//       // ✅ CHECK IF BACKEND RETURNED NAVIGATION
-//       if (res?.navigation) {
-//         dispatch(setNavigation(res.navigation));
-//       }
-
 //       toast.success("Education added successfully");
 
 //       const created = res.data[0];
@@ -661,23 +653,19 @@
 //     try {
 //       setIsSubmitting(true);
 
-//       const res = await API(
+//       await API(
 //         "PUT",
-//         `${URL_PATH.education}/${editingId}`,
+//         `${URL_PATH.education}/${editingId}`, // 🔴 confirm endpoint
 //         payload,
 //         { "user-id": userId },
 //       );
-
-//       // ✅ UPDATE REDUX IF NAVIGATION RETURNED
-//       if (res?.navigation) {
-//         dispatch(setNavigation(res.navigation));
-//       }
 
 //       toast.success("Education updated");
 
 //       setEducations((prev) =>
 //         prev.map((e) => {
 //           if (e.id !== editingId) return e;
+
 //           return {
 //             ...e,
 //             degree: payload.degree,
@@ -716,19 +704,13 @@
 //     try {
 //       setIsSubmitting(true);
 
-//       const res = await API(
+//       await API(
 //         "DELETE",
 //         `${URL_PATH.deleteEducation}/${deleteId}`,
 //         undefined,
 //         { "user-id": userId },
 //       );
 
-//       // ✅ UPDATE REDUX IF NAVIGATION RETURNED
-//       if (res?.navigation) {
-//         dispatch(setNavigation(res.navigation));
-//       }
-
-//       toast.success("Education deleted successfully");
 //       setEducations((prev) => prev.filter((e) => e.id !== deleteId));
 //       await fetchExperienceIndex();
 //       setDeleteId(null);
@@ -1484,7 +1466,6 @@
 //                     if (source === "dashboard") {
 //                       navigate("/dashboard");
 //                     } else {
-//                       // This will go back to the previous page in history
 //                       navigate("/demographics");
 //                     }
 //                   }}
@@ -1826,88 +1807,88 @@
 
 //                 {/* GPA Field - US 4-point scale */}
 //                 {/* Grade Type Selector Dropdown + Input Side by Side */}
-//                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-//                   {/* Grade Type Selector Dropdown */}
-//                   <div className="flex flex-col gap-1">
-//                     <label className="text-[12px] font-medium text-neutral-900">
-//                       Grade System <span className="text-red-500">*</span>
-//                     </label>
+// <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+//   {/* Grade Type Selector Dropdown */}
+//   <div className="flex flex-col gap-1">
+//     <label className="text-[12px] font-medium text-neutral-900">
+//       Grade System <span className="text-red-500">*</span>
+//     </label>
 
-//                     <SubframeCore.DropdownMenu.Root>
-//                       <SubframeCore.DropdownMenu.Trigger asChild>
-//                         <div
-//                           className="flex h-10 items-center justify-between rounded-full border border-neutral-300 px-4 cursor-pointer hover:bg-neutral-50 transition"
-//                           style={{ backgroundColor: colors.white }}
-//                         >
-//                           <span
-//                             className="text-[12px] font-medium"
-//                             style={{ color: colors.accent }}
-//                           >
-//                             {gradeType === "gpa" ? "GPA" : "CGPA"}
-//                           </span>
+//     <SubframeCore.DropdownMenu.Root>
+//       <SubframeCore.DropdownMenu.Trigger asChild>
+//         <div
+//           className="flex h-10 items-center justify-between rounded-full border border-neutral-300 px-4 cursor-pointer hover:bg-neutral-50 transition"
+//           style={{ backgroundColor: colors.white }}
+//         >
+//           <span
+//             className="text-[12px] font-medium"
+//             style={{ color: colors.accent }}
+//           >
+//             {gradeType === "gpa" ? "GPA" : "CGPA"}
+//           </span>
 
-//                           <FeatherChevronDown style={{ color: "#6B7280" }} />
-//                         </div>
-//                       </SubframeCore.DropdownMenu.Trigger>
+//           <FeatherChevronDown style={{ color: "#6B7280" }} />
+//         </div>
+//       </SubframeCore.DropdownMenu.Trigger>
 
-//                       <SubframeCore.DropdownMenu.Portal>
-//                         <SubframeCore.DropdownMenu.Content
-//                           sideOffset={4}
-//                           align="start"
-//                           className="bg-white text-neutral-900 rounded-2xl shadow-lg py-1 border border-neutral-300 min-w-[180px]"
-//                           style={{ zIndex: 999999 }}
-//                         >
-//                           <SubframeCore.DropdownMenu.Item
-//                             className="px-4 py-2 text-sm text-neutral-900 cursor-pointer hover:bg-neutral-100 outline-none"
-//                             onSelect={() => {
-//                               setGradeType("gpa");
-//                               setGradeValue("");
-//                             }}
-//                           >
-//                             GPA (4.0)
-//                           </SubframeCore.DropdownMenu.Item>
+//       <SubframeCore.DropdownMenu.Portal>
+//         <SubframeCore.DropdownMenu.Content
+//           sideOffset={4}
+//           align="start"
+//           className="bg-white text-neutral-900 rounded-2xl shadow-lg py-1 border border-neutral-300 min-w-[180px]"
+//           style={{ zIndex: 999999 }}
+//         >
+//           <SubframeCore.DropdownMenu.Item
+//             className="px-4 py-2 text-sm text-neutral-900 cursor-pointer hover:bg-neutral-100 outline-none"
+//             onSelect={() => {
+//               setGradeType("gpa");
+//               setGradeValue("");
+//             }}
+//           >
+//             GPA (4.0)
+//           </SubframeCore.DropdownMenu.Item>
 
-//                           <SubframeCore.DropdownMenu.Item
-//                             className="px-4 py-2 text-sm text-neutral-900 cursor-pointer hover:bg-neutral-100 outline-none"
-//                             onSelect={() => {
-//                               setGradeType("cgpa");
-//                               setGradeValue("");
-//                             }}
-//                           >
-//                             CGPA (10.0)
-//                           </SubframeCore.DropdownMenu.Item>
-//                         </SubframeCore.DropdownMenu.Content>
-//                       </SubframeCore.DropdownMenu.Portal>
-//                     </SubframeCore.DropdownMenu.Root>
-//                   </div>
+//           <SubframeCore.DropdownMenu.Item
+//             className="px-4 py-2 text-sm text-neutral-900 cursor-pointer hover:bg-neutral-100 outline-none"
+//             onSelect={() => {
+//               setGradeType("cgpa");
+//               setGradeValue("");
+//             }}
+//           >
+//             CGPA (10.0)
+//           </SubframeCore.DropdownMenu.Item>
+//         </SubframeCore.DropdownMenu.Content>
+//       </SubframeCore.DropdownMenu.Portal>
+//     </SubframeCore.DropdownMenu.Root>
+//   </div>
 
-//                   {/* Single Grade Input Field */}
-//                   <TextField
-//                     className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
-//                     label={
-//                       <span className="text-[12px]">
-//                         {gradeType === "gpa" ? "GPA" : "CGPA"}{" "}
-//                         <span className="text-red-500">*</span>
-//                       </span>
-//                     }
-//                   >
-//                     <TextField.Input
-//                       className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0"
-//                       placeholder={
-//                         gradeType === "gpa" ? "e.g., 3.8" : "e.g., 7.8"
-//                       }
-//                       value={gradeValue}
-//                       onChange={(ev: React.ChangeEvent<HTMLInputElement>) => {
-//                         const value = ev.target.value.replace(/[^0-9.]/g, "");
-//                         const decimalCount = (value.match(/\./g) || []).length;
-//                         if (decimalCount <= 1) {
-//                           setGradeValue(value);
-//                         }
-//                       }}
-//                     />
-//                   </TextField>
-//                 </div>
-
+//   {/* Single Grade Input Field */}
+//   <TextField
+//     className="h-auto w-full [&>div]:rounded-full [&>div]:border [&>div]:border-neutral-300"
+//     label={
+//       <span className="text-[12px]">
+//         {gradeType === "gpa" ? "GPA" : "CGPA"}{" "}
+//       <span className="text-red-500">*</span>
+//       </span>
+//     }
+//   >
+//     <TextField.Input
+//       className="rounded-full h-10 px-4 bg-white !border-none focus:ring-0"
+//       placeholder={
+//         gradeType === "gpa" ? "e.g., 3.8" : "e.g., 7.8"
+//       }
+//       value={gradeValue}
+//       onChange={(ev: React.ChangeEvent<HTMLInputElement>) => {
+//         const value = ev.target.value.replace(/[^0-9.]/g, "");
+//         const decimalCount = (value.match(/\./g) || []).length;
+//         if (decimalCount <= 1) {
+//           setGradeValue(value);
+//         }
+//       }}
+//     />
+//   </TextField>
+//   </div>
+                
 //                 <div className="mt-2 flex flex-col sm:flex-row gap-3 items-center">
 //                   <Button
 //                     type="button"
@@ -1928,20 +1909,22 @@
 //                         : "Add another education"}
 //                   </Button>
 
+
 //                   <div className="flex-1" />
-//                   {/* ✅ Cancle Edit */}
-//                   {isEditing && (
-//                     <Button
-//                       onClick={resetForm}
-//                       type="button"
-//                       className="w-full rounded-full h-10 mt-2"
-//                       variant="brand-tertiary"
-//                       style={{ backgroundColor: colors.primaryGlow }}
-//                     >
-//                       Cancel edit
-//                     </Button>
+//                  {/* ✅ Cancle Edit */}
+//                  {isEditing && (
+//                   <Button
+//                     onClick={resetForm}
+//                     type="button"
+//                     className="w-full rounded-full h-10 mt-2"
+//                     variant="brand-tertiary"
+//                     style={{backgroundColor: colors.primaryGlow}}
+//                   >
+//                     Cancel edit
+//                   </Button>
 //                   )}
 //                 </div>
+                
 //               </form>
 
 //               {/* Top form horizontal line */}
@@ -2186,6 +2169,7 @@
 //     </div>
 //   );
 // }
+
 
 // src/components/Education.tsx
 // // src/components/Education.tsx
