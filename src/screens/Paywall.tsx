@@ -153,13 +153,21 @@ function Paywall() {
   };
 
   // Format price display
+  // Format price display
   const formatPrice = (plan: SubscriptionPlan | undefined): string => {
     if (!plan) return "";
 
     if (plan.price === 0) return "Free";
 
-    const period = plan.billingPeriod === "yearly" ? "year" : "month";
-    return `₹${plan.price}/${period}`;
+    // Show appropriate period label based on billingPeriod from backend
+    if (plan.billingPeriod === "yearly") {
+      return `$${plan.price}/year`;
+    } else if (plan.billingPeriod === "oneTime") {
+      return `$${plan.price} one-time`;
+    } else {
+      // Fallback for any other cases (monthly, etc.)
+      return `$${plan.price}/${plan.billingPeriod}`;
+    }
   };
 
   // Check if plan is popular

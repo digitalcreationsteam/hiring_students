@@ -147,14 +147,6 @@ const DEFAULT_AVATAR =
 const formatLocation = (city?: string, state?: string): string =>
   `${city || ""}, ${state || ""}`.trim().replace(/^,\s*|,\s*$/g, "");
 
-const calculatePercentile = (rank?: number): string => {
-  if (!rank || rank <= 0) return "-";
-  if (rank === 1) return "1";
-  if (rank <= 5) return "5";
-  if (rank <= 10) return "10";
-  return "25";
-};
-
 /* ==================== COMPONENTS ==================== */
 
 const DomainRankingsCard = ({
@@ -321,6 +313,13 @@ export default function Dashboard() {
     domain: "",
     location: "",
   });
+  const [totalCounts, setTotalCounts] = useState({
+    global: 0,
+    country: 0,
+    state: 0,
+    city: 0,
+    university: 0,
+  });
 
   const [workExperience, setWorkExperience] = useState<WorkExperience[]>([]);
   const [education, setEducation] = useState<Education[]>([]);
@@ -408,8 +407,22 @@ export default function Dashboard() {
     navigate(`/chat/${chatUserId.trim()}`);
   };
 
-  /* ==================== API CALLS ==================== */
+  // Update the calculatePercentile function with proper types
+  const calculatePercentile = (
+    rank: number | undefined,
+    total: number,
+  ): string => {
+    if (!rank || rank <= 0 || !total || total <= 0) return "-";
 
+    // Calculate percentile: (1 - rank/total) * 100
+    // If rank is 1 out of 100, percentile = 99% (top 1%)
+    const percentile = ((total - rank) / total) * 100;
+
+    // Round to nearest integer and return as string
+    return Math.round(percentile).toString();
+  };
+
+  /* ==================== API CALLS ==================== */
   const fetchDashboardData = useCallback(async () => {
     try {
       const res = await API("GET", URL_PATH.calculateExperienceIndex);
@@ -445,7 +458,6 @@ export default function Dashboard() {
         }
         setAvatar(normalizedProfile);
 
-        // Save to localStorage
         try {
           const u = localStorage.getItem("user");
           const parsed = u ? JSON.parse(u) : {};
@@ -458,27 +470,34 @@ export default function Dashboard() {
 
       /* RANK */
       const rank = res?.rank;
+      const totals = res?.totalCounts || {};
 
+      setTotalCounts(totals);
+
+      // Calculate percentiles using the new function
       const newRankData = {
         global: {
           rank: rank?.globalRank ?? "-",
-          percentile: calculatePercentile(rank?.globalRank),
+          percentile: calculatePercentile(rank?.globalRank, totals.global),
         },
         country: {
           rank: rank?.countryRank ?? "-",
-          percentile: calculatePercentile(rank?.countryRank),
+          percentile: calculatePercentile(rank?.countryRank, totals.country),
         },
         state: {
           rank: rank?.stateRank ?? "-",
-          percentile: calculatePercentile(rank?.stateRank),
+          percentile: calculatePercentile(rank?.stateRank, totals.state),
         },
         city: {
           rank: rank?.cityRank ?? "-",
-          percentile: calculatePercentile(rank?.cityRank),
+          percentile: calculatePercentile(rank?.cityRank, totals.city),
         },
         university: {
           rank: rank?.universityRank ?? "-",
-          percentile: calculatePercentile(rank?.universityRank),
+          percentile: calculatePercentile(
+            rank?.universityRank,
+            totals.university,
+          ),
         },
       };
 
@@ -576,7 +595,7 @@ export default function Dashboard() {
         try {
           const caseStudyRes = await API(
             "GET",
-            `/cases/${demoId}/weekly`,
+            `${URL_PATH.getWeeklyCaseAttempts}/${demoId}`,
           );
 
           const weeklyAttempts = caseStudyRes?.totalAttempts ?? 0;
@@ -1117,7 +1136,9 @@ export default function Dashboard() {
                           color: colors.accent,
                         }}
                       >
-                        Top {rank.pct}%
+                        {rank.val.percentile !== "-"
+                          ? `Top ${rank.val.percentile}%`
+                          : "Top -%"}
                       </Badge>
                     </CardContent>
                   </Card>

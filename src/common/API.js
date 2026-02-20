@@ -46,8 +46,7 @@ export const URL_PATH = {
   verifyRoute: "/auth/verify-route",
   verifyOTP: "/auth/verify-otp",
   resendOTP: "/auth/resend-otp",
-
-
+  getWeeklyCaseAttempts: (demoId) => `/user-case-attempts/${demoId}/weekly`,
   /* ---------- EMAIL VERIFICATION ---------- */
   verifyEmail: "/auth/verify",
   resendVerification: "/auth/resend-verification",
@@ -140,7 +139,7 @@ export const URL_PATH = {
   getUnreadCount: "/chat/unread-count",
 
   // Case Study
-   getAllCases: "/cases/",
+  getAllCases: "/cases/",
   startCase: (caseId) => `/cases/${caseId}/start`,
   // getCurrentQuestion: (attemptId) => `/cases/attempt/${attemptId}/question`,
   getCurrentQuestion: (caseId, number) => `/cases/${caseId}/questions/${number}`,
