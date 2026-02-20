@@ -47,6 +47,7 @@ import PaymentProcessing from "./ui/components/PaymentProcessing";
 import "./App.css";
 import NotFound from "./screens/NotFound";
 import ProfilePage from "./screens/ProfilePage";
+import MyProfile from "./screens/my-profile";
 import EmailVerificationOTP from "./screens/EmailVerificationOTP";
 
 const router = createBrowserRouter([
@@ -327,7 +328,7 @@ const router = createBrowserRouter([
     path: "/profile",
     element: (
       <ProtectedRoute requireIncomplete={true}>
-        <ProfilePage />
+        <MyProfile />
       </ProtectedRoute>
     ),
   },

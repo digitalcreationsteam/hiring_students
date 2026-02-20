@@ -41,6 +41,8 @@ export const URL_PATH = {
   loginGoogle: "/auth/google",
   loginLinkedin: "/auth/linkedin",
 
+
+
   /* ✅ Navigation endpoints */
   getUserStatus: "/auth/user-status",
   verifyRoute: "/auth/verify-route",
@@ -62,9 +64,12 @@ export const URL_PATH = {
   uploadResume: "/user/resume",
   getResume: "/user/resume",
   uploadProfile: "/user/profile",
+  getUserProfile: `/user/my-profile`,
 
   /* ---------- EXPERIENCE INDEX ---------- */
   calculateExperienceIndex: "/user/experience_index",
+  updateExperience: "/user/work",
+  updateCertification: "/user/certification/:id",
 
   /* ---------- DEMOGRAPHICS ---------- */
   demographics: "/user/demographics",
@@ -108,7 +113,9 @@ export const URL_PATH = {
   getJobDomain: "/user/domain",
   getSubDomain: "/user/by-domain/694e588f2af883559ebe9540",
   getUserDomainSkills: "/user/getUserDomainSkills",
-
+  updateAward: "/user/awards/:id",
+  updateProject: "/user/projects/:id",
+  uploadProfilePicture: "/profile/uploadProfile",
   /* ---------- SKILL ASSESSMENT ---------- */
   startAssessment: "/user/assessment/start",
   getAttemptQuestions: "/user/assessment/getAttemptQuestions",

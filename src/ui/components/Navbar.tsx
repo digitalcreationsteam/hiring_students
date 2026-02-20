@@ -144,6 +144,10 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showLogoutModal]);
 
+  const handleLogoClick = () => {
+    navigate("/dashboard");
+  };
+
   // Prevent scrolling when modal is open
   useEffect(() => {
     if (showLogoutModal) {
@@ -166,7 +170,10 @@ const Navbar = () => {
     >
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center gap-3">
+        <div
+          className="flex items-center gap-3 cursor-pointer"
+          onClick={handleLogoClick}
+        >
           <img
             src="/UNITALENT.png"
             alt="Company Logo"
@@ -220,8 +227,8 @@ const Navbar = () => {
                 Sign Up
               </Link>
             </>
-          ) : isDashboardPage ? (
-            /* Avatar only on dashboard */
+          ) : (
+            /* Other pages → only Logout */
             <div className="relative" ref={dropdownRef}>
               <img
                 src={avatar}
@@ -269,15 +276,6 @@ const Navbar = () => {
                 </div>
               )}
             </div>
-          ) : (
-            /* Other pages → only Logout */
-            <button
-              onClick={handleLogoutClick}
-              className="flex items-center gap-2 px-5 py-2 rounded-lg font-semibold transition-all duration-300 bg-red-50 text-red-600"
-            >
-              <LogOut size={18} />
-              Logout
-            </button>
           )}
         </div>
 
