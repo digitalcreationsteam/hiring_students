@@ -34,17 +34,28 @@ function CaseAssessmentOpening() {
   const { state } = useLocation();
   const navigate = useNavigate();
 
-  const { opening, attemptId } = state || {};
+  const { attemptId, attemptNumber, caseId, opening } = state || {};
 
-  useEffect(() => {
-    if (!opening || !attemptId) {
-      navigate("/case-assessments");
-    }
-  }, [opening, attemptId, navigate]);
+  console.log(attemptNumber);
 
-  if (!opening || !attemptId) {
-    return null;
+// Redirect if required data is missing
+useEffect(() => {
+  if (!opening || !attemptId || !caseId) {
+    navigate("/case-assessments");
   }
+}, [opening, attemptId, caseId, navigate]);
+
+  // const { attemptId, opening, attemptNumber, caseId } = state || {};
+
+  // useEffect(() => {
+  //   if (!opening || !attemptNumber) {
+  //     navigate("/case-assessments");
+  //   }
+  // }, [opening, attemptNumber, navigate]);
+
+  // if (!opening || !attemptNumber) {
+  //   return null;
+  // }
 
   const primaryColor = getColorString(colors.primary, "#7c3aed");
   const secondaryColor = getColorString(colors.secondary, "#4f46e5");
@@ -144,79 +155,41 @@ function CaseAssessmentOpening() {
                         The Challenge
                       </h4>
                       <div className="bg-neutral-50 rounded-xl p-5 border border-neutral-200">
-                        <div className="text-sm text-neutral-700 leading-relaxed whitespace-pre-line">
+                        {/* <div className="text-sm text-neutral-700 leading-relaxed whitespace-pre-line">
                           {opening.openingText}
-                        </div>
+                        </div> */}
+                        <div className="text-sm text-neutral-700 leading-relaxed whitespace-pre-line space-y-4">
+  
+                        {/* Opening Text */}
+                        {opening.openingText && (
+                          <div>
+                            {opening.openingText}
+                          </div>
+                        )}
+
+                        {/* Opening Image */}
+                        {opening.openingImageUrl && (
+                          <div className="mt-4">
+                            {/* <img
+                              src={opening.openingImageUrl}
+                              alt="Case Opening"
+                              className="w-full rounded-2xl shadow-md border border-neutral-200 object-contain max-h-[500px]"
+                            /> */}
+                            <iframe
+                              src={opening.openingImageUrl.replace("/view?usp=sharing", "/preview")}
+                              width="100%"
+                              height="500"
+                              allow="autoplay"
+                              className="rounded-2xl border border-neutral-200"
+                            />
+                          </div>
+                        )}
+
+                      </div>
+
                       </div>
                     </div>
                     
-                    {/* Key Considerations */}
-                    {/* <div className="mb-6">
-                      <h4 className="text-sm font-semibold text-neutral-900 mb-3">Key Considerations</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
-                          <h5 className="text-sm font-semibold text-blue-800 mb-2">✅ Expected Approach</h5>
-                          <ul className="text-xs text-blue-700 space-y-1.5">
-                            <li className="flex items-start gap-2">
-                              <div className="w-1 h-1 rounded-full bg-blue-500 mt-1.5" />
-                              Show strategic thinking process
-                            </li>
-                            <li className="flex items-start gap-2">
-                              <div className="w-1 h-1 rounded-full bg-blue-500 mt-1.5" />
-                              Consider multiple stakeholders
-                            </li>
-                            <li className="flex items-start gap-2">
-                              <div className="w-1 h-1 rounded-full bg-blue-500 mt-1.5" />
-                              Balance short vs long-term goals
-                            </li>
-                          </ul>
-                        </div>
-                        
-                        <div className="bg-emerald-50 border border-emerald-100 rounded-lg p-4">
-                          <h5 className="text-sm font-semibold text-emerald-800 mb-2">📈 Evaluation Focus</h5>
-                          <ul className="text-xs text-emerald-700 space-y-1.5">
-                            <li className="flex items-start gap-2">
-                              <div className="w-1 h-1 rounded-full bg-emerald-500 mt-1.5" />
-                              Decision quality & rationale
-                            </li>
-                            <li className="flex items-start gap-2">
-                              <div className="w-1 h-1 rounded-full bg-emerald-500 mt-1.5" />
-                              Problem-solving methodology
-                            </li>
-                            <li className="flex items-start gap-2">
-                              <div className="w-1 h-1 rounded-full bg-emerald-500 mt-1.5" />
-                              Communication clarity
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div> */}
-                    
-                    {/* Success Metrics */}
-                    {/* <div className="pt-4 border-t border-neutral-200">
-                      <h4 className="text-sm font-semibold text-neutral-900 mb-3">Success Metrics</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {[
-                          "Strategic Alignment",
-                          "Business Impact",
-                          "Feasibility",
-                          "Innovation",
-                          "Execution Plan"
-                        ].map((metric, index) => (
-                          <span 
-                            key={index}
-                            className="px-3 py-1.5 rounded-full text-xs font-medium border"
-                            style={{
-                              backgroundColor: primaryColor + "08",
-                              color: primaryColor,
-                              borderColor: primaryColor + "20"
-                            }}
-                          >
-                            {metric}
-                          </span>
-                        ))}
-                      </div>
-                    </div> */}
                   </div>
                 </div>
               </div>
@@ -324,7 +297,7 @@ function CaseAssessmentOpening() {
                   icon={<FeatherZap />}
                   onClick={() =>
                     navigate("/case-assessment-questions", {
-                      state: { attemptId, caseId: opening.caseId },
+                      state: { attemptId, attemptNumber, caseId },
                     })
                   }
                 >
