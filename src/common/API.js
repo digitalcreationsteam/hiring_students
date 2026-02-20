@@ -140,12 +140,15 @@ export const URL_PATH = {
   getUnreadCount: "/chat/unread-count",
 
   // Case Study
-  getAllCases: "/cases/",
+   getAllCases: "/cases/",
   startCase: (caseId) => `/cases/${caseId}/start`,
-  getCurrentQuestion: (attemptId) => `/cases/attempt/${attemptId}/question`,
-  submitAnswer: (attemptId) => `/cases/attempt/${attemptId}/answer`,
+  // getCurrentQuestion: (attemptId) => `/cases/attempt/${attemptId}/question`,
+  getCurrentQuestion: (caseId, number) => `/cases/${caseId}/questions/${number}`,
+  // submitAnswer: (attemptId) => `/cases/attempt/${attemptId}/answer`,
+  submitAnswer: (caseId, questionId) => `/cases/${caseId}/questions/${questionId}/answer`,
   submitAttempt: (attemptId) => `cases/attempt/${attemptId}/submit`,
   getCaseReveal: (caseId) => `/cases/${caseId}/reveal`,
+  getOpening: (caseId) => `/cases/${caseId}/opening`,
 
   getStudentsBySchool: "/user/students"
 };
