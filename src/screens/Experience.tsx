@@ -1076,7 +1076,7 @@ export default function Experience() {
                         : "Adding..."
                       : isEditing
                         ? "Update experience"
-                        : "Add another experience"}
+                        : "Update and add another experience"}
                   </Button>
 
                   {/* ✅ Cancel Edit */}

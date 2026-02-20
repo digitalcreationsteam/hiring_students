@@ -698,7 +698,7 @@ export default function Projects() {
                         : "Adding..."
                       : isEditing
                         ? "Update project"
-                        : "Add another project"}
+                        : "Update and add another project"}
                   </Button>
 
                   {/* ✅ Cancel edit */}

@@ -2,6 +2,7 @@
 // ✅ PURE JAVASCRIPT VERSION (No TypeScript)
 
 import axios from "axios";
+import { optimizedAppearDataId } from "framer-motion";
 
 /* =========================================
    🌐 BASE URL
@@ -43,6 +44,9 @@ export const URL_PATH = {
   /* ✅ Navigation endpoints */
   getUserStatus: "/auth/user-status",
   verifyRoute: "/auth/verify-route",
+  verifyOTP: "/auth/verify-otp",
+  resendOTP: "/auth/resend-otp",
+
 
   /* ---------- EMAIL VERIFICATION ---------- */
   verifyEmail: "/auth/verify",
@@ -84,6 +88,10 @@ export const URL_PATH = {
   certification: "/user/certification",
   getCertification: "/user/certification",
   deleteCertification: "/user/certification",
+
+  searchUniversities: "/university/search", // Add this line
+
+
 
   /* ---------- AWARDS ---------- */
   awards: "/user/awards",

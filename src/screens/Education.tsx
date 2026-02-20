@@ -249,10 +249,10 @@ function SchoolNameDropdown({
   // ✅ Updated: Fetch universities from your backend API
   const fetchUniversities = React.useCallback(async (q: string) => {
     try {
-      // Call your backend API endpoint
+      // Call your backend API endpoint using the URL_PATH
       const response = await API(
         "GET",
-        `/api/university/search?query=${encodeURIComponent(q)}`,
+        `${URL_PATH.searchUniversities}?query=${encodeURIComponent(q)}`,
       );
 
       // Map the response to UniversityEntry format
@@ -1303,7 +1303,7 @@ export default function Education() {
                         : "Adding..."
                       : isEditing
                         ? "Update education"
-                        : "Add another education"}
+                        : "Update and add another education"}
                   </Button>
 
                   {/* ✅ Cancel Edit */}

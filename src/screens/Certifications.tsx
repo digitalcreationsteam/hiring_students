@@ -987,7 +987,7 @@ export default function Certifications() {
                         : "Adding..."
                       : isEditing
                         ? "Update certification"
-                        : "Add another certification"}
+                        : "Update and add another certification"}
                   </Button>
 
                   {/* ✅ Cancel Edit */}

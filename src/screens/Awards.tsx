@@ -639,7 +639,7 @@ export default function Awards() {
                         : "Adding..."
                       : isEditing
                         ? "Update award"
-                        : "Add another award"}
+                        : "Update and add another award"}
                   </Button>
 
                   {/* ✅ Cancel edit */}

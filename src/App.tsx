@@ -7,11 +7,11 @@ import LandingPage from "./screens/LandingPage";
 import RecruiterChats from "./screens/RecruiterChats";
 import SignUp from "./screens/SignUp";
 import LogIn from "./screens/Login";
-import EmailVerification from "./screens/EmailVerification";
 import Paywall from "./screens/Paywall";
 import HowItWorks from "./screens/HowItWorks";
 import ExperienceIndex from "./screens/ExperienceIndex";
 import SkillIndex from "./screens/SkillIndex";
+import EmailVerification from "./screens/EmailVerification";
 import HireabilityIndex from "./screens/HireabilityIndex";
 import UploadResume from "./screens/UploadResume";
 import Education from "./screens/Education";
@@ -47,6 +47,7 @@ import PaymentProcessing from "./ui/components/PaymentProcessing";
 import "./App.css";
 import NotFound from "./screens/NotFound";
 import ProfilePage from "./screens/ProfilePage";
+import EmailVerificationOTP from "./screens/EmailVerificationOTP";
 
 const router = createBrowserRouter([
   {
@@ -65,9 +66,10 @@ const router = createBrowserRouter([
   { path: "/verify-code", element: <ForgotPassword2 /> },
   { path: "/set-password", element: <ForgotPassword3 /> },
   { path: "/success-password", element: <ForgotPassword4 /> },
-  { path: "/verify-email", element: <EmailVerification /> },
+  { path: "/verify-email", element: <EmailVerificationOTP /> },
   { path: "/verify-email/:token", element: <EmailVerification /> },
-  { path: "/email-verified", element: <EmailVerifiedSuccess /> },
+  // { path: "/email-verified", element: <EmailVerifiedSuccess /> },
+  { path: "/email-verified-success", element: <EmailVerifiedSuccess /> },
 
   // ✅ PAYMENT PROCESSING ROUTE (After Dodo redirect)
   {
