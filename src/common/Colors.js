@@ -58,6 +58,7 @@ export const colors = {
     100: "#F2F2F2", // Very light grey for subtle backgrounds
     200: "#E5E5E5", // Border/Divider color
     400: "#9CA3AF", // Placeholder text / Secondary text
+    500: "#6a717e", // Placeholder text / Secondary text
     600: "#4B5563", // Muted text
     800: "#1F2937", // Primary heading text
   },

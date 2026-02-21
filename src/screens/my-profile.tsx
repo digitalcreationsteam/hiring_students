@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Edit2,
   Mail,
@@ -18,8 +18,14 @@ import {
   Package,
   Link as LinkIcon,
   LogOut,
+  Camera,
 } from "lucide-react";
+import {
+  FeatherArrowLeft,
+  
+} from "@subframe/core";
 import { uniTalentColors } from "src/common/Colors";
+import { colors } from "src/common/Colors";
 import API from "src/common/API";
 import { URL_PATH } from "src/common/API";
 import Navbar from "src/ui/components/Navbar";
@@ -111,6 +117,11 @@ const DEFAULT_PROFILE: UserProfile = {
 
 const MyProfile: React.FC = () => {
   const navigate = useNavigate();
+
+  // ── Avatar upload refs & state ──────────────────────────────
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
   const [editedProfile, setEditedProfile] = useState<UserProfile | null>(null);
@@ -207,11 +218,9 @@ const MyProfile: React.FC = () => {
     }
   };
 
-  // FIXED: Updated to match the actual API response structure
   const extractProfileData = (responseData: any): UserProfile => {
     console.log("📊 extractProfileData - Full response:", responseData);
 
-    // The data is nested under responseData.data
     const data = responseData?.data || {};
     const demographics = data?.demographics || {};
     const documents = responseData?.documents || {};
@@ -244,11 +253,19 @@ const MyProfile: React.FC = () => {
       const response = await API("GET", URL_PATH.getUserProfile);
       console.log("📊 API Response:", response);
 
-      // The response already contains the data structure
       const profileData = extractProfileData(response);
       setProfile(profileData);
+      if (profileData.avatar) {
+  try {
+    const u = localStorage.getItem("user");
+    const parsed = u ? JSON.parse(u) : {};
+    parsed.profileUrl = profileData.avatar;
+    localStorage.setItem("user", JSON.stringify(parsed));
+  } catch (e) {
+    console.error("Error saving avatar to localStorage:", e);
+  }
+}
 
-      // Also update other sections from the profile response
       if (response?.data) {
         setEducations(response.data.education || []);
         setWorkExperiences(response.data.workExperience || []);
@@ -266,6 +283,55 @@ const MyProfile: React.FC = () => {
       setProfile(DEFAULT_PROFILE);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // ── Avatar upload handler (same as Dashboard) ───────────────
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("File size should be less than 5MB");
+      return;
+    }
+
+    const validTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (!validTypes.includes(file.type)) {
+      alert("Please select a valid image (JPEG, PNG, or WebP)");
+      return;
+    }
+
+    // Instant preview
+    const previewUrl = URL.createObjectURL(file);
+    setProfile((prev) => ({ ...prev, avatar: previewUrl }));
+    setImageFailed(false);
+
+    try {
+      setIsUploadingAvatar(true);
+
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      await API("POST", URL_PATH.uploadProfile, formData);
+
+      // Refresh to get real server URL
+      await fetchProfile();
+
+      // Notify Navbar / other listeners
+      window.dispatchEvent(new Event("avatar-updated"));
+
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (error) {
+      console.error("Avatar upload failed:", error);
+      alert("Failed to upload profile picture. Please try again.");
+      await fetchProfile();
+    } finally {
+      setIsUploadingAvatar(false);
+      setTimeout(() => URL.revokeObjectURL(previewUrl), 1000);
+      // Reset input so same file can be re-selected
+      if (fileRef.current) fileRef.current.value = "";
     }
   };
 
@@ -324,7 +390,6 @@ const MyProfile: React.FC = () => {
   const handleSaveExperience = async (experience: WorkExperience) => {
     try {
       setSaveLoading(true);
-
       if (experience._id) {
         await API(
           "PUT",
@@ -510,10 +575,7 @@ const MyProfile: React.FC = () => {
     if (editedProfile) {
       setEditedProfile((prev) => {
         if (!prev) return null;
-        return {
-          ...prev,
-          [name]: value,
-        } as UserProfile;
+        return { ...prev, [name]: value } as UserProfile;
       });
     }
   };
@@ -542,18 +604,8 @@ const MyProfile: React.FC = () => {
   const formatWorkDate = (month?: number, year?: number) => {
     if (!year) return "";
     const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
     ];
     const monthName = month ? monthNames[month - 1] : "";
     return month ? `${monthName} ${year}` : `${year}`;
@@ -567,7 +619,6 @@ const MyProfile: React.FC = () => {
     if (!duration) return "";
     const years = Math.floor(duration / 12);
     const months = duration % 12;
-
     if (years > 0 && months > 0) {
       return `${years} yr${years > 1 ? "s" : ""} ${months} mo${months > 1 ? "s" : ""}`;
     } else if (years > 0) {
@@ -576,9 +627,6 @@ const MyProfile: React.FC = () => {
       return `${months} mo${months > 1 ? "s" : ""}`;
     }
   };
-
-  // Modal Components (keep your existing modal components here)
-  // ... (I'll keep them as they are)
 
   if (loading) {
     return (
@@ -655,177 +703,240 @@ const MyProfile: React.FC = () => {
       <div className="flex-1 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10 w-full">
         <div className="flex justify-center">
           <div className="w-full max-w-[1000px]">
-            {/* Profile Header */}
-            <div
-              className="backdrop-blur-xl rounded-3xl shadow-2xl relative overflow-hidden mb-8"
+            <button
+                onClick={() => navigate("/dashboard")}
+                className="w-10 h-10 rounded-full hover:bg-white/50 flex items-center justify-center transition-colors"
+                style={{ color: colors.neutral[600] }}
+              >
+                <FeatherArrowLeft style={{ width: 20, height: 20 }} />
+              </button>
+
+            {/* ── Profile Header ─────────────────────────────────── */}
+           <div
+  className="backdrop-blur-xl rounded-3xl shadow-2xl relative overflow-hidden mb-8 w-full"
+  style={{
+    backgroundColor: `${uniTalentColors.white}CC`,
+    border: `1px solid ${uniTalentColors.white}`,
+  }}
+>
+  <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent pointer-events-none" />
+
+  <div className="relative z-10 p-4 sm:p-6 md:p-8">
+    <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center md:items-start">
+      {/* ── Avatar with pencil/camera upload ── */}
+      <div className="flex-shrink-0">
+        {/* Hidden file input */}
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={handleAvatarChange}
+          className="hidden"
+        />
+
+        <div
+          className="relative group cursor-pointer"
+          onClick={() => fileRef.current?.click()}
+          title="Change profile photo"
+        >
+          {/* Avatar image or initials fallback */}
+          {profile.avatar && !imageFailed ? (
+            <img
+              src={profile.avatar}
+              alt={profile.fullName}
+              className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-2xl object-cover shadow-xl"
               style={{
-                backgroundColor: `${uniTalentColors.white}CC`,
-                border: `1px solid ${uniTalentColors.white}`,
+                boxShadow: `0 0 0 4px ${uniTalentColors.white}`,
+              }}
+              onError={handleImageError}
+            />
+          ) : (
+            <div
+              className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-2xl flex items-center justify-center text-3xl sm:text-4xl md:text-5xl font-bold text-white shadow-xl"
+              style={{
+                backgroundColor: uniTalentColors.primary,
+                boxShadow: `0 0 0 4px ${uniTalentColors.white}`,
               }}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent pointer-events-none" />
-
-              <div className="relative z-10 p-6 md:p-8">
-                <div className="flex flex-col md:flex-row gap-8 items-start">
-                  {/* Avatar */}
-                  <div className="flex-shrink-0">
-                    {profile.avatar && !imageFailed ? (
-                      <div className="relative group">
-                        <img
-                          src={profile.avatar}
-                          alt={profile.fullName}
-                          className="w-32 h-32 md:w-40 md:h-40 rounded-2xl object-cover shadow-xl"
-                          style={{
-                            boxShadow: `0 0 0 4px ${uniTalentColors.white}`,
-                          }}
-                          onError={handleImageError}
-                        />
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 rounded-2xl transition-all duration-300"></div>
-                      </div>
-                    ) : (
-                      <div
-                        className="w-32 h-32 md:w-40 md:h-40 rounded-2xl flex items-center justify-center text-4xl md:text-5xl font-bold text-white shadow-xl"
-                        style={{
-                          backgroundColor: uniTalentColors.primary,
-                          boxShadow: `0 0 0 4px ${uniTalentColors.white}`,
-                        }}
-                      >
-                        {profile.fullName ? getInitials() : "U"}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Profile Info */}
-                  <div className="flex-1">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                      <div>
-                        <h1
-                          className="text-3xl md:text-4xl font-light mb-1"
-                          style={{ color: uniTalentColors.text }}
-                        >
-                          {profile.fullName || "Your Name"}
-                        </h1>
-                        <p
-                          className="text-lg md:text-xl font-light"
-                          style={{ color: uniTalentColors.secondary }}
-                        >
-                          {profile.headline}
-                        </p>
-                      </div>
-
-                      <div className="flex gap-2">
-                        {!isEditing && (
-                          <button
-                            onClick={handleEditClick}
-                            className="group relative h-12 px-6 rounded-2xl font-medium overflow-hidden whitespace-nowrap"
-                          >
-                            <div
-                              className="absolute inset-0 transition-all duration-300 group-hover:scale-105"
-                              style={{
-                                background: `linear-gradient(135deg, ${uniTalentColors.primary}, ${uniTalentColors.secondary})`,
-                              }}
-                            />
-                            <span className="relative z-10 flex items-center gap-2 text-white">
-                              <Edit2 size={18} /> Edit Profile
-                            </span>
-                          </button>
-                        )}
-
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div
-                        className="flex items-center gap-3 p-3 rounded-xl"
-                        style={{
-                          backgroundColor: `${uniTalentColors.primary}08`,
-                        }}
-                      >
-                        <Mail
-                          size={18}
-                          style={{ color: uniTalentColors.primary }}
-                        />
-                        <span
-                          className="text-sm"
-                          style={{ color: uniTalentColors.secondary }}
-                        >
-                          {profile.email || "email@example.com"}
-                        </span>
-                      </div>
-                      <div
-                        className="flex items-center gap-3 p-3 rounded-xl"
-                        style={{
-                          backgroundColor: `${uniTalentColors.primary}08`,
-                        }}
-                      >
-                        <MapPin
-                          size={18}
-                          style={{ color: uniTalentColors.primary }}
-                        />
-                        <span
-                          className="text-sm"
-                          style={{ color: uniTalentColors.secondary }}
-                        >
-                          {getFullAddress()}
-                        </span>
-                      </div>
-                      <div
-                        className="flex items-center gap-3 p-3 rounded-xl"
-                        style={{
-                          backgroundColor: `${uniTalentColors.primary}08`,
-                        }}
-                      >
-                        <Phone
-                          size={18}
-                          style={{ color: uniTalentColors.primary }}
-                        />
-                        <span
-                          className="text-sm"
-                          style={{ color: uniTalentColors.secondary }}
-                        >
-                          {profile.phoneNumber || "Not provided"}
-                        </span>
-                      </div>
-                      <div
-                        className="flex items-center gap-3 p-3 rounded-xl"
-                        style={{
-                          backgroundColor: `${uniTalentColors.primary}08`,
-                        }}
-                      >
-                        <Calendar
-                          size={18}
-                          style={{ color: uniTalentColors.primary }}
-                        />
-                        <span
-                          className="text-sm"
-                          style={{ color: uniTalentColors.secondary }}
-                        >
-                          Joined {profile.joinDate || "Recently"}
-                        </span>
-                      </div>
-                    </div>
-
-                    {!isEditing && profile.bio && (
-                      <div
-                        className="mt-6 p-4 rounded-xl"
-                        style={{
-                          backgroundColor: `${uniTalentColors.primary}08`,
-                        }}
-                      >
-                        <p
-                          className="text-sm leading-relaxed"
-                          style={{ color: uniTalentColors.secondary }}
-                        >
-                          {profile.bio}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+              {profile.fullName ? getInitials() : "U"}
             </div>
+          )}
 
-            {/* Edit Profile Form */}
+          {/* Hover overlay */}
+          <div className="absolute inset-0 rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-all duration-200">
+            {isUploadingAvatar ? (
+              <div className="w-6 h-6 sm:w-7 sm:h-7 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <>
+                <Camera className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white mb-1" />
+                <span className="text-white text-[10px] sm:text-xs font-semibold uppercase tracking-wide">
+                  Change
+                </span>
+              </>
+            )}
+          </div>
+
+          {/* Always-visible pencil badge (bottom-right corner) */}
+          {!isUploadingAvatar && (
+            <div
+              className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-full flex items-center justify-center shadow-lg border-2 border-white"
+              style={{ backgroundColor: uniTalentColors.primary }}
+            >
+              <Edit2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 lg:w-3.5 lg:h-3.5 text-white" />
+            </div>
+          )}
+
+          {/* Uploading spinner badge */}
+          {isUploadingAvatar && (
+            <div
+              className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-full flex items-center justify-center shadow-lg border-2 border-white"
+              style={{ backgroundColor: uniTalentColors.primary }}
+            >
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 lg:w-3.5 lg:h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Profile Info */}
+      <div className="flex-1 w-full">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div className="text-center sm:text-left">
+            <h1
+              className="text-2xl sm:text-3xl md:text-4xl font-light mb-1 break-words"
+              style={{ color: uniTalentColors.text }}
+            >
+              {profile.fullName || "Your Name"}
+            </h1>
+            <p
+              className="text-base sm:text-lg md:text-xl font-light"
+              style={{ color: uniTalentColors.secondary }}
+            >
+              {profile.headline}
+            </p>
+          </div>
+
+          <div className="flex justify-center sm:justify-end">
+            {!isEditing && (
+              <button
+                onClick={handleEditClick}
+                className="group relative h-10 sm:h-12 px-4 sm:px-6 rounded-xl sm:rounded-2xl font-medium overflow-hidden whitespace-nowrap text-sm sm:text-base w-full sm:w-auto"
+              >
+                <div
+                  className="absolute inset-0 transition-all duration-300 group-hover:scale-105"
+                  style={{
+                    background: `linear-gradient(135deg, ${uniTalentColors.primary}, ${uniTalentColors.secondary})`,
+                  }}
+                />
+                <span className="relative z-10 flex items-center justify-center gap-2 text-white">
+                  <Edit2 size={16} className="sm:w-[18px] sm:h-[18px]" /> 
+                  <span className="hidden xs:inline">Edit Profile</span>
+                  <span className="xs:hidden">Edit</span>
+                </span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+          <div
+            className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl"
+            style={{
+              backgroundColor: `${uniTalentColors.primary}08`,
+            }}
+          >
+            <Mail
+              size={16}
+              className="sm:w-[18px] sm:h-[18px] flex-shrink-0"
+              style={{ color: uniTalentColors.primary }}
+            />
+            <span
+              className="text-xs sm:text-sm truncate"
+              style={{ color: uniTalentColors.secondary }}
+            >
+              {profile.email || "email@example.com"}
+            </span>
+          </div>
+          
+          <div
+            className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl"
+            style={{
+              backgroundColor: `${uniTalentColors.primary}08`,
+            }}
+          >
+            <MapPin
+              size={16}
+              className="sm:w-[18px] sm:h-[18px] flex-shrink-0"
+              style={{ color: uniTalentColors.primary }}
+            />
+            <span
+              className="text-xs sm:text-sm truncate"
+              style={{ color: uniTalentColors.secondary }}
+            >
+              {getFullAddress()}
+            </span>
+          </div>
+          
+          <div
+            className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl"
+            style={{
+              backgroundColor: `${uniTalentColors.primary}08`,
+            }}
+          >
+            <Phone
+              size={16}
+              className="sm:w-[18px] sm:h-[18px] flex-shrink-0"
+              style={{ color: uniTalentColors.primary }}
+            />
+            <span
+              className="text-xs sm:text-sm truncate"
+              style={{ color: uniTalentColors.secondary }}
+            >
+              {profile.phoneNumber || "Not provided"}
+            </span>
+          </div>
+          
+          <div
+            className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl"
+            style={{
+              backgroundColor: `${uniTalentColors.primary}08`,
+            }}
+          >
+            <Calendar
+              size={16}
+              className="sm:w-[18px] sm:h-[18px] flex-shrink-0"
+              style={{ color: uniTalentColors.primary }}
+            />
+            <span
+              className="text-xs sm:text-sm truncate"
+              style={{ color: uniTalentColors.secondary }}
+            >
+              Joined {profile.joinDate || "Recently"}
+            </span>
+          </div>
+        </div>
+
+        {!isEditing && profile.bio && (
+          <div
+            className="mt-4 sm:mt-6 p-3 sm:p-4 rounded-xl"
+            style={{
+              backgroundColor: `${uniTalentColors.primary}08`,
+            }}
+          >
+            <p
+              className="text-xs sm:text-sm leading-relaxed"
+              style={{ color: uniTalentColors.secondary }}
+            >
+              {profile.bio}
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</div>
+
+            {/* ── Edit Profile Form ───────────────────────────────── */}
             {isEditing && editedProfile && (
               <div
                 className="backdrop-blur-xl rounded-3xl shadow-2xl relative overflow-hidden mb-8"
@@ -1061,7 +1172,7 @@ const MyProfile: React.FC = () => {
               </div>
             )}
 
-            {/* Sections with Add/Edit/Delete */}
+            {/* ── Sections ────────────────────────────────────────── */}
             <Section
               title="Experience"
               icon={Briefcase}
@@ -1347,7 +1458,7 @@ const MyProfile: React.FC = () => {
   );
 };
 
-// Reusable Section Component with proper types
+// ── Reusable Section Component ───────────────────────────────
 interface SectionProps<T> {
   title: string;
   icon: React.ElementType;

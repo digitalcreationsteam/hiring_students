@@ -38,8 +38,8 @@ const ResumeIllustration = () => (
     animate={{ opacity: 1, scale: 1 }}
     transition={{ duration: 0.8 }}
     style={{
-      marginLeft: "-80px",
-      paddingLeft: "0px",
+      marginLeft: window.innerWidth < 1024 ? "0px" : "-80px",
+      paddingLeft: window.innerWidth < 1024 ? "0px" : "0px",
       overflow: "visible",
     }}
   >
@@ -49,7 +49,12 @@ const ResumeIllustration = () => (
       viewBox="0 0 500 500"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      style={{ maxWidth: "480px", minWidth: "400px" }}
+      style={{ 
+        maxWidth: window.innerWidth < 1024 ? "320px" : "480px", 
+        minWidth: window.innerWidth < 1024 ? "280px" : "400px",
+        width: "100%",
+        height: "auto"
+      }}
       animate={{
         y: [0, -20, 0],
       }}
@@ -106,11 +111,11 @@ const ResumeIllustration = () => (
       <motion.circle
         cx="250"
         cy="250"
-        r="200"
+        r={window.innerWidth < 1024 ? "150" : "200"}
         fill="url(#neonBlueGradient)"
         opacity="0.08"
         animate={{
-          r: [200, 215, 200],
+          r: window.innerWidth < 1024 ? [150, 165, 150] : [200, 215, 200],
           opacity: [0.08, 0.15, 0.08],
         }}
         transition={{
@@ -123,11 +128,11 @@ const ResumeIllustration = () => (
       <motion.circle
         cx="250"
         cy="250"
-        r="180"
+        r={window.innerWidth < 1024 ? "130" : "180"}
         fill="url(#electricBlueGradient)"
         opacity="0.05"
         animate={{
-          r: [180, 190, 180],
+          r: window.innerWidth < 1024 ? [130, 140, 130] : [180, 190, 180],
           opacity: [0.05, 0.1, 0.05],
         }}
         transition={{
@@ -140,10 +145,10 @@ const ResumeIllustration = () => (
 
       {/* Document base */}
       <motion.rect
-        x="120"
-        y="60"
-        width="260"
-        height="360"
+        x={window.innerWidth < 1024 ? "140" : "120"}
+        y={window.innerWidth < 1024 ? "80" : "60"}
+        width={window.innerWidth < 1024 ? "220" : "260"}
+        height={window.innerWidth < 1024 ? "320" : "360"}
         rx="16"
         fill="white"
         stroke="url(#neonBlueGradient)"
@@ -165,9 +170,9 @@ const ResumeIllustration = () => (
       {/* RESUME HEADER SECTION */}
       {/* Name */}
       <motion.text
-        x="140"
-        y="100"
-        fontSize="16"
+        x={window.innerWidth < 1024 ? "160" : "140"}
+        y={window.innerWidth < 1024 ? "110" : "100"}
+        fontSize={window.innerWidth < 1024 ? "14" : "16"}
         fontWeight="bold"
         fill="#1E90FF"
         filter="url(#neonGlow)"
@@ -184,21 +189,31 @@ const ResumeIllustration = () => (
       </motion.text>
 
       {/* Title */}
-      <motion.text x="140" y="120" fontSize="10" fill="#666666">
+      <motion.text 
+        x={window.innerWidth < 1024 ? "160" : "140"} 
+        y={window.innerWidth < 1024 ? "125" : "120"} 
+        fontSize={window.innerWidth < 1024 ? "9" : "10"} 
+        fill="#666666"
+      >
         Product Designer
       </motion.text>
 
       {/* Contact line */}
-      <motion.text x="140" y="135" fontSize="7" fill="#999999">
+      <motion.text 
+        x={window.innerWidth < 1024 ? "160" : "140"} 
+        y={window.innerWidth < 1024 ? "140" : "135"} 
+        fontSize={window.innerWidth < 1024 ? "6" : "7"} 
+        fill="#999999"
+      >
         alex.rivera@email.com | (415) 555-0123
       </motion.text>
 
       {/* Divider line */}
       <motion.line
-        x1="140"
-        y1="145"
-        x2="360"
-        y2="145"
+        x1={window.innerWidth < 1024 ? "160" : "140"}
+        y1={window.innerWidth < 1024 ? "150" : "145"}
+        x2={window.innerWidth < 1024 ? "340" : "360"}
+        y2={window.innerWidth < 1024 ? "150" : "145"}
         stroke="#E0E0E0"
         strokeWidth="1"
         strokeDasharray="4 4"
@@ -206,9 +221,9 @@ const ResumeIllustration = () => (
 
       {/* EXPERIENCE SECTION */}
       <motion.text
-        x="140"
-        y="165"
-        fontSize="10"
+        x={window.innerWidth < 1024 ? "160" : "140"}
+        y={window.innerWidth < 1024 ? "170" : "165"}
+        fontSize={window.innerWidth < 1024 ? "9" : "10"}
         fontWeight="bold"
         fill="#00BFFF"
         filter="url(#neonGlow)"
@@ -227,61 +242,91 @@ const ResumeIllustration = () => (
 
       {/* Job 1 */}
       <motion.text
-        x="140"
-        y="185"
-        fontSize="9"
+        x={window.innerWidth < 1024 ? "160" : "140"}
+        y={window.innerWidth < 1024 ? "190" : "185"}
+        fontSize={window.innerWidth < 1024 ? "8" : "9"}
         fontWeight="bold"
         fill="#333333"
       >
         Senior Product Designer
       </motion.text>
-      <motion.text x="280" y="185" fontSize="7" fill="#999999">
+      <motion.text 
+        x={window.innerWidth < 1024 ? "260" : "280"} 
+        y={window.innerWidth < 1024 ? "190" : "185"} 
+        fontSize={window.innerWidth < 1024 ? "6" : "7"} 
+        fill="#999999"
+      >
         2022-Present
       </motion.text>
-      <motion.text x="140" y="200" fontSize="7" fill="#666666">
-        • Led product redesign, increasing engagement by 45%
+      <motion.text 
+        x={window.innerWidth < 1024 ? "160" : "140"} 
+        y={window.innerWidth < 1024 ? "205" : "200"} 
+        fontSize={window.innerWidth < 1024 ? "6" : "7"} 
+        fill="#666666"
+      >
+        • Led redesign, inc. engagement 45%
       </motion.text>
 
       {/* Job 2 */}
       <motion.text
-        x="140"
-        y="220"
-        fontSize="9"
+        x={window.innerWidth < 1024 ? "160" : "140"}
+        y={window.innerWidth < 1024 ? "225" : "220"}
+        fontSize={window.innerWidth < 1024 ? "8" : "9"}
         fontWeight="bold"
         fill="#333333"
       >
         UI/UX Designer
       </motion.text>
-      <motion.text x="280" y="220" fontSize="7" fill="#999999">
+      <motion.text 
+        x={window.innerWidth < 1024 ? "260" : "280"} 
+        y={window.innerWidth < 1024 ? "225" : "220"} 
+        fontSize={window.innerWidth < 1024 ? "6" : "7"} 
+        fill="#999999"
+      >
         2020-2022
       </motion.text>
-      <motion.text x="140" y="235" fontSize="7" fill="#666666">
-        • Designed 20+ user interfaces for mobile applications
+      <motion.text 
+        x={window.innerWidth < 1024 ? "160" : "140"} 
+        y={window.innerWidth < 1024 ? "240" : "235"} 
+        fontSize={window.innerWidth < 1024 ? "6" : "7"} 
+        fill="#666666"
+      >
+        • Designed 20+ mobile interfaces
       </motion.text>
 
       {/* Job 3 */}
       <motion.text
-        x="140"
-        y="255"
-        fontSize="9"
+        x={window.innerWidth < 1024 ? "160" : "140"}
+        y={window.innerWidth < 1024 ? "260" : "255"}
+        fontSize={window.innerWidth < 1024 ? "8" : "9"}
         fontWeight="bold"
         fill="#333333"
       >
         Junior Designer
       </motion.text>
-      <motion.text x="280" y="255" fontSize="7" fill="#999999">
+      <motion.text 
+        x={window.innerWidth < 1024 ? "260" : "280"} 
+        y={window.innerWidth < 1024 ? "260" : "255"} 
+        fontSize={window.innerWidth < 1024 ? "6" : "7"} 
+        fill="#999999"
+      >
         2019-2020
       </motion.text>
-      <motion.text x="140" y="270" fontSize="7" fill="#666666">
-        • Created wireframes and prototypes for client projects
+      <motion.text 
+        x={window.innerWidth < 1024 ? "160" : "140"} 
+        y={window.innerWidth < 1024 ? "275" : "270"} 
+        fontSize={window.innerWidth < 1024 ? "6" : "7"} 
+        fill="#666666"
+      >
+        • Created wireframes & prototypes
       </motion.text>
 
       {/* Divider line */}
       <motion.line
-        x1="140"
-        y1="285"
-        x2="360"
-        y2="285"
+        x1={window.innerWidth < 1024 ? "160" : "140"}
+        y1={window.innerWidth < 1024 ? "290" : "285"}
+        x2={window.innerWidth < 1024 ? "340" : "360"}
+        y2={window.innerWidth < 1024 ? "290" : "285"}
         stroke="#E0E0E0"
         strokeWidth="1"
         strokeDasharray="4 4"
@@ -289,9 +334,9 @@ const ResumeIllustration = () => (
 
       {/* EDUCATION SECTION */}
       <motion.text
-        x="140"
-        y="305"
-        fontSize="10"
+        x={window.innerWidth < 1024 ? "160" : "140"}
+        y={window.innerWidth < 1024 ? "310" : "305"}
+        fontSize={window.innerWidth < 1024 ? "9" : "10"}
         fontWeight="bold"
         fill="#4169E1"
         filter="url(#neonGlow)"
@@ -309,24 +354,29 @@ const ResumeIllustration = () => (
       </motion.text>
 
       <motion.text
-        x="140"
-        y="325"
-        fontSize="9"
+        x={window.innerWidth < 1024 ? "160" : "140"}
+        y={window.innerWidth < 1024 ? "330" : "325"}
+        fontSize={window.innerWidth < 1024 ? "8" : "9"}
         fontWeight="bold"
         fill="#333333"
       >
         BFA in Digital Design
       </motion.text>
-      <motion.text x="140" y="340" fontSize="7" fill="#666666">
+      <motion.text 
+        x={window.innerWidth < 1024 ? "160" : "140"} 
+        y={window.innerWidth < 1024 ? "345" : "340"} 
+        fontSize={window.innerWidth < 1024 ? "6" : "7"} 
+        fill="#666666"
+      >
         Stanford University · 2020
       </motion.text>
 
       {/* Divider line */}
       <motion.line
-        x1="140"
-        y1="355"
-        x2="360"
-        y2="355"
+        x1={window.innerWidth < 1024 ? "160" : "140"}
+        y1={window.innerWidth < 1024 ? "360" : "355"}
+        x2={window.innerWidth < 1024 ? "340" : "360"}
+        y2={window.innerWidth < 1024 ? "360" : "355"}
         stroke="#E0E0E0"
         strokeWidth="1"
         strokeDasharray="4 4"
@@ -334,9 +384,9 @@ const ResumeIllustration = () => (
 
       {/* SKILLS SECTION */}
       <motion.text
-        x="140"
-        y="375"
-        fontSize="10"
+        x={window.innerWidth < 1024 ? "160" : "140"}
+        y={window.innerWidth < 1024 ? "380" : "375"}
+        fontSize={window.innerWidth < 1024 ? "9" : "10"}
         fontWeight="bold"
         fill="#00CED1"
         filter="url(#neonGlow)"
@@ -355,9 +405,9 @@ const ResumeIllustration = () => (
 
       {/* First row of skill tags */}
       <motion.rect
-        x="140"
-        y="390"
-        width="55"
+        x={window.innerWidth < 1024 ? "160" : "140"}
+        y={window.innerWidth < 1024 ? "395" : "390"}
+        width={window.innerWidth < 1024 ? "45" : "55"}
         height="18"
         rx="9"
         fill="#1E90FF"
@@ -366,14 +416,19 @@ const ResumeIllustration = () => (
         strokeWidth="0.5"
         strokeOpacity="0.4"
       />
-      <motion.text x="153" y="403" fontSize="8" fill="#1E90FF">
+      <motion.text 
+        x={window.innerWidth < 1024 ? "170" : "153"} 
+        y={window.innerWidth < 1024 ? "408" : "403"} 
+        fontSize={window.innerWidth < 1024 ? "7" : "8"} 
+        fill="#1E90FF"
+      >
         Figma
       </motion.text>
 
       <motion.rect
-        x="205"
-        y="390"
-        width="60"
+        x={window.innerWidth < 1024 ? "215" : "205"}
+        y={window.innerWidth < 1024 ? "395" : "390"}
+        width={window.innerWidth < 1024 ? "50" : "60"}
         height="18"
         rx="9"
         fill="#00BFFF"
@@ -382,14 +437,19 @@ const ResumeIllustration = () => (
         strokeWidth="0.5"
         strokeOpacity="0.4"
       />
-      <motion.text x="218" y="403" fontSize="8" fill="#00BFFF">
+      <motion.text 
+        x={window.innerWidth < 1024 ? "225" : "218"} 
+        y={window.innerWidth < 1024 ? "408" : "403"} 
+        fontSize={window.innerWidth < 1024 ? "7" : "8"} 
+        fill="#00BFFF"
+      >
         Sketch
       </motion.text>
 
       <motion.rect
-        x="275"
-        y="390"
-        width="65"
+        x={window.innerWidth < 1024 ? "275" : "275"}
+        y={window.innerWidth < 1024 ? "395" : "390"}
+        width={window.innerWidth < 1024 ? "55" : "65"}
         height="18"
         rx="9"
         fill="#4169E1"
@@ -398,7 +458,12 @@ const ResumeIllustration = () => (
         strokeWidth="0.5"
         strokeOpacity="0.4"
       />
-      <motion.text x="288" y="403" fontSize="8" fill="#4169E1">
+      <motion.text 
+        x={window.innerWidth < 1024 ? "285" : "288"} 
+        y={window.innerWidth < 1024 ? "408" : "403"} 
+        fontSize={window.innerWidth < 1024 ? "7" : "8"} 
+        fill="#4169E1"
+      >
         InVision
       </motion.text>
 
@@ -415,7 +480,7 @@ const ResumeIllustration = () => (
       >
         <circle
           cx="250"
-          cy="480"
+          cy={window.innerWidth < 1024 ? "460" : "480"}
           r="24"
           fill="url(#neonBlueGradient)"
           fillOpacity="0.15"
@@ -423,7 +488,7 @@ const ResumeIllustration = () => (
         />
         <circle
           cx="250"
-          cy="480"
+          cy={window.innerWidth < 1024 ? "460" : "480"}
           r="20"
           fill="white"
           fillOpacity="0.1"
@@ -432,7 +497,7 @@ const ResumeIllustration = () => (
           strokeOpacity="0.6"
         />
         <path
-          d="M250 465L250 480M250 465L245 470M250 465L255 470"
+          d="M250 445L250 460M250 445L245 450M250 445L255 450"
           stroke="#1E90FF"
           strokeWidth="2.5"
           strokeLinecap="round"
@@ -440,7 +505,7 @@ const ResumeIllustration = () => (
         />
         <text
           x="230"
-          y="510"
+          y={window.innerWidth < 1024 ? "490" : "510"}
           fontSize="7"
           fill="#1E90FF"
           filter="url(#neonGlow)"
@@ -449,64 +514,49 @@ const ResumeIllustration = () => (
         </text>
       </motion.g>
 
-      {/* Floating particles */}
-      <motion.circle
-        cx="90"
-        cy="120"
-        r="6"
-        fill="#1E90FF"
-        opacity="0.15"
-        filter="url(#neonGlow)"
-        animate={{
-          y: [0, -15, 0],
-          x: [0, 10, 0],
-          opacity: [0.15, 0.3, 0.15],
-        }}
-        transition={{
-          duration: 3,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
+      {/* Floating particles - hide on mobile */}
+      {window.innerWidth >= 768 && (
+        <>
+          <motion.circle
+            cx="90"
+            cy="120"
+            r="6"
+            fill="#1E90FF"
+            opacity="0.15"
+            filter="url(#neonGlow)"
+            animate={{
+              y: [0, -15, 0],
+              x: [0, 10, 0],
+              opacity: [0.15, 0.3, 0.15],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
 
-      <motion.circle
-        cx="410"
-        cy="300"
-        r="8"
-        fill="#00BFFF"
-        opacity="0.15"
-        filter="url(#neonGlow)"
-        animate={{
-          y: [0, 15, 0],
-          x: [0, -10, 0],
-          opacity: [0.15, 0.3, 0.15],
-        }}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 0.5,
-        }}
-      />
-
-      {/* Decorative corner elements */}
-      <motion.path
-        d="M130 70 L145 85"
-        stroke="#1E90FF"
-        strokeWidth="1.5"
-        strokeOpacity="0.3"
-        strokeLinecap="round"
-        filter="url(#neonGlow)"
-      />
-
-      <motion.path
-        d="M370 70 L355 85"
-        stroke="#00BFFF"
-        strokeWidth="1.5"
-        strokeOpacity="0.3"
-        strokeLinecap="round"
-        filter="url(#neonGlow)"
-      />
+          <motion.circle
+            cx="410"
+            cy="300"
+            r="8"
+            fill="#00BFFF"
+            opacity="0.15"
+            filter="url(#neonGlow)"
+            animate={{
+              y: [0, 15, 0],
+              x: [0, -10, 0],
+              opacity: [0.15, 0.3, 0.15],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 0.5,
+            }}
+          />
+        </>
+      )}
     </motion.svg>
   </motion.div>
 );
@@ -546,9 +596,20 @@ function UploadResume() {
     url: string;
   } | null>(null);
   const [focused, setFocused] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleBrowseFile = () => fileInputRef.current?.click();
 
@@ -776,7 +837,7 @@ function UploadResume() {
       <ToastContainer position="top-center" autoClose={2000} />
       <Navbar />
 
-      <div className="min-h-screen w-full flex items-center justify-center px-4 py-12 relative overflow-hidden">
+      <div className="min-h-screen w-full flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8 sm:py-12 relative overflow-hidden">
         {/* Minimalistic gradient background */}
         <div
           className="pointer-events-none fixed inset-0 -z-10"
@@ -789,29 +850,33 @@ function UploadResume() {
           }}
         />
 
-        {/* Decorative circles */}
-        <motion.div
-          className="absolute top-20 left-10 w-32 h-32 rounded-full opacity-5"
-          style={{ backgroundColor: colors.primary }}
-          animate={{ y: [0, -30, 0] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute bottom-20 right-10 w-40 h-40 rounded-full opacity-5"
-          style={{ backgroundColor: colors.accent }}
-          animate={{ y: [0, 30, 0] }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1,
-          }}
-        />
+        {/* Decorative circles - hide on mobile */}
+        {windowWidth >= 768 && (
+          <>
+            <motion.div
+              className="absolute top-20 left-10 w-32 h-32 rounded-full opacity-5"
+              style={{ backgroundColor: colors.primary }}
+              animate={{ y: [0, -30, 0] }}
+              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <motion.div
+              className="absolute bottom-20 right-10 w-40 h-40 rounded-full opacity-5"
+              style={{ backgroundColor: colors.accent }}
+              animate={{ y: [0, 30, 0] }}
+              transition={{
+                duration: 10,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1,
+              }}
+            />
+          </>
+        )}
 
-        <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-          {/* LEFT - Illustration & Benefits */}
+        <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12 xl:gap-16 items-start lg:items-center">
+          {/* LEFT - Illustration & Benefits - hidden on mobile, visible on lg screens */}
           <motion.div
-            className="hidden lg:flex flex-col gap-12"
+            className="hidden lg:flex flex-col gap-8 xl:gap-12"
             initial={{ opacity: 0, x: -40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
@@ -822,7 +887,7 @@ function UploadResume() {
             </div>
 
             {/* Benefits */}
-            <div className="space-y-6">
+            <div className="space-y-4 xl:space-y-6 max-w-md mx-auto">
               {[
                 {
                   icon: FeatherCheckCircle,
@@ -842,7 +907,7 @@ function UploadResume() {
               ].map((benefit, i) => (
                 <motion.div
                   key={i}
-                  className="flex gap-4 items-start"
+                  className="flex gap-3 xl:gap-4 items-start"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2 + i * 0.1 }}
@@ -854,6 +919,7 @@ function UploadResume() {
                       viewBox="0 0 24 24"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
+                      className="w-5 h-5 xl:w-6 xl:h-6"
                     >
                       <circle
                         cx="12"
@@ -873,13 +939,13 @@ function UploadResume() {
                   </div>
                   <div>
                     <h3
-                      className="font-medium text-sm"
+                      className="font-medium text-sm xl:text-base"
                       style={{ color: colors.accent }}
                     >
                       {benefit.title}
                     </h3>
                     <p
-                      className="text-xs mt-1"
+                      className="text-xs xl:text-sm mt-1"
                       style={{ color: colors.neutral[600] }}
                     >
                       {benefit.desc}
@@ -892,13 +958,13 @@ function UploadResume() {
 
           {/* RIGHT - Upload Form */}
           <motion.div
-            className="w-full"
-            initial={{ opacity: 0, x: 40 }}
+            className="w-full max-w-lg mx-auto lg:mx-0"
+            initial={{ opacity: 0, x: windowWidth >= 1024 ? 40 : 0 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
             {/* Back + Progress Bar */}
-            <div className="flex w-full items-center gap-3 sm:gap-4 mb-6">
+            <div className="flex w-full items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
               <IconButton
                 size="small"
                 icon={<FeatherArrowLeft />}
@@ -911,9 +977,9 @@ function UploadResume() {
             </div>
 
             {/* Title */}
-            <div className="flex w-full flex-col items-start gap-2 mb-6">
+            <div className="flex w-full flex-col items-start gap-2 mb-4 sm:mb-6">
               <span
-                className="text-base sm:text-lg font-medium"
+                className="text-lg sm:text-xl lg:text-2xl font-medium"
                 style={{ color: colors.accent }}
               >
                 Upload your Resume
@@ -929,7 +995,7 @@ function UploadResume() {
 
             {/* Resume Upload Section */}
             <div className="flex w-full flex-col items-start gap-4">
-              <span className="text-sm font-semibold text-neutral-900">
+              <span className="text-sm font-semibold" style={{ color: colors.neutral[800] }}>
                 Resume / CV
               </span>
 
@@ -938,9 +1004,9 @@ function UploadResume() {
                 role="button"
                 tabIndex={0}
                 aria-label="Upload resume. Click or press Enter to browse files. Or drag and drop a file here. Press Escape to remove the selected file."
-                className="w-full flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed bg-white px-4 sm:px-6 py-4 sm:py-6 cursor-pointer transition-all"
+                className="w-full flex flex-col items-center justify-center gap-2 sm:gap-3 rounded-xl border-2 border-dashed bg-white px-4 sm:px-6 py-6 sm:py-8 cursor-pointer transition-all"
                 style={{
-                  borderColor: focused ? colors.primary : colors.neutral[600],
+                  borderColor: focused ? colors.primary : colors.neutral[400],
                   backgroundColor: focused
                     ? `rgba(${parseInt(colors.primary.slice(1, 3), 16)}, ${parseInt(colors.primary.slice(3, 5), 16)}, ${parseInt(colors.primary.slice(5, 7), 16)}, 0.02)`
                     : "white",
@@ -953,7 +1019,7 @@ function UploadResume() {
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
                 animate={{
-                  borderColor: focused ? colors.primary : colors.neutral[600],
+                  borderColor: focused ? colors.primary : colors.neutral[400],
                 }}
                 transition={{ duration: 0.2 }}
               >
@@ -969,9 +1035,9 @@ function UploadResume() {
                 >
                   <IconWithBackground
                     variant="neutral"
-                    size="large"
-                    icon={<FeatherUpload className="w-5 h-5" />}
-                    className="!p-3 !bg-neutral-100"
+                    size={windowWidth < 640 ? "medium" : "large"}
+                    icon={<FeatherUpload className="w-4 h-4 sm:w-5 sm:h-5" />}
+                    className="!p-2 sm:!p-3 !bg-neutral-100"
                     style={{
                       backgroundColor: `rgba(${parseInt(colors.primary.slice(1, 3), 16)}, ${parseInt(colors.primary.slice(3, 5), 16)}, ${parseInt(colors.primary.slice(5, 7), 16)}, 0.1)`,
                     }}
@@ -980,7 +1046,7 @@ function UploadResume() {
 
                 <div className="flex flex-col items-center justify-center gap-1">
                   <span
-                    className="text-sm font-medium"
+                    className="text-xs sm:text-sm font-medium text-center"
                     style={{ color: colors.accent }}
                   >
                     Click to select file or drag to upload
@@ -1009,7 +1075,7 @@ function UploadResume() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="w-full flex items-center gap-3 sm:gap-4 rounded-lg border p-3"
+                  className="w-full flex items-center gap-3 rounded-lg border p-3"
                   style={{ borderColor: colors.neutral[200] }}
                 >
                   <IconWithBackground
@@ -1018,14 +1084,14 @@ function UploadResume() {
                     icon={
                       <FeatherFileText className="w-4 h-4 text-neutral-700" />
                     }
-                    className="!p-2 !bg-neutral-100"
+                    className="!p-2 !bg-neutral-100 flex-shrink-0"
                     style={{
                       backgroundColor: `rgba(${parseInt(colors.primary.slice(1, 3), 16)}, ${parseInt(colors.primary.slice(3, 5), 16)}, ${parseInt(colors.primary.slice(5, 7), 16)}, 0.1)`,
                     }}
                   />
 
-                  <div className="flex grow flex-col">
-                    <span className="text-sm text-neutral-900 truncate">
+                  <div className="flex grow flex-col min-w-0">
+                    <span className="text-xs sm:text-sm text-neutral-900 truncate max-w-[150px] sm:max-w-[200px] md:max-w-[250px]">
                       {file?.name || existingResume?.name}
                     </span>
 
@@ -1034,7 +1100,7 @@ function UploadResume() {
                         href={existingResume.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs hover:underline"
+                        className="text-xs hover:underline truncate"
                         style={{ color: colors.primary }}
                       >
                         View resume
@@ -1055,22 +1121,22 @@ function UploadResume() {
                     size="small"
                     icon={<FeatherX />}
                     onClick={removeFile}
-                    className="!bg-transparent !text-neutral-500"
+                    className="!bg-transparent !text-neutral-500 flex-shrink-0"
                   />
                 </motion.div>
               )}
             </div>
 
             {/* Continue Button */}
-            <div className="flex w-full justify-center sm:justify-end border-t border-neutral-border pt-6 mt-6">
+            <div className="flex flex-col items-center w-full border-t pt-6 mt-6">
               <button
-                className={`h-10 w-full sm:max-w-[520px] rounded-full font-semibold shadow-md transition ${
+                className={`h-10 sm:h-12 w-full sm:max-w-md rounded-full font-semibold shadow-md transition ${
                   uploading ? "pointer-events-none opacity-70" : ""
                 }`}
                 style={{
                   backgroundColor:
                     (!file && !existingResume) || uploading
-                      ? colors.neutral[200]
+                      ? colors.neutral[400]
                       : colors.primary,
                   color: colors.white,
                   border: "none",

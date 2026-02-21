@@ -12,9 +12,30 @@ import {
 } from "lucide-react";
 import { BASE_URL } from "src/common/API";
 import { clearUserData } from "src/utils/authUtils";
-
+import { motion } from "framer-motion";
 const DEFAULT_AVATAR =
   "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400";
+
+const buildAvatarUrl = (raw: string | undefined): string => {
+  if (!raw) return DEFAULT_AVATAR;
+  if (/^https?:\/\//.test(raw)) return raw;
+  const origin = BASE_URL.replace(/\/api\/?$/, "");
+  if (raw.startsWith("/")) return origin + raw;
+  return origin + "/" + raw;
+};
+
+const getAvatarFromStorage = (): string => {
+  try {
+    const u = localStorage.getItem("user");
+    if (u) {
+      const parsed = JSON.parse(u);
+      return buildAvatarUrl(parsed?.profileUrl);
+    }
+  } catch (e) {
+    console.error("Error parsing avatar:", e);
+  }
+  return DEFAULT_AVATAR;
+};
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,102 +46,59 @@ const Navbar = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  /* -------------------- Avatar Logic -------------------- */
+  const [avatar, setAvatar] = useState<string>(getAvatarFromStorage);
 
-  // Function to get avatar from localStorage
-  const getAvatarFromStorage = () => {
-    try {
-      const u = localStorage.getItem("user");
-      if (u) {
-        const parsed = JSON.parse(u);
-        const raw = parsed?.profileUrl;
-
-        if (raw) {
-          const origin = BASE_URL.replace(/\/api\/?$/, "");
-
-          if (/^https?:\/\//.test(raw)) return raw;
-          if (raw.startsWith("/")) return origin + raw;
-          return origin + "/" + raw;
-        }
-      }
-    } catch (e) {
-      console.error("Error parsing avatar:", e);
-    }
-    return DEFAULT_AVATAR;
-  };
-
-  // Initialize avatar state
-  const [avatar, setAvatar] = useState<string>(getAvatarFromStorage());
-
-  // Listen for avatar updates
   useEffect(() => {
-    const handleAvatarUpdate = (event: CustomEvent) => {
-      // If the event contains the new avatar URL, use it directly
-      if (event.detail?.avatarUrl) {
-        setAvatar(event.detail.avatarUrl);
+    const handleAvatarUpdate = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      if (customEvent.detail?.avatarUrl) {
+        setAvatar(customEvent.detail.avatarUrl);
       } else {
-        // Otherwise, fetch from localStorage
         setAvatar(getAvatarFromStorage());
       }
     };
 
-    // Listen for storage events (cross-tab)
     const handleStorageChange = () => {
       setAvatar(getAvatarFromStorage());
     };
 
+    window.addEventListener("avatar-updated", handleAvatarUpdate);
     window.addEventListener("storage", handleStorageChange);
-    window.addEventListener(
-      "avatar-updated",
-      handleAvatarUpdate as EventListener,
-    );
 
     return () => {
+      window.removeEventListener("avatar-updated", handleAvatarUpdate);
       window.removeEventListener("storage", handleStorageChange);
-      window.removeEventListener(
-        "avatar-updated",
-        handleAvatarUpdate as EventListener,
-      );
     };
   }, []);
-
-  /* -------------------- Page Checks -------------------- */
 
   const isLoggedIn = !!localStorage.getItem("token");
   const isDashboardPage = location.pathname === "/dashboard";
   const isLandingPage = location.pathname === "/";
 
-  /* -------------------- Handlers -------------------- */
-
   const toggleMenu = () => setIsOpen(!isOpen);
 
   const handleScroll = (sectionId: string) => {
     const element = document.getElementById(sectionId.toLowerCase());
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+    if (element) element.scrollIntoView({ behavior: "smooth" });
     setIsOpen(false);
   };
 
-  // Open logout confirmation modal
   const handleLogoutClick = () => {
     setProfileOpen(false);
+    setIsOpen(false);
     setShowLogoutModal(true);
   };
 
-  // Confirm logout
   const handleConfirmLogout = () => {
     clearUserData();
     setShowLogoutModal(false);
     navigate("/login");
   };
 
-  // Cancel logout
   const handleCancelLogout = () => {
     setShowLogoutModal(false);
   };
 
-  /* Close dropdown on outside click */
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -129,8 +107,6 @@ const Navbar = () => {
       ) {
         setProfileOpen(false);
       }
-
-      // Close modal if clicked outside
       if (
         modalRef.current &&
         !modalRef.current.contains(event.target as Node) &&
@@ -139,26 +115,15 @@ const Navbar = () => {
         setShowLogoutModal(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showLogoutModal]);
 
-  const handleLogoClick = () => {
-    navigate("/dashboard");
-  };
+  const handleLogoClick = () => navigate("/dashboard");
 
-  // Prevent scrolling when modal is open
   useEffect(() => {
-    if (showLogoutModal) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-
-    return () => {
-      document.body.style.overflow = "unset";
-    };
+    document.body.style.overflow = showLogoutModal ? "hidden" : "unset";
+    return () => { document.body.style.overflow = "unset"; };
   }, [showLogoutModal]);
 
   const menuItems = ["Home", "Features", "Contact"];
@@ -169,6 +134,7 @@ const Navbar = () => {
       style={{ backgroundColor: colors.primary }}
     >
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+
         {/* Logo */}
         <div
           className="flex items-center gap-3 cursor-pointer"
@@ -181,7 +147,7 @@ const Navbar = () => {
           />
         </div>
 
-        {/* Landing Page Menu */}
+        {/* Landing page nav links */}
         {isLandingPage && (
           <nav className="hidden md:flex items-center gap-12">
             {menuItems.map((item) => (
@@ -201,7 +167,7 @@ const Navbar = () => {
           </nav>
         )}
 
-        {/* Desktop Auth Section */}
+        {/* Desktop auth section */}
         <div className="hidden md:flex items-center gap-4 relative">
           {!isLoggedIn ? (
             <>
@@ -215,7 +181,6 @@ const Navbar = () => {
               >
                 Login
               </Link>
-
               <Link
                 to="/signup"
                 style={{
@@ -228,7 +193,6 @@ const Navbar = () => {
               </Link>
             </>
           ) : (
-            /* Other pages → only Logout */
             <div className="relative" ref={dropdownRef}>
               <img
                 src={avatar}
@@ -241,45 +205,55 @@ const Navbar = () => {
               />
 
               {profileOpen && (
-                <div className="absolute right-0 mt-3 w-52 bg-white border rounded-xl shadow-lg overflow-hidden z-50">
-                  <button
-                    onClick={() => {
-                      navigate("/profile");
-                      setProfileOpen(false);
-                    }}
-                    className="flex items-center gap-3 w-full px-4 py-3 hover:bg-gray-100 text-sm"
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  className="absolute right-0 mt-3 w-52 backdrop-blur-xl bg-white/90 border rounded-xl shadow-2xl overflow-hidden z-50 origin-top-right"
+                  style={{
+                    backdropFilter: "blur(12px)",
+                    border: "1px solid rgba(255, 255, 255, 0.3)",
+                  }}
+                >
+                  <motion.button
+                    whileHover={{ x: 4 }}
+                    transition={{ duration: 0.2 }}
+                    onClick={() => { navigate("/profile"); setProfileOpen(false); }}
+                    className="flex items-center gap-3 w-full px-4 py-3 hover:bg-gray-100/80 text-sm transition-colors duration-150"
                   >
                     <User size={16} />
                     My Profile
-                  </button>
+                  </motion.button>
 
-                  <button
-                    onClick={() => {
-                      navigate("/chat");
-                      setProfileOpen(false);
-                    }}
-                    className="flex items-center gap-3 w-full px-4 py-3 hover:bg-gray-100 text-sm"
+                  <motion.button
+                    whileHover={{ x: 4 }}
+                    transition={{ duration: 0.2 }}
+                    onClick={() => { navigate("/chat"); setProfileOpen(false); }}
+                    className="flex items-center gap-3 w-full px-4 py-3 hover:bg-gray-100/80 text-sm transition-colors duration-150"
                   >
                     <MessageCircle size={16} />
                     Messages
-                  </button>
+                  </motion.button>
 
-                  <div className="border-t"></div>
+                  <div className="border-t border-gray-200/50" />
 
-                  <button
+                  <motion.button
+                    whileHover={{ x: 4 }}
+                    transition={{ duration: 0.2 }}
                     onClick={handleLogoutClick}
-                    className="flex items-center gap-3 w-full px-4 py-3 hover:bg-red-50 text-sm text-red-600"
+                    className="flex items-center gap-3 w-full px-4 py-3 hover:bg-red-50/80 text-sm text-red-600 transition-colors duration-150"
                   >
                     <LogOut size={18} />
                     Logout
-                  </button>
-                </div>
+                  </motion.button>
+                </motion.div>
               )}
             </div>
           )}
         </div>
 
-        {/* Mobile Hamburger */}
+        {/* Mobile hamburger */}
         <button
           onClick={toggleMenu}
           className="md:hidden p-2 rounded-lg"
@@ -289,13 +263,14 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* ── Mobile Menu ─────────────────────────────────────────── */}
       {isOpen && (
         <div
           className="md:hidden border-t"
           style={{ backgroundColor: uniTalentColors.primary }}
         >
           <div className="px-4 py-4 space-y-4">
+            {/* Landing page nav links */}
             {isLandingPage &&
               menuItems.map((item) => (
                 <button
@@ -308,26 +283,20 @@ const Navbar = () => {
                 </button>
               ))}
 
-            <div className="pt-4 border-t space-y-3">
+            <div className="pt-2 space-y-3">
               {!isLoggedIn ? (
                 <div className="flex flex-col items-center gap-3">
                   <Link
-                    className="px-6 py-2 rounded-lg font-semibold transition-all duration-300 hover:scale-105"
-                    style={{
-                      backgroundColor: colors.white,
-                      color: colors.primary,
-                    }}
+                    className="px-6 py-2 rounded-lg font-semibold transition-all duration-300 hover:scale-105 w-full text-center"
+                    style={{ backgroundColor: colors.white, color: colors.primary }}
                     to="/login"
                     onClick={() => setIsOpen(false)}
                   >
                     Login
                   </Link>
                   <Link
-                    className="px-6 py-2 m-2 rounded-lg font-semibold transition-all duration-300 hover:scale-105"
-                    style={{
-                      backgroundColor: colors.white,
-                      color: colors.primary,
-                    }}
+                    className="px-6 py-2 rounded-lg font-semibold transition-all duration-300 hover:scale-105 w-full text-center"
+                    style={{ backgroundColor: colors.white, color: colors.primary }}
                     to="/signup"
                     onClick={() => setIsOpen(false)}
                   >
@@ -335,20 +304,54 @@ const Navbar = () => {
                   </Link>
                 </div>
               ) : (
-                <button
-                  onClick={handleLogoutClick}
-                  className="flex items-center gap-2 text-red-600"
-                >
-                  <LogOut size={18} />
-                  Logout
-                </button>
+                /* Logged-in mobile: Profile, Messages, Logout */
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={() => { navigate("/profile"); setIsOpen(false); }}
+                    className="flex items-center gap-3 w-full px-4 py-3 rounded-lg font-medium transition-colors"
+                    style={{
+                      backgroundColor: "rgba(255,255,255,0.15)",
+                      color: "#ffffff",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                    }}
+                  >
+                    <User size={20} />
+                    <span>My Profile</span>
+                  </button>
+
+                  <button
+                    onClick={() => { navigate("/chat"); setIsOpen(false); }}
+                    className="flex items-center gap-3 w-full px-4 py-3 rounded-lg font-medium transition-colors"
+                    style={{
+                      backgroundColor: "rgba(255,255,255,0.15)",
+                      color: "#ffffff",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                    }}
+                  >
+                    <MessageCircle size={20} />
+                    <span>Messages</span>
+                  </button>
+
+                  <button
+                    onClick={handleLogoutClick}
+                    className="flex items-center gap-3 w-full px-4 py-3 rounded-lg font-medium transition-colors"
+                    style={{
+                      backgroundColor: "rgba(239,68,68,0.15)",
+                      color: "#ff6b6b",
+                      border: "1px solid rgba(239,68,68,0.3)",
+                    }}
+                  >
+                    <LogOut size={20} />
+                    <span>Logout</span>
+                  </button>
+                </div>
               )}
             </div>
           </div>
         </div>
       )}
 
-      {/* Logout Confirmation Modal */}
+      {/* ── Logout Confirmation Modal ────────────────────────────── */}
       {showLogoutModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div

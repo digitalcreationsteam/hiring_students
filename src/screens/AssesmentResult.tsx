@@ -1,26 +1,248 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
+import { motion } from "framer-motion";
 import { Badge } from "../ui/components/Badge";
 import { Button } from "../ui/components/Button";
 import { IconWithBackground } from "../ui/components/IconWithBackground";
-import { FeatherArrowRight } from "@subframe/core";
-import { FeatherAward } from "@subframe/core";
-import { FeatherBookOpen } from "@subframe/core";
-import { FeatherCalendar } from "@subframe/core";
-import { FeatherClock } from "@subframe/core";
-import { FeatherGlobe } from "@subframe/core";
-import { FeatherMap } from "@subframe/core";
-import { FeatherMapPin } from "@subframe/core";
-import { FeatherShield } from "@subframe/core";
-import { FeatherTarget } from "@subframe/core";
-import { FeatherUsers } from "@subframe/core";
-import { FeatherArrowLeft } from "@subframe/core";
+import { 
+  FeatherArrowRight, 
+  FeatherAward, 
+  FeatherBookOpen, 
+  FeatherCalendar, 
+  FeatherClock, 
+  FeatherGlobe, 
+  FeatherMap, 
+  FeatherMapPin, 
+  FeatherShield, 
+  FeatherTarget, 
+  FeatherUsers, 
+  FeatherArrowLeft,
+  FeatherStar,
+  FeatherTrophy,
+  FeatherZap
+} from "@subframe/core";
 import { useNavigate, useLocation } from "react-router-dom";
 import API, { URL_PATH } from "src/common/API";
 import { colors } from "src/common/Colors";
 import Navbar from "src/ui/components/Navbar";
 import Footer from "src/ui/components/Footer";
+
+// ============================================
+// ENHANCED BACKGROUND GLASS LAYER
+// ============================================
+const BackgroundGlass: React.FC = () => (
+  <div className="fixed inset-0 pointer-events-none overflow-hidden">
+    <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-slate-100" />
+    <div className="absolute inset-0 bg-white/20 backdrop-blur-[150px]" />
+    <div className="absolute inset-0 bg-gradient-to-t from-white/10 via-transparent to-white/10" />
+  </div>
+);
+
+// ============================================
+// GLASS CARD COMPONENT
+// ============================================
+const GlassCard: React.FC<{
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+  onClick?: () => void;
+}> = ({ children, className = "", delay = 0, onClick }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 30 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.6, delay }}
+    className={`relative group cursor-pointer ${className}`}
+    onClick={onClick}
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+  >
+    {/* Main glass layer */}
+    <div
+      className="absolute inset-0 rounded-3xl transition-all duration-500 group-hover:shadow-xl"
+      style={{
+        background: "rgba(255, 255, 255, 0.6)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        border: "1px solid rgba(255, 255, 255, 0.5)",
+        boxShadow:
+          "0 8px 32px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(255, 255, 255, 0.3) inset",
+      }}
+    />
+
+    {/* Hover glow effect */}
+    <div
+      className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-30 transition-opacity duration-500"
+      style={{
+        background: `radial-gradient(circle at 50% 50%, ${colors.primary}40, transparent 70%)`,
+      }}
+    />
+
+    {/* Content */}
+    <div className="relative z-10">{children}</div>
+  </motion.div>
+);
+
+// ============================================
+// ANIMATED ILLUSTRATION COMPONENTS
+// ============================================
+const FloatingOrbs: React.FC = () => (
+  <div className="fixed inset-0 pointer-events-none overflow-hidden">
+    {/* Top right orb */}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.5 }}
+      animate={{ opacity: 0.4, scale: 1 }}
+      transition={{ duration: 1.5 }}
+      className="absolute -top-20 -right-20 w-64 h-64"
+    >
+      <motion.div
+        animate={{ 
+          y: [0, -30, 0],
+          rotate: [0, 10, 0]
+        }}
+        transition={{ 
+          duration: 12,
+          repeat: Infinity,
+          repeatType: "reverse",
+          ease: "easeInOut"
+        }}
+        className="w-full h-full rounded-full"
+        style={{
+          background: `radial-gradient(circle, ${colors.primary}15 0%, transparent 70%)`,
+          filter: "blur(40px)",
+        }}
+      />
+    </motion.div>
+
+    {/* Bottom left orb */}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.5 }}
+      animate={{ opacity: 0.4, scale: 1 }}
+      transition={{ duration: 1.5, delay: 0.3 }}
+      className="absolute -bottom-20 -left-20 w-72 h-72"
+    >
+      <motion.div
+        animate={{ 
+          y: [0, 30, 0],
+          x: [0, 20, 0]
+        }}
+        transition={{ 
+          duration: 15,
+          repeat: Infinity,
+          repeatType: "reverse",
+          ease: "easeInOut"
+        }}
+        className="w-full h-full rounded-full"
+        style={{
+          background: `radial-gradient(circle, ${colors.secondary}15 0%, transparent 70%)`,
+          filter: "blur(50px)",
+        }}
+      />
+    </motion.div>
+
+    {/* Center right orb */}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.5 }}
+      animate={{ opacity: 0.3, scale: 1 }}
+      transition={{ duration: 1.5, delay: 0.6 }}
+      className="absolute top-1/2 right-20 w-48 h-48"
+    >
+      <motion.div
+        animate={{ 
+          scale: [1, 1.2, 1],
+          rotate: [0, 15, 0]
+        }}
+        transition={{ 
+          duration: 10,
+          repeat: Infinity,
+          repeatType: "reverse",
+          ease: "easeInOut"
+        }}
+        className="w-full h-full rounded-full"
+        style={{
+          background: `radial-gradient(circle, ${colors.accent}15 0%, transparent 70%)`,
+          filter: "blur(40px)",
+        }}
+      />
+    </motion.div>
+
+    {/* Floating particles */}
+    {[...Array(20)].map((_, i) => (
+      <motion.div
+        key={i}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.2 }}
+        transition={{ duration: 1, delay: i * 0.1 }}
+        className="absolute rounded-full"
+        style={{
+          width: Math.random() * 4 + 2,
+          height: Math.random() * 4 + 2,
+          background: i % 3 === 0 ? colors.primary : i % 3 === 1 ? colors.secondary : colors.accent,
+          left: `${Math.random() * 100}%`,
+          top: `${Math.random() * 100}%`,
+          filter: "blur(1px)",
+        }}
+      >
+        <motion.div
+          animate={{ 
+            y: [0, -30, 0],
+            x: [0, 20, 0]
+          }}
+          transition={{ 
+            duration: Math.random() * 10 + 10,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: "easeInOut",
+            delay: Math.random() * 5
+          }}
+          className="w-full h-full"
+        />
+      </motion.div>
+    ))}
+  </div>
+);
+
+// ============================================
+// CONFETTI COMPONENT
+// ============================================
+const Confetti: React.FC<{ show: boolean }> = ({ show }) => {
+  if (!show) return null;
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-50">
+      {[...Array(50)].map((_, i) => (
+        <motion.div
+          key={i}
+          initial={{ 
+            x: `${Math.random() * 100}%`, 
+            y: -20,
+            rotate: 0,
+            scale: 0
+          }}
+          animate={{ 
+            y: '120vh',
+            rotate: Math.random() * 720,
+            scale: 1
+          }}
+          transition={{ 
+            duration: Math.random() * 3 + 2,
+            delay: Math.random() * 0.5,
+            ease: "easeOut"
+          }}
+          className="absolute"
+          style={{
+            left: `${Math.random() * 100}%`,
+            width: `${Math.random() * 10 + 5}px`,
+            height: `${Math.random() * 10 + 5}px`,
+            background: `hsl(${Math.random() * 360}, 80%, 60%)`,
+            borderRadius: Math.random() > 0.5 ? '50%' : '0',
+            boxShadow: '0 0 10px rgba(255,255,255,0.5)',
+          }}
+        />
+      ))}
+    </div>
+  );
+};
 
 type RankItem = {
   rank: number | string;
@@ -280,179 +502,233 @@ function AssessmentResult() {
 
   if (isResultLoading) {
     return (
-      <div className="w-full h-[60vh] flex items-center justify-center">
-        <div className="relative">
+      <div className="min-h-screen flex items-center justify-center relative">
+        <BackgroundGlass />
+        <FloatingOrbs />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="relative"
+        >
           <div className="w-20 h-20 border-4 border-gray-200 border-t-gray-600 rounded-full animate-spin"></div>
-          <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-gray-500 text-sm">
+          <motion.span 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-gray-500 text-sm"
+          >
             Loading...
-          </span>
-        </div>
+          </motion.span>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div
-      style={{
-        background: `linear-gradient(
-        to bottom,
-        #d9d9d9 0%,
-        #cfd3d6 25%,
-        #9aa6b2 55%,
-        #2E4056 100%
-      )`,
-      }}
-      className="min-h-screen relative overflow-hidden"
-    >
-      {/* CSS-only confetti effect */}
-      {showCelebration && (
-        <div className="fixed inset-0 pointer-events-none z-50">
-          {[...Array(50)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute animate-confetti"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `-10%`,
-                width: `${Math.random() * 10 + 5}px`,
-                height: `${Math.random() * 10 + 5}px`,
-                background: `hsl(${Math.random() * 360}, 80%, 60%)`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${Math.random() * 3 + 2}s`,
-                borderRadius: Math.random() > 0.5 ? "50%" : "0",
-                transform: `rotate(${Math.random() * 360}deg)`,
-              }}
-            />
-          ))}
-        </div>
-      )}
+    <>
+      <Navbar />
+      <BackgroundGlass />
+      <FloatingOrbs />
+      <Confetti show={showCelebration} />
 
-      <div className="w-full relative z-10">
-        <Navbar />
-      </div>
+      {/* Main Content */}
+      <div className="relative z-10 min-h-screen w-full overflow-x-hidden">
+        <div className="max-w-[1024px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-6"
+          >
+            <button
+              onClick={() => navigate(-1)}
+              className="w-10 h-10 rounded-full hover:bg-white/50 flex items-center justify-center transition-colors"
+              style={{ color: colors.neutral[600] }}
+            >
+              <FeatherArrowLeft style={{ width: 20, height: 20 }} />
+            </button>
+          </motion.div>
 
-      <div className="relative z-10">
-        <div className="w-full py-12">
-          <div className="mx-auto flex w-full max-w-[1024px] flex-col gap-8 px-4">
-            {/* Header with celebration animation */}
-            <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between animate-slideDown">
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-3">
-                  <h1 className="text-3xl font-bold text-default-font">
-                    Assessment Results
-                  </h1>
-                  {showCelebration && (
-                    <span className="text-3xl animate-bounce">🎉</span>
-                  )}
-                </div>
-                <span className="text-sm text-subtext-color flex items-center gap-2">
-                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                  Product Management · Skill Index
-                </span>
-              </div>
-
-              {/* Floating badge */}
-              <div className="relative group">
-                <div className="absolute inset-0 bg-accent rounded-lg blur opacity-50 group-hover:opacity-75 transition duration-300"></div>
-                <div className="relative px-4 py-2 bg-white rounded-lg shadow-lg">
-                  <span
-                    style={{ color: colors.accent }}
-                    className="text-sm font-semibold"
+          {/* Header with celebration animation */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-8"
+          >
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-3">
+                <motion.h1 
+                  className="text-3xl font-light tracking-tight"
+                  style={{ color: colors.accent }}
+                >
+                  Assessment Results
+                </motion.h1>
+                {showCelebration && (
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1, rotate: [0, 10, -10, 0] }}
+                    transition={{ duration: 0.5 }}
+                    className="text-3xl"
                   >
-                    🏆 Top Performer
-                  </span>
-                </div>
+                    🎉
+                  </motion.span>
+                )}
               </div>
+              <motion.span 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="text-sm flex items-center gap-2"
+                style={{ color: colors.neutral[600] }}
+              >
+                <motion.span 
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: colors.primary }}
+                />
+                Product Management · Skill Index
+              </motion.span>
             </div>
 
-            {/* Main Score Card */}
-            <div
-              style={{ backgroundColor: colors.white }}
-              className="relative w-full overflow-hidden rounded-3xl border-[3px] bg-gradient-to-b from-[#F4F2FF] to-white px-4 py-8 sm:px-12 sm:py-14 shadow-lg transform transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl group"
+            {/* Floating badge */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+              className="relative group"
             >
-              {/* Animated gradient border */}
-              <div
-                style={{
-                  background: `linear-gradient(to right, ${colors.accent}, ${colors.primary}, ${colors.aqua})`,
-                  opacity: 0,
-                }}
-                className="absolute inset-0 group-hover:opacity-30 transition-opacity duration-500"
-              ></div>
+              <div className="relative px-4 py-2 rounded-lg overflow-hidden">
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: `linear-gradient(135deg, ${colors.primary}20, ${colors.primary}05)`,
+                    backdropFilter: "blur(8px)",
+                    border: `1px solid ${colors.primary}30`,
+                  }}
+                />
+                <span
+                  className="relative z-10 text-sm font-medium flex items-center gap-2"
+                  style={{ color: colors.primary }}
+                >
+                  <FeatherTrophy className="w-4 h-4" />
+                  Top Performer
+                </span>
+              </div>
+            </motion.div>
+          </motion.div>
 
+          {/* Main Score Card */}
+          <GlassCard delay={0.2}>
+            <div className="p-6 sm:p-8 md:p-10">
               {/* Score with animation */}
-              <div className="flex flex-col items-center gap-6 relative">
-                <div className="flex items-end gap-3">
-                  <span
-                    style={{ color: colors.accent }}
-                    className={`text-[64px] sm:text-[80px] lg:text-[96px] font-bold leading-none transition-all duration-300 ${
+              <motion.div 
+                className="flex flex-col items-center gap-4"
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.4, type: "spring" }}
+              >
+                <div className="flex items-end gap-2">
+                  <motion.span
+                    style={{ color: colors.primary }}
+                    className={`text-5xl sm:text-6xl md:text-7xl font-light transition-all duration-300 ${
                       scoreAnimating ? "scale-110" : ""
                     }`}
                   >
                     {animatedScore || result?.skillIndex || "--"}
-                  </span>
-                  <span className="text-[20px] sm:text-[28px] lg:text-[32px] font-medium text-subtext-color pb-2 sm:pb-4">
+                  </motion.span>
+                  <span className="text-xl sm:text-2xl font-light" style={{ color: colors.neutral[400] }}>
                     / {result?.maxSkillIndex || "--"}
                   </span>
                 </div>
 
                 {/* Achievement badges */}
-                <div className="flex gap-3 mt-2">
-                  <div className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium animate-pulse">
+                <motion.div 
+                  className="flex gap-3 mt-2"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="px-3 py-1 rounded-full text-xs font-medium"
+                    style={{
+                      background: `linear-gradient(135deg, ${colors.primary}20, ${colors.primary}05)`,
+                      border: `1px solid ${colors.primary}30`,
+                      color: colors.primary,
+                    }}
+                  >
                     ⭐ Top 15%
-                  </div>
-                  <div className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                  </motion.div>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="px-3 py-1 rounded-full text-xs font-medium"
+                    style={{
+                      background: `linear-gradient(135deg, ${colors.secondary}20, ${colors.secondary}05)`,
+                      border: `1px solid ${colors.secondary}30`,
+                      color: colors.secondary,
+                    }}
+                  >
                     🎯 Excellent
-                  </div>
-                </div>
-              </div>
+                  </motion.div>
+                </motion.div>
+              </motion.div>
 
               {/* Performance Tier */}
-              <div className="mt-8 flex w-full max-w-[768px] flex-col items-center gap-6 mx-auto">
-                <div className="flex flex-col items-center">
-                  <span className="text-sm text-subtext-color">
+              <motion.div 
+                className="mt-8 flex flex-col items-center gap-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+              >
+                <div className="text-center">
+                  <span className="text-xs uppercase tracking-widest" style={{ color: colors.neutral[400] }}>
                     Performance Tier
                   </span>
-                  <span
-                    style={{ color: colors.accent }}
-                    className="text-base font-semibold"
+                  <motion.div
+                    initial={{ scale: 0.9 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.7, type: "spring" }}
+                    className="text-lg font-medium mt-1"
+                    style={{ color: colors.primary }}
                   >
                     Elite Performer
-                  </span>
+                  </motion.div>
                 </div>
 
                 {/* Animated tier progress */}
-                <div className="flex w-full items-center gap-4 overflow-x-auto sm:overflow-visible px-2 sm:px-0">
+                <div className="flex w-full items-center justify-center gap-2 sm:gap-4 overflow-x-auto pb-2">
                   {[
                     { name: "Development", percent: 40, color: "gray" },
                     { name: "Competent", percent: 25, color: "gray" },
                     {
                       name: "You are here",
                       percent: 15,
-                      color: "accent",
+                      color: "primary",
                       active: true,
                     },
-                    { name: "Advanced", percent: 10, color: "accent" },
+                    { name: "Advanced", percent: 10, color: "primary" },
                     { name: "Master", percent: 10, color: "gray" },
                   ].map((tier, index) => (
                     <React.Fragment key={tier.name}>
-                      <div className="flex flex-col items-center gap-2 shrink-0 group">
+                      <motion.div 
+                        className="flex flex-col items-center gap-2 shrink-0"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.8 + index * 0.1 }}
+                        whileHover={{ y: -5 }}
+                      >
                         <div
-                          className={`relative flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full transition-all duration-300 group-hover:scale-110 ${
-                            tier.active
-                              ? "bg-accent shadow-lg animate-soft-blink"
-                              : tier.color === "accent"
-                                ? "bg-accent/70"
-                                : "bg-neutral-300"
-                          }`}
+                          className={`relative flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full`}
                           style={{
-                            backgroundColor: tier.active
-                              ? colors.accent
-                              : tier.color === "accent"
-                                ? colors.accent + "70"
-                                : colors.primaryGlow,
-                            boxShadow: tier.active
-                              ? `0 0 20px ${colors.accent}`
-                              : "none",
+                            background: tier.active 
+                              ? `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`
+                              : tier.color === "primary"
+                                ? `linear-gradient(135deg, ${colors.primary}40, ${colors.primary}20)`
+                                : `linear-gradient(135deg, ${colors.neutral[400]}, ${colors.neutral[200]})`,
                           }}
                         >
                           <span className="text-xs font-medium text-white">
@@ -460,44 +736,34 @@ function AssessmentResult() {
                           </span>
                           {tier.active && (
                             <>
-                              <div className="absolute inset-0 rounded-full animate-ping bg-accent opacity-20"></div>
-                              <div
-                                className="absolute -inset-1 rounded-full blur opacity-30 group-hover:opacity-50 transition-opacity"
+                              <motion.div
+                                animate={{ scale: [1, 1.5, 1] }}
+                                transition={{ duration: 2, repeat: Infinity }}
+                                className="absolute inset-0 rounded-full"
                                 style={{
-                                  background: `linear-gradient(to right, ${colors.accent}, ${colors.primary})`,
+                                  background: `radial-gradient(circle, ${colors.primary}40 0%, transparent 70%)`,
                                 }}
-                              ></div>
+                              />
                             </>
                           )}
                         </div>
-                        <span
-                          className={`text-xs ${tier.active ? "text-accent font-medium" : "text-subtext-color"}`}
-                          style={{
-                            color: tier.active ? colors.accent : undefined,
-                          }}
+                        <span 
+                          className={`text-[10px] sm:text-xs whitespace-nowrap ${tier.active ? 'font-medium' : ''}`}
+                          style={{ color: tier.active ? colors.primary : colors.neutral[400] }}
                         >
                           {tier.name}
                         </span>
-                        {tier.active && (
-                          <span
-                            className="absolute -bottom-6 text-xs px-2 py-0.5 rounded-full whitespace-nowrap"
-                            style={{
-                              backgroundColor: colors.primaryGlow,
-                              color: "black",
-                            }}
-                          >
-                            ← You are here
-                          </span>
-                        )}
-                      </div>
+                      </motion.div>
                       {index < 4 && (
-                        <div
-                          className={`hidden sm:block h-1 flex-1 rounded-full ${
-                            index === 2 ? "bg-accent" : "bg-neutral-300"
-                          }`}
+                        <motion.div 
+                          className="hidden sm:block h-0.5 w-4 sm:w-8 rounded-full"
+                          initial={{ scaleX: 0 }}
+                          animate={{ scaleX: 1 }}
+                          transition={{ delay: 0.9 + index * 0.1 }}
                           style={{
-                            backgroundColor:
-                              index === 2 ? colors.accent : undefined,
+                            background: index === 2 
+                              ? `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`
+                              : colors.neutral[200],
                           }}
                         />
                       )}
@@ -505,47 +771,56 @@ function AssessmentResult() {
                   ))}
                 </div>
 
-                {/* Info Bar with glow effect */}
-                <div className="mt-6 relative group w-full">
+                {/* Info Bar */}
+                <motion.div 
+                  className="mt-4 w-full max-w-md mx-auto"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.9 }}
+                >
                   <div
-                    className="absolute inset-0 rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity"
+                    className="relative px-4 py-2 rounded-full text-center overflow-hidden"
                     style={{
-                      background: `linear-gradient(to right, ${colors.accent}, ${colors.primary})`,
+                      background: `linear-gradient(135deg, ${colors.primary}10, ${colors.primary}05)`,
+                      border: `1px solid ${colors.primary}20`,
                     }}
-                  ></div>
-                  <div
-                    className="relative flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3"
-                    style={{ backgroundColor: colors.primaryGlow }}
                   >
-                    <span
-                      className="text-sm font-medium animate-pulse"
-                      style={{ color: "black" }}
+                    <motion.span 
+                      className="text-xs sm:text-sm"
+                      style={{ color: colors.primary }}
                     >
                       ✨ Just 3 points away from Top 10%! Keep going!
-                    </span>
+                    </motion.span>
+                    <motion.div
+                      animate={{ x: ["-100%", "100%"] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                      className="absolute inset-0"
+                      style={{
+                        background: `linear-gradient(90deg, transparent, ${colors.primary}10, transparent)`,
+                      }}
+                    />
                   </div>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             </div>
+          </GlassCard>
 
-            {/* Metrics Cards */}
-            <div
-              style={{ backgroundColor: colors.white }}
-              className="w-full rounded-3xl shadow-md transform transition-all duration-300 hover:shadow-xl"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-4 sm:gap-8 px-4 sm:px-8 py-4">
+          {/* Metrics Cards */}
+          <GlassCard delay={0.3}>
+            <div className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-4 sm:gap-8">
                 {[
                   {
                     icon: FeatherCalendar,
                     label: "Completed",
                     value: formattedSubmittedDate,
-                    color: "green",
+                    color: colors.primary,
                   },
                   {
                     icon: FeatherClock,
                     label: "Time Taken",
                     value: formattedTimeTaken,
-                    color: "accent",
+                    color: colors.secondary,
                   },
                   {
                     icon: FeatherShield,
@@ -555,213 +830,180 @@ function AssessmentResult() {
                   },
                 ].map((item, index) => (
                   <React.Fragment key={item.label}>
-                    <div className="flex items-center gap-3 sm:gap-2 group">
+                    <motion.div 
+                      className="flex items-center gap-3 group"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.4 + index * 0.1 }}
+                      whileHover={{ scale: 1.05 }}
+                    >
                       <div
-                        className="p-2 rounded-lg group-hover:scale-110 transition-transform duration-300"
-                        style={{ backgroundColor: colors.primaryGlow }}
+                        className="p-2 rounded-lg"
+                        style={{
+                          background: `linear-gradient(135deg, ${item.color}20, ${item.color}05)`,
+                          border: `1px solid ${item.color}30`,
+                        }}
                       >
-                        <item.icon
-                          style={{
-                            color:
-                              item.color === "accent"
-                                ? colors.accent
-                                : item.color,
-                          }}
-                          className="text-sm"
-                        />
+                        <item.icon style={{ color: item.color }} className="w-4 h-4" />
                       </div>
-                      <div className="flex flex-col min-w-0">
-                        <span className="text-[14px] font-medium text-default-font truncate">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium" style={{ color: colors.accent }}>
                           {item.value}
                         </span>
-                        <span className="text-xs text-subtext-color">
+                        <span className="text-xs" style={{ color: colors.neutral[400] }}>
                           {item.label}
                         </span>
                       </div>
-                    </div>
+                    </motion.div>
                     {index < 2 && (
-                      <div className="h-px w-full bg-neutral-200 sm:h-6 sm:w-px" />
+                      <motion.div 
+                        className="hidden sm:block h-8 w-px"
+                        initial={{ height: 0 }}
+                        animate={{ height: 32 }}
+                        transition={{ delay: 0.5 + index * 0.1 }}
+                        style={{ backgroundColor: colors.neutral[200] }}
+                      />
                     )}
                   </React.Fragment>
                 ))}
               </div>
             </div>
+          </GlassCard>
 
-            {/* Ranking Cards */}
-            <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {[
-                {
-                  icon: FeatherMapPin,
-                  title: "City Ranking",
-                  value: rankData.city.rank,
-                },
-                {
-                  icon: FeatherMap,
-                  title: "Country Ranking",
-                  value: rankData.country.rank,
-                },
-                {
-                  icon: FeatherGlobe,
-                  title: "Global Ranking",
-                  value: rankData.global.rank,
-                },
-              ].map((item) => (
-                <div
-                  key={item.title}
-                  className="group perspective"
-                  onMouseEnter={() => setHoveredCard(item.title)}
-                  onMouseLeave={() => setHoveredCard(null)}
-                >
-                  <div
-                    className={`relative preserve-3d transition-all duration-500 ${
-                      hoveredCard === item.title ? "rotate-y-6 scale-105" : ""
-                    }`}
+          {/* Ranking Cards */}
+          <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 mt-8">
+            {[
+              {
+                icon: FeatherMapPin,
+                title: "City Ranking",
+                value: rankData.city.rank,
+                delay: 0.4,
+              },
+              {
+                icon: FeatherMap,
+                title: "Country Ranking",
+                value: rankData.country.rank,
+                delay: 0.5,
+              },
+              {
+                icon: FeatherGlobe,
+                title: "Global Ranking",
+                value: rankData.global.rank,
+                delay: 0.6,
+              },
+            ].map((item) => (
+              <GlassCard key={item.title} delay={item.delay}>
+                <div className="p-6 text-center">
+                  <motion.div
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                    className="flex justify-center mb-3"
                   >
-                    <div className="flex min-w-[220px] grow flex-col items-center gap-3 rounded-3xl border border-violet-200 bg-gradient-to-b from-[#F4F2FF] to-white px-6 py-8 shadow-md transform transition-all duration-300 hover:shadow-xl">
-                      <div className="relative">
-                        <div
-                          className="absolute inset-0 rounded-full blur-xl opacity-30 group-hover:opacity-50 transition-opacity"
-                          style={{ backgroundColor: colors.accent }}
-                        ></div>
-                        <IconWithBackground
-                          style={{
-                            backgroundColor: colors.primary,
-                            color: colors.white,
-                          }}
-                          className="rounded-full text-[20px] transform group-hover:scale-110 transition-transform duration-300"
-                          variant="brand"
-                          size="large"
-                          icon={<item.icon />}
-                        />
-                      </div>
-                      <span className="text-lg font-semibold text-default-font">
-                        {item.value !== "-" ? `#${item.value}` : "--"}
-                      </span>
-                      <span className="text-sm text-subtext-color">
-                        {item.title}
-                      </span>
-
-                      {/* Animated shine effect */}
-                      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent rounded-3xl"></div>
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center"
+                      style={{
+                        background: `linear-gradient(135deg, ${colors.primary}20, ${colors.primary}05)`,
+                        border: `1px solid ${colors.primary}30`,
+                      }}
+                    >
+                      <item.icon style={{ color: colors.primary }} className="w-5 h-5" />
                     </div>
-                  </div>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="text-2xl font-light mb-1"
+                    style={{ color: colors.primary }}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: item.delay + 0.2, type: "spring" }}
+                  >
+                    {item.value !== "-" ? `#${item.value}` : "--"}
+                  </motion.div>
+                  
+                  <span className="text-xs uppercase tracking-widest" style={{ color: colors.neutral[400] }}>
+                    {item.title}
+                  </span>
                 </div>
-              ))}
-            </div>
-
-            {/* Dashboard Button */}
-            <div className="flex w-full items-center justify-center relative group">
-              <div
-                className="absolute inset-0 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity animate-pulse"
-                style={{
-                  background: `linear-gradient(to right, ${colors.accent}, ${colors.primary})`,
-                }}
-              ></div>
-              <Button
-                style={{ backgroundColor: colors.primary }}
-                className="
-                  w-full max-w-[200px] h-12 rounded-2xl font-semibold
-                  transform transition-all duration-300 
-                  hover:scale-110 hover:shadow-2xl
-                  relative overflow-hidden
-                  [&_span]:!text-white
-                  [&_svg]:!text-white
-                  group
-                "
-                size="large"
-                iconRight={
-                  <FeatherArrowRight className="group-hover:translate-x-1 transition-transform" />
-                }
-                onClick={() => navigate("/dashboard")}
-              >
-                <span className="relative z-10">Go to Dashboard</span>
-                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
-              </Button>
-            </div>
+              </GlassCard>
+            ))}
           </div>
+
+          {/* Dashboard Button */}
+        <motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 0.7 }}
+  className="flex justify-center mt-8"
+>
+  <motion.div
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    className="relative"
+  >
+<button
+  onClick={() => navigate("/dashboard")}
+  className="group relative flex h-[50px] w-40 items-center justify-center overflow-hidden rounded-full shadow-2xl transition-all before:absolute before:h-0 before:w-0 before:rounded-full before:bg-orange-600 before:duration-500 before:ease-out hover:shadow-orange-600 hover:before:h-56 hover:before:w-56 mx-4"
+  style={{
+    background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
+  }}
+>
+  <div className="relative z-10 flex items-center justify-center gap-2 text-white">
+    <span>Go to Dashboard</span>
+    <FeatherArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
+  </div>
+</button>
+  </motion.div>
+</motion.div>
         </div>
       </div>
+
       <Footer />
 
       <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-20px) rotate(5deg); }
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap');
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
         }
-        
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+
+        html {
+          scroll-behavior: smooth;
+          overflow-x: hidden;
+          width: 100%;
         }
-        
-        @keyframes confetti {
-          0% {
-            transform: translateY(0) rotate(0deg);
-            opacity: 1;
-          }
-          100% {
-            transform: translateY(100vh) rotate(720deg);
-            opacity: 0;
-          }
+
+        body {
+          overflow-x: hidden;
+          width: 100%;
+          position: relative;
         }
-        
-        .animate-float {
-          animation: float 15s infinite ease-in-out;
+
+        #root {
+          overflow-x: hidden;
+          width: 100%;
+          position: relative;
         }
-        
-        .animate-slideDown {
-          animation: slideDown 0.6s ease-out;
+
+        ::-webkit-scrollbar {
+          width: 6px;
         }
-        
-        .animate-soft-blink {
-          animation: softBlink 2s infinite;
+
+        ::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.1);
         }
-        
-        .animate-confetti {
-          animation: confetti 3s ease-out forwards;
+
+        ::-webkit-scrollbar-thumb {
+          background: ${colors.primary}4D;
+          border-radius: 3px;
         }
-        
-        @keyframes softBlink {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.8; }
-        }
-        
-        .perspective {
-          perspective: 1000px;
-        }
-        
-        .preserve-3d {
-          transform-style: preserve-3d;
-        }
-        
-        .rotate-y-6 {
-          transform: rotateY(6deg);
-        }
-        
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-        
-        .animate-shimmer {
-          animation: shimmer 2s infinite;
-        }
-        
-        .bg-accent {
-          background-color: ${colors.accent};
-        }
-        
-        .text-accent {
-          color: ${colors.accent};
+
+        ::-webkit-scrollbar-thumb:hover {
+          background: ${colors.primary}80;
         }
       `}</style>
-    </div>
+    </>
   );
 }
 
