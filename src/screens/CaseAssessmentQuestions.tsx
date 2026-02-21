@@ -200,7 +200,7 @@ export default function CaseAssessmentQuestions() {
 // };
 
 
-  const handleSubmit = async () => {
+const handleSubmit = async () => {
   if (!selected) return;
 
   try {
@@ -209,13 +209,29 @@ export default function CaseAssessmentQuestions() {
     const currentQuestion = questions[currentIndex];
 
     // 1️⃣ Submit current answer
-    await API("POST", URL_PATH.submitAnswer(caseId, currentQuestion._id), {
+    const response = await API("POST", URL_PATH.submitAnswer(caseId, currentQuestion._id), {
       selectedOption: selected,
     });
 
     setSelected(null);
 
-    // 2️⃣ If this is the last question
+    // Check if the attempt is completed from the response
+    if (response?.completed) {
+      // If completed, submit the attempt and go to score page
+      const finalRes = await API("POST", URL_PATH.submitAttempt(attemptId));
+      
+      navigate("/case-assessment-score", {
+        state: {
+          score: finalRes.score,
+          retryAvailable: finalRes.retryAvailable,
+          attemptId,
+          caseId,
+        },
+      });
+      return;
+    }
+
+    // 2️⃣ If this is the last question (based on index)
     if (currentIndex + 1 >= TOTAL_QUESTIONS) {
       const finalRes = await API("POST", URL_PATH.submitAttempt(attemptId));
 
@@ -227,20 +243,58 @@ export default function CaseAssessmentQuestions() {
           caseId,
         },
       });
-
-      return; // STOP here — do NOT increment currentIndex
+      return;
     }
 
     // 3️⃣ Otherwise, move to next question
     setCurrentIndex((prev) => prev + 1);
   } catch (err) {
     console.error("Submit failed:", err);
+    
+    // Handle "already submitted" error - move to next question
+    // Check for the error message in different possible formats
+    const errorMessage = 
+      (err as any)?.message || 
+      (err as any)?.response?.data?.message || 
+      (err as any)?.data?.message;
+    
+    if (errorMessage === "Answer already submitted") {
+      console.log("Answer already submitted, moving to next question...");
+      
+      // Clear selection
+      setSelected(null);
+      
+      // Check if this was the last question
+      if (currentIndex + 1 >= TOTAL_QUESTIONS) {
+        try {
+          // Submit the entire attempt
+          const finalRes = await API("POST", URL_PATH.submitAttempt(attemptId));
+          
+          navigate("/case-assessment-score", {
+            state: {
+              score: finalRes.score,
+              retryAvailable: finalRes.retryAvailable,
+              attemptId,
+              caseId,
+            },
+          });
+        } catch (finalErr) {
+          console.error("Failed to submit attempt:", finalErr);
+          // If attempt submission fails, still try to move to next question
+          setCurrentIndex((prev) => prev + 1);
+        }
+      } else {
+        // Move to next question
+        setCurrentIndex((prev) => prev + 1);
+      }
+    } else {
+      // Handle other errors (optional: show error message to user)
+      alert("Failed to submit answer. Please try again.");
+    }
   } finally {
     setSubmitting(false);
   }
 };
-
-
 
   const currentQuestion = questions[currentIndex];
 

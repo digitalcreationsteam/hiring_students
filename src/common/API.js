@@ -10,7 +10,10 @@ import { optimizedAppearDataId } from "framer-motion";
 // export const BASE_URL = "http://localhost:5000/dev-api";
 // export const BASE_URL = "http://localhost:5000/api";
 //  export const BASE_URL = "https://unitalent.cloud/api";
+
 // export const BASE_URL = "http://localhost:5000/api";
+//  export const BASE_URL = "https://unitalent.cloud/api";
+
 // export const BASE_URL = "http://localhost:5001/api";
 export const BASE_URL = "https://unitalent.cloud/api";
 // export const BASE_URL = "https://unitalent.cloud/dev-api";
@@ -48,7 +51,7 @@ export const URL_PATH = {
   verifyRoute: "/auth/verify-route",
   verifyOTP: "/auth/verify-otp",
   resendOTP: "/auth/resend-otp",
-  getWeeklyCaseAttempts: (demoId) => `/user-case-attempts/${demoId}/weekly`,
+  getWeeklyCaseAttempts: (demoId) => `/cases/${demoId}/weekly`,
   /* ---------- EMAIL VERIFICATION ---------- */
   verifyEmail: "/auth/verify",
   resendVerification: "/auth/resend-verification",

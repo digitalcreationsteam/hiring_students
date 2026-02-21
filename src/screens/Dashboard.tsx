@@ -147,6 +147,25 @@ const DEFAULT_AVATAR =
 const formatLocation = (city?: string, state?: string): string =>
   `${city || ""}, ${state || ""}`.trim().replace(/^,\s*|,\s*$/g, "");
 
+/* ==================== RESPONSIVE CIRCLE HOOK ==================== */
+function useCircleSize() {
+  const [size, setSize] = useState(72);
+
+  useEffect(() => {
+    const update = () => {
+      const w = window.innerWidth;
+      if (w < 640) setSize(56);
+      else if (w < 1024) setSize(64);
+      else setSize(72);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  return size;
+}
+
 /* ==================== COMPONENTS ==================== */
 
 const DomainRankingsCard = ({
@@ -161,7 +180,7 @@ const DomainRankingsCard = ({
   return (
     <Card
       style={{ border: `1.5px solid ${colors.primaryGlow}` }}
-      className="bg-white rounded-[2rem] border shadow-sm"
+      className="bg-white rounded-2xl lg:rounded-[2rem] border shadow-sm"
     >
       <CardHeader>
         <CardTitle
@@ -176,8 +195,8 @@ const DomainRankingsCard = ({
       <CardContent className="space-y-4">
         {domains.map((domain, idx) => (
           <div key={idx} className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span
                   className="text-xs font-semibold"
                   style={{
@@ -213,7 +232,6 @@ const DomainRankingsCard = ({
               </div>
             </div>
 
-            {/* Skills preview */}
             <div className="flex flex-wrap gap-1">
               {domain.skills?.slice(0, 3).map((skill, i) => (
                 <span
@@ -231,7 +249,6 @@ const DomainRankingsCard = ({
               )}
             </div>
 
-            {/* Domain score progress */}
             {domain.score > 0 && (
               <div className="space-y-1">
                 <div className="flex justify-between text-[8px]">
@@ -263,37 +280,6 @@ const DomainRankingsCard = ({
   );
 };
 
-const ExperienceBadge = ({
-  years,
-  cohort,
-}: {
-  years: number;
-  cohort: string;
-}) => {
-  return (
-    <div className="flex items-center gap-2 mb-4">
-      <Badge
-        className="px-3 py-1 rounded-full text-xs"
-        style={{
-          backgroundColor: colors.primary,
-          color: "white",
-        }}
-      >
-        {years} YOE
-      </Badge>
-      <Badge
-        className="px-3 py-1 rounded-full text-xs"
-        style={{
-          backgroundColor: colors.background,
-          color: colors.accent,
-        }}
-      >
-        Cohort {cohort}
-      </Badge>
-    </div>
-  );
-};
-
 /* ==================== MAIN COMPONENT ==================== */
 
 export default function Dashboard() {
@@ -304,9 +290,7 @@ export default function Dashboard() {
 
   const [avatar, setAvatar] = useState<string>(DEFAULT_AVATAR);
   const [isSavingAvatar, setIsSavingAvatar] = useState(false);
-  const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(
-    null,
-  );
+  const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null);
 
   const [user, setUser] = useState<UserProfile>({
     name: "",
@@ -352,7 +336,6 @@ export default function Dashboard() {
     experience: { score: 0, max: 0 },
   });
 
-  // New states for domains and experience
   const [domains, setDomains] = useState<DomainRank[]>([]);
   const [primaryDomain, setPrimaryDomain] = useState<any>(null);
   const [experienceInfo, setExperienceInfo] = useState<ExperienceInfo>({
@@ -380,13 +363,17 @@ export default function Dashboard() {
     hackathons: { val: "0/0", pct: "0%" },
   });
 
+  // Reactive circle radius via hook (fixes SSR/resize bug)
+  const circleRadius = useCircleSize();
+  const circleCenter = circleRadius + 8;
+  const circleViewBox = circleCenter * 2;
+  const CIRCUMFERENCE = 2 * Math.PI * circleRadius;
+
   useEffect(() => {
     const user = localStorage.getItem("user");
     if (user) {
       const parsed = JSON.parse(user);
       setCurrentUserId(parsed?._id || null);
-
-      // Initialize avatar from localStorage
       if (parsed?.profileUrl) {
         const origin = BASE_URL.replace(/\/api\/?$/, "");
         let normalizedProfile = parsed.profileUrl;
@@ -407,18 +394,12 @@ export default function Dashboard() {
     navigate(`/chat/${chatUserId.trim()}`);
   };
 
-  // Update the calculatePercentile function with proper types
   const calculatePercentile = (
     rank: number | undefined,
     total: number,
   ): string => {
     if (!rank || rank <= 0 || !total || total <= 0) return "-";
-
-    // Calculate percentile: (1 - rank/total) * 100
-    // If rank is 1 out of 100, percentile = 99% (top 1%)
     const percentile = ((total - rank) / total) * 100;
-
-    // Round to nearest integer and return as string
     return Math.round(percentile).toString();
   };
 
@@ -432,7 +413,6 @@ export default function Dashboard() {
         return;
       }
 
-      /* DEMOGRAPHICS */
       const demo = res?.data?.demographics?.[0];
 
       setUser({
@@ -444,7 +424,6 @@ export default function Dashboard() {
       setUserCity(demo?.city || "City");
       setUserState(demo?.state || "State");
 
-      /* AVATAR */
       const profileFromServer = res?.documents?.profileUrl;
       if (profileFromServer) {
         const origin = BASE_URL.replace(/\/api\/?$/, "");
@@ -457,7 +436,6 @@ export default function Dashboard() {
           normalizedProfile = origin + "/" + profileFromServer;
         }
         setAvatar(normalizedProfile);
-
         try {
           const u = localStorage.getItem("user");
           const parsed = u ? JSON.parse(u) : {};
@@ -468,13 +446,10 @@ export default function Dashboard() {
         }
       }
 
-      /* RANK */
       const rank = res?.rank;
       const totals = res?.totalCounts || {};
-
       setTotalCounts(totals);
 
-      // Calculate percentiles using the new function
       const newRankData = {
         global: {
           rank: rank?.globalRank ?? "-",
@@ -494,31 +469,16 @@ export default function Dashboard() {
         },
         university: {
           rank: rank?.universityRank ?? "-",
-          percentile: calculatePercentile(
-            rank?.universityRank,
-            totals.university,
-          ),
+          percentile: calculatePercentile(rank?.universityRank, totals.university),
         },
       };
-
       setRankData(newRankData);
 
-      /* NEW: Domain and Experience Data */
-      if (res?.domains) {
-        setDomains(res.domains);
-      }
+      if (res?.domains) setDomains(res.domains);
+      if (res?.primaryDomain) setPrimaryDomain(res.primaryDomain);
+      if (res?.experience) setExperienceInfo(res.experience);
 
-      if (res?.primaryDomain) {
-        setPrimaryDomain(res.primaryDomain);
-      }
-
-      if (res?.experience) {
-        setExperienceInfo(res.experience);
-      }
-
-      /* HIREABILITY */
       const hireabilityIndex = res?.hireabilityIndex;
-
       const newHireability = {
         totalScore: hireabilityIndex?.hireabilityIndex ?? 0,
         weeklyChange: 0,
@@ -534,10 +494,8 @@ export default function Dashboard() {
           max: hireabilityIndex?.experienceIndexTotal ?? 0,
         },
       };
-
       setHireability(newHireability);
 
-      /* LISTS */
       setWorkExperience(res?.data?.workExperience || []);
 
       const mappedProjects = (res?.data?.projects || []).map((p: any) => ({
@@ -563,24 +521,17 @@ export default function Dashboard() {
       }));
       setSkills(skillsList);
 
-      /* JOB DOMAIN */
       const jobDomain = res?.jobdomain?.domain || "Professional";
       setDomain(jobDomain);
 
-      /* UNIVERSITY NAME + LEADERBOARD */
       const userUniversity = educationList?.[0]?.schoolName;
-
       if (userUniversity) {
         setUserUniversityName(userUniversity);
-
         try {
           const leaderboardRes = await API(
             "GET",
-            `${URL_PATH.getStudentsBySchool}?schoolName=${encodeURIComponent(
-              userUniversity,
-            )}`,
+            `${URL_PATH.getStudentsBySchool}?schoolName=${encodeURIComponent(userUniversity)}`,
           );
-
           const students = leaderboardRes?.data || [];
           setUniversityLeaderboard(students);
         } catch (error) {
@@ -588,29 +539,22 @@ export default function Dashboard() {
         }
       }
 
-      /* FETCH CASE STUDY ATTEMPTS THIS WEEK */
       const demoId = demo?.id || demo?._id;
-
       if (demoId) {
         try {
           const caseStudyRes = await API(
             "GET",
-            `${URL_PATH.getWeeklyCaseAttempts}/${demoId}`,
+            URL_PATH.getWeeklyCaseAttempts(demoId),
           );
-
           const weeklyAttempts = caseStudyRes?.totalAttempts ?? 0;
           const totalCaseStudies = 5;
           const pct = Math.round((weeklyAttempts / totalCaseStudies) * 100);
-
           setWeeklyActivity({
             caseStudies: {
               val: `${weeklyAttempts}/${totalCaseStudies}`,
               pct: `${pct}%`,
             },
-            hackathons: {
-              val: `1/2`,
-              pct: `50%`,
-            },
+            hackathons: { val: `1/2`, pct: `50%` },
           });
         } catch (error) {
           console.error("Weekly case study fetch failed:", error);
@@ -641,7 +585,6 @@ export default function Dashboard() {
         setIsProfileMenuOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -657,9 +600,7 @@ export default function Dashboard() {
   };
 
   const handleNavigate = (path: string) => {
-    navigate(path, {
-      state: { source: "dashboard" },
-    });
+    navigate(path, { state: { source: "dashboard" } });
   };
 
   const handleAssessmentClick = () => {
@@ -667,10 +608,7 @@ export default function Dashboard() {
       toast.success("Assessment already completed");
       return;
     }
-
-    navigate("/assessment-intro", {
-      state: { source: "dashboard" },
-    });
+    navigate("/assessment-intro", { state: { source: "dashboard" } });
   };
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -681,32 +619,23 @@ export default function Dashboard() {
       toast.error("File size should be less than 5MB");
       return;
     }
-
     const validTypes = ["image/jpeg", "image/png", "image/webp"];
     if (!validTypes.includes(file.type)) {
       toast.error("Please select a valid image (JPEG, PNG, or WebP)");
       return;
     }
-
     if (avatar && avatar.startsWith("blob:")) {
       URL.revokeObjectURL(avatar);
     }
-
     const previewUrl = URL.createObjectURL(file);
     setAvatar(previewUrl);
-
     try {
       setIsSavingAvatar(true);
-
       const formData = new FormData();
       formData.append("avatar", file);
-
       await API("POST", URL_PATH.uploadProfile, formData);
-
       await fetchDashboardData();
-
       window.dispatchEvent(new Event("avatar-updated"));
-
       setTimeout(() => {
         if (previewUrl.startsWith("blob:")) {
           URL.revokeObjectURL(previewUrl);
@@ -726,7 +655,6 @@ export default function Dashboard() {
   };
 
   /* ==================== MEMOS ==================== */
-
   const skillProgress = useMemo(() => {
     return hireability.skill.max > 0
       ? (hireability.skill.score / hireability.skill.max) * 100
@@ -740,10 +668,9 @@ export default function Dashboard() {
   }, [hireability.experience]);
 
   const circleOffset = useMemo(() => {
-    const CIRCUMFERENCE = 452.4;
     const MAX_SCORE = 1000;
     return CIRCUMFERENCE - (CIRCUMFERENCE * hireability.totalScore) / MAX_SCORE;
-  }, [hireability.totalScore]);
+  }, [hireability.totalScore, CIRCUMFERENCE]);
 
   /* ==================== UI ==================== */
   return (
@@ -752,12 +679,12 @@ export default function Dashboard() {
       <div
         style={{
           background: `linear-gradient(
-          to bottom,
-          #d9d9d9 0%,
-          #cfd3d6 25%,
-          #9aa6b2 55%,
-          #2E4056 100%
-        )`,
+            to bottom,
+            #d9d9d9 0%,
+            #cfd3d6 25%,
+            #9aa6b2 55%,
+            #2E4056 100%
+          )`,
           width: "100%",
           fontFamily: "'Poppins', sans-serif",
           minHeight: "100vh",
@@ -766,7 +693,7 @@ export default function Dashboard() {
         }}
         className="min-h-screen w-full relative"
       >
-        {/* TOP WELCOME BANNER */}
+        {/* NAVBAR */}
         <div
           className="w-full relative flex-shrink-0"
           style={{ borderColor: colors.aqua }}
@@ -775,26 +702,26 @@ export default function Dashboard() {
         </div>
 
         {/* Main Content */}
-        <div className="flex-grow max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mt-10 mb-10">
-          <div className="flex flex-col gap-8 lg:flex-row">
-            {/* --- LEFT SIDEBAR --- */}
-            <div className="flex w-full flex-col gap-6 lg:w-[340px] lg:flex-none">
-              {/* Experience Badge - New */}
-              {/* <ExperienceBadge
-                years={experienceInfo.years}
-                cohort={experienceInfo.cohort}
-              /> */}
+        <div className="flex-grow w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 relative z-10 mt-4 sm:mt-6 lg:mt-10 mb-4 sm:mb-6 lg:mb-10">
+          {/*
+            Layout:
+            - Mobile/Tablet (<lg): Single column stack
+            - Desktop (lg+): Three columns [left sidebar | center | right sidebar]
+          */}
+          <div className="flex flex-col gap-4 sm:gap-6 lg:flex-row lg:items-start">
 
+            {/* ============ LEFT SIDEBAR ============ */}
+            <div className="w-full lg:w-72 xl:w-80 lg:flex-none flex flex-col gap-4 sm:gap-6">
               <Card
-                className="w-full rounded-[2rem] shadow-sm"
+                className="w-full rounded-2xl lg:rounded-[2rem] shadow-sm"
                 style={{
                   backgroundColor: colors.white,
                   border: `1.5px solid ${colors.primaryGlow}`,
                 }}
               >
-                <CardContent className="p-6">
-                  {/* Header with Avatar and User Info */}
-                  <div className="flex items-start gap-4 mb-6">
+                <CardContent className="p-4 sm:p-5 lg:p-6">
+                  {/* Avatar + User Info */}
+                  <div className="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-5">
                     <div
                       className="relative cursor-pointer group flex-shrink-0"
                       onClick={() => fileRef.current?.click()}
@@ -803,17 +730,15 @@ export default function Dashboard() {
                         size="x-large"
                         image={avatar}
                         style={{ boxShadow: `0 0 0 4px ${colors.primaryGlow}` }}
-                        className="rounded-xl w-16 h-16"
+                        className="rounded-xl w-14 h-14 sm:w-16 sm:h-16"
                       >
                         PP
                       </Avatar>
-
                       <div className="absolute inset-0 rounded-xl bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
-                        <span className="text-white text-xs font-bold uppercase">
+                        <span className="text-white text-[10px] font-bold uppercase">
                           Change
                         </span>
                       </div>
-
                       <input
                         ref={fileRef}
                         type="file"
@@ -823,22 +748,22 @@ export default function Dashboard() {
                       />
                     </div>
 
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <h2
-                        className="text-xl font-semibold"
+                        className="text-base sm:text-lg font-semibold truncate"
                         style={{ color: colors.accent }}
                       >
                         {user.name}
                       </h2>
-                      <div className="flex items-center gap-2 mt-1">
+                      <div className="flex flex-col gap-0.5 mt-1">
                         <span
-                          className="text-sm"
+                          className="text-xs truncate"
                           style={{ color: colors.secondary }}
                         >
                           {user.domain}
                         </span>
                         <span
-                          className="text-xs"
+                          className="text-[10px] truncate"
                           style={{ color: colors.neutral[400] }}
                         >
                           {user.location}
@@ -848,42 +773,33 @@ export default function Dashboard() {
                   </div>
 
                   {/* Resume Content */}
-                  <div
-                    className="space-y-6 max-h-[500px] overflow-y-auto pr-2 scrollbar-hide mb-6"
-                    style={{
-                      scrollbarWidth: "none",
-                      msOverflowStyle: "none",
-                    }}
-                  >
+                  <div className="space-y-4 sm:space-y-5 mb-4 sm:mb-5">
                     {/* Experience */}
-                    <div className="space-y-4">
+                    <div className="space-y-2">
                       <p
-                        className="text-[10px] font-black uppercase tracking-widest"
+                        className="text-[9px] font-black uppercase tracking-widest"
                         style={{ color: colors.accent }}
                       >
                         Experience
                       </p>
-
                       <div
-                        className="space-y-4 border-l-2 ml-1"
+                        className="space-y-3 border-l-2 ml-1"
                         style={{ borderColor: colors.accent }}
                       >
                         {workExperience?.slice(0, 2).map((exp, i) => (
-                          <div key={i} className="pl-4 relative">
+                          <div key={i} className="pl-3 relative">
                             <div
                               className="absolute w-2 h-2 rounded-full -left-[5px] top-1 ring-2 ring-white"
                               style={{ backgroundColor: colors.accent }}
                             />
-
                             <h4
-                              className="text-xs leading-tight"
+                              className="text-xs leading-tight truncate"
                               style={{ color: colors.accent }}
                             >
                               {exp.jobTitle}
                             </h4>
-
                             <p
-                              className="text-[10px]"
+                              className="text-[9px] truncate"
                               style={{ color: colors.accent }}
                             >
                               {exp.companyName}
@@ -894,43 +810,37 @@ export default function Dashboard() {
                     </div>
 
                     {/* Projects */}
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       <p
-                        className="text-[10px] font-black uppercase tracking-widest"
+                        className="text-[9px] font-black uppercase tracking-widest"
                         style={{ color: colors.accent }}
                       >
                         Projects
                       </p>
-
                       {projects?.slice(0, 2).map((proj, i) => (
                         <div
                           key={i}
-                          className="relative pl-4 pr-3 py-3 rounded-xl border transition hover:shadow-md"
-                          style={{
-                            backgroundColor: colors.background,
-                          }}
+                          className="relative pl-3 pr-2 py-2 rounded-xl border transition hover:shadow-md"
+                          style={{ backgroundColor: colors.background }}
                         >
                           <span
-                            className="absolute left-0 top-3 bottom-3 w-1 rounded-full"
+                            className="absolute left-0 top-2 bottom-2 w-1 rounded-full"
                             style={{ backgroundColor: colors.accent }}
                           />
-
                           <span
-                            className="text-[9px] mb-1 inline-block"
+                            className="text-[8px] mb-0.5 inline-block"
                             style={{ color: colors.accent }}
                           >
                             Project {i + 1}
                           </span>
-
                           <h4
-                            className="text-[12px] font-bold leading-tight truncate"
+                            className="text-[11px] font-bold leading-tight truncate"
                             style={{ color: colors.primary }}
                           >
                             {proj.title}
                           </h4>
-
                           <p
-                            className="text-[10px] mt-1 leading-snug line-clamp-2"
+                            className="text-[9px] mt-0.5 leading-snug line-clamp-2"
                             style={{ color: colors.secondary }}
                           >
                             {proj.summary}
@@ -940,47 +850,41 @@ export default function Dashboard() {
                     </div>
 
                     {/* Certifications */}
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       <p
-                        className="text-[10px] font-black uppercase tracking-widest"
+                        className="text-[9px] font-black uppercase tracking-widest"
                         style={{ color: colors.accent }}
                       >
                         Certifications
                       </p>
-
                       {certifications?.slice(0, 2).map((cert, i) => (
                         <div
                           key={i}
-                          className="flex items-start gap-3 p-3 rounded-xl border shadow-sm"
-                          style={{
-                            backgroundColor: colors.background,
-                          }}
+                          className="flex items-start gap-2 p-2 rounded-xl border shadow-sm"
+                          style={{ backgroundColor: colors.background }}
                         >
-                          <div className="mt-0.5">
+                          <div className="mt-0.5 flex-shrink-0">
                             <FeatherAward
-                              className="w-4 h-4"
+                              className="w-3 h-3"
                               style={{ color: colors.accent }}
                             />
                           </div>
-
                           <div className="flex-1 min-w-0">
                             <p
-                              className="text-[11px] truncate"
+                              className="text-[10px] truncate"
                               style={{ color: colors.primary }}
                             >
                               {cert.name}
                             </p>
-
                             <p
-                              className="text-[9px] mt-0.5 truncate"
+                              className="text-[8px] mt-0.5 truncate"
                               style={{ color: colors.secondary }}
                             >
                               Issued by {cert.issuedBy}
                             </p>
                           </div>
-
                           <p
-                            className="text-[10px] whitespace-nowrap"
+                            className="text-[9px] whitespace-nowrap flex-shrink-0"
                             style={{ color: colors.primary }}
                           >
                             {cert.issueYear}
@@ -990,32 +894,30 @@ export default function Dashboard() {
                     </div>
 
                     {/* Education */}
-                    <div className="space-y-3 pt-2">
+                    <div className="space-y-2 pt-1">
                       <div className="flex items-center justify-between">
                         <p
-                          className="text-[10px] font-black uppercase tracking-widest"
+                          className="text-[9px] font-black uppercase tracking-widest"
                           style={{ color: colors.accent }}
                         >
                           Education
                         </p>
-
                         <div className="flex gap-1">
                           {certifications?.slice(0, 3).map((_, i) => (
                             <FeatherCheckCircle
                               key={i}
-                              className="w-3 h-3 text-green-500"
+                              className="w-2.5 h-2.5 text-green-500"
                             />
                           ))}
                         </div>
                       </div>
-
                       {education?.map((edu, i) => (
-                        <div key={i} className="text-[11px] space-y-0.5">
-                          <p className="text-neutral-800 leading-tight">
+                        <div key={i} className="text-[10px] space-y-0.5">
+                          <p className="text-neutral-800 leading-tight truncate">
                             {edu.schoolName}
                           </p>
-                          <p className="text-neutral-500">{edu.degree}</p>
-                          <p className="text-[10px] text-neutral-400 whitespace-nowrap">
+                          <p className="text-neutral-500 truncate">{edu.degree}</p>
+                          <p className="text-[9px] text-neutral-400">
                             {edu.startYear}
                             {edu.endYear ? ` – ${edu.endYear}` : " – Present"}
                           </p>
@@ -1024,19 +926,18 @@ export default function Dashboard() {
                     </div>
 
                     {/* Skills */}
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       <p
-                        className="text-[10px] font-black uppercase tracking-widest"
+                        className="text-[9px] font-black uppercase tracking-widest"
                         style={{ color: colors.accent }}
                       >
                         Skills
                       </p>
-
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1">
                         {skills?.slice(0, 6).map((skill, i) => (
                           <span
                             key={i}
-                            className="px-2 py-1 border rounded-md text-[9px] uppercase"
+                            className="px-2 py-0.5 border rounded-md text-[8px] uppercase"
                             style={{
                               backgroundColor: colors.background,
                               color: colors.accent,
@@ -1053,7 +954,7 @@ export default function Dashboard() {
                   <Button
                     onClick={() => navigate("/profile")}
                     style={{ backgroundColor: colors.primary }}
-                    className="w-full"
+                    className="w-full text-sm py-2"
                   >
                     Edit Profile
                   </Button>
@@ -1061,76 +962,60 @@ export default function Dashboard() {
               </Card>
             </div>
 
-            {/* --- CENTER DASHBOARD --- */}
-            <div className="flex w-full flex-col gap-8 lg:max-w-[800px]">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {/* ============ CENTER DASHBOARD ============ */}
+            <div className="w-full flex flex-col gap-4 sm:gap-6 lg:flex-1 min-w-0">
+
+              {/*
+                RANK CARDS:
+                - Mobile/Tablet: 2 columns (2×2 grid)
+                - Large screens (lg+): 4 columns (single row)
+              */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {[
                   {
                     label: "Global Rank",
                     val: rankData.global,
-                    pct: rankData.global.percentile,
                     icon: "/glob.png",
                     theme: colors.accent,
                   },
                   {
                     label: userState || "State",
                     val: rankData.state,
-                    pct: rankData.state.percentile,
                     icon: "/state.png",
                     theme: colors.secondary,
                   },
                   {
                     label: userCity || "City",
                     val: rankData.city,
-                    pct: rankData.city.percentile,
                     icon: "/city.png",
                     theme: colors.primary,
                   },
                   {
                     label: userUniversityName || "University",
                     val: rankData.university,
-                    pct: rankData.university.percentile,
                     icon: "/university.svg",
                     theme: colors.accent,
                   },
                 ].map((rank, i) => (
                   <Card
                     key={i}
-                    className="rounded-3xl shadow-sm border"
+                    className="rounded-2xl sm:rounded-3xl shadow-sm border"
                     style={{
                       backgroundColor: colors.white,
                       border: `1.5px solid ${colors.primaryGlow}`,
                     }}
                   >
-                    <CardContent className="flex flex-col items-center gap-2 p-6 text-center">
-                      <div className="h-10 w-10 flex items-center justify-center rounded-full">
-                        {typeof rank.icon === "string" ? (
-                          <img
-                            src={rank.icon}
-                            alt={rank.label}
-                            className="h-7 w-7 object-contain"
-                          />
-                        ) : (
-                          rank.icon
-                        )}
+                    <CardContent className="flex flex-col items-center gap-1 sm:gap-2 p-3 lg:p-3 text-center">
+                      <div className="h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded-full">
+                        <img
+                          src={rank.icon}
+                          alt={rank.label}
+                          className="h-5 w-5 sm:h-6 sm:w-6 object-contain"
+                        />
                       </div>
 
-                      <span
-                        style={{ color: "black" }}
-                        className="text-[10px] uppercase tracking-widest"
-                      >
-                        {rank.label}
-                      </span>
-
-                      <span
-                        className="text-3xl font-black"
-                        style={{ color: rank.theme }}
-                      >
-                        {rank.val.rank}
-                      </span>
-
                       <Badge
-                        className="border-none text-[10px]"
+                        className="border-none text-[7px] sm:text-[9px] whitespace-nowrap"
                         style={{
                           backgroundColor: colors.background,
                           color: colors.accent,
@@ -1140,76 +1025,94 @@ export default function Dashboard() {
                           ? `Top ${rank.val.percentile}%`
                           : "Top -%"}
                       </Badge>
+
+                      <span
+                        style={{ color: "black" }}
+                        className="text-[7px] sm:text-[9px] uppercase tracking-widest truncate max-w-full px-0.5 text-center"
+                      >
+                        {rank.label}
+                      </span>
+
+                      <span
+                        className="text-xl sm:text-2xl lg:text-2xl font-black"
+                        style={{ color: rank.theme }}
+                      >
+                        {rank.val.rank}
+                      </span>
                     </CardContent>
                   </Card>
                 ))}
               </div>
 
+              {/* Hireability Index Card */}
               <Card
-                className="w-full rounded-[2.5rem] shadow-xl overflow-hidden"
+                className="w-full rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden"
                 style={{
                   backgroundColor: "white",
                   color: colors.accent,
                   border: `1.5px solid ${colors.primaryGlow}`,
                 }}
               >
-                <CardContent className="p-8">
-                  <div className="flex flex-col md:flex-row items-center gap-8">
-                    {/* Circular Progress */}
-                    <div className="relative h-40 w-40 flex items-center justify-center">
-                      <svg className="absolute w-full h-full transform -rotate-90">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                    {/* Circular Progress — reactive via hook */}
+                    <div
+                      className="relative flex items-center justify-center flex-shrink-0"
+                      style={{ width: circleViewBox, height: circleViewBox }}
+                    >
+                      <svg
+                        width={circleViewBox}
+                        height={circleViewBox}
+                        className="transform -rotate-90"
+                      >
                         <circle
-                          cx="80"
-                          cy="80"
-                          r="72"
+                          cx={circleCenter}
+                          cy={circleCenter}
+                          r={circleRadius}
                           stroke="rgba(0,0,0,0.08)"
-                          strokeWidth="10"
+                          strokeWidth="8"
                           fill="transparent"
                         />
                         <circle
-                          cx="80"
-                          cy="80"
-                          r="72"
+                          cx={circleCenter}
+                          cy={circleCenter}
+                          r={circleRadius}
                           stroke={colors.accent}
-                          strokeWidth="10"
+                          strokeWidth="8"
                           fill="transparent"
-                          strokeDasharray="452.4"
+                          strokeDasharray={CIRCUMFERENCE}
                           strokeDashoffset={circleOffset}
                           strokeLinecap="round"
                         />
                       </svg>
-
-                      <div className="text-center">
+                      <div className="absolute text-center">
                         <span
-                          className="text-xl font-black"
+                          className="text-base sm:text-lg font-black"
                           style={{ color: colors.primary }}
                         >
                           {hireability.totalScore}
                         </span>
-
-                        <p className="text-[10px] uppercase opacity-60 font-bold tracking-widest">
+                        <p className="text-[8px] uppercase opacity-60 font-bold tracking-widest leading-tight">
                           Total Index
                         </p>
                       </div>
                     </div>
 
-                    {/* Right Side Content */}
-                    <div className="flex-1 space-y-6">
-                      <div className="flex items-center justify-between gap-3">
+                    {/* Right Side */}
+                    <div className="flex-1 space-y-3 sm:space-y-4 w-full">
+                      <div className="flex flex-row items-center justify-between gap-2">
                         <h3
-                          className="text-lg sm:text-xl font-bold"
+                          className="text-base sm:text-lg font-bold"
                           style={{ color: colors.accent }}
                         >
                           Hireability Index
                         </h3>
-
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-sm text-green-600">
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs text-green-600">
                             +{hireability?.weeklyChange ?? 0}
                           </span>
-
                           <span
-                            className="text-xs"
+                            className="text-[10px]"
                             style={{ color: colors.secondary }}
                           >
                             this week
@@ -1217,15 +1120,14 @@ export default function Dashboard() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 xs:grid-cols-2 gap-3">
                         <div className="space-y-1">
-                          <div className="flex justify-between text-[10px] uppercase tracking-widest opacity-70">
+                          <div className="flex justify-between text-[9px] uppercase tracking-widest opacity-70">
                             <span>Skill Index</span>
                             <span>
                               {hireability.skill.score}/{hireability.skill.max}
                             </span>
                           </div>
-
                           <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden">
                             <div
                               className="h-full"
@@ -1238,14 +1140,13 @@ export default function Dashboard() {
                         </div>
 
                         <div className="space-y-1">
-                          <div className="flex justify-between text-[10px] uppercase tracking-widest opacity-70">
+                          <div className="flex justify-between text-[9px] uppercase tracking-widest opacity-70">
                             <span>Experience</span>
                             <span>
                               {hireability.experience.score}/
                               {hireability.experience.max}
                             </span>
                           </div>
-
                           <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden">
                             <div
                               className="h-full"
@@ -1260,7 +1161,7 @@ export default function Dashboard() {
 
                       <Button
                         variant="neutral-primary"
-                        className="text-black border-none px-8 rounded-2xl h-12 transition-transform hover:scale-105"
+                        className="text-black border-none px-5 sm:px-6 rounded-xl h-10 text-sm transition-transform hover:scale-105 w-full sm:w-auto"
                         style={{
                           backgroundColor: colors.background2,
                           color: "#000000",
@@ -1273,113 +1174,108 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 items-start">
-                  <Card
-                    style={{ border: `1.5px solid ${colors.primaryGlow}` }}
-                    className="border p-3 border-neutral-200 rounded-3xl sm:rounded-[2rem] shadow-sm bg-white transition-all"
-                  >
-                    <CardContent className="pt-2 pb-0 px-4 sm:pt-3 sm:pb-3 sm:px-3">
-                      <h4 className="text-base sm:text-lg mb-2">
-                        Complete Assessment
-                      </h4>
-
-                      <p className="text-sm text-neutral-500 mb-4 sm:mb-6 leading-relaxed">
-                        Begin evaluation and boost your credibility with
-                        role-specific eval.
-                      </p>
-
-                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <span className="text-xs text-neutral-400 flex items-center gap-1">
-                          <FeatherClock className="w-3 h-3" /> 20 min
-                        </span>
-
-                        {isAssessmentCompleted ? (
-                          <Button
-                            disabled
-                            className="w-full sm:w-auto rounded-2xl bg-neutral-200 text-neutral-500 cursor-not-allowed border-none px-5 sm:px-6"
-                          >
-                            Completed
-                          </Button>
-                        ) : (
-                          <Button
-                            className="w-full sm:w-auto rounded-2xl px-5 sm:px-6"
-                            style={{
-                              backgroundColor: colors.secondary,
-                              color: "white",
-                            }}
-                            onClick={handleAssessmentClick}
-                          >
-                            Start Now
-                          </Button>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card
-                    style={{ border: `1.5px solid ${colors.primaryGlow}` }}
-                    className="border p-3 border-neutral-200 rounded-3xl sm:rounded-[2rem] shadow-sm bg-white transition-all"
-                  >
-                    <CardContent className="pt-2 pb-0 px-4 sm:pt-3 sm:pb-3 sm:px-3">
-                      <h4 className="text-base sm:text-lg mb-2">
-                        Solve Case Studies
-                      </h4>
-
-                      <p className="text-sm text-neutral-500 mb-4 sm:mb-6 leading-relaxed">
-                        Solving cases shows recruiters your effort to increase
-                        your knowledge base.
-                      </p>
-
-                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <span className="text-xs text-neutral-400 flex items-center gap-1">
-                          <FeatherClock className="w-3 h-3" /> 20 min
-                        </span>
-
+              {/* Assessment + Case Studies Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <Card
+                  style={{ border: `1.5px solid ${colors.primaryGlow}` }}
+                  className="border rounded-2xl sm:rounded-3xl shadow-sm bg-white"
+                >
+                  <CardContent className="p-3 sm:p-4">
+                    <h4 className="text-sm sm:text-base mb-1 sm:mb-2">
+                      Complete Assessment
+                    </h4>
+                    <p className="text-xs text-neutral-500 mb-3 sm:mb-4 leading-relaxed">
+                      Begin evaluation and boost your credibility with
+                      role-specific eval.
+                    </p>
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <span className="text-[10px] text-neutral-400 flex items-center gap-1">
+                        <FeatherClock className="w-3 h-3" /> 20 min
+                      </span>
+                      {isAssessmentCompleted ? (
                         <Button
-                          className="w-full sm:w-auto rounded-2xl px-5 sm:px-6"
-                          style={{ backgroundColor: colors.secondary }}
-                          onClick={() => handleNavigate("/case-assessments")}
+                          disabled
+                          className="rounded-xl bg-neutral-200 text-neutral-500 cursor-not-allowed border-none px-4 text-xs"
+                        >
+                          Completed
+                        </Button>
+                      ) : (
+                        <Button
+                          className="rounded-xl px-4 text-xs"
+                          style={{
+                            backgroundColor: colors.secondary,
+                            color: "white",
+                          }}
+                          onClick={handleAssessmentClick}
                         >
                           Start Now
                         </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card
+                  style={{ border: `1.5px solid ${colors.primaryGlow}` }}
+                  className="border rounded-2xl sm:rounded-3xl shadow-sm bg-white"
+                >
+                  <CardContent className="p-3 sm:p-4">
+                    <h4 className="text-sm sm:text-base mb-1 sm:mb-2">
+                      Solve Case Studies
+                    </h4>
+                    <p className="text-xs text-neutral-500 mb-3 sm:mb-4 leading-relaxed">
+                      Solving cases shows recruiters your effort to increase
+                      your knowledge base.
+                    </p>
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <span className="text-[10px] text-neutral-400 flex items-center gap-1">
+                        <FeatherClock className="w-3 h-3" /> 20 min
+                      </span>
+                      <Button
+                        className="rounded-xl px-4 text-xs"
+                        style={{ backgroundColor: colors.secondary, color: "white" }}
+                        onClick={() => handleNavigate("/case-assessments")}
+                      >
+                        Start Now
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
 
-            {/* --- RIGHT SIDEBAR --- */}
-            <div className="flex w-full flex-col gap-6 lg:w-[340px] lg:flex-none">
-              {/* New Domain Rankings Card */}
+            {/* ============ RIGHT SIDEBAR ============ */}
+            <div className="w-full lg:w-72 xl:w-80 lg:flex-none flex flex-col gap-4 sm:gap-6">
+
+              {/* Domain Rankings */}
               <DomainRankingsCard
                 domains={domains}
                 primaryDomain={primaryDomain}
               />
 
+              {/* University Leaderboard */}
               <Card
                 style={{ border: `1.5px solid ${colors.primaryGlow}` }}
-                className="bg-white rounded-[2rem] border shadow-sm"
+                className="bg-white rounded-2xl lg:rounded-[2rem] border shadow-sm"
               >
-                <CardHeader className="pb-2">
+                <CardHeader className="pb-1 sm:pb-2">
                   <CardTitle
                     className="text-sm font-bold flex flex-col items-start gap-1"
                     style={{ color: colors.accent }}
                   >
-                    <div className="flex gap-2">
-                      <div>
+                    <div className="flex gap-2 w-full">
+                      <div className="flex-shrink-0">
                         <img
                           src="/trophy.png"
                           alt="Trophy"
-                          className="w-7 h-7 object-contain"
+                          className="w-6 h-6 object-contain"
                         />
                       </div>
-                      <div className="flex flex-col">
-                        <span style={{ color: colors.accent }}>
+                      <div className="flex flex-col min-w-0 flex-1">
+                        <span className="truncate" style={{ color: colors.accent }}>
                           Top PMs at {universityName}
                         </span>
-                        <span className="text-xs font-normal opacity-70">
+                        <span className="text-[10px] font-normal opacity-70">
                           Full Leaderboard
                         </span>
                       </div>
@@ -1387,7 +1283,7 @@ export default function Dashboard() {
                   </CardTitle>
                 </CardHeader>
 
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-2">
                   {universityLeaderboard?.length === 0 ? (
                     <p className="text-xs">No students found</p>
                   ) : (
@@ -1396,7 +1292,6 @@ export default function Dashboard() {
                       .slice(0, 5)
                       .map((p: any, index: number) => {
                         const isUser = p.userId?._id === currentUserId;
-
                         const fullName = `${p.userId?.firstname || ""} ${
                           p.userId?.lastname || ""
                         }`.trim();
@@ -1404,7 +1299,7 @@ export default function Dashboard() {
                         return (
                           <div
                             key={p._id}
-                            className="flex items-center gap-3 p-3 rounded-2xl"
+                            className="flex items-center gap-2 p-2 rounded-xl"
                             style={{
                               backgroundColor: isUser
                                 ? colors.aqua
@@ -1412,7 +1307,7 @@ export default function Dashboard() {
                             }}
                           >
                             <div
-                              className="w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black"
+                              className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg flex items-center justify-center text-[8px] font-black flex-shrink-0"
                               style={{
                                 backgroundColor: colors.white,
                                 color: isUser ? colors.primary : colors.accent,
@@ -1420,22 +1315,18 @@ export default function Dashboard() {
                             >
                               #{index + 1}
                             </div>
-
                             <div className="flex-1 min-w-0">
                               <p
-                                className="text-xs truncate font-semibold"
+                                className="text-[11px] truncate font-semibold"
                                 style={{
-                                  color: isUser
-                                    ? colors.primary
-                                    : colors.accent,
+                                  color: isUser ? colors.primary : colors.accent,
                                 }}
                               >
                                 {fullName || p.userId?.email}{" "}
                                 {isUser && "(You)"}
                               </p>
-
                               <p
-                                className="text-[10px] opacity-60"
+                                className="text-[9px] opacity-60 truncate"
                                 style={{ color: colors.accent }}
                               >
                                 Score: {p.educationScore}
@@ -1448,20 +1339,20 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
+              {/* Profile Views */}
               <Card
                 style={{ border: `1.5px solid ${colors.primaryGlow}` }}
-                className="bg-white rounded-[2rem] border shadow-sm"
+                className="bg-white rounded-2xl lg:rounded-[2rem] border shadow-sm"
               >
-                <CardHeader className="flex flex-row items-center justify-between">
+                <CardHeader className="flex flex-row items-center justify-between pb-1 sm:pb-2">
                   <CardTitle
                     className="text-sm font-bold"
                     style={{ color: colors.accent }}
                   >
                     Profile Views
                   </CardTitle>
-
                   <Badge
-                    className="border-none text-[10px]"
+                    className="border-none text-[8px]"
                     style={{
                       backgroundColor: colors.primary,
                       color: colors.white,
@@ -1470,10 +1361,9 @@ export default function Dashboard() {
                     0
                   </Badge>
                 </CardHeader>
-
-                <CardContent className="flex items-center justify-center py-6">
+                <CardContent className="flex items-center justify-center py-4 sm:py-6">
                   <p
-                    className="text-xs opacity-60"
+                    className="text-[11px] opacity-60"
                     style={{ color: colors.accent }}
                   >
                     No profile views yet
@@ -1481,21 +1371,21 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
+              {/* Weekly Activity */}
               <Card
-                className="w-full rounded-[2rem] shadow-sm border"
+                className="w-full rounded-2xl lg:rounded-[2rem] shadow-sm border"
                 style={{
                   backgroundColor: colors.white,
                   color: colors.accent,
                   border: `1.5px solid ${colors.primaryGlow}`,
                 }}
               >
-                <CardHeader className="pb-2">
+                <CardHeader className="pb-1 sm:pb-2">
                   <CardTitle className="text-sm font-bold">
                     Activity This Week
                   </CardTitle>
                 </CardHeader>
-
-                <CardContent className="space-y-5">
+                <CardContent className="space-y-3 sm:space-y-4">
                   {[
                     {
                       label: "Case Studies",
@@ -1504,32 +1394,23 @@ export default function Dashboard() {
                     },
                   ].map((item, idx) => (
                     <div key={idx} className="space-y-1">
-                      <div className="flex justify-between text-[11px]">
-                        <span style={{ color: colors.accent }}>
-                          {item.label}
-                        </span>
-                        <span style={{ color: colors.primary }}>
-                          {item.val}
-                        </span>
+                      <div className="flex justify-between text-[10px]">
+                        <span style={{ color: colors.accent }}>{item.label}</span>
+                        <span style={{ color: colors.primary }}>{item.val}</span>
                       </div>
-
                       <div
                         className="h-1.5 w-full rounded-full overflow-hidden"
                         style={{ backgroundColor: colors.background }}
                       >
                         <div
                           className="h-full rounded-full transition-all duration-500"
-                          style={{
-                            width: item.pct,
-                            backgroundColor: item.color,
-                          }}
+                          style={{ width: item.pct, backgroundColor: item.color }}
                         />
                       </div>
                     </div>
                   ))}
-
                   <div
-                    className="mt-2 rounded-xl px-3 py-2 text-center text-[10px]"
+                    className="mt-1 rounded-lg px-2 py-1.5 text-center text-[9px]"
                     style={{
                       backgroundColor: colors.background2,
                       color: "black",
@@ -1540,41 +1421,82 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
+              {/* Recruiter Messages */}
               <Card
                 style={{ border: `1.5px solid ${colors.primaryGlow}` }}
-                className="bg-white rounded-[2rem] border shadow-sm overflow-hidden"
+                className="bg-white rounded-2xl lg:rounded-[2rem] border shadow-sm overflow-hidden"
               >
-                <CardContent className="p-6">
-                  <div className="flex flex-col items-center text-center gap-4">
-                    <div className="space-y-2">
-                      <h3
-                        className="text-lg font-semibold"
-                        style={{ color: colors.accent }}
+                <CardContent className="p-4 sm:p-5">
+                  <h3
+                    className="text-base font-semibold mb-3"
+                    style={{ color: colors.accent }}
+                  >
+                    Recruiter Messages
+                  </h3>
+                  <div className="space-y-2 w-full">
+                    <div
+                      className="flex items-start gap-2 p-2 sm:p-3 rounded-xl text-left"
+                      style={{ backgroundColor: `${colors.primary}08` }}
+                    >
+                      <div
+                        className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: colors.primary }}
                       >
-                        Talk to Recruiters
-                      </h3>
-                      <p
-                        className="text-sm"
-                        style={{ color: colors.secondary }}
-                      >
-                        Directly message recruiters and explore new
-                        opportunities.
-                      </p>
+                        <span className="text-white text-[10px]">R</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p
+                          className="text-xs font-medium truncate"
+                          style={{ color: colors.accent }}
+                        >
+                          Sarah Johnson
+                        </p>
+                        <p
+                          className="text-[10px] truncate"
+                          style={{ color: colors.secondary }}
+                        >
+                          Interested in your profile for a Product Manager...
+                        </p>
+                        <p
+                          className="text-[8px] mt-0.5"
+                          style={{ color: colors.neutral[400] }}
+                        >
+                          2 hours ago
+                        </p>
+                      </div>
                     </div>
 
-                    <Button
-                      onClick={() => navigate("/chat")}
-                      className="w-full rounded-2xl h-12 transition-transform hover:scale-105 mt-2"
-                      style={{
-                        backgroundColor: colors.primary,
-                        color: "white",
-                      }}
+                    <div
+                      className="flex items-start gap-2 p-2 sm:p-3 rounded-xl text-left"
+                      style={{ backgroundColor: `${colors.primary}08` }}
                     >
-                      <div className="flex items-center justify-center gap-2">
-                        <span>Send a Message</span>
-                        <FeatherArrowRight className="w-4 h-4" />
+                      <div
+                        className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: colors.secondary }}
+                      >
+                        <span className="text-white text-[10px]">M</span>
                       </div>
-                    </Button>
+                      <div className="flex-1 min-w-0">
+                        <p
+                          className="text-xs font-medium truncate"
+                          style={{ color: colors.accent }}
+                        >
+                          Michael Chen
+                        </p>
+                        <p
+                          className="text-[10px] truncate"
+                          style={{ color: colors.secondary }}
+                        >
+                          Would you be available for a quick call this week?...
+                        </p>
+                        <p
+                          className="text-[8px] mt-0.5"
+                          style={{ color: colors.neutral[400] }}
+                        >
+                          1 day ago
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

@@ -43,13 +43,15 @@ import CaseAssessmentQuestions from "./screens/CaseAssessmentQuestions";
 import CaseAssessmentScore from "./screens/CaseAssessmentScore";
 import CaseAssessmentRevel from "./screens/CaseAssessmentRevel";
 import PaymentProcessing from "./ui/components/PaymentProcessing";
-
+import RefundCancellation from "./screens/RefundCancellation";
+import TermsOfService from "./screens/TermsOfService";
+import PrivacyPolicy from "./screens/PrivacyPolicy";
 import "./App.css";
 import NotFound from "./screens/NotFound";
 import ProfilePage from "./screens/ProfilePage";
 import MyProfile from "./screens/my-profile";
 import EmailVerificationOTP from "./screens/EmailVerificationOTP";
-
+import CookiePolicy from "./screens/CookiePolicy"; // 👈 ADD THIS IMPORT
 const router = createBrowserRouter([
   {
     index: true,
@@ -71,6 +73,11 @@ const router = createBrowserRouter([
   { path: "/verify-email/:token", element: <EmailVerification /> },
   // { path: "/email-verified", element: <EmailVerifiedSuccess /> },
   { path: "/email-verified-success", element: <EmailVerifiedSuccess /> },
+  { path: "/refund-cancellation", element: <RefundCancellation /> },
+  { path: "/terms-of-service", element: <TermsOfService /> },
+  { path: "/privacy-policy", element: <PrivacyPolicy /> },
+
+  { path: "/cookie-policy", element: <CookiePolicy /> }, // 👈 ADD THIS ROUTE
 
   // ✅ PAYMENT PROCESSING ROUTE (After Dodo redirect)
   {
